@@ -1,0 +1,124 @@
+﻿@model CoPortal.Models.Course
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Announcements</h2>
+
+<div v-show="!loading" v-for="(announcement,i) in Announcements" class="alert alert-info">
+    <div class="row">
+        <div class="col-sm-3">
+            <span class="badge">{{ announcement.lecturer }}</span>
+        </div>
+        <div class="text-right col-sm-push-6 col-sm-3" style="font-size:smaller">
+            <span>{{ announcement.date }}</span>
+        </div>
+    </div>
+    <div class="body-content text-center">
+        <h4>{{ announcement.message }}</h4>
+    </div>
+</div>
+
+<div v-show="loading" class="row">
+    <div class="col-sm-6 col-sm-offset-3 text-center">
+        <div class="loader"></div>
+    </div>
+</div>
+
+<h2>Details</h2>
+
+<div>
+    <h4>Course</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Code)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Code)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StartDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StartDate)
+        </dd>
+
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>File</th>
+                    <th>Upload time</th>
+                </tr>
+                @if (Model.LectureNotes != null)
+                {
+                    foreach (var item in Model.LectureNotes)
+                    {
+                        <tr>
+                            <td><a href="~/App_Data/LectureNotes/@Html.DisplayFor(modelItem => item.PdfLectureNote)">@Html.DisplayFor(modelItem => item.PdfLectureNote)</a></td>
+                            <td>@Html.DisplayFor(modelItem => item.LectureDate)</td>
+                        </tr>
+                    }
+                }
+            </table>
+        </dd>
+    </dl>
+</div>
+
+<p>
+    @if (CoPortal.Login.HttpContextHelper.Session != "STUDENT")
+    {
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id })
+        @Html.ActionLink("Back to List", "Index");
+    }
+    else
+    {
+        @Html.ActionLink("Back", "Index", "Student");
+    }
+</p>
+
+
+@section scripts{
+    <script>
+        new Vue({
+            el: '#vueApp',
+            data: {
+                deletingIndex:-1,
+                loading:false,
+                Announcements: [{ date: new Date().toDateString(), message: "Go home and study" }, { date: new Date().toDateString(), message: "You have a test on friday" }]
+            },
+            mounted() {
+                this.loading = true;
+                axios.get('/announcement/StudentsAnnouncements?courseID=' + @Model.Id).
+                    then(response => {
+                        this.Announcements = response.data;
+                        this.loading = false;
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        this.loading = false;
+                    })
+            }
+        })
+    </script>
+}

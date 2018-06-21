@@ -1,0 +1,176 @@
+﻿@model CoPortal.Models.Course
+
+@{
+    ViewBag.Title = "Course Details";
+}
+
+<h2>Announcements</h2>
+
+<p>
+    <button v-show="showAnnouncements" v-on:click="showAnnouncements = !showAnnouncements" class="btn btn-success text-right">Send new</button>
+</p>
+
+<div v-show="!showAnnouncements">
+    <div class="row">
+        <div class="form-group col-sm-6 col-sm-offset-3">
+            <label for="exampleFormControlTextarea1">Announcement </label>
+            <textarea v-model="txtAnnouncement" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div v-show="!loading" class="col-sm-6 col-sm-offset-3 text-center">
+            <button v-on:click="AddNewAnnouncement()" class="btn btn-success">Send anouncement</button>
+            <button v-on:click="showAnnouncements = !showAnnouncements" class="btn btn-danger">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div v-show="loading" class="row">
+    <div class="col-sm-6 col-sm-offset-3 text-center">
+        <div class="loader"></div>
+    </div>
+</div>
+
+<div v-if="showAnnouncements && !loading" v-for="(announcement,i) in Announcements" class="alert alert-info">
+    <div class="row">
+        <div class="text-right col-sm-push-9 col-sm-3" style="font-size:smaller">
+            <span>{{ announcement.date }}</span>
+        </div>
+    </div>
+    <div class="body-content text-center">
+        <h4>{{ announcement.message }}</h4>
+    </div>
+    <div v-show="deletingIndex != i" class="text-right">
+        <button v-on:click="deletingIndex == i ? deletingIndex = -1 : deletingIndex = i" class="btn btn-danger">Delete</button>
+    </div>
+    <div v-show="deletingIndex == i" class="text-right">
+        <p style="font-size:small">Are you sure?</p>
+        <button v-on:click="DeleteAnnouncement(announcement.id)" class="btn btn-danger">Yes</button>
+        <button v-on:click="deletingIndex = -1" class="btn btn-success">No</button>
+    </div>
+</div>
+
+<h2>Course Details</h2>
+<div>
+    <h4>Lecturer</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Code)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Code)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LectureNotes)
+        </dt>
+        <dd>
+            <p>
+                @Html.ActionLink("Add New", "NewNotes", new { CourseId = Model.Id }, new { @class = "btn btn-default" })
+            </p>
+        </dd>
+        <dd>
+
+            @if (Model.LectureNotes != null)
+            {
+                <table class="table">
+                    <tr>
+                        <th>File</th>
+                        <th>Upload time</th>
+                        <th>Action</th>
+                    </tr>
+                    @foreach (var item in Model.LectureNotes)
+                    {
+                        <tr>
+                            <td><a href="~/App_Data/LectureNotes/@Html.DisplayFor(modelItem => item.PdfLectureNote)">@Html.DisplayFor(modelItem => item.PdfLectureNote)</a></td>
+                            <td>@Html.DisplayFor(modelItem => item.LectureDate)</td>
+                            <td>@Html.ActionLink("Delete", "DeleteLectureNote", new { item.Id })</td>
+                        </tr>
+                    }
+                </table>
+            }
+        </dd>
+    </dl>
+</div>
+
+
+@section scripts{
+    <script>
+        new Vue({
+            el: '#vueApp',
+            data: {
+                deletingIndex: -1,
+                loading: false,
+                txtAnnouncement: '',
+                showAnnouncements: true,
+                Announcements: []
+            },
+            mounted() {
+                this.loading = true;
+                axios.get('/announcement/LecturersAnnouncements?courseID=' + @Model.Id).
+                    then(response => {
+                        this.Announcements = response.data;
+                        this.loading = false;
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        this.loading = false;
+                    })
+            },
+            methods: {
+                AddNewAnnouncement() {
+                    if (this.txtAnnouncement.length > 3) {
+                        this.loading = true;
+                        axios.post('/announcement/add?courseID=' + @Model.Id + '&message=' + this.txtAnnouncement)
+                            .then((response)=> {
+
+                                this.Announcements.unshift({
+                                    date: new Date().toDateString(),
+                                    message: this.txtAnnouncement
+                                });
+
+                                this.txtAnnouncement = '';
+                                this.showAnnouncements = true;
+                                this.loading = false;
+                            })
+                            .catch((error)=> {
+                                console.log(error);
+                                this.loading = false;
+                            });
+
+                    } else {
+                        alert("Announcement text too short.");
+                    }
+                },
+                DeleteAnnouncement(announcementID) {
+                    this.deletingIndex = -1;
+                    axios.post('/announcement/Delete?id=' + announcementID).
+                        then(response => {
+                        })
+                        .catch(err => {
+                            console.log("Unable to delete " + announcementID);
+                        })
+                    this.Announcements = this.Announcements.filter(f => f.id != announcementID);
+                }
+            }
+        })
+    </script>
+}
+
