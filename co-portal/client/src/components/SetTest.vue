@@ -59,7 +59,7 @@
       </div>
     </div>
     <div v-if="currentPage == 1">
-      <TakeTest :questions="questions"/>
+      <TakeTest :questions="questions" />
     </div>
   </div>
 </template>
@@ -68,9 +68,13 @@
 import swal from "sweetalert";
 import TakeTest from "./TakeTest";
 
+const axios = require("axios");
+
 export default {
   name: "SetTest",
-  components: { TakeTest },
+  components: {
+    TakeTest
+  },
   data() {
     return {
       currentPage: 0,
@@ -130,6 +134,18 @@ export default {
         );
         return;
       }
+
+      axios
+        .get(this.$store.state.settings.baseLink + "/s/students/all/names")
+        .then(results => {
+          this.users = [];
+          alert(results);
+          console.log(results);
+        })
+        .catch(err => {
+          alert(err);
+          console.log(err);
+        });
 
       this.questions.push({
         id:
