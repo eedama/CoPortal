@@ -16,11 +16,8 @@ import Rent from "../models/Rent";
         Login student
 */
 
-router.get("/rents/all", function (req, res) {
-  Rent.find().then(rents => {
-    if (rents == null) res.send("Error : 90ty32rtu834g9erbo");
-    res.json(rents);
-  });
+router.post("/add/questionaire", function (req, res) {
+  res.json(req.body);
 });
 
 router.get("/students/all", function (req, res) {
