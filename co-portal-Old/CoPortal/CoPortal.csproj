@@ -218,6 +218,8 @@
     <Content Include="Content\img\co-portalIcon.png" />
     <Content Include="Content\img\coPortalIcon.jpg" />
     <Content Include="Content\img\coPortalLogo.jpg" />
+    <Content Include="Content\img\slide\slide-01.jpeg" />
+    <Content Include="Content\img\slide\slide-02.jpeg" />
     <Content Include="css\animate.css" />
     <Content Include="css\bootstrap.min.css" />
     <Content Include="css\color.css" />
