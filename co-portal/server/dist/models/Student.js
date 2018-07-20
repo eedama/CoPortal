@@ -9,8 +9,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var Schema = _mongoose2.default.Schema;
 
 var StudentSchema = new _mongoose2.default.Schema({
-    _id: { type: Schema.Types.ObjectId, default: _mongoose2.default.Types.ObjectId() },
-    addedBy: { type: Schema.Types.ObjectId, ref: 'Admin' },
+    _id: {
+        type: Schema.Types.ObjectId,
+        default: _mongoose2.default.Types.ObjectId()
+    },
+    addedBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'Admin'
+    },
     idNumber: Number,
     username: String,
     firstName: String,
@@ -21,7 +27,10 @@ var StudentSchema = new _mongoose2.default.Schema({
     profilePic: String,
     password: String,
     contactNumbers: Number,
-    active: { type: Boolean, default: true },
+    active: {
+        type: Boolean,
+        default: true
+    },
     nextOfKin: {
         name: String,
         surname: String,
@@ -36,17 +45,37 @@ var StudentSchema = new _mongoose2.default.Schema({
         rentAmount: Number,
         depositAmount: Number
     }, // ForeignKey
-    lastUpdatedAt: { type: Date, default: Date.now() },
-    lastActivityDate: { type: Date, default: Date.now() },
-    date: { type: Date, default: Date.now() },
-    removed: { type: Boolean, default: false },
+    lastUpdatedAt: {
+        type: Date,
+        default: Date.now()
+    },
+    lastActivityDate: {
+        type: Date,
+        default: Date.now()
+    },
+    date: {
+        type: Date,
+        default: Date.now()
+    },
+    removed: {
+        type: Boolean,
+        default: false
+    },
     // Relationships
-    notifications: [{ type: Schema.Types.ObjectId, ref: 'Notification' }],
-    rents: [{ type: Schema.Types.ObjectId, ref: 'Rent' }]
+    notifications: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Notification'
+    }],
+    rents: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Rent'
+    }]
 });
 
 StudentSchema.methods.findSimilarTypes = function (cb) {
-    return this.model('Animal').find({ type: this.type }, cb);
+    return this.model('Animal').find({
+        type: this.type
+    }, cb);
 };
 
 var Student = _mongoose2.default.model('Student', StudentSchema);
