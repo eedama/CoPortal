@@ -54,6 +54,46 @@
       </div>
     </div>
     <div v-if="!addingQuestion && questions.length > 0 && currentPage == 0" class="row">
+      <!--
+      <div class="col s12 m8 offset-m2 card-panel row p-10">
+        <div class="col s12 row">
+          <div class="switch">
+            <label>
+                <input v-model="hasExpiryDatetime" type="checkbox">
+                <span class="lever"></span>
+                {{ hasExpiryDatetime ?  'Has expiry date/time' : 'No expiry date/time' }} 
+              </label>
+          </div>
+        </div>
+        <div v-show="hasExpiryDatetime" class="col s12 l6 input-field">
+          <input v-model="questionaire.expiryDate" id="ExpiryDate" type="date" class="datepicker">
+          <label for="ExpiryDate">Expiry date</label>
+        </div>
+        <div v-show="hasExpiryDatetime" class="col s12 m6 input-field">
+          <input v-model="questionaire.expiryTime" id="ExpiryTime" type="time" class="validate">
+          <label for="ExpiryTime">Expiry time</label>
+        </div>
+      </div>
+      -->
+      <div class="col s12 m8 offset-m2 card-panel row p-10">
+        <div class="col s12 row">
+          <div class="switch">
+            <label>
+                <input v-model="hasTimeLimit" type="checkbox">
+                <span class="lever"></span>
+                {{ hasTimeLimit ? 'Has time limit' : 'No time limit' }}
+              </label>
+          </div>
+        </div>
+        <label v-show="hasTimeLimit" class="col s12">Time limit</label>
+        <div v-show="hasTimeLimit" class="col s4 m2" style="padding:5px" v-for="limit in timeLimits" :key="limit">
+          <div class="chip waves pointer" v-on:click="questionaire.timeLimit = limit" :class="{'selectedTag':questionaire.timeLimit == limit}">
+            {{ limit }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="!addingQuestion && questions.length > 0 && currentPage == 0" class="row">
       <div class="col s12 m8 offset-m2 right-align">
         <button class="btn green" v-on:click="SubmitQuestionaire()"><i class="material-icons">done</i></button>
       </div>
@@ -77,11 +117,16 @@ export default {
   },
   data() {
     return {
+      hasTimeLimit: false,
+      hasExpiryDatetime: false,
       currentPage: 0,
       title: "",
       questionaire: {
         title: "",
-        answers: []
+        answers: [],
+        expiryDate: null,
+        expiryTime: null,
+        timeLimit: null
       },
       addingQuestion: false,
       answers: [
@@ -90,8 +135,21 @@ export default {
         }
       ],
       questions: [],
+      timeLimits: [
+        "10 minutes",
+        "30 minutes",
+        "45 minutes",
+        "1 hour",
+        "1.5 hours",
+        "2 hours"
+      ],
       msg: "Welcome to Your Vue.js App"
     };
+  },
+  mounted() {
+    var elems = document.querySelectorAll(".datepicker");
+    var instances = this.$materialize.Datepicker.init(elems);
+    alert(this.$materialize.AutoInit());
   },
   methods: {
     AddQuestion() {
@@ -135,27 +193,22 @@ export default {
         return;
       }
 
-      axios
-        .get(this.$store.state.settings.baseLink + "/s/students/all/names")
-        .then(results => {
-          this.users = [];
-          alert(results);
-          console.log(results);
-        })
-        .catch(err => {
-          alert(err);
-          console.log(err);
-        });
-
       this.questions.push({
         id:
           this.questionaire.title +
           "-" +
-          (Math.random() + 100) +
+          Date.now +
           "-" +
           this.questions.length,
         title: this.questionaire.title,
-        answers: this.questionaire.answers
+        answers: this.questionaire.answers,
+        expiryDate: this.hasExpiryDatetime
+          ? this.questionaire.expiryDate
+          : null,
+        expiryTime: this.hasExpiryDatetime
+          ? this.questionaire.expiryTime
+          : null,
+        timeLimit: this.hasTimeLimit ? this.questionaire.timeLimit : null
       });
 
       this.questionaire.title = "";
@@ -171,7 +224,32 @@ export default {
         );
         return;
       }
-      this.currentPage = 1;
+
+      if (
+        this.hasTimeLimit &&
+        (this.questionaire.timeLimit == null ||
+          this.questionaire.timeLimit.length < 2)
+      ) {
+        swal(
+          "Invalid time limit",
+          "Please provide a valid time limit",
+          "error"
+        );
+        return;
+      }
+
+      axios
+        .post(this.$store.state.settings.baseLink + "/l/add/questionaire", {
+          ...this.questions
+        })
+        .then(results => {
+          console.log(results.data);
+
+          this.currentPage = 1;
+        })
+        .catch(err => {
+          swal("Unable to submit questionaire", err.message, "error");
+        });
     }
   }
 };
@@ -179,6 +257,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.p-10 {
+  padding: 10px;
+}
+
 h1,
 h2 {
   font-weight: normal;
@@ -196,5 +278,13 @@ li {
 
 a {
   color: #42b983;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.selectedTag {
+  background-color: #42b983 !important;
 }
 </style>
