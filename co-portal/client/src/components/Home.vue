@@ -32,8 +32,8 @@ export default {
           link: "/test/set"
         },
         {
-          text: "Take test",
-          link: "/test/take"
+          text: "Test list",
+          link: "/test/list"
         }
       ]
     };

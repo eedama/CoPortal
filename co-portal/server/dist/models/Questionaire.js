@@ -13,16 +13,15 @@ var QuestionaireSchema = new _mongoose2.default.Schema({
         type: Schema.Types.ObjectId,
         default: _mongoose2.default.Types.ObjectId()
     },
-    studentID: {
+    lecturerID: {
         type: Schema.Types.ObjectId,
-        ref: 'Student'
+        ref: 'Lecturer'
     }, // ForeignKey
-    datePaid: Date,
-    monthOfPayment: String,
-    amount: Number,
-    isDeposit: {
-        type: Boolean,
-        default: false
+    title: String,
+    questions: Array,
+    timeLimit: {
+        type: String,
+        default: Date.now
     },
     date: {
         type: Date,

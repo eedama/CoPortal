@@ -98,8 +98,8 @@
         <button class="btn green" v-on:click="SubmitQuestionaire()"><i class="material-icons">done</i></button>
       </div>
     </div>
-    <div v-if="currentPage == 1">
-      <TakeTest :questions="questions" />
+    <div v-if="currentPage == 1 && dbQuestionaire != null">
+      <TakeTest :dbQuestionaire="dbQuestionaire" :isMemo="true" />
     </div>
   </div>
 </template>
@@ -134,6 +134,7 @@ export default {
           value: "Jacob Zuma"
         }
       ],
+      dbQuestionaire: null,
       questions: [],
       timeLimits: [
         "10 minutes",
@@ -197,7 +198,7 @@ export default {
         id:
           this.questionaire.title +
           "-" +
-          Date.now +
+          Date.now() +
           "-" +
           this.questions.length,
         title: this.questionaire.title,
@@ -240,11 +241,13 @@ export default {
 
       axios
         .post(this.$store.state.settings.baseLink + "/l/add/questionaire", {
-          ...this.questions
+          title: this.title,
+          questions: this.questions,
+          timeLimit: this.questionaire.timeLimit
         })
         .then(results => {
           console.log(results.data);
-
+          this.dbQuestionaire = results.data;
           this.currentPage = 1;
         })
         .catch(err => {
