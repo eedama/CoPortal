@@ -5,10 +5,6 @@
 </template>
 
 <script>
-import "materialize-css/dist/css/materialize.min.css";
-var materialize = require("materialize-css/dist/js/materialize.min.js");
-import "vue-animate/dist/vue-animate.min.css";
-
 export default {
   name: "App"
 };

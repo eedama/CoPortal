@@ -6,8 +6,14 @@ import router from './router'
 import store from "./store";
 import VueTyperPlugin from 'vue-typer'
 
+import "materialize-css/dist/css/materialize.min.css";
+var materialize = require("materialize-css/dist/js/materialize.min.js");
+import "vue-animate/dist/vue-animate.min.css";
+
 Vue.config.productionTip = false
 Vue.use(VueTyperPlugin)
+
+Vue.prototype.$materialize = materialize;
 
 /* eslint-disable no-new */
 new Vue({
@@ -16,6 +22,9 @@ new Vue({
   store,
   components: {
     App
+  },
+  mounted() {
+    materialize.AutoInit();
   },
   template: '<App/>'
 })
