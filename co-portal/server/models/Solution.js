@@ -39,17 +39,13 @@ SolutionSchema.pre("save", function (next) {
                 isMemo: true
             })
             .then(s => {
-                console.log("Inside this thing");
                 if (s == null) throw "Test does not have a memorandum";
 
-                console.log(s);
-
                 this.answers.forEach((answer, i) => {
-                    let solution = s.answers.find(v => v.question == answer.question);
-                    if (solution != null) {
-                        if (answer.solution == solution.solution) {
-                            mark++;
-                        }
+                    let solution = s.answers.find(v => v.question.id == answer.question.id);
+                    if (solution == null) throw "Test does not have a memorandum";
+                    if (answer.answer == solution.answer) {
+                        mark++;
                     }
                 });
                 this.mark = mark;
