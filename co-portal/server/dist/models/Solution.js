@@ -47,19 +47,15 @@ SolutionSchema.pre("save", function (next) {
             questionaireId: this.questionaireId,
             isMemo: true
         }).then(function (s) {
-            console.log("Inside this thing");
             if (s == null) throw "Test does not have a memorandum";
-
-            console.log(s);
 
             _this.answers.forEach(function (answer, i) {
                 var solution = s.answers.find(function (v) {
-                    return v.question == answer.question;
+                    return v.question.id == answer.question.id;
                 });
-                if (solution != null) {
-                    if (answer.solution == solution.solution) {
-                        mark++;
-                    }
+                if (solution == null) throw "Test does not have a memorandum";
+                if (answer.answer == solution.answer) {
+                    mark++;
                 }
             });
             _this.mark = mark;

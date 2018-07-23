@@ -114,8 +114,10 @@ export default {
               swal("Submitted!", {
                 icon: "success"
               });
-              console.log(results.data);
-              this.currentPage = 1;
+              this.$router.push({
+                name: "TestMarks",
+                params: { solutionId: results.data._id }
+              });
             })
             .catch(err => {
               swal("Unable to submit", err.message, "error");

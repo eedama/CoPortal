@@ -60,6 +60,19 @@ router.get("/all/questionaire", function (req, res) {
 
 });
 
+router.get("/get/solutions/:solutionId", function (req, res) {
+  var solutionId = req.params.solutionId;
+  Solution.findById(solutionId).then(solution => {
+    if (solution == null) res.send("Can not find that solution");
+    console.log(solution);
+    console.log(solutionId + " id");
+    res.json(solution);
+  }).catch(err => {
+    res.statusCode = 404;
+    res.send(err);
+  });
+});
+
 function shuffle(array) {
   var m = array.length,
     t, i;

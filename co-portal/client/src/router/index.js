@@ -4,6 +4,7 @@ import Home from '@/components/Home'
 import TestList from '@/components/TestList'
 import SetTest from '@/components/SetTest'
 import TakeTest from '@/components/TakeTest'
+import TestMarks from '@/components/TestMarks'
 
 Vue.use(Router)
 
@@ -21,6 +22,11 @@ export default new Router({
     name: 'TakeTest',
     props: true,
     component: TakeTest
+  }, {
+    path: '/test/marks',
+    name: 'TestMarks',
+    props: true,
+    component: TestMarks
   }, {
     path: '/test/set',
     name: 'SetTest',
