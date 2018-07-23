@@ -5,9 +5,6 @@
         <input v-model="title" id="title" type="text" class="validate">
         <label for="title">Title</label>
       </div>
-      <div v-if="!addingQuestion && currentPage == 0" class="col s12 center-align">
-        <button class="btn green" v-on:click="AddQuestion()">Add Question</button>
-      </div>
       <div v-if="currentPage == 1" class="col s12 center-align">
         <h3>Memorandum creation</h3>
       </div>
@@ -26,6 +23,11 @@
           </div>
         </div>
   
+      </div>
+    </div>
+    <div class="row">
+      <div v-if="!addingQuestion && currentPage == 0" class="col s12 center-align">
+        <button class="btn green" v-on:click="AddQuestion()">Add Question</button>
       </div>
     </div>
     <div v-if="addingQuestion && currentPage == 0" class="row">

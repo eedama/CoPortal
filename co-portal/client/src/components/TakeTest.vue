@@ -10,11 +10,14 @@
             <form>
               <h6 class="pointer" v-for="(answer,j) in question.answers" :key="j">
                 <label>
-                  <input v-model="solutions[i]" :value="answer" :id="answer + '-' + j" class="with-gap" :name="question.id" type="radio"/>
-                  <span :for="answer + '-' + j">{{ answer }}</span>
-                </label>
+                    <input v-model="solutions[i]" :value="answer" :id="answer + '-' + j" class="with-gap" :name="question.id" type="radio"/>
+                    <span :for="answer + '-' + j">{{ answer }}</span>
+                  </label>
               </h6>
             </form>
+          </div>
+          <div class="col m8 offset-m2 s12">
+            <p class="center-align red-text" v-show="txtError.length > 2">{{ txtError }}</p>
           </div>
         </div>
       </div>
@@ -24,8 +27,8 @@
         </div>
   
         <div class="col s9 right-align">
-          <button class="btn red" v-if="currentPage > 0 " v-on:click="currentPage--">Previous</button>
-          <button class="btn" v-if="(currentPage+ 1) < Questionaire.questions.length" v-on:click="currentPage++">Next</button>
+          <button class="btn red" v-if="currentPage > 0" v-on:click="changePage(false)">Previous</button>
+          <button class="btn" v-if="(currentPage+ 1) < Questionaire.questions.length" v-on:click="changePage(true)">Next</button>
           <button class="btn green" v-if="(currentPage+1) == Questionaire.questions.length" v-on:click="SubmitQuiz()">Done</button>
         </div>
       </div>
@@ -43,45 +46,44 @@ export default {
     return {
       currentPage: 0,
       solutions: [],
-      questions2: {
-        _id: "qwefwefwef23fewcdcev32ew",
-        timeLimit: null,
-        questions: [
-          {
-            id: "gsabfhjewbhjes",
-            title: "How old is Nelson mandela",
-            answers: [54, 20, 43, 12]
-          },
-          {
-            id: "gsabfhjewbhjes",
-            title: "How old is R-Kelly",
-            answers: [44, 21, 31, 62]
-          },
-          {
-            id: "gsabfhjewbhjes",
-            title: "How old is Billy Gates",
-            answers: [46, 12, 31, 20]
-          },
-          {
-            id: "gsabfhjewbhjes",
-            title: "How old is Donald Trump",
-            answers: [64, 21, 31, 62]
-          }
-        ]
-      },
-      Questionaire: null
+      Questionaire: null,
+      txtError: ""
     };
   },
   mounted() {
+    if (
+      this.dbQuestionaire == null ||
+      this.dbQuestionaire.questions == null ||
+      this.dbQuestionaire.questions.length <= 0
+    ) {
+      this.$router.push("/");
+      return;
+    }
+    this.solutions = [];
+    this.dbQuestionaire.questions.map(q => {
+      this.solutions.push(null);
+    });
+
     this.Questionaire = this.dbQuestionaire;
-
-    console.log(this.Questionaire);
-
-    if (this.Questionaire == null) this.Questionaire = this.questions2;
   },
   props: ["dbQuestionaire", "isMemo"],
   methods: {
+    changePage(isForward) {
+      this.txtError = "";
+      isForward ? this.currentPage++ : this.currentPage--;
+    },
     SubmitQuiz() {
+      this.txtError = "";
+      var hasError = false;
+      this.solutions.map((s, i) => {
+        if (s == null) {
+          hasError = true;
+          this.txtError = "Please provide an answer to this question";
+          this.currentPage = i;
+        }
+      });
+      if (hasError) return;
+
       swal({
         title: "Submit?",
         text: "Are you sure you want to submit?",
