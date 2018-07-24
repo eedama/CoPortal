@@ -152,7 +152,6 @@ export default {
   mounted() {
     var elems = document.querySelectorAll(".datepicker");
     var instances = this.$materialize.Datepicker.init(elems);
-    alert(this.$materialize.AutoInit());
   },
   methods: {
     AddQuestion() {
