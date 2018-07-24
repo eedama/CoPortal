@@ -4,13 +4,18 @@
       <div class="col s12 m8 offset-m2">
         <h5>Your score is <a :class="{'red-text':(Solution.mark*2 < Solution.answers.length)}">{{ Solution.mark }}/{{ Solution.answers.length }}</a></h5>
       </div>
+      <div class="col s12 right-align">
+        <a class="btn-floating black waves" title="Download" v-on:click="DownloadMarks"><i class="material-icons">save</i></a>
+        <a class="btn-floating black waves" title="Share"><i class="material-icons">share</i></a>
+        <a class="btn-floating black waves" title="Feed back"><i class="material-icons">chat</i></a>
+      </div>
       <div class="col s12 m8 offset-m2">
         <span class="blue-text">Scroll down to see view your test.</span>
       </div>
     </div>
-    <div class="col s12 m8 offset-m2">
+    <div class="col s10 offset-s1">
       <div v-for="(solution,i) in Solution.answers" :key="i" class="row">
-        <div class="col m8 offset-m2 row card-panel">
+        <div class="col m8 offset-m2 row card-panel hoverable">
           <div class="col s12">
             <h5 class="center-align">{{ solution.question.title }}</h5>
           </div>
@@ -18,7 +23,7 @@
             <form>
               <h6 class="pointer" v-for="(answer,j) in solution.question.answers" :key="j">
                 <label>
-                    <input disabled="true" :checked="solution.answer == answer" :id="answer + '-' + j" class="with-gap" :name="solution._id" type="radio"/>
+                    <input :disabled="solution.answer != answer" :checked="solution.answer == answer" :id="answer + '-' + j" class="with-gap" :name="solution._id" type="radio"/>
                     <span :for="answer + '-' + j">{{ answer }}</span>
                   </label>
               </h6>
@@ -74,7 +79,11 @@ export default {
       });
   },
   props: ["solutionId"],
-  methods: {}
+  methods: {
+    DownloadMarks(){
+     window.print();
+    }
+  }
 };
 </script>
 
