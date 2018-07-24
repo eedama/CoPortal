@@ -5,15 +5,37 @@
         <h5>Your score is <a :class="{'red-text':(Solution.mark*2 < Solution.answers.length)}">{{ Solution.mark }}/{{ Solution.answers.length }}</a></h5>
       </div>
       <div class="col s12 right-align">
-        <a class="btn-floating black waves" title="Download" v-on:click="DownloadMarks"><i class="material-icons">save</i></a>
-        <a class="btn-floating black waves" title="Share"><i class="material-icons">share</i></a>
-        <a class="btn-floating black waves" title="Feed back"><i class="material-icons">chat</i></a>
+        <a class="btn-floating black waves-effect" title="Download" v-on:click="DownloadMarks"><i class="material-icons">save</i></a>
+        <a class="btn-floating black waves-effect" title="Share"><i class="material-icons">share</i></a>
+        <a class="btn-floating black waves-effect" :class="{'transparent':addingFeedBack}" v-on:click="addingFeedBack = !addingFeedBack" title="Feed back"><i :class="{'black-text':addingFeedBack}" class="material-icons">chat</i></a>
       </div>
       <div class="col s12 m8 offset-m2">
-        <span class="blue-text">Scroll down to see view your test.</span>
+        <span class="blue-text">Scroll down to see {{ addingFeedBack ?'add your feedback' : 'view your test'}}.</span>
       </div>
     </div>
-    <div class="col s10 offset-s1">
+    <div v-show="addingFeedBack" class="col s12 row">
+      <div class="col s12 right-align">
+     <a class="btn-floating transparent waves-effect right-align" v-on:click="addingFeedBack = !addingFeedBack"><i class="material-icons red-text">close</i></a>
+     </div>
+     <div class="row">
+       <div class="col s10" :class="{'right-align':feedback.from == 'Joe'}" v-for="(feedback,i) in feedbacks" :key="i">
+         <span class="chip">{{ feedback.message }}</span>
+        </div>
+     </div>
+     <form class="col s12 center-align">
+      <div class="row">
+        <div class="input-field col s10 offset-s1 m6 offset-m3">
+          <i class="material-icons prefix">chat</i>
+          <textarea id="icon_prefix2" class="materialize-textarea"></textarea>
+          <label for="icon_prefix2">Feedback</label>
+        </div>
+      <div class="col s8 offset-s2 center-align">
+          <a class="btn green waves-effect-effect">Submit feedback</a>
+        </div>
+      </div>
+    </form>
+    </div>
+    <div v-show="!addingFeedBack" class="col s10 offset-s1">
       <div v-for="(solution,i) in Solution.answers" :key="i" class="row">
         <div class="col m8 offset-m2 row card-panel hoverable">
           <div class="col s12">
@@ -49,7 +71,21 @@ export default {
   data() {
     return {
       currentPage: 0,
-      Solution: []
+      Solution: [],
+      feedbacks:[{
+        from:'Joe',
+        message:"This app does not work.",
+        Time:Date.now()
+      },{
+        from:'Mpho',
+        message:"It does work",
+        Time:Date.now()
+      },{
+        from:'Joe',
+        message:"Why do you say so?",
+        Time:Date.now()
+      }],
+      addingFeedBack:false
     };
   },
   mounted() {
