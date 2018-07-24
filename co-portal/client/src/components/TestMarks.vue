@@ -6,34 +6,37 @@
       </div>
       <div class="col s12 right-align">
         <a class="btn-floating black waves-effect" title="Download" v-on:click="DownloadMarks"><i class="material-icons">save</i></a>
-        <a class="btn-floating black waves-effect" title="Share"><i class="material-icons">share</i></a>
+        <a class="btn-floating black waves-effect" title="Memorandum" v-on:click="ViewMemorandum"><i class="material-icons">description</i></a>
         <a class="btn-floating black waves-effect" :class="{'transparent':addingFeedBack}" v-on:click="addingFeedBack = !addingFeedBack" title="Feed back"><i :class="{'black-text':addingFeedBack}" class="material-icons">chat</i></a>
       </div>
       <div class="col s12 m8 offset-m2">
         <span class="blue-text">Scroll down to see {{ addingFeedBack ?'add your feedback' : 'view your test'}}.</span>
       </div>
     </div>
-    <div v-show="addingFeedBack" class="col s12 row">
+    <div v-show="addingFeedBack" class="col s12 row card-panel">
       <div class="col s12 right-align">
-     <a class="btn-floating transparent waves-effect right-align" v-on:click="addingFeedBack = !addingFeedBack"><i class="material-icons red-text">close</i></a>
-     </div>
-     <div class="row">
-       <div class="col s10" :class="{'right-align':feedback.from == 'Joe'}" v-for="(feedback,i) in feedbacks" :key="i">
-         <span class="chip">{{ feedback.message }}</span>
-        </div>
-     </div>
-     <form class="col s12 center-align">
+        <a class="btn-floating transparent waves-effect right-align" v-on:click="addingFeedBack = !addingFeedBack"><i class="material-icons red-text">close</i></a>
+      </div>
       <div class="row">
-        <div class="input-field col s10 offset-s1 m6 offset-m3">
-          <i class="material-icons prefix">chat</i>
-          <textarea id="icon_prefix2" class="materialize-textarea"></textarea>
-          <label for="icon_prefix2">Feedback</label>
-        </div>
-      <div class="col s8 offset-s2 center-align">
-          <a class="btn green waves-effect-effect">Submit feedback</a>
+        <div class="col s10 offset-s1 chat" :class="{'right-align':feedback.from == 'Joe'}" v-for="(feedback,i) in feedbacks" :key="i">
+          <span class="chip message" :class="{'notSent':feedback.status != 'sent'}">
+             <span class="from">{{ feedback.from }}</span> : {{ feedback.message }}
+          </span>
+          <p class="time">{{ feedback.status != 'sent' ? feedback.status : getMoment(feedback.date).fromNow() }}</p>
         </div>
       </div>
-    </form>
+      <form class="col s12 center-align">
+        <div class="row">
+          <div class="input-field col s10 offset-s1 m6 offset-m3">
+            <i class="material-icons prefix">chat</i>
+            <textarea v-model="txtFeedback" id="icon_prefix2" class="materialize-textarea"></textarea>
+            <label for="icon_prefix2">Comment</label>
+          </div>
+          <div class="col s8 offset-s2 center-align">
+            <a v-on:click="SubmitFeedback" class="btn green waves-effect-effect">Comment</a>
+          </div>
+        </div>
+      </form>
     </div>
     <div v-show="!addingFeedBack" class="col s10 offset-s1">
       <div v-for="(solution,i) in Solution.answers" :key="i" class="row">
@@ -45,9 +48,9 @@
             <form>
               <h6 class="pointer" v-for="(answer,j) in solution.question.answers" :key="j">
                 <label>
-                    <input :disabled="solution.answer != answer" :checked="solution.answer == answer" :id="answer + '-' + j" class="with-gap" :name="solution._id" type="radio"/>
-                    <span :for="answer + '-' + j">{{ answer }}</span>
-                  </label>
+                      <input :disabled="solution.answer != answer" :checked="solution.answer == answer" :id="answer + '-' + j" class="with-gap" :name="solution._id" type="radio"/>
+                      <span :for="answer + '-' + j">{{ answer }}</span>
+                    </label>
               </h6>
             </form>
           </div>
@@ -64,28 +67,38 @@
 
 <script>
 import swal from "sweetalert";
+import * as moment from "moment";
 const axios = require("axios");
 
 export default {
   name: "TestMarks",
   data() {
     return {
+      txtFeedback: "",
       currentPage: 0,
       Solution: [],
-      feedbacks:[{
-        from:'Joe',
-        message:"This app does not work.",
-        Time:Date.now()
-      },{
-        from:'Mpho',
-        message:"It does work",
-        Time:Date.now()
-      },{
-        from:'Joe',
-        message:"Why do you say so?",
-        Time:Date.now()
-      }],
-      addingFeedBack:false
+      feedbacks: [
+        {
+          from: "Joe",
+          message: "This app does not work.",
+          date: Date.now(),
+          status: "sent"
+        },
+        {
+          from: "Mpho",
+          message:
+            "It does chdbvbjdjbhsdj hdbs jhdbhj bdshjsd bbhj bfusdbfuywe fyue fyekwubyewhkfsdb kfyubewk ufybehb",
+          date: Date.now(),
+          status: "sent"
+        },
+        {
+          from: "Joe",
+          message: "Why do you say so?",
+          date: Date.now(),
+          status: "sent"
+        }
+      ],
+      addingFeedBack: false
     };
   },
   mounted() {
@@ -93,7 +106,7 @@ export default {
       this.$router.push("/");
       return;
     }
-
+    alert(this.getMoment().format("dd"));
     axios
       .get(
         this.$store.state.settings.baseLink +
@@ -106,6 +119,12 @@ export default {
           return;
         }
         this.Solution = results.data;
+        if (
+          this.Solution == null ||
+          this.Solution.answers == null ||
+          this.Solution.answers.length < 1
+        )
+          throw new Error("Unable to retreive the solution , try again later");
         console.log(this.Solution);
       })
       .catch(err => {
@@ -116,8 +135,34 @@ export default {
   },
   props: ["solutionId"],
   methods: {
-    DownloadMarks(){
-     window.print();
+    getMoment(value) {
+      return moment(value);
+    },
+    getMoment() {
+      return moment();
+    },
+    DownloadMarks() {
+      window.print();
+    },
+    ViewMemorandum() {
+      swal(
+        "Memorandum not yet avaliable",
+        "Not all students have wrote the test",
+        "error"
+      );
+    },
+    SubmitFeedback() {
+      if (this.txtFeedback.length < 1) {
+        return;
+      }
+      this.feedbacks.push({
+        from: "Joe",
+        message: this.txtFeedback,
+        date: Date.now(),
+        status: "sending...."
+      });
+      this.txtFeedback = "";
+      alert("Submiting test");
     }
   }
 };
@@ -125,4 +170,27 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.chip {
+  height: inherit;
+}
+
+.chat {
+  padding-top: 10px;
+}
+
+.chat .from {
+  cursor: pointer;
+  color: grey;
+  margin-bottom: 0%;
+  font-size: smaller;
+}
+
+.chat .time {
+  margin-top: 0%;
+  font-size: smaller;
+}
+
+.chat .notSent {
+  border: 1px solid red;
+}
 </style>
