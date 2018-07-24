@@ -56,6 +56,9 @@ router.get("/all/questionaire", function (req, res) {
       });
     });
     res.json(questionaires);
+  }).catch(err => {
+    res.statusCode = 400;
+    res.send(err);
   });
 
 });
