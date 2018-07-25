@@ -10,10 +10,20 @@ import "materialize-css/dist/css/materialize.min.css";
 var materialize = require("materialize-css/dist/js/materialize.min.js");
 import "vue-animate/dist/vue-animate.min.css";
 
+import {
+  Picker,
+  Emoji
+} from "emoji-mart-vue";
+import 'emoji-mart-vue/css/emoji-mart.css'
+
+Vue.component("picker", Picker);
+Vue.component("emoji", Emoji);
+
 Vue.config.productionTip = false
 Vue.use(VueTyperPlugin)
 
 Vue.prototype.$materialize = materialize;
+Vue.prototype.$emoji = Emoji;
 
 /* eslint-disable no-new */
 new Vue({

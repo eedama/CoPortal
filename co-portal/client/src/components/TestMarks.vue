@@ -155,14 +155,41 @@ export default {
       if (this.txtFeedback.length < 1) {
         return;
       }
-      this.feedbacks.push({
+      var feedback = {
         from: "Joe",
         message: this.txtFeedback,
         date: Date.now(),
         status: "sending...."
-      });
+      };
+
+      this.feedbacks.push(feedback);
       this.txtFeedback = "";
-      alert("Submiting test");
+
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/l/feedback/submit/" +
+            this.Solution.questionaireId,
+          {
+            from: feedback.from,
+            message: feedback.message,
+            date: feedback.date,
+            existingId: this.feedbacks.map(m => m._id)
+          }
+        )
+        .then(results => {
+          results.data.forEach(element => {
+            this.feedbacks.push(element);
+          });
+        })
+        .catch(err => {
+          this.feedbacks.map(o => {
+            if (o.status != "sent") {
+              o.status = "not sent";
+            }
+          });
+          swal("Unable to submit questionaire", err.message, "error");
+        });
     }
   }
 };

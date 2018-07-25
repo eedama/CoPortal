@@ -10,6 +10,11 @@
         </h4>
       </div>
     </div>
+    <div class="row input-emoji">
+      <div class="col s12">
+        <TextAreaEmoji />
+      </div>
+    </div>
     <div class="row">
       <div v-for="(option,i) in options" :key="i" v-on:click="$router.push(option.link)" class="col m4 offset-m1 s6 pointer">
         <div class="card-panel hoverable">
@@ -25,6 +30,8 @@ export default {
   name: "Home",
   data() {
     return {
+      showEmoji: false,
+      txtSearch: "",
       titleText: ["Welcome to Co-Portal.", "Please take a test"],
       options: [
         {
@@ -37,12 +44,33 @@ export default {
         }
       ]
     };
+  },
+  methods: {
+    addEmoji(emoji) {
+      alert(this.$emoji);
+      this.txtSearch += emoji.native;
+      this.showEmoji = !this.showEmoji;
+    },
+    OpenEmojis(emoji) {
+      this.showEmoji = !this.showEmoji;
+    }
   }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.input-emoji .input {
+  margin-left: 20px;
+}
+
+.input-emoji .emoji {
+  position: absolute;
+  margin-left: -7%;
+  margin-top: 0%;
+  cursor: pointer;
+}
+
 .home {
   text-align: center;
 }
