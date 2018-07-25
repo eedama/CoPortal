@@ -7,7 +7,7 @@
       <div class="col s12 right-align">
         <a class="btn-floating black waves-effect" title="Download" v-on:click="DownloadMarks"><i class="material-icons">save</i></a>
         <a class="btn-floating black waves-effect" title="Memorandum" v-on:click="ViewMemorandum"><i class="material-icons">description</i></a>
-        <a class="btn-floating black waves-effect" :class="{'transparent':addingFeedBack}" v-on:click="addingFeedBack = !addingFeedBack" title="Feed back"><i :class="{'black-text':addingFeedBack}" class="material-icons">chat</i></a>
+        <a class="btn-floating black waves-effect" :class="{'transparent':addingFeedBack}" v-on:click="openCloseFeedbacks" title="Feed back"><i :class="{'black-text':addingFeedBack}" class="material-icons">chat</i></a>
       </div>
       <div class="col s12 m8 offset-m2">
         <span class="blue-text">Scroll down to see {{ addingFeedBack ?'add your feedback' : 'view your test'}}.</span>
@@ -20,10 +20,13 @@
       <div class="row">
         <div class="col s10 offset-s1 chat" :class="{'right-align':feedback.from == 'Joe'}" v-for="(feedback,i) in feedbacks" :key="i">
           <span class="chip message" :class="{'notSent':feedback.status != 'sent'}">
-             <span class="from">{{ feedback.from }}</span> : {{ feedback.message }}
+               <span class="from">{{ feedback.from }}</span> : {{ feedback.message }}
           </span>
           <p class="time">{{ feedback.status != 'sent' ? feedback.status : getMoment(feedback.date).fromNow() }}</p>
         </div>
+      </div>
+      <div class="col s12 right-align">
+        <a class="btn-floating transparent waves-effect right-align" v-on:click="refreshFeedbacks"><i class="material-icons black-text">refresh</i></a>
       </div>
       <form class="col s12 center-align">
         <div class="row">
@@ -48,9 +51,9 @@
             <form>
               <h6 class="pointer" v-for="(answer,j) in solution.question.answers" :key="j">
                 <label>
-                      <input :disabled="solution.answer != answer" :checked="solution.answer == answer" :id="answer + '-' + j" class="with-gap" :name="solution._id" type="radio"/>
-                      <span :for="answer + '-' + j">{{ answer }}</span>
-                    </label>
+                        <input :disabled="solution.answer != answer" :checked="solution.answer == answer" :id="answer + '-' + j" class="with-gap" :name="solution._id" type="radio"/>
+                        <span :for="answer + '-' + j">{{ answer }}</span>
+                      </label>
               </h6>
             </form>
           </div>
@@ -81,20 +84,20 @@ export default {
         {
           from: "Joe",
           message: "This app does not work.",
-          date: Date.now(),
+          date: new Date(),
           status: "sent"
         },
         {
           from: "Mpho",
           message:
             "It does chdbvbjdjbhsdj hdbs jhdbhj bdshjsd bbhj bfusdbfuywe fyue fyekwubyewhkfsdb kfyubewk ufybehb",
-          date: Date.now(),
+          date: new Date(),
           status: "sent"
         },
         {
           from: "Joe",
           message: "Why do you say so?",
-          date: Date.now(),
+          date: new Date(),
           status: "sent"
         }
       ],
@@ -106,7 +109,6 @@ export default {
       this.$router.push("/");
       return;
     }
-    alert(this.getMoment().format("dd"));
     axios
       .get(
         this.$store.state.settings.baseLink +
@@ -138,9 +140,6 @@ export default {
     getMoment(value) {
       return moment(value);
     },
-    getMoment() {
-      return moment();
-    },
     DownloadMarks() {
       window.print();
     },
@@ -151,6 +150,34 @@ export default {
         "error"
       );
     },
+    refreshFeedbacks() {
+      axios
+        .get(
+          this.$store.state.settings.baseLink +
+            "/l/feedback/reload/" +
+            this.Solution.questionaireId
+        )
+        .then(results => {
+          this.feedbacks = [];
+          results.data.forEach(element => {
+            this.feedbacks.push(element);
+          });
+        })
+        .catch(err => {
+          this.feedbacks.map(o => {
+            if (o.status != "sent") {
+              o.status = "not sent";
+            }
+          });
+          swal("Unable to submit questionaire", err.message, "error");
+        });
+    },
+    openCloseFeedbacks() {
+      this.addingFeedBack = !this.addingFeedBack;
+      if (this.addingFeedBack) {
+        this.refreshFeedbacks();
+      }
+    },
     SubmitFeedback() {
       if (this.txtFeedback.length < 1) {
         return;
@@ -158,7 +185,7 @@ export default {
       var feedback = {
         from: "Joe",
         message: this.txtFeedback,
-        date: Date.now(),
+        date: new Date(),
         status: "sending...."
       };
 
@@ -178,6 +205,7 @@ export default {
           }
         )
         .then(results => {
+          this.feedbacks = [];
           results.data.forEach(element => {
             this.feedbacks.push(element);
           });
