@@ -44,6 +44,54 @@ router.post("/submit/questionaire", function (req, res) {
   });
 });
 
+router.post('/l/feedback/submit/:questionaireId', function (req, res) {
+  var questionaireId = req.params.questionaireId;
+  Solution.findOne({
+      questionaireId: questionaireId,
+      isMemo: true
+    })
+    .then(s => {
+      if (s == null) throw "Test does not have a memorandum";
+
+      if (s.feedbacks == null) s.feedbacks = [];
+
+      s.feedbacks.push({
+        from: req.body.from,
+        message: req.body.message,
+        date: req.body.date
+      });
+
+      s.save(function (err) {
+        if (err) throw "Unable to save feedback";
+        var answer = s.feedbacks.filter(f => req.body.existingId.indexOf(f._id) < 0);
+        res.json(answer);
+      });
+    })
+    .catch(err => {
+      res.statusCode = 402;
+      res.send(err.message);
+    });
+});
+
+router.get('/l/feedback/reload/:questionaireId', function (req, res) {
+  var questionaireId = req.params.questionaireId;
+  Solution.findOne({
+      questionaireId: questionaireId,
+      isMemo: true
+    })
+    .then(s => {
+      if (s == null) throw "Test does not have a memorandum";
+
+      if (s.feedbacks == null) s.feedbacks = [];
+      var answer = s.feedbacks.filter(f => req.body.existingId.indexOf(f._id) < 0);
+      res.json(answer);
+    })
+    .catch(err => {
+      res.statusCode = 402;
+      res.send(err.message);
+    });
+});
+
 router.get("/all/questionaire", function (req, res) {
 
   Questionaire.find().then(questionaires => {

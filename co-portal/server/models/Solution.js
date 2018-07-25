@@ -12,6 +12,7 @@ const SolutionSchema = new mongoose.Schema({
     },
     answers: Array,
     mark: Number,
+    feedbacks: Array,
     isMemo: {
         type: Boolean,
         default: false
