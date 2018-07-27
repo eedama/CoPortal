@@ -49,20 +49,21 @@ router.post("/submit/questionaire", function (req, res) {
     isMemo: req.body.solution.isMemo,
     answers: req.body.solution.answers
   });
-
-  solution.save(function (err) {
-    if (err) res.send(err);
-    Student.findById(req.body.studentId).then(student => {
-      if (student == null) new Error("Student does not exist");
-      student.solutions.push(solution._id);
-      student.save(function (err) {
-        if (err) res.status(512).send("Server error : " + err.message);
-        res.json(solution);
+  if (!req.body.isMemo) {
+    solution.save(function (err) {
+      if (err) res.send(err);
+      Student.findById(req.body.studentId).then(student => {
+        if (student == null) new Error("Student does not exist");
+        student.solutions.push(solution._id);
+        student.save(function (err) {
+          if (err) res.status(512).send("Server error : " + err.message);
+          res.json(solution);
+        })
+      }).catch(err => {
+        res.status(512).send("Server error : " + err.message);
       })
-    }).catch(err => {
-      res.status(512).send("Server error : " + err.message);
-    })
-  });
+    });
+  }
 });
 
 router.post('/feedback/submit/:questionaireId', function (req, res) {
