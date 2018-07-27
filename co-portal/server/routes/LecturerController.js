@@ -50,7 +50,7 @@ router.post("/submit/questionaire", function (req, res) {
     isMemo: req.body.solution.isMemo,
     answers: req.body.solution.answers
   });
-  if (!req.body.isMemo) {
+  if (!req.body.solution.isMemo) {
     solution.save(function (err) {
       if (err) res.send(err);
       Student.findById(req.body.studentId).then(student => {
