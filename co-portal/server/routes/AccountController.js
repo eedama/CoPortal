@@ -43,7 +43,10 @@ router.post("/login", function (req, res) {
                 if (admin.password != password) {
                   res.status(512).send("Incorrect password for " + username);
                 }
-                res.json(admin);
+                res.json({
+                  userType: 'ADMIN',
+                  user: admin
+                });
               }
             });
           } else {
@@ -51,7 +54,10 @@ router.post("/login", function (req, res) {
             if (lecturer.password != password) {
               res.status(512).send("Incorrect password for " + username);
             }
-            res.json(lecturer);
+            res.json({
+              userType: 'LECTURER',
+              user: lecturer
+            });
           }
         });
       } else {
@@ -59,7 +65,10 @@ router.post("/login", function (req, res) {
         if (student.password != password) {
           res.status(512).send("Incorrect password for " + username);
         }
-        res.json(student);
+        res.json({
+          userType: 'STUDENT',
+          user: student
+        });
       }
     }).catch(err => {
       res.status(500).send(err.message);
