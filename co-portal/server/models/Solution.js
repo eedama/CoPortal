@@ -10,6 +10,10 @@ const SolutionSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Questionaire'
     },
+    studentID: {
+        type: Schema.Types.ObjectId,
+        ref: 'Student'
+    },
     answers: Array,
     mark: Number,
     feedbacks: Array,
