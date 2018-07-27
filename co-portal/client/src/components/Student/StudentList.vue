@@ -1,60 +1,55 @@
 <template>
-    <div>
-        <div class="row">
-            <div class="col s10 offset-s1 m8 offset-m3 l6 offset-l3 ">
-                <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-                    <input v-on:keypress.enter="DeepSearch" v-model="txtSearch" id="Password" name="Search" type="search" />
-                    <label class="text-center" for="Search">Search</label>
-                </div>
-            </div>
+  <div>
+    <div class="row">
+      <div class="col s10 offset-s1 m8 offset-m3 l6 offset-l3 ">
+        <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+          <input v-on:keypress.enter="DeepSearch" v-model="txtSearch" id="Password" name="Search" type="search" />
+          <label class="text-center" for="Search">Search</label>
         </div>
-        <div class="row">
-            <div v-for="a in 10" :key="a" class="contact-area col s12 m6 l4 xl3">
-                <div class="contact">
-                    <main>
-                        <section>
-                            <div class="content">
-                                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/256492/_mLIxaKY_400x400.jpg" alt="Profile Image">
-    
-                                <aside>
-                                    <h1 class="white-text">Riccardo Cavallo</h1>
-                                    <p>Hi, I'm Riccardo Cavallo and I'm a Graphic and Visual Designer.</p>
-                                </aside>
-    
-                                <button v-on:click="show = !show" class="pointer waves-effect" :class="{'active':show}">
-                                    <span>Past tests</span>
-                        
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"> <g class="nc-icon-wrapper" fill="#444444"> <path d="M14.83 30.83L24 21.66l9.17 9.17L36 28 24 16 12 28z"></path> </g> </svg>
-                                </button>
-                            </div>
-    
-                            <div class="title" :class="{'active':show}">
-                                <p>Past tests</p>
-                            </div>
-                        </section>
-    
-    
-                    </main>
-    
-                    <nav :class="{'active':show}">
-                        <a href="#" class="gmail">
-                            <div class="icon">
-                                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M16 3v10c0 .567-.433 1-1 1h-1V4.925L8 9.233 2 4.925V14H1c-.567 0-1-.433-1-1V3c0-.283.108-.533.287-.712C.467 2.107.718 2 1 2h.333L8 6.833 14.667 2H15c.283 0 .533.108.713.288.179.179.287.429.287.712z" fill-rule="evenodd"/></svg>
-                            </div>
-    
-                            <div class="content">
-                                <h1>Email</h1>
-                                <span>Riccavallo@gmail.com</span>
-                            </div>
-    
-                            <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"> <g class="nc-icon-wrapper" fill="#444444"> <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path> </g> </svg>
-                        </a>
-                    </nav>
-                </div>
-            </div>
-    
-        </div>
+      </div>
     </div>
+    <div class="row">
+      <div v-for="(student,i) in students" :key="i" class="contact-area col s12 m6 l4 xl3">
+        <div class="contact">
+          <main>
+            <section>
+              <div class="content">
+                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/256492/_mLIxaKY_400x400.jpg" alt="Profile Image">
+  
+                <aside>
+                  <h1 class="white-text valign-wrapper">{{ student.lastname }} {{ student.firstname}}</h1>
+                </aside>
+  
+                <button v-on:click="show = !show" class="pointer waves-effect" :class="{'active':show}">
+                                      <span>Past tests</span>
+                          
+                                   <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"> <g class="nc-icon-wrapper" fill="#444444"> <path d="M14.83 30.83L24 21.66l9.17 9.17L36 28 24 16 12 28z"></path> </g> </svg>
+                                  </button>
+              </div>
+  
+              <div class="title" :class="{'active':show}">
+                <p>Past tests</p>
+              </div>
+            </section>
+  
+  
+          </main>
+  
+          <nav :class="{'active':show}">
+            <a href="#" class="gmail">
+              <div class="content">
+                <h1>Email</h1>
+                <span>Riccavallo@gmail.com</span>
+              </div>
+  
+              <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"> <g class="nc-icon-wrapper" fill="#444444"> <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path> </g> </svg>
+            </a>
+          </nav>
+        </div>
+      </div>
+  
+    </div>
+  </div>
 </template>
 
 <script>
@@ -107,13 +102,13 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 /* COLORS
-        ========================================== */
+          ========================================== */
 
 /* MIXINS
-        ========================================== */
+          ========================================== */
 
 /* RESET
-        ========================================== */
+          ========================================== */
 
 *,
 *:before,
@@ -124,7 +119,7 @@ export default {
 }
 
 /* CONTACT
-        ========================================== */
+          ========================================== */
 
 .contact-area {
   width: 100%;
@@ -429,47 +424,16 @@ export default {
   fill: #e6e6e6;
 }
 
-.contact nav a.gmail .icon svg {
-  background-color: #d14836;
-}
-
 .contact nav a.gmail .content h1 {
   color: #d14836;
-}
-
-.contact nav a.facebook .icon svg {
-  background-color: #3b5998;
 }
 
 .contact nav a.facebook .content h1 {
   color: #3b5998;
 }
 
-.contact nav a.twitter .icon svg {
-  background-color: #1da1f2;
-}
-
 .contact nav a.twitter .content h1 {
   color: #1da1f2;
-}
-
-.contact nav a .icon {
-  float: left;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin-right: 20px;
-}
-
-.contact nav a .icon svg {
-  width: 100%;
-  height: 100%;
-  padding: 14px;
-}
-
-.contact nav a .icon svg path {
-  fill: #ffffff;
 }
 
 .contact nav a .content h1 {
