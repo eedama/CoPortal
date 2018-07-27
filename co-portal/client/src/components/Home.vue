@@ -12,7 +12,6 @@
     </div>
     <div class="row input-emoji">
       <div class="col s12">
-        <TextAreaEmoji />
       </div>
     </div>
     <div class="row">

@@ -62,6 +62,22 @@ export default {
       if (this.username.length == 0)
         this.txtError = "Please enter a valid user name";
       if (this.txtError.length != 0) return;
+
+      axios
+        .post(this.$store.state.settings.baseLink + "/acc/login", {
+          username: this.username,
+          password: this.password
+        })
+        .then(results => {
+          alert(JSON.parse(results));
+        })
+        .catch(err => {
+          if (err.response != null && err.response.status == 512) {
+            this.txtError = err.response.data;
+          } else {
+            swal("Unable to log you in", "Try again later", "error");
+          }
+        });
     }
   }
 };
