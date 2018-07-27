@@ -78,6 +78,7 @@ export default {
                 type: "ADMIN",
                 isLoggedIn: true
               });
+              this.$router.push("/");
               break;
             case "LECTURER":
               this.$store.commit("login", {
@@ -97,9 +98,9 @@ export default {
                 type: "STUDENT",
                 isLoggedIn: true
               });
+              this.$router.push("/");
               break;
           }
-          alert(this.$store.state.user.type);
         })
         .catch(err => {
           if (err.response != null && err.response.status == 512) {
