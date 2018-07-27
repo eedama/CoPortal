@@ -19,6 +19,7 @@ import Lecturer from "../models/Lecturer";
 router.post("/add/questionaire", function (req, res) {
   var questionaire = new Questionaire({
     _id: mongoose.Types.ObjectId(),
+    lecturerID: req.body.lecturerId,
     title: req.body.title,
     questions: req.body.questions,
     timeLimit: req.body.timeLimit
@@ -26,14 +27,24 @@ router.post("/add/questionaire", function (req, res) {
 
   questionaire.save(function (err) {
     if (err) res.send(err);
-    console.log(questionaire);
-    res.json(questionaire);
+    Lecturer.findById(req.body.lecturerId).then(lecturer => {
+      if (lecturer == null) new Error("Lecturer does not exist");
+      lecturer.questionaires.push(questionaire._id);
+      lecturer.save(function (err) {
+        if (err) res.send(err);
+        console.log(questionaire);
+        res.json(questionaire);
+      })
+    }).catch(err => {
+      res.status(512).send("Server error : " + err.message);
+    })
   });
 });
 
 router.post("/submit/questionaire", function (req, res) {
   var solution = new Solution({
     _id: mongoose.Types.ObjectId(),
+    studentID: req.body.studentId,
     questionaireId: req.body.solution.id,
     isMemo: req.body.solution.isMemo,
     answers: req.body.solution.answers
@@ -41,7 +52,16 @@ router.post("/submit/questionaire", function (req, res) {
 
   solution.save(function (err) {
     if (err) res.send(err);
-    res.json(solution);
+    Student.findById(req.body.studentId).then(student => {
+      if (student == null) new Error("Student does not exist");
+      student.solutions.push(solution._id);
+      student.save(function (err) {
+        if (err) res.status(512).send("Server error : " + err.message);
+        res.json(solution);
+      })
+    }).catch(err => {
+      res.status(512).send("Server error : " + err.message);
+    })
   });
 });
 

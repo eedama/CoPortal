@@ -55,13 +55,9 @@ const StudentSchema = new mongoose.Schema({
         default: false
     },
     // Relationships
-    notifications: [{
+    solutions: [{
         type: Schema.Types.ObjectId,
-        ref: 'Notification'
-    }],
-    rents: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Rent'
+        ref: 'Solution'
     }]
 });
 
