@@ -29,6 +29,7 @@ router.post("/add/questionaire", function (req, res) {
     if (err) res.send(err);
     Lecturer.findById(req.body.lecturerId).then(lecturer => {
       if (lecturer == null) new Error("Lecturer does not exist");
+      if (lecturer.questionaires == null) lecturer.questionaires = [];
       lecturer.questionaires.push(questionaire._id);
       lecturer.save(function (err) {
         if (err) res.send(err);
