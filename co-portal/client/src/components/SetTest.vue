@@ -252,7 +252,11 @@ export default {
           this.currentPage = 1;
         })
         .catch(err => {
-          swal("Unable to submit questionaire", err.message, "error");
+          if (err.response != null && err.response.status == 512) {
+            alert(err.response.data);
+          } else {
+            swal("Unable to submit questionaire", err.message, "error");
+          }
         });
     }
   }
