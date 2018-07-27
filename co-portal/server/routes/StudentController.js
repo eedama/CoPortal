@@ -16,13 +16,6 @@ import Rent from "../models/Rent";
         Login student
 */
 
-router.get("/rents/all", function (req, res) {
-  Rent.find().then(rents => {
-    if (rents == null) res.send("Error : 90ty32rtu834g9erbo");
-    res.json(rents);
-  });
-});
-
 router.get("/students/all", function (req, res) {
   Student.find({
       "active": true
@@ -34,10 +27,19 @@ router.get("/students/all", function (req, res) {
     });
 });
 
-router.get("/students/all/names", function (req, res) {
+router.get("/students/all/usernames", function (req, res) {
   Student.find({
     "active": true
   }, "_id username").then(students => {
+    if (students == null) res.send("Error : 9032rtu834g9erbo");
+    res.json(students);
+  });
+});
+
+router.get("/students/all/fullnames", function (req, res) {
+  Student.find({
+    "active": true
+  }, "_id firstname lastname").then(students => {
     if (students == null) res.send("Error : 9032rtu834g9erbo");
     res.json(students);
   });
@@ -65,28 +67,18 @@ router.get("/:id/get", function (req, res) {
  */
 
 router.post("/:text/search", function (req, res) {
-  let text = req.params.text;
-  if (text == null || text.length < 3) {
+  let txtSearch = req.params.text;
+  if (txtSearch == null || txtSearch.length < 2) {
     res.status(404);
-    res.send("Cannot search for - " + text);
+    res.send("Cannot search for - " + txtSearch);
   } else {
     Student.find({
-      where: {
-        [Op.or]: [{
-            lastName: {
-              [Op.like]: "%" + text + "%"
-            }
-          },
-          {
-            firstName: {
-              [Op.like]: "%" + text + "%"
-            }
-          }
-        ]
+      $text: {
+        $search: new RegExp('^' + txtSearch + '$', "i")
       }
     }).then(answer => {
-      if (answer == null || answer.length != 1) {
-        res.send("firstname or lastname that match : " + text);
+      if (answer == null || answer.length <= 0) {
+        res.status(512).send("No results for : " + txtSearch);
       } else {
         res.json(answer);
       }

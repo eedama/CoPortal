@@ -71,5 +71,9 @@ StudentSchema.methods.findSimilarTypes = function (cb) {
     }, cb);
 };
 
+StudentSchema.index({
+    '$**': 'text'
+});
+
 const Student = mongoose.model('Student', StudentSchema);
 module.exports = Student;
