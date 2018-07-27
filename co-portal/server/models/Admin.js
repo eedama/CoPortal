@@ -6,8 +6,8 @@ const AdminSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         default: mongoose.Types.ObjectId()
     },
-    userName: String,
-    pass: String,
+    username: String,
+    password: String,
     email: String,
     role: {
         type: String,

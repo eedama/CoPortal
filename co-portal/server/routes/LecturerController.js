@@ -44,27 +44,30 @@ router.post("/submit/questionaire", function (req, res) {
   });
 });
 
-router.post('/l/feedback/submit/:questionaireId', function (req, res) {
+router.post('/feedback/submit/:questionaireId', function (req, res) {
   var questionaireId = req.params.questionaireId;
+  console.log("Submitting feedback " + questionaireId)
   Solution.findOne({
       questionaireId: questionaireId,
       isMemo: true
     })
     .then(s => {
       if (s == null) throw "Test does not have a memorandum";
-
+      console.log(s.feedbacks);
       if (s.feedbacks == null) s.feedbacks = [];
 
       s.feedbacks.push({
+        _id: mongoose.Types.ObjectId(),
         from: req.body.from,
         message: req.body.message,
-        date: req.body.date
+        date: req.body.date,
+        status: 'sent'
       });
 
       s.save(function (err) {
         if (err) throw "Unable to save feedback";
-        var answer = s.feedbacks.filter(f => req.body.existingId.indexOf(f._id) < 0);
-        res.json(answer);
+        //var answer = s.feedbacks.filter(f => req.body.existingId.indexOf(f._id) < 0);
+        res.json(s.feedbacks);
       });
     })
     .catch(err => {
@@ -73,7 +76,7 @@ router.post('/l/feedback/submit/:questionaireId', function (req, res) {
     });
 });
 
-router.get('/l/feedback/reload/:questionaireId', function (req, res) {
+router.get('/feedback/reload/:questionaireId', function (req, res) {
   var questionaireId = req.params.questionaireId;
   Solution.findOne({
       questionaireId: questionaireId,
@@ -83,11 +86,12 @@ router.get('/l/feedback/reload/:questionaireId', function (req, res) {
       if (s == null) throw "Test does not have a memorandum";
 
       if (s.feedbacks == null) s.feedbacks = [];
-      var answer = s.feedbacks.filter(f => req.body.existingId.indexOf(f._id) < 0);
-      res.json(answer);
+      //var answer = s.feedbacks.filter(f => req.body.existingId.indexOf(f._id) < 0);
+      res.json(s.feedbacks);
     })
     .catch(err => {
       res.statusCode = 402;
+      console.log("Error " + err.message);
       res.send(err.message);
     });
 });
