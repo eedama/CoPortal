@@ -4,15 +4,16 @@ import mongoose from "mongoose";
 
 import Questionaire from "../models/Questionaire";
 import Solution from "../models/Solution";
+import Lecturer from "../models/Lecturer";
 
 /*
-  TODO: Get one student - DONE
+  TODO: Get one lecturer - DONE
         Get a list of them - DONE
-        Search for a student - DONE
-        Add a student
-        Remove a student (Not to delete)
-        Edit student details
-        Login student
+        Search for a lecturer - DONE
+        Add a lecturer
+        Remove a lecturer (Not to delete)
+        Edit lecturer details
+        Login lecturer
 */
 
 router.post("/add/questionaire", function (req, res) {
@@ -147,4 +148,69 @@ function shuffle(array) {
   return array;
 }
 
+router.get("/lecturers/all", function (req, res) {
+  Lecturer.find({
+      "active": true
+    })
+    .populate(["rents"])
+    .then(lecturers => {
+      if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
+      res.json(lecturers);
+    });
+});
+
+router.get("/lecturers/all/usernames", function (req, res) {
+  Lecturer.find({
+    "active": true
+  }, "_id username").then(lecturers => {
+    if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
+    res.json(lecturers);
+  });
+});
+
+router.get("/lecturers/all/fullnames", function (req, res) {
+  Lecturer.find({
+    "active": true
+  }, "_id firstname lastname").then(lecturers => {
+    if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
+    res.json(lecturers);
+  });
+});
+
+router.get("/:id/get", function (req, res) {
+  let id = req.params.id;
+  if (id == null) {
+    res.status(404);
+    res.send("Invalid ID > " + id);
+  } else {
+    Lecturer.findById(id).then(lecturer => {
+      if (lecturer == null) {
+        res.status(404);
+        res.send("No lecturer with id : " + id);
+      } else {
+        res.json(lecturer);
+      }
+    });
+  }
+});
+
+router.post("/:text/search", function (req, res) {
+  let txtSearch = req.params.text;
+  if (txtSearch == null || txtSearch.length < 2) {
+    res.status(404);
+    res.send("Cannot search for - " + txtSearch);
+  } else {
+    Lecturer.find({
+      $text: {
+        $search: new RegExp('^' + txtSearch + '$', "i")
+      }
+    }).then(answer => {
+      if (answer == null || answer.length <= 0) {
+        res.status(512).send("No results for : " + txtSearch);
+      } else {
+        res.json(answer);
+      }
+    });
+  }
+});
 module.exports = router;

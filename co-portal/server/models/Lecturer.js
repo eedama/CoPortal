@@ -71,5 +71,9 @@ LecturerSchema.methods.findSimilarTypes = function (cb) {
     }, cb);
 };
 
+LecturerSchema.index({
+    '$**': 'text'
+});
+
 const Lecturer = mongoose.model('Lecturer', LecturerSchema);
 module.exports = Lecturer;
