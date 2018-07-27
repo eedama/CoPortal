@@ -47,7 +47,7 @@ export default {
         {
           text: "My Dashboard",
           link:
-            this.$store.state.user.type.toLowerCase() +
+            this.$store.state.user.type +
             "/dashboard/for/" +
             this.$store.state.user.id,
           auth: ["STUDENT", "LECTURER", "ADMIN"]
@@ -59,7 +59,7 @@ export default {
         },
         {
           text: "Students",
-          link: "/test/set",
+          link: "/student/list",
           auth: ["LECTURER", "ADMIN"]
         },
         {
