@@ -69,7 +69,37 @@ export default {
           password: this.password
         })
         .then(results => {
-          alert(JSON.parse(results));
+          switch (results.data.userType) {
+            case "ADMIN":
+              this.$store.commit("login", {
+                id: results.data.user._id,
+                username: results.data.user.username,
+                password: results.data.user.password,
+                type: "ADMIN",
+                isLoggedIn: true
+              });
+              break;
+            case "LECTURER":
+              this.$store.commit("login", {
+                id: results.data.user._id,
+                username: results.data.user.username,
+                password: results.data.user.password,
+                type: "LECTURER",
+                isLoggedIn: true
+              });
+              this.$router.push("/");
+              break;
+            case "STUDENT":
+              this.$store.commit("login", {
+                id: results.data.user._id,
+                username: results.data.user.username,
+                password: results.data.user.password,
+                type: "STUDENT",
+                isLoggedIn: true
+              });
+              break;
+          }
+          alert(this.$store.state.user.type);
         })
         .catch(err => {
           if (err.response != null && err.response.status == 512) {
