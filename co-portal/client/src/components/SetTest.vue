@@ -243,6 +243,7 @@ export default {
       axios
         .post(this.$store.state.settings.baseLink + "/l/add/questionaire", {
           title: this.title,
+          lecturerId: this.$store.state.user.id,
           questions: this.questions,
           timeLimit: this.questionaire.timeLimit
         })

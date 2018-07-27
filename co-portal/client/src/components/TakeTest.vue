@@ -107,6 +107,7 @@ export default {
             .post(
               this.$store.state.settings.baseLink + "/l/submit/questionaire",
               {
+                studentId: this.$store.state.user.id,
                 solution: solution
               }
             )
