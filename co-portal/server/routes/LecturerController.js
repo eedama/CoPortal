@@ -21,7 +21,6 @@ router.get("/lecturers/all", function (req, res) {
   Lecturer.find({
       "active": true
     })
-    .populate(["rents"])
     .then(lecturers => {
       if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
       res.json(lecturers);

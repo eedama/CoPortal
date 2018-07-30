@@ -6,9 +6,62 @@
           <input v-on:keypress.enter="DeepSearch" v-model="txtSearch" id="Password" name="Search" type="search" />
           <label class="text-center" for="Search">Search</label>
         </div>
+  
       </div>
     </div>
     <div class="row">
+      <div class="col s8 offset-s2 center-align">
+        <a v-on:click="addingLecturers = !addingLecturers" :class="{'red':addingLecturers}" class="btn waves-effect">{{ !addingLecturers ? 'Add Lecturer' : 'Cancel'}}</a>
+      </div>
+    </div>
+    <div v-if="addingLecturers" class="row valign-wrapper" style="height:80vh">
+      <div class="col m6 offset-m3 col s12 center-align">
+        <div class="card row">
+          <div class="card-content">
+            <div class="row">
+              <div class="col s12 center-align">
+                <h5>Adding a lecturer</h5>
+              </div>
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="lecturer.firstname" id="Firstname" name="Firstname" type="text" />
+                <label class="text-center" for="Firstname">Firstname</label>
+              </div>
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="lecturer.lastname" id="Lastname" name="Lastname" type="text" />
+                <label class="text-center" for="Lastname">Lastname</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+                <input v-model="lecturer.username" id="Username" name="Username" type="text" />
+                <label class="text-center" for="Username">Username</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="lecturer.password" id="Password" name="Password" type="password" />
+                <label class="text-center" for="Password">Password</label>
+              </div>
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="lecturer.confirmPassword" id="ConfirmPassword" name="ConfirmPassword" type="password" />
+                <label class="text-center" for="ConfirmPassword">Confirm Password</label>
+              </div>
+            </div>
+            <div class="row" v-show="txtError.length > 0">
+              <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                <label class="text-center red-text">{{ txtError }}</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                <input v-on:click="SubmitLecturer()" type="submit" value="Submit lecturer" class="btn center-align tg-btn" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="!addingLecturers" class="row">
       <div v-if="lecturer != null" v-for="(lecturer,i) in lecturers" :key="i" class="contact-area col s12 m6 l4 xl3 pointer">
         <div class="contact">
           <main>
@@ -20,14 +73,10 @@
                   <h1 class="white-text valign-wrapper">{{ lecturer.lastname }} {{ lecturer.firstname}}</h1>
                 </aside>
               </div>
-  
             </section>
-  
-  
           </main>
         </div>
       </div>
-  
     </div>
   </div>
 </template>
@@ -42,6 +91,17 @@ export default {
   name: "LecturerList",
   data() {
     return {
+      // Add lecturer staff
+      txtError: "",
+      lecturer: {
+        firstname: "",
+        lastname: "",
+        username: "",
+        password: "",
+        confirmPassword: ""
+      },
+      addingLecturers: false,
+      //
       _txtSearch: "",
       lecturers: []
     };
@@ -58,7 +118,6 @@ export default {
     }
   },
   mounted() {
-    alert("in");
     axios
       .get(this.$store.state.settings.baseLink + "/l/lecturers/all")
       .then(results => {
@@ -73,8 +132,45 @@ export default {
       });
   },
   methods: {
-    DeepSearch() {
-      alert("Deep searching for " + this.txtSearch);
+    SubmitLecturer() {
+      this.txtError = "";
+      if (this.lecturer.lastname.length < 2) {
+        this.txtError = "Please enter a valid lastname";
+      }
+
+      if (this.lecturer.firstname.length < 2) {
+        this.txtError = "Please enter a valid firstname";
+      }
+
+      if (this.lecturer.password != this.lecturer.confirmPassword) {
+        this.txtError = "Passwords do not match";
+      }
+
+      if (this.lecturer.password.length < 6) {
+        this.txtError =
+          "Please enter a valid password , passwords must be more than 6 charactors long";
+      }
+      if (this.lecturer.username.length < 2) {
+        this.txtError = "Please enter a valid username";
+      }
+
+      if (this.txtError.length > 2) return;
+
+      axios
+        .post(this.$store.state.settings.baseLink + "/a/add/lecturer", {
+          lecturer: this.lecturer
+        })
+        .then(results => {
+          this.lecturers = results.data;
+          this.addingLecturers = false;
+        })
+        .catch(err => {
+          if (err.response != null && err.response.status == 512) {
+            this.txtError = err.response.data;
+          } else {
+            swal("Unable to submit the lecturer", err.message, "error");
+          }
+        });
     }
   }
 };
@@ -83,24 +179,16 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 /* COLORS
-                ========================================== */
+                    ========================================== */
 
 /* MIXINS
-                ========================================== */
+                    ========================================== */
 
 /* RESET
-                ========================================== */
-
-*,
-*:before,
-*:after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+                    ========================================== */
 
 /* CONTACT
-                ========================================== */
+                    ========================================== */
 
 .contact-area {
   width: 100%;
