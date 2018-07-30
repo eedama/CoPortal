@@ -1,8 +1,8 @@
 <template>
   <div class="row">
-    <div class="col s12 m8 offset-m2">
+    <div class="col s10 offset-s1">
       <div v-if="currentPage == i" v-for="(question,i) in Questionaire.questions" :key="i" class="row">
-        <div class="col m8 offset-m2 row card-panel">
+        <div class="col s10 offset-s1 row card-panel">
           <div class="col s12">
             <h5 class="center-align">{{ question.title }}</h5>
           </div>
@@ -107,6 +107,7 @@ export default {
             .post(
               this.$store.state.settings.baseLink + "/l/submit/questionaire",
               {
+                studentId: this.$store.state.user.id,
                 solution: solution
               }
             )

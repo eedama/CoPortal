@@ -1,10 +1,10 @@
 const state = {
-  userName: 'admin',
+  username: 'admin',
   id: '',
-  pass: 'admin',
+  password: 'admin',
   email: 'admin@gmail.com',
   numbers: '0760487292',
-  role: 'PROPERTY',
+  type: null,
   profilePic: null,
   isLoggedIn: false,
   isAdmin: false
@@ -13,24 +13,23 @@ const state = {
 const mutations = {
   login(state, user) {
     state.id = user.id;
-    state.userName = user.userName;
-    state.pass = user.pass;
+    state.username = user.username;
+    state.password = user.password;
     state.email = user.email;
     state.numbers = user.numbers;
     state.profilePic = user.profilePic;
-    state.role = user.role;
+    state.type = user.type;
     state.isLoggedIn = user.isLoggedIn;
-    state.isAdmin = user.isAdmin;
   },
   logout(state, self) {
 
     state.id = null;
-    state.userName = null;
-    state.pass = null;
+    state.username = null;
+    state.password = null;
     state.email = null;
     state.numbers = null;
     state.profilePic = null;
-    state.role = null;
+    state.type = null;
     state.isLoggedIn = false;
     state.isAdmin = false;
   },
