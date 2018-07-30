@@ -9,9 +9,9 @@
       </div>
     </div>
     <div class="row">
-      <div v-for="(student,i) in students" :key="i" class="contact-area col s12 m6 l4 xl3">
+      <div v-if="student != null" v-for="(student,i) in students" :key="i" class="contact-area col s12 m6 l4 xl3">
         <div class="contact">
-          <main>
+          <main v-if="selectedStudent == null">
             <section>
               <div class="content">
                 <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/256492/_mLIxaKY_400x400.jpg" alt="Profile Image">
@@ -20,31 +20,50 @@
                   <h1 class="white-text valign-wrapper">{{ student.lastname }} {{ student.firstname}}</h1>
                 </aside>
   
-                <button v-on:click="show = !show" class="pointer waves-effect" :class="{'active':show}">
-                                      <span>Past tests</span>
-                          
-                                   <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"> <g class="nc-icon-wrapper" fill="#444444"> <path d="M14.83 30.83L24 21.66l9.17 9.17L36 28 24 16 12 28z"></path> </g> </svg>
-                                  </button>
+                <button v-on:click="GetPastTestsFor(student)" class="pointer waves-effect">
+                        <span>Past tests</span>
+                </button>
               </div>
   
-              <div class="title" :class="{'active':show}">
-                <p>Past tests</p>
-              </div>
             </section>
   
   
           </main>
+          <div v-if="selectedStudent != null">
+            <main>
+              <section>
+                <div class="content">
+                  <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/256492/_mLIxaKY_400x400.jpg" alt="Profile Image">
   
-          <nav :class="{'active':show}">
-            <a href="#" class="gmail">
-              <div class="content">
-                <h1>Email</h1>
-                <span>Riccavallo@gmail.com</span>
-              </div>
+                  <aside>
+                    <h1 class="white-text valign-wrapper">{{ student.lastname }} {{ student.show }} {{ student.firstname}}</h1>
+                  </aside>
   
-              <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"> <g class="nc-icon-wrapper" fill="#444444"> <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path> </g> </svg>
-            </a>
-          </nav>
+                  <button v-on:click="selectedStudent = null" class="pointer waves-effect active">
+                                          <span>Cancel</span>
+                              
+                                       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"> <g class="nc-icon-wrapper" fill="#444444"> <path d="M14.83 30.83L24 21.66l9.17 9.17L36 28 24 16 12 28z"></path> </g> </svg>
+                   </button>
+                </div>
+                <div class="title active">
+                  <p>Past tests</p>
+                </div>
+  
+              </section>
+            </main>
+            <nav class="active">
+              <a v-on:click="goToSolution(pastTest.solutionId)" v-for="(pastTest,v) in selectedStudent.pastTests" :key="v" href="#" class="facebook waves-effect">
+                <div class="content">
+                  <h1>{{pastTest.title}}</h1>
+                  <span>{{ getMoment(pastTest.date).fromNow() }}</span>
+                  <h1 class="black-text">{{pastTest.mark}}</h1>
+                </div>
+  
+                <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"> <g class="nc-icon-wrapper" fill="#444444"> <path d="M17.17 32.92l9.17-9.17-9.17-9.17L20 11.75l12 12-12 12z"></path> </g> </svg>
+              </a>
+            </nav>
+  
+          </div>
         </div>
       </div>
   
@@ -54,6 +73,7 @@
 
 <script>
 import swal from "sweetalert";
+import * as moment from "moment";
 
 const axios = require("axios");
 
@@ -63,7 +83,7 @@ export default {
     return {
       _txtSearch: "",
       students: [],
-      show: false
+      selectedStudent: null
     };
   },
   computed: {
@@ -82,6 +102,9 @@ export default {
       .get(this.$store.state.settings.baseLink + "/s/students/all")
       .then(results => {
         this.students = results.data;
+        this.students.map(s => {
+          s.show = true;
+        });
       })
       .catch(err => {
         if (err.response != null && err.response.status == 512) {
@@ -94,6 +117,47 @@ export default {
   methods: {
     DeepSearch() {
       alert("Deep searching for " + this.txtSearch);
+    },
+    getMoment(value) {
+      return moment(value);
+    },
+    goToSolution(solutionId) {
+      this.$router.push({
+        name: "TestMarks",
+        params: { solutionId: solutionId }
+      });
+    },
+    GetPastTestsFor(student) {
+      axios
+        .get(
+          this.$store.state.settings.baseLink +
+            "/s/all/past/tests/for/" +
+            student._id
+        )
+        .then(results => {
+          this.students.filter(s => s._id == student._id).map(s => {
+            s.pastTests = [];
+            results.data.forEach(element => {
+              s.pastTests.push({
+                solutionId: element.solutionId,
+                title: element.title,
+                mark: element.mark,
+                date: element.date
+              });
+            });
+          });
+
+          this.selectedStudent = this.students.filter(
+            s => (s._id = student._id)
+          )[0];
+        })
+        .catch(err => {
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal("Unable to load students", err.message, "error");
+          }
+        });
     }
   }
 };
@@ -102,13 +166,13 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 /* COLORS
-          ========================================== */
+              ========================================== */
 
 /* MIXINS
-          ========================================== */
+              ========================================== */
 
 /* RESET
-          ========================================== */
+              ========================================== */
 
 *,
 *:before,
@@ -119,7 +183,7 @@ export default {
 }
 
 /* CONTACT
-          ========================================== */
+              ========================================== */
 
 .contact-area {
   width: 100%;

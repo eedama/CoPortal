@@ -3,8 +3,7 @@ var router = express.Router();
 import mongoose from "mongoose";
 
 import Student from "../models/Student";
-
-import Rent from "../models/Rent";
+import Questionaire from "../models/Questionaire";
 
 /*
   TODO: Get one student - DONE
@@ -44,6 +43,35 @@ router.get("/students/all/fullnames", function (req, res) {
     res.json(students);
   });
 });
+
+router.get('/all/past/tests/for/:studentId', function (req, res) {
+  var studentId = req.params.studentId;
+  Student.findById(studentId).populate('solutions').then(s => {
+    if (s == null) res.status(512).send("Student not found");
+    console.log(s);
+    var answer = [];
+    s.solutions.forEach(solution => {
+      Questionaire.findById(solution.questionaireId).then(q => {
+        console.log(q);
+        if (q != null) {
+          answer.push({
+            solutionId: solution._id,
+            title: q.title,
+            mark: solution.mark + '/' + solution.answers.length,
+            date: solution.date
+          })
+          console.log(answer);
+          res.json(answer);
+        } else {
+          res.status(512).send("Server error : questionaire does not exist");
+        }
+      });
+    });
+  }).catch(err => {
+    res.status(512).send("Server error : " + err.message);
+  });
+});
+
 
 router.get("/:id/get", function (req, res) {
   let id = req.params.id;

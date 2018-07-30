@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col s12 center-align card-panel row">
       <div class="col s12 m8 offset-m2">
+        <h4><a>{{ Solution.isMemo ? 'Memorandum' : Solution.studentId.firstname + " " + Solution.studentId.lastname}}</a></h4>
         <h5>Your score is <a :class="{'red-text':(Solution.mark*2 < Solution.answers.length)}">{{ Solution.mark }}/{{ Solution.answers.length }}</a></h5>
       </div>
       <div class="col s12 right-align">
@@ -68,7 +69,7 @@
       </div>
       <div class="row">
         <div class="col s8 offset-s2 center-align">
-          <button class="btn red">Go to my profile</button>
+          <button v-on:click="$router.push('/')" class="btn red">Go home</button>
         </div>
       </div>
     </div>
@@ -133,7 +134,6 @@ export default {
       } else {
         clearInterval(this.refreshTimer);
       }
-      alert(this.refreshTimer);
     },
     getMoment(value) {
       return moment(value);
@@ -185,7 +185,6 @@ export default {
         );
         return;
       }
-      alert("WHat is this -> " + this.$store.state.user.name);
       if (this.txtFeedback.length < 1) {
         return;
       }

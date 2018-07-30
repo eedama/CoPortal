@@ -46,7 +46,7 @@ router.post("/add/questionaire", function (req, res) {
 router.post("/submit/questionaire", function (req, res) {
   var solution = new Solution({
     _id: mongoose.Types.ObjectId(),
-    studentID: req.body.studentId,
+    studentId: req.body.studentId,
     questionaireId: req.body.solution.id,
     isMemo: req.body.solution.isMemo,
     answers: req.body.solution.answers
@@ -160,7 +160,7 @@ router.get("/all/questionaire", function (req, res) {
 
 router.get("/get/solutions/:solutionId", function (req, res) {
   var solutionId = req.params.solutionId;
-  Solution.findById(solutionId).then(solution => {
+  Solution.findById(solutionId).populate('studentId').then(solution => {
     if (solution == null) res.send("Can not find that solution");
     console.log(solution);
     console.log(solutionId + " id");

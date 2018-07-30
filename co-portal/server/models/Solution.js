@@ -10,7 +10,7 @@ const SolutionSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Questionaire'
     },
-    studentID: {
+    studentId: {
         type: Schema.Types.ObjectId,
         ref: 'Student'
     },
