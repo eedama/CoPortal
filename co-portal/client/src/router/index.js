@@ -7,6 +7,7 @@ import SetTest from '@/components/SetTest'
 import TakeTest from '@/components/TakeTest'
 import TestMarks from '@/components/TestMarks'
 import StudentList from '@/components/Student/StudentList'
+import LecturerList from '@/components/Lecturer/LecturerList'
 
 Vue.use(Router)
 
@@ -70,9 +71,23 @@ const router = new Router({
         authLevel: ['LECTURER', 'ADMIN'],
       },
       component: StudentList
-    }
+    },
     /**
      * Student routes END
+     */
+    /**
+     * Lecturer routes START
+     */
+    {
+      path: '/lecturer/list',
+      name: 'LecturerList',
+      meta: {
+        authLevel: ['ADMIN'],
+      },
+      component: LecturerList
+    }
+    /**
+     * Lecturer routes END
      */
   ]
 });
@@ -84,6 +99,7 @@ router.beforeEach((to, from, next) => {
       swal("You are not Authorized to access this page!", "You must be logged in to access this page.", "error");
       return;
     } else {
+      alert(userType);
       if (to.meta.authLevel.indexOf(userType) < 0) {
         swal("You are not Authorized to access this page!", "If you feel this is unfair, please contact admin.", "error");
         return;

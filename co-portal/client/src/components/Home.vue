@@ -64,7 +64,7 @@ export default {
         },
         {
           text: "Lecturers",
-          link: "/test/set",
+          link: "/lecturer/list",
           auth: ["ADMIN"]
         },
         {
