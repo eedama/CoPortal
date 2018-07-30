@@ -43,4 +43,32 @@ router.post("/add/lecturer", function (req, res) {
   });
 });
 
+router.post("/add/student", function (req, res) {
+  var student = new Student({
+    _id: mongoose.Types.ObjectId(),
+    lastname: req.body.student.lastname,
+    firstname: req.body.student.firstname,
+    password: req.body.student.password,
+    username: req.body.student.username,
+  });
+
+  Student.findOne({
+    username: student.username
+  }).then(l => {
+    if (l != null) res.status(512).send("Username " + student.username + " is already taken.");
+    student.save(function (err) {
+      if (err) res.send(err);
+      Student.find({
+          "active": true
+        })
+        .then(students => {
+          if (students == null) res.status(512).send("Error : 9032rtu834g9erbo");
+          res.json(students);
+        });
+    });
+  }).catch(err => {
+    res.status(512).send("Server error : " + err.message);
+  });
+});
+
 module.exports = router;

@@ -96,12 +96,15 @@ router.beforeEach((to, from, next) => {
   var userType = store.state.user.type;
   if (to.meta.authLevel != null) {
     if (userType == null) {
-      swal("You are not Authorized to access this page!", "You must be logged in to access this page.", "error");
+      swal("You are not Authorized to access this page!", "You must be logged in to access this page.", "error").then((value) => {
+        next('/');
+      });;
       return;
     } else {
-      alert(userType);
       if (to.meta.authLevel.indexOf(userType) < 0) {
-        swal("You are not Authorized to access this page!", "If you feel this is unfair, please contact admin.", "error");
+        swal("You are not Authorized to access this page!", "If you feel this is unfair, please contact admin.", "error").then((value) => {
+          next('/');
+        });
         return;
       }
     }

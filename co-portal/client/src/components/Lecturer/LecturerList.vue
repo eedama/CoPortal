@@ -187,6 +187,14 @@ export default {
 /* RESET
                     ========================================== */
 
+.contact *,
+.contact *:before,
+.contact *:after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 /* CONTACT
                     ========================================== */
 

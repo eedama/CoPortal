@@ -57,11 +57,13 @@ router.post("/add/questionaire", function (req, res) {
 router.post("/submit/questionaire", function (req, res) {
   var solution = new Solution({
     _id: mongoose.Types.ObjectId(),
-    studentId: req.body.studentId,
+    studentId: req.body.solution.isMemo ? null : req.body.studentId,
     questionaireId: req.body.solution.id,
     isMemo: req.body.solution.isMemo,
     answers: req.body.solution.answers
   });
+  console.log(solution);
+
   if (!req.body.solution.isMemo) {
     solution.save(function (err) {
       if (err) res.send(err);
@@ -70,11 +72,17 @@ router.post("/submit/questionaire", function (req, res) {
         student.solutions.push(solution._id);
         student.save(function (err) {
           if (err) res.status(512).send("Server error : " + err.message);
+          console.log(solution);
           res.json(solution);
         })
       }).catch(err => {
         res.status(512).send("Server error : " + err.message);
       })
+    });
+  } else {
+    solution.save(function (err) {
+      if (err) res.status(512).send("Server error : " + err.message);
+      res.json(solution);
     });
   }
 });

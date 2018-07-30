@@ -8,54 +8,107 @@
         </div>
       </div>
     </div>
+  
     <div class="row">
+      <div class="col s8 offset-s2 center-align">
+        <a v-on:click="addingStudents = !addingStudents" :class="{'red':addingStudents}" class="btn waves-effect">{{ !addingStudents ? 'Add Student' : 'Cancel'}}</a>
+      </div>
+    </div>
+    <div v-if="addingStudents" class="row valign-wrapper" style="height:80vh">
+      <div class="col m6 offset-m3 col s12 center-align">
+        <div class="card row">
+          <div class="card-content">
+            <div class="row">
+              <div class="col s12 center-align">
+                <h5>Adding a student</h5>
+              </div>
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="student.firstname" id="Firstname" name="Firstname" type="text" />
+                <label class="text-center" for="Firstname">Firstname</label>
+              </div>
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="student.lastname" id="Lastname" name="Lastname" type="text" />
+                <label class="text-center" for="Lastname">Lastname</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+                <input v-model="student.username" id="Username" name="Username" type="text" />
+                <label class="text-center" for="Username">Username</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="student.password" id="Password" name="Password" type="password" />
+                <label class="text-center" for="Password">Password</label>
+              </div>
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="student.confirmPassword" id="ConfirmPassword" name="ConfirmPassword" type="password" />
+                <label class="text-center" for="ConfirmPassword">Confirm Password</label>
+              </div>
+            </div>
+            <div class="row" v-show="txtError.length > 0">
+              <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                <label class="text-center red-text">{{ txtError }}</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                <input v-on:click="SubmitStudent()" type="submit" value="Submit student" class="btn center-align tg-btn" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="!addingStudents" class="row">
       <div v-if="student != null" v-for="(student,i) in students" :key="i" class="contact-area col s12 m6 l4 xl3">
         <div class="contact">
-          <main v-if="selectedStudent == null">
+          <main v-if="selectedStudent == null || selectedStudent != student">
             <section>
               <div class="content">
                 <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/256492/_mLIxaKY_400x400.jpg" alt="Profile Image">
-  
+                <p>{{ students[i]._id}}</p>
                 <aside>
                   <h1 class="white-text valign-wrapper">{{ student.lastname }} {{ student.firstname}}</h1>
                 </aside>
   
                 <button v-on:click="GetPastTestsFor(student)" class="pointer waves-effect">
-                        <span>Past tests</span>
-                </button>
+                          <span>Past tests</span>
+                  </button>
               </div>
   
             </section>
   
   
           </main>
-          <div v-if="selectedStudent != null">
+          <div v-if="selectedStudent != null && selectedStudent == student">
             <main>
               <section>
                 <div class="content">
                   <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/256492/_mLIxaKY_400x400.jpg" alt="Profile Image">
   
                   <aside>
-                    <h1 class="white-text valign-wrapper">{{ student.lastname }} {{ student.show }} {{ student.firstname}}</h1>
+                    <h1 class="white-text valign-wrapper">{{ student.lastname }} {{ student.firstname}}</h1>
                   </aside>
   
-                  <button v-on:click="selectedStudent = null" class="pointer waves-effect active">
-                                          <span>Cancel</span>
-                              
-                                       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"> <g class="nc-icon-wrapper" fill="#444444"> <path d="M14.83 30.83L24 21.66l9.17 9.17L36 28 24 16 12 28z"></path> </g> </svg>
-                   </button>
+                  <button v-on:click="selectedStudent = null" class="pointer waves-effect" :class="{'active': selectedStudent == student}">
+                                            <span>Cancel</span>
+                                
+                                         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"> <g class="nc-icon-wrapper" fill="#444444"> <path d="M14.83 30.83L24 21.66l9.17 9.17L36 28 24 16 12 28z"></path> </g> </svg>
+                     </button>
                 </div>
-                <div class="title active">
+                <div class="title" :class="{'active': selectedStudent == student}">
                   <p>Past tests</p>
                 </div>
   
               </section>
             </main>
-            <nav class="active">
+            <nav :class="{'active': selectedStudent == student}">
               <a v-on:click="goToSolution(pastTest.solutionId)" v-for="(pastTest,v) in selectedStudent.pastTests" :key="v" href="#" class="facebook waves-effect">
                 <div class="content">
                   <h1>{{pastTest.title}}</h1>
-                  <span>{{ getMoment(pastTest.date).fromNow() }}</span>
+                  <span></span>
                   <h1 class="black-text">{{pastTest.mark}}</h1>
                 </div>
   
@@ -82,6 +135,15 @@ export default {
   data() {
     return {
       _txtSearch: "",
+      txtError: "",
+      student: {
+        firstname: "",
+        lastname: "",
+        username: "",
+        password: "",
+        confirmPassword: ""
+      },
+      addingStudents: false,
       students: [],
       selectedStudent: null
     };
@@ -102,6 +164,7 @@ export default {
       .get(this.$store.state.settings.baseLink + "/s/students/all")
       .then(results => {
         this.students = results.data;
+        console.log(this.students);
         this.students.map(s => {
           s.show = true;
         });
@@ -124,7 +187,9 @@ export default {
     goToSolution(solutionId) {
       this.$router.push({
         name: "TestMarks",
-        params: { solutionId: solutionId }
+        params: {
+          solutionId: solutionId
+        }
       });
     },
     GetPastTestsFor(student) {
@@ -135,27 +200,66 @@ export default {
             student._id
         )
         .then(results => {
-          this.students.filter(s => s._id == student._id).map(s => {
-            s.pastTests = [];
-            results.data.forEach(element => {
-              s.pastTests.push({
-                solutionId: element.solutionId,
-                title: element.title,
-                mark: element.mark,
-                date: element.date
+          this.students.map(s => {
+            if (s._id == student._id) {
+              s.pastTests = [];
+              results.data.forEach(element => {
+                s.pastTests.push({
+                  solutionId: element.solutionId,
+                  title: element.title,
+                  mark: element.mark,
+                  date: element.date
+                });
               });
-            });
+              this.selectedStudent = s;
+            }
           });
-
-          this.selectedStudent = this.students.filter(
-            s => (s._id = student._id)
-          )[0];
         })
         .catch(err => {
           if (err.response != null && err.response.status == 512) {
             swal(err.response.data, "error");
           } else {
             swal("Unable to load students", err.message, "error");
+          }
+        });
+    },
+    SubmitStudent() {
+      this.txtError = "";
+      if (this.student.lastname.length < 2) {
+        this.txtError = "Please enter a valid lastname";
+      }
+
+      if (this.student.firstname.length < 2) {
+        this.txtError = "Please enter a valid firstname";
+      }
+
+      if (this.student.password != this.student.confirmPassword) {
+        this.txtError = "Passwords do not match";
+      }
+
+      if (this.student.password.length < 6) {
+        this.txtError =
+          "Please enter a valid password , passwords must be more than 6 charactors long";
+      }
+      if (this.student.username.length < 2) {
+        this.txtError = "Please enter a valid username";
+      }
+
+      if (this.txtError.length > 2) return;
+
+      axios
+        .post(this.$store.state.settings.baseLink + "/a/add/student", {
+          student: this.student
+        })
+        .then(results => {
+          this.students = results.data;
+          this.addingStudents = false;
+        })
+        .catch(err => {
+          if (err.response != null && err.response.status == 512) {
+            this.txtError = err.response.data;
+          } else {
+            swal("Unable to submit the student", err.message, "error");
           }
         });
     }
@@ -166,24 +270,24 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 /* COLORS
-              ========================================== */
+                ========================================== */
 
 /* MIXINS
-              ========================================== */
+                ========================================== */
 
 /* RESET
-              ========================================== */
+                ========================================== */
 
-*,
-*:before,
-*:after {
+.contact *,
+.contact *:before,
+.contact *:after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
 /* CONTACT
-              ========================================== */
+                ========================================== */
 
 .contact-area {
   width: 100%;
