@@ -18,15 +18,22 @@
         <a class="btn-floating transparent waves-effect right-align" v-on:click="addingFeedBack = !addingFeedBack"><i class="material-icons red-text">close</i></a>
       </div>
       <div class="row">
-        <div class="col s10 offset-s1 chat" :class="{'right-align':feedback.from == 'Joe'}" v-for="(feedback,i) in feedbacks" :key="i">
-          <span class="chip message" :class="{'notSent':feedback.status != 'sent'}">
-               <span class="from">{{ feedback.from }}</span> : {{ feedback.message }}
+        <div class="col s10 offset-s1 chat" :class="{'right-align':feedback.from.id == $store.state.user.id}" v-for="(feedback,i) in feedbacks" :key="i">
+          <span class="chip message" :class="{'notSent':feedback.status != 'sent','black white-text':feedback.from.type != 'STUDENT'}">
+               <span class="from" :class="{'white-text':feedback.from.type != 'STUDENT'}">{{ feedback.from.name }}</span> : {{ feedback.message }}
           </span>
           <p class="time">{{ feedback.status != 'sent' ? feedback.status : getMoment(feedback.date).fromNow() }}</p>
         </div>
       </div>
-      <div class="col s12 right-align">
-        <a class="btn-floating transparent waves-effect right-align" v-on:click="refreshFeedbacks"><i class="material-icons black-text">refresh</i></a>
+      <div class="col s10 switch">
+            <label>
+                <input v-on:change="toggleAutoRefresh" v-model="autoRefreshChats" type="checkbox">
+                <span class="lever"></span>
+                {{ autoRefreshChats ?  'Auto refreshing every 5 seconds' : 'Auto refresh is off, Use the button on the right to get the latest messages' }} 
+              </label>
+          </div>
+      <div class="col s2 right-align">
+           <a class="btn-floating transparent waves-effect right-align" v-on:click="refreshFeedbacks"><i class="material-icons black-text">refresh</i></a>
       </div>
       <form class="col s12 center-align">
         <div class="row">
@@ -80,30 +87,13 @@ export default {
       txtFeedback: "",
       currentPage: 0,
       Solution: [],
-      feedbacks: [
-        {
-          from: "Joe",
-          message: "This app does not work.",
-          date: new Date(),
-          status: "sent"
-        },
-        {
-          from: "Mpho",
-          message:
-            "It does chdbvbjdjbhsdj hdbs jhdbhj bdshjsd bbhj bfusdbfuywe fyue fyekwubyewhkfsdb kfyubewk ufybehb",
-          date: new Date(),
-          status: "sent"
-        },
-        {
-          from: "Joe",
-          message: "Why do you say so?",
-          date: new Date(),
-          status: "sent"
-        }
-      ],
-      addingFeedBack: false
+      feedbacks: [],
+      addingFeedBack: false,
+      autoRefreshChats: false,
+      refreshTimer: ""
     };
   },
+  computed: {},
   mounted() {
     if (this.solutionId == null) {
       this.$router.push("/");
@@ -137,6 +127,14 @@ export default {
   },
   props: ["solutionId"],
   methods: {
+    toggleAutoRefresh() {
+      if (this.autoRefreshChats) {
+        this.refreshTimer = setInterval(this.refreshFeedbacks, 5000);
+      } else {
+        clearInterval(this.refreshTimer);
+      }
+      alert(this.refreshTimer);
+    },
     getMoment(value) {
       return moment(value);
     },
@@ -179,11 +177,20 @@ export default {
       }
     },
     SubmitFeedback() {
+      if (!this.$store.state.user.isLoggedIn) {
+        swal(
+          "Unable to send",
+          "Your session is over please log in again",
+          "error"
+        );
+        return;
+      }
+      alert("WHat is this -> " + this.$store.state.user.name);
       if (this.txtFeedback.length < 1) {
         return;
       }
       var feedback = {
-        from: "Joe",
+        from: this.$store.state.user.username,
         message: this.txtFeedback,
         date: new Date(),
         status: "sending...."
@@ -198,7 +205,9 @@ export default {
             "/l/feedback/submit/" +
             this.Solution.questionaireId,
           {
+            fromId: this.$store.state.user.id,
             from: feedback.from,
+            fromType: this.$store.state.user.type,
             message: feedback.message,
             date: feedback.date,
             existingId: this.feedbacks.map(m => m._id)

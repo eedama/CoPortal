@@ -44,7 +44,28 @@ export default {
   },
   methods: {
     TakeTest(test) {
-      this.$router.push({ name: "TakeTest", params: { dbQuestionaire: test } });
+      if (this.$store.state.user.type == "LECTURER") {
+        axios
+          .get(
+            this.$store.state.settings.baseLink +
+              "/l/get/solution/id/for/" +
+              test._id
+          )
+          .then(results => {
+            this.$router.push({
+              name: "TestMarks",
+              params: { solutionId: results.data.id }
+            });
+          })
+          .catch(err => {
+            swal("Unable to submit", err.message, "error");
+          });
+      } else {
+        this.$router.push({
+          name: "TakeTest",
+          params: { dbQuestionaire: test }
+        });
+      }
     }
   }
 };

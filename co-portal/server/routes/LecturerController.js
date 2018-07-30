@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 
 import Questionaire from "../models/Questionaire";
 import Solution from "../models/Solution";
+import Student from "../models/Student";
 import Lecturer from "../models/Lecturer";
 
 /*
@@ -67,6 +68,21 @@ router.post("/submit/questionaire", function (req, res) {
   }
 });
 
+router.get("/get/solution/id/for/:questionaireId", function (req, res) {
+  var questionaireId = req.params.questionaireId;
+  Solution.findOne({
+    questionaireId: questionaireId,
+    isMemo: true
+  }).then(solution => {
+    if (solution == null) res.status(512).send("No solution for this questionaire");
+    res.json({
+      id: solution._id
+    });
+  }).catch(err => {
+    res.status(512).send("Server error : " + err.message);
+  });
+});
+
 router.post('/feedback/submit/:questionaireId', function (req, res) {
   var questionaireId = req.params.questionaireId;
   console.log("Submitting feedback " + questionaireId)
@@ -81,7 +97,11 @@ router.post('/feedback/submit/:questionaireId', function (req, res) {
 
       s.feedbacks.push({
         _id: mongoose.Types.ObjectId(),
-        from: req.body.from,
+        from: {
+          id: req.body.fromId,
+          name: req.body.from,
+          type: req.body.fromType
+        },
         message: req.body.message,
         date: req.body.date,
         status: 'sent'
