@@ -68,7 +68,6 @@
             <section>
               <div class="content">
                 <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/256492/_mLIxaKY_400x400.jpg" alt="Profile Image">
-                <p>{{ students[i]._id}}</p>
                 <aside>
                   <h1 class="white-text valign-wrapper">{{ student.lastname }} {{ student.firstname}}</h1>
                 </aside>
