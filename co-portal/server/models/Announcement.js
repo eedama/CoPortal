@@ -6,15 +6,15 @@ const AnnouncementSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         default: mongoose.Types.ObjectId()
     },
-    LecturerId: {
+    lecturerId: {
         type: Schema.Types.ObjectId,
         ref: 'Lecturer'
     },
-    StudentId: {
+    studentId: {
         type: Schema.Types.ObjectId,
         ref: 'Student'
     },
-    ModuleId: {
+    moduleId: {
         type: Schema.Types.ObjectId,
         ref: 'Module'
     },
