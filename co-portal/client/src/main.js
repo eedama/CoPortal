@@ -5,6 +5,9 @@ import App from './App'
 import router from './router'
 import store from "./store";
 import VueTyperPlugin from 'vue-typer'
+import VueMaterial from "vue-material";
+
+import * as moment from "moment";
 
 import "materialize-css/dist/css/materialize.min.css";
 var materialize = require("materialize-css/dist/js/materialize.min.js");
@@ -21,10 +24,19 @@ Vue.component("emoji", Emoji);
 
 Vue.config.productionTip = false
 Vue.use(VueTyperPlugin)
+Vue.use(VueMaterial)
+// Vue.use(MdOption)
+// Vue.use(Mdfield)
 
 Vue.prototype.$materialize = materialize;
 Vue.prototype.$emoji = Emoji;
-
+Vue.mixin({
+  methods: {
+    getMoment(value) {
+      return moment(value);
+    }
+  }
+})
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

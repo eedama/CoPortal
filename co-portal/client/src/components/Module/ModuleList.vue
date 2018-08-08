@@ -85,7 +85,6 @@
 
 <script>
 import swal from "sweetalert";
-import * as moment from "moment";
 
 const axios = require("axios");
 
@@ -137,9 +136,6 @@ export default {
   methods: {
     DeepSearch() {
       alert("Deep searching for " + this.txtSearch);
-    },
-    getMoment(value) {
-      return moment(value);
     },
     goToSolution(solutionId) {
       this.$router.push({
