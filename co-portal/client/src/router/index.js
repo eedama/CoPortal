@@ -7,6 +7,7 @@ import SetTest from '@/components/SetTest'
 import TakeTest from '@/components/TakeTest'
 import TestMarks from '@/components/TestMarks'
 import StudentList from '@/components/Student/StudentList'
+import ModuleList from '@/components/Module/ModuleList'
 import LecturerList from '@/components/Lecturer/LecturerList'
 
 Vue.use(Router)
@@ -85,6 +86,21 @@ const router = new Router({
         authLevel: ['ADMIN'],
       },
       component: LecturerList
+    },
+    /**
+     * Lecturer routes END
+     */
+
+    /**
+     * Module routes START
+     */
+    {
+      path: '/module/list',
+      name: 'ModuleList',
+      meta: {
+        authLevel: ['ADMIN', 'LECTURER', 'STUDENT'],
+      },
+      component: ModuleList
     }
     /**
      * Lecturer routes END

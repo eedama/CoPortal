@@ -7,7 +7,9 @@ var bodyParser = require("body-parser");
 
 var app = express();
 
-import mongoose from "mongoose";
+import mongoose, {
+    mongo
+} from "mongoose";
 import adminController from "./routes/AdminController";
 import studentController from "./routes/StudentController";
 import lecturerController from "./routes/LecturerController";
@@ -51,10 +53,10 @@ mongoose.connect("mongodb://localhost:27017/JMRdb", {
 
 mongoose
     .connect("mongodb://localhost:27017/CoportalDB?authSource=admin", {
-        auth: {
-            user: "admin",
-            password: "Mulavhelesi@1"
-        },
+        //  auth: {
+        //      user: "admin",
+        //      password: "Mulavhelesi@1"
+        //  },
         useNewUrlParser: true,
         reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
         reconnectInterval: 500, // Reconnect every 500ms
