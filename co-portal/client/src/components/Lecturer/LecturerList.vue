@@ -109,13 +109,13 @@
           <label class="center-align" for="Search">Search....</label>
         </div>
       </div>
-      <div v-if="lecturer != null" v-for="(lecturer,i) in lecturers" :key="i" class="col s12 m6 l4 xl3 pointer">
+      <div v-if="lecturer != null" v-for="(lecturer,i) in filteredLecturers" :key="i + lecturer._id" class="col s12 m6 l4 xl3 pointer">
         <div class="col s12">
           <md-card>
             <md-card-header>
               <div class="md-title">{{ lecturer.lastname }} {{ lecturer.firstname}}</div>
               <div class="md-subhead">
-                <p v-for="m in lecturer.modules" :key="m"><a class="waves-effect">{{ m.name }} ( {{ m.code }} )</a></p>
+                <p v-for="m in lecturer.modules" :key="m._id"><a class="waves-effect">{{ m.name }} ( {{ m.code }} )</a></p>
               </div>
             </md-card-header>
   
@@ -227,7 +227,7 @@ export default {
       },
       addingLecturers: false,
       //
-      _txtSearch: "",
+      txtSearch: "",
       lecturers: [],
       modules: []
     };
@@ -255,14 +255,14 @@ export default {
     }
   },
   computed: {
-    txtSearch: {
-      get() {
-        return this._txtSearch;
-      },
-      set(v) {
-        // FIlter lecturers
-        this._txtSearch = v;
-      }
+    filteredLecturers() {
+      return this.lecturers.filter(
+        l =>
+          this.txtSearch.length < 2 ||
+          JSON.stringify(l)
+            .toLowerCase()
+            .indexOf(this.txtSearch.toLowerCase()) >= 0
+      );
     }
   },
   mounted() {
@@ -270,6 +270,7 @@ export default {
       .get(this.$store.state.settings.baseLink + "/l/lecturers/all")
       .then(results => {
         this.lecturers = results.data;
+        // this.filteredLecturers = results.data;
       })
       .catch(err => {
         if (err.response != null && err.response.status == 512) {
