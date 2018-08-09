@@ -1,15 +1,15 @@
 <template>
-  <div class="home">
+  <div class="screen">    
     <div class="row">
-      <div class="col s10 offset-s1 m8 offset-m2 center-align">
-        <img src="../assets/logo.png" class="responsive-img">
-      </div>
-      <div class="col s6 offset-s3 center-align">
+     <div class="col s6 offset-s3 center-align">
         <h5 class="center-align">
           <vue-typer v-if="!$store.state.user.isLoggedIn" class="center-align" :text='titleText' erase-style='backspace'></vue-typer>
           <span v-if="$store.state.user.isLoggedIn">Welcome back <a class="pointer waves-effect">{{ $store.state.user.username }}</a></span>
         </h5>
+      </div> <div class="col s10 offset-s1 m8 offset-m2 center-align">
+        <img src="../assets/logo.png" class="responsive-img">
       </div>
+      
     </div>
     <div class="row">
       <div v-if="!$store.state.user.isLoggedIn" v-on:click="$router.push('/login')" class="col m6 offset-m3 s12 pointer bigButton center-align waves-effect">
@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-      <div v-if="$store.state.user.isLoggedIn" class="row">
+    <div v-if="$store.state.user.isLoggedIn" class="row">
       <div v-on:click="Logout()" class="col m2 offset-m5 s12 pointer center-align waves-effect">
         <div class="card-panel hoverable red">
           <h5 class="text-xs-center">Log out <i class="material-icons right">exit_to_app</i> </h5>
@@ -45,7 +45,7 @@ export default {
       titleText: ["Welcome to Co-Portal.", "Please take a test"],
       options: [
         {
-          text: "My Dashboard",
+          text: "Profile",
           link:
             this.$store.state.user.type +
             "/dashboard/for/" +
@@ -101,5 +101,19 @@ export default {
 .bigButton :hover {
   background: black;
   color: white;
+}
+
+.screen{
+      /* The image used */
+    background-image: url("../assets/img/plain-white.png");
+
+    /* Full height */
+    height: 100vh; 
+    padding-top:200px;
+
+    /* Center and scale the image nicely */
+    background-position:top;
+    background-repeat: no-repeat;
+    background-size: fit;
 }
 </style>

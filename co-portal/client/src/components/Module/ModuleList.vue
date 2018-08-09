@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col s8 offset-s2">
         <md-button v-on:click="$router.back()" class="right">
-            <md-icon>keyboard_backspace</md-icon>
+          <md-icon>keyboard_backspace</md-icon>
           <span>Back</span>
         </md-button>
       </div>
@@ -60,6 +60,38 @@
       </div>
     </div>
     <div v-if="!addingModules" class="row">
+      <md-dialog class="card" style="position:absolute" :md-active.sync="showNotesAndTests">
+        <md-dialog-actions>
+          <md-button class="md-icon-button right" @click="showNotesAndTests = false">
+            <md-icon>close</md-icon>
+          </md-button>
+        </md-dialog-actions>
+        <md-tabs md-dynamic-height>
+          <md-tab class="active" md-label="Notes">
+            <md-list class="md-double-line">
+              <md-list-item class="waves-effect">
+                <md-icon class="md-primary">library_books</md-icon>
+                <div class="md-list-item-text">
+                  <span>The life of life</span>
+                  <span>{{ getMoment(new Date()).format('YYYY-MM-DD hh:mm') }}</span>
+                </div>
+              </md-list-item>
+            </md-list>
+          </md-tab>
+  
+          <md-tab md-label="Tests">
+             <md-list class="md-double-line">
+              <md-list-item class="waves-effect">
+                <md-icon class="md-primary">assignment</md-icon>
+                <div class="md-list-item-text">
+                  <span>This is the title</span>
+                  <span>{{ getMoment(new Date()).format('YYYY-MM-DD hh:mm') }}</span>
+                </div>
+              </md-list-item>
+            </md-list>
+               </md-tab>
+        </md-tabs>
+      </md-dialog>
       <div class="col s12">
         <table class="highlight card" v-show="modules && modules.length > 0">
           <thead>
@@ -69,6 +101,7 @@
               <th>Description</th>
               <th>Lecturers</th>
               <th>Total students</th>
+              <th>Notes and tests</th>
             </tr>
           </thead>
   
@@ -78,15 +111,17 @@
               <td>{{ module.code }}</td>
               <td>{{ module.description }}</td>
               <td>
-                <a v-for="lecturer in module.lecturers" :key="lecturer._id">
-                        {{ l.lastname }} {{ l.firstname }}
-                      </a>
+                <a class="pointer" v-for="lecturer in module.lecturers" :key="lecturer._id">
+                  <p>{{ lecturer.lastname }} {{ lecturer.firstname }}</p>
+                </a>
               </td>
-              <td>{{ module.students.length }}</td>
+              <td><a class="pointer">{{ module.students.length }}</a></td>
+              <td><a class="pointer btn" v-on:click="showNotesAndTests = true">Open</a></td>
             </tr>
           </tbody>
         </table>
       </div>
+  
     </div>
   </div>
 </template>
@@ -109,7 +144,8 @@ export default {
       },
       addingModules: false,
       modules: [],
-      selectedStudent: null
+      selectedStudent: null,
+      showNotesAndTests: false
     };
   },
   computed: {

@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="screen">
   <div class="row">
       <div class="col s8 offset-s2">
         <md-button v-on:click="$router.back()" class="right">
@@ -10,7 +10,7 @@
     </div>
     <div class="row valign-wrapper" style="height:80vh">
         <div class="col m6 offset-m3 col s12 center-align">
-            <div class="card row">
+            <div class="card row z-depth-5">
                 <div class="card-image col l8 offset-l2 m6 offset-m3 s12">
                     <img class="img-responsive" src="static/img/coPortalLogo.jpg">
                 </div>
@@ -124,35 +124,17 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.p-10 {
-  padding: 10px;
-}
+.screen{
+      /* The image used */
+    background-image: url("../assets/img/cupOfCoffee.jpg");
 
-h1,
-h2 {
-  font-weight: normal;
-}
+    /* Full height */
+    height: 100vh; 
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
-
-.pointer {
-  cursor: pointer;
-}
-
-.selectedTag {
-  background-color: #42b983 !important;
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 </style>
 
