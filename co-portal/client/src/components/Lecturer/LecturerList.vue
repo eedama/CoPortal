@@ -1,6 +1,14 @@
 <template>
   <div>
     <div class="row">
+      <div class="col s8 offset-s2">
+        <md-button v-on:click="$router.back()" class="right">
+            <md-icon>keyboard_backspace</md-icon>
+          <span>Back</span>
+        </md-button>
+      </div>
+    </div>
+    <div class="row">
       <div class="col s8 offset-s2 center-align">
         <a v-on:click="addingLecturers = !addingLecturers" :class="{'red':addingLecturers}" class="btn waves-effect">{{ !addingLecturers ? 'Add Lecturer' : 'Cancel'}}</a>
       </div>
@@ -108,6 +116,9 @@
           <input v-on:keypress.enter="DeepSearch" v-model="txtSearch" id="Password" name="Search" type="search" />
           <label class="center-align" for="Search">Search....</label>
         </div>
+      </div>
+      <div v-show="filteredLecturers.length == 0" class="col s12 center-align">
+        <p class="red-text">No results found</p>
       </div>
       <div v-if="lecturer != null" v-for="(lecturer,i) in filteredLecturers" :key="i + lecturer._id" class="col s12 m6 l4 xl3 pointer">
         <div class="col s12">
@@ -258,7 +269,7 @@ export default {
     filteredLecturers() {
       return this.lecturers.filter(
         l =>
-          this.txtSearch.length < 2 ||
+          this.txtSearch.length < 1 ||
           JSON.stringify(l)
             .toLowerCase()
             .indexOf(this.txtSearch.toLowerCase()) >= 0

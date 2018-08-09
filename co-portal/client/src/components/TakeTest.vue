@@ -1,5 +1,13 @@
 <template>
   <div class="row">
+    <div class="row">
+      <div class="col s8 offset-s2">
+        <md-button v-on:click="$router.back()" class="right">
+          <md-icon>keyboard_backspace</md-icon>
+          <span>Back</span>
+        </md-button>
+      </div>
+    </div>
     <div class="col s10 offset-s1">
       <div v-if="currentPage == i" v-for="(question,i) in Questionaire.questions" :key="i" class="row">
         <div class="col s10 offset-s1 row card-panel">
@@ -10,9 +18,9 @@
             <form>
               <h6 class="pointer" v-for="(answer,j) in question.answers" :key="j">
                 <label>
-                    <input v-model="solutions[i]" :value="answer" :id="answer + '-' + j" class="with-gap" :name="question.id" type="radio"/>
-                    <span :for="answer + '-' + j">{{ answer }}</span>
-                  </label>
+                      <input v-model="solutions[i]" :value="answer" :id="answer + '-' + j" class="with-gap" :name="question.id" type="radio"/>
+                      <span :for="answer + '-' + j">{{ answer }}</span>
+                    </label>
               </h6>
             </form>
           </div>
@@ -37,99 +45,101 @@
 </template>
 
 <script>
-import swal from "sweetalert";
-const axios = require("axios");
-
-export default {
-  name: "Test",
-  data() {
-    return {
-      currentPage: 0,
-      solutions: [],
-      Questionaire: null,
-      txtError: ""
-    };
-  },
-  mounted() {
-    if (
-      this.dbQuestionaire == null ||
-      this.dbQuestionaire.questions == null ||
-      this.dbQuestionaire.questions.length <= 0
-    ) {
-      this.$router.push("/");
-      return;
-    }
-    this.solutions = [];
-    this.dbQuestionaire.questions.map(q => {
-      this.solutions.push(null);
-    });
-
-    this.Questionaire = this.dbQuestionaire;
-  },
-  props: ["dbQuestionaire", "isMemo"],
-  methods: {
-    changePage(isForward) {
-      this.txtError = "";
-      isForward ? this.currentPage++ : this.currentPage--;
+  import swal from "sweetalert";
+  const axios = require("axios");
+  
+  export default {
+    name: "Test",
+    data() {
+      return {
+        currentPage: 0,
+        solutions: [],
+        Questionaire: null,
+        txtError: ""
+      };
     },
-    SubmitQuiz() {
-      this.txtError = "";
-      var hasError = false;
-      this.solutions.map((s, i) => {
-        if (s == null) {
-          hasError = true;
-          this.txtError = "Please provide an answer to this question";
-          this.currentPage = i;
-        }
+    mounted() {
+      if (
+        this.dbQuestionaire == null ||
+        this.dbQuestionaire.questions == null ||
+        this.dbQuestionaire.questions.length <= 0
+      ) {
+        this.$router.push("/");
+        return;
+      }
+      this.solutions = [];
+      this.dbQuestionaire.questions.map(q => {
+        this.solutions.push(null);
       });
-      if (hasError) return;
-
-      swal({
-        title: "Submit?",
-        text: "Are you sure you want to submit?",
-        icon: "warning",
-        buttons: [true, "Yes"]
-      }).then(proceedSubmit => {
-        if (proceedSubmit) {
-          var solution = {
-            id: this.Questionaire._id,
-            isMemo: this.isMemo,
-            answers: []
-          };
-          this.solutions.forEach((v, i) => {
-            solution.answers.push({
-              answer: v,
-              question: this.Questionaire.questions[i]
-            });
-          });
-
-          axios
-            .post(
-              this.$store.state.settings.baseLink + "/l/submit/questionaire",
-              {
-                studentId: this.$store.state.user.id,
-                solution: solution
-              }
-            )
-            .then(results => {
-              swal("Submitted!", {
-                icon: "success"
+  
+      this.Questionaire = this.dbQuestionaire;
+    },
+    props: ["dbQuestionaire", "isMemo"],
+    methods: {
+      changePage(isForward) {
+        this.txtError = "";
+        isForward ? this.currentPage++ : this.currentPage--;
+      },
+      SubmitQuiz() {
+        this.txtError = "";
+        var hasError = false;
+        this.solutions.map((s, i) => {
+          if (s == null) {
+            hasError = true;
+            this.txtError = "Please provide an answer to this question";
+            this.currentPage = i;
+          }
+        });
+        if (hasError) return;
+  
+        swal({
+          title: "Submit?",
+          text: "Are you sure you want to submit?",
+          icon: "warning",
+          buttons: [true, "Yes"]
+        }).then(proceedSubmit => {
+          if (proceedSubmit) {
+            var solution = {
+              id: this.Questionaire._id,
+              isMemo: this.isMemo,
+              answers: []
+            };
+            this.solutions.forEach((v, i) => {
+              solution.answers.push({
+                answer: v,
+                question: this.Questionaire.questions[i]
               });
-              this.$router.push({
-                name: "TestMarks",
-                params: { solutionId: results.data._id }
-              });
-            })
-            .catch(err => {
-              swal("Unable to submit", err.message, "error");
             });
-        }
-      });
+  
+            axios
+              .post(
+                this.$store.state.settings.baseLink + "/l/submit/questionaire", {
+                  studentId: this.$store.state.user.id,
+                  solution: solution
+                }
+              )
+              .then(results => {
+                swal("Submitted!", {
+                  icon: "success"
+                });
+                this.$router.push({
+                  name: "TestMarks",
+                  params: {
+                    solutionId: results.data._id
+                  }
+                });
+              })
+              .catch(err => {
+                swal("Unable to submit", err.message, "error");
+              });
+          }
+        });
+      }
     }
-  }
-};
+  };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  
 </style>

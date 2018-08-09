@@ -1,5 +1,13 @@
 <template>
   <div class="row">
+        <div class="row">
+      <div class="col s8 offset-s2">
+        <md-button v-on:click="$router.back()" class="right">
+            <md-icon>keyboard_backspace</md-icon>
+          <span>Back</span>
+        </md-button>
+      </div>
+    </div>
     <div class="col s12 center-align card-panel row">
       <div class="col s12 m8 offset-m2">
         <h4><a>{{ Solution.isMemo ? 'Memorandum' : Solution.studentId.firstname + " " + Solution.studentId.lastname}}</a></h4>

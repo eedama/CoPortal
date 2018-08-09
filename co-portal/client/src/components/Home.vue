@@ -68,6 +68,11 @@ export default {
           auth: ["ADMIN"]
         },
         {
+          text: "Modules",
+          link: "/module/list",
+          auth: ["ADMIN", "LECTURER"]
+        },
+        {
           text: "Test list",
           link: "/test/list",
           auth: ["STUDENT", "LECTURER", "ADMIN"]

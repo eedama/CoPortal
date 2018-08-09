@@ -1,6 +1,14 @@
 <template>
   <div>
     <div class="row">
+      <div class="col s8 offset-s2">
+        <md-button v-on:click="$router.back()" class="right">
+            <md-icon>keyboard_backspace</md-icon>
+          <span>Back</span>
+        </md-button>
+      </div>
+    </div>
+    <div class="row">
       <div class="col s10 offset-s1 m8 offset-m3 l6 offset-l3 ">
         <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
           <input v-on:keypress.enter="DeepSearch" v-model="txtSearch" id="Password" name="Search" type="search" />
@@ -65,14 +73,14 @@
           </thead>
   
           <tbody>
-            <tr v-for="(module,i) in modules" :key="i">
+            <tr v-for="(module,i) in filteredModules" :key="i">
               <td>{{ module.name }}</td>
               <td>{{ module.code }}</td>
               <td>{{ module.description }}</td>
               <td>
                 <a v-for="lecturer in module.lecturers" :key="lecturer._id">
-                      {{ l.lastname }} {{ l.firstname }}
-                    </a>
+                        {{ l.lastname }} {{ l.firstname }}
+                      </a>
               </td>
               <td>{{ module.students.length }}</td>
             </tr>
@@ -92,7 +100,7 @@ export default {
   name: "StidentList",
   data() {
     return {
-      _txtSearch: "",
+      txtSearch: "",
       txtError: "",
       module: {
         name: "",
@@ -105,14 +113,14 @@ export default {
     };
   },
   computed: {
-    txtSearch: {
-      get() {
-        return this._txtSearch;
-      },
-      set(v) {
-        // FIlter modules
-        this._txtSearch = v;
-      }
+    filteredModules() {
+      return this.modules.filter(
+        m =>
+          this.txtSearch.length < 1 ||
+          JSON.stringify(m)
+            .toLowerCase()
+            .indexOf(this.txtSearch.toLowerCase()) >= 0
+      );
     }
   },
   mounted() {
