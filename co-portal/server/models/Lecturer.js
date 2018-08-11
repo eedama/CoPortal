@@ -10,34 +10,30 @@ const LecturerSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Admin'
     },
-    idNumber: Number,
-    username: String,
+    idNumber: {
+        type: Number,
+        unique: true
+    },
+    username: {
+        type: String,
+        unique: true
+    },
     firstname: String,
     lastname: String,
-    room: String,
     gender: String,
     email: String,
     profilePic: String,
     password: String,
     contactNumbers: Number,
+    isSouthAfrican: {
+        type: Boolean,
+        default: null
+    },
     active: {
         type: Boolean,
         default: true
     },
-    nextOfKin: {
-        name: String,
-        surname: String,
-        relationship: String,
-        contact: Number
-    },
-    sponsor: String,
-    lease: {
-        rentDueOn: String,
-        startDate: Date,
-        endDate: Date,
-        rentAmount: Number,
-        depositAmount: Number
-    }, // ForeignKey
+    dob: Date,
     lastUpdatedAt: {
         type: Date,
         default: Date.now()
@@ -58,7 +54,11 @@ const LecturerSchema = new mongoose.Schema({
     questionaires: [{
         type: Schema.Types.ObjectId,
         ref: 'Questionaire'
-    }]
+    }],
+    modules: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Module'
+    }],
 });
 
 LecturerSchema.methods.findSimilarTypes = function (cb) {

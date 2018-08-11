@@ -6,9 +6,6 @@ import mongoose from "mongoose";
 import Admin from "../models/Admin";
 import Lecturer from "../models/Lecturer";
 import Student from "../models/Student";
-import Document from "../models/Document";
-import Transaction from "../models/Transaction";
-import Bug from "../models/Bug";
 
 /*
   TODO : Add admin

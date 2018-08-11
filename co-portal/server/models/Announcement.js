@@ -49,5 +49,16 @@ AnnouncementSchema.methods.findSimilarTypes = function (cb) {
     }, cb);
 };
 
+AnnouncementSchema.index({
+    lecturerId: 1,
+    studentId: 1,
+    moduleId: 1,
+    message: 1,
+    type: 1
+}, {
+    unique: true
+});
+
+
 const Announcement = mongoose.model('Announcement', AnnouncementSchema);
 module.exports = Announcement;

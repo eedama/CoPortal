@@ -41,6 +41,13 @@ LectureNoteSchema.methods.findSimilarTypes = function (cb) {
         type: this.type
     }, cb);
 };
+LectureNoteSchema.index({
+    lecturerId: 1,
+    moduleId: 1,
+    date: 1
+}, {
+    unique: true
+});
 
 const LectureNote = mongoose.model('LectureNote', LectureNoteSchema);
 module.exports = LectureNote;

@@ -26,5 +26,12 @@ const QuestionaireSchema = new mongoose.Schema({
     }
 });
 
+QuestionaireSchema.index({
+    title: 1,
+    questions: 1
+}, {
+    unique: true
+});
+
 const Questionaire = mongoose.model('Questionaire', QuestionaireSchema);
 module.exports = Questionaire;

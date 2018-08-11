@@ -43,5 +43,14 @@ ModuleSchema.methods.findSimilarTypes = function (cb) {
     }, cb);
 };
 
+ModuleSchema.index({
+    name: 1,
+    code: 1,
+    description: 1
+}, {
+    unique: true
+});
+
+
 const Module = mongoose.model('Module', ModuleSchema);
 module.exports = Module;

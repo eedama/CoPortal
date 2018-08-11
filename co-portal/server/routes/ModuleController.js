@@ -4,8 +4,10 @@ import mongoose from 'mongoose';
 
 // import the models
 import Module from '../models/Module';
+//import Attachment from '../models/Attachment'
 import LectureNote from '../models/LectureNote';
 import Admin from '../models/Admin';
+import Lecturer from '../models/Lecturer';
 import Student from '../models/Student';
 
 
@@ -18,18 +20,43 @@ import Student from '../models/Student';
          Get all for user (done),
          Get all from user (done)
 */
+
+router.get("/modules/all", function (req, res) {
+    Module.find()
+        .populate(["lecturers"])
+        .populate(["students"])
+        .populate(["notes"])
+        .then(modules => {
+            if (modules == null) res.status(512).send("Server error : bsaubdsajbfewjhbfa");
+            res.json(modules);
+        });
+});
+
 router.post('/add/new/module', function (req, res) {
 
-    var module = new Module({
-        _id: mongoose.Types.ObjectId(),
-        name: req.body.name,
-        code: req.body.code,
-        description: req.body.description,
-    });
+    Module.findOne({
+        name: req.body.module.name,
+        code: req.body.module.code,
+    }).then(results => {
+        if (results != null) res.status(512).send(`Module ${req.body.module.name}(${req.body.module.code}) already exist`);
+        var module = new Module({
+            _id: mongoose.Types.ObjectId(),
+            name: req.body.module.name,
+            code: req.body.module.code,
+            description: req.body.module.description,
+        });
 
-    module.save(function (err) {
-        if (err) res.status(512).send("Server error : " + err.message);
-        res.json(module);
+        module.save(function (err) {
+            if (err) res.status(512).send("Server error : " + err.message);
+            Module.find()
+                .populate(["lecturers"])
+                .populate(["students"])
+                .populate(["notes"])
+                .then(modules => {
+                    if (modules == null) res.status(512).send("Server error : sadbbyjwyqduqwgyu");
+                    res.json(modules);
+                });
+        });
     })
 });
 
@@ -38,9 +65,10 @@ router.post('/add/notes/for/:moduleId/by/:lectureId', function (req, res) {
     var lectureId = req.params.lectureId;
 
     Module.findById(moduleId).then(module => {
+        if (module == null) new Error("Module does not exist");
         if (module.lecturers.indexOf(lectureId) < 0) new Error("Lecturer does not exist / Is not incharge of this module");
 
-        var lecturerNote = new Module({
+        var lecturerNote = new LectureNote({
             _id: mongoose.Types.ObjectId(),
             lecturerId: lecturerId,
             moduleId: moduleId,
@@ -48,87 +76,146 @@ router.post('/add/notes/for/:moduleId/by/:lectureId', function (req, res) {
             size: req.body.size,
             thumbnail: req.body.thumbnail,
             description: req.body.description,
-            file: req.body.file,
+            //     file: Attachment.saveFile(req.body.document),
+            type: req.body.type,
         });
+
+        lecturerNote.save(function (err) {
+            if (err) res.status(512).send("Server error : " + err.message);
+            module.notes.push(lecturerNote._id);
+            module.save(function (err) {
+                if (err) res.status(512).send("Server error : " + err.message);
+                res.json(lecturerNote._id);
+            });
+        })
     }).catch(err => {
         res.status(512).send("Server error : " + err.message);
     });
 });
 
+router.post('/assign/to/lecturer/:lecturerID', function (req, res) {
+    var lecturerID = req.params.lecturerID;
 
+    var lecturerModules = new Array();
 
-router.get('/search/:searchText', function (req, res) {
-    var text = req.params.searchText;
-    Notification.find({
-        fromId: req.params.adminId,
-        dueDate: null
-    }).populate('fromId').populate('toId').then((notifications) => {
-        if (notifications == null) res.send("Error : 9032egrrtu834g9erbo");
-        res.json(notifications);
+    req.body.modules.filter(m => m != null).map(m => {
+        lecturerModules.push(mongoose.Types.ObjectId(m));
+    });
+
+    Lecturer.findById(lecturerID).then(lecturer => {
+        if (lecturer == null) res.status(512).send("Lecturer was not found");
+        Module.find({
+            '_id': {
+                $in: lecturerModules
+            }
+        }).then(modules => {
+            lecturerModules = modules.filter(m => lecturer.modules.filter(sm => sm == m._id).length == 0).map(m => m._id);
+            lecturer.modules.push(lecturerModules);
+            lecturer.save(function (err) {
+                if (err) res.status(512).send("Server error : " + err.message);
+                res.json(true);
+            });
+        }).catch(err => {
+            console.log(err);
+            res.status(512).send("Server error : " + err.message);
+        });
+    }).catch(err => {
+        console.log(err);
+        res.status(512).send("Server error : " + err.message);
     });
 });
 
-router.get('/all/for/:userId', function (req, res) {
-    var receiver = req.params.userId;
-    Notification.find({
-        toId: receiver
-    }).then((notifications) => {
-        if (notifications == null) res.send("Error : 9032egrrtu834g9erbo");
-        res.json(notifications);
+router.post("/unassign/module/:moduleID/from/lecturer/:lecturerID", function (req, res) {
+    var lecturerID = req.params.lecturerID;
+    var moduleID = req.params.moduleID;
+
+    Lecturer.findById(lecturerID).then(lecturer => {
+        if (lecturer == null) res.status(512).send("Lecturer was not found");
+        Module.findById(moduleID).then(module => {
+            if (module == null) res.status(512).send("Module was not found");
+            var victim = lecturer.modules.find(m => m == moduleID);
+            console.log("before " + lecturer.modules.length);
+            console.log(victim)
+            if (victim != null) {
+                var index = lecturer.modules.indexOf(victim);
+                console.log(index)
+                lecturer.modules.splice(index, 1);
+            }
+            console.log("after " + lecturer.modules.length);
+            lecturer.save(function (err) {
+                if (err) res.status(512).send("Server error : " + err.message);
+                res.json(true);
+            });
+        }).catch(err => {
+            console.log(err);
+            res.status(512).send("Server error : " + err.message);
+        });
+    }).catch(err => {
+        console.log(err);
+        res.status(512).send("Server error : " + err.message);
     });
 });
 
-router.get('/all/:userId', function (req, res) {
-    let sender = req.params.userId;
-    Notification.find({
-        dueDate: null,
-        $or: [{
-            fromId: sender
-        }, {
-            toId: sender
-        }]
-    }).then((result) => {
-        if (result == null) {
-            res.status(400);
-            res.send("Error : 9032egrrtu834g9erbo");
-        }
+router.post('/assign/to/student/:studentID', function (req, res) {
+    var studentID = req.params.studentID;
 
-        res.json(result);
+    var studentModules = new Array();
+
+    req.body.modules.filter(m => m != null).map(m => {
+        studentModules.push(mongoose.Types.ObjectId(m));
+    });
+
+    Student.findById(studentID).then(student => {
+        if (student == null) res.status(512).send("Student was not found");
+        Module.find({
+            '_id': {
+                $in: studentModules
+            }
+        }).then(modules => {
+            studentModules = modules.filter(m => student.modules.filter(sm => sm == m._id).length == 0).map(m => m._id);
+            student.modules.push(studentModules);
+            student.save(function (err) {
+                if (err) res.status(512).send("Server error : " + err.message);
+                res.json(true);
+            });
+        }).catch(err => {
+            console.log(err);
+            res.status(512).send("Server error : " + err.message);
+        });
+    }).catch(err => {
+        console.log(err);
+        res.status(512).send("Server error : " + err.message);
     });
 });
 
+router.post("/unassign/module/:moduleID/from/student/:studentID", function (req, res) {
+    var studentID = req.params.studentID;
+    var moduleID = req.params.moduleID;
 
-router.get('/tasks/all', function (req, res) {
-    Notification.find({
-        dueDate: {
-            $ne: null
-        }
-    }).then((result) => {
-        if (result == null) {
-            res.status(400);
-            res.send("Error : 9032egrrtu834g9erbo");
-        }
-        res.json(result);
-    });
-});
-
-router.get('/tasks/all/:userId', function (req, res) {
-    var sender = req.params.userId;
-    Notification.find({
-        dueDate: {
-            $ne: null
-        },
-        $or: [{
-            fromId: sender
-        }, {
-            toId: sender
-        }]
-    }).then((result) => {
-        if (result == null) {
-            res.status(400);
-            res.send("Error : 9032egrrtu834g9erbo");
-        }
-        res.json(result);
+    Student.findById(studentID).then(student => {
+        if (student == null) res.status(512).send("Student was not found");
+        Module.findById(moduleID).then(module => {
+            if (module == null) res.status(512).send("Module was not found");
+            var victim = student.modules.find(m => m == moduleID);
+            console.log("before " + student.modules.length);
+            console.log(victim)
+            if (victim != null) {
+                var index = student.modules.indexOf(victim);
+                console.log(index)
+                student.modules.splice(index, 1);
+            }
+            console.log("after " + student.modules.length);
+            student.save(function (err) {
+                if (err) res.status(512).send("Server error : " + err.message);
+                res.json(true);
+            });
+        }).catch(err => {
+            console.log(err);
+            res.status(512).send("Server error : " + err.message);
+        });
+    }).catch(err => {
+        console.log(err);
+        res.status(512).send("Server error : " + err.message);
     });
 });
 

@@ -17,16 +17,20 @@ import Lecturer from "../models/Lecturer";
         Login lecturer
 */
 
-router.get("/lecturers/all", function (req, res) {
-  Lecturer.find({
-      "active": true
+router.post("/delete/:lecturerID", function (req, res) {
+  var lecturerID = req.params.lecturerID;
+  Lecturer.findById(lecturerID).then(lecturer => {
+    lecturer.active = false;
+    lecturer.removed = true;
+    lecturer.save(function (err) {
+      if (err) res.status(512).send("Server error : " + err.message);
+      res.send(lecturerID);
     })
-    .then(lecturers => {
-      if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
-      res.json(lecturers);
-    });
-});
+  }).catch(err => {
+    res.status(512).send("Server error : " + err.message);
+  });
 
+})
 
 router.post("/add/questionaire", function (req, res) {
   var questionaire = new Questionaire({
@@ -34,24 +38,31 @@ router.post("/add/questionaire", function (req, res) {
     lecturerID: req.body.lecturerId,
     title: req.body.title,
     questions: req.body.questions,
-    timeLimit: req.body.timeLimit
+    timeLimit: req.body.timeLimit,
+    moduleId: req.body.moduleId
   });
-
-  questionaire.save(function (err) {
-    if (err) res.send(err);
-    Lecturer.findById(req.body.lecturerId).then(lecturer => {
-      if (lecturer == null) new Error("Lecturer does not exist");
+  Lecturer.findById(req.body.lecturerId).then(lecturer => {
+    if (lecturer == null) new Error("Lecturer does not exist");
+    questionaire.save(function (err) {
+      if (err) res.send(err);
       if (lecturer.questionaires == null) lecturer.questionaires = [];
       lecturer.questionaires.push(questionaire._id);
       lecturer.save(function (err) {
         if (err) res.send(err);
-        console.log(questionaire);
-        res.json(questionaire);
+        Module.findById(moduleId).then(module => {
+          if (module == null) new Error("Module does not exist");
+          module.questionaires.push(questionaire._id);
+          module.save(function (err) {
+            if (err) res.status(512).send("Server error : " + err.message);
+            console.log(questionaire);
+            res.json(questionaire);
+          });
+        });
+      }).catch(err => {
+        res.status(512).send("Server error : " + err.message);
       })
-    }).catch(err => {
-      res.status(512).send("Server error : " + err.message);
-    })
-  });
+    });
+  })
 });
 
 router.post("/submit/questionaire", function (req, res) {
@@ -214,6 +225,7 @@ router.get("/lecturers/all", function (req, res) {
       "active": true
     })
     .populate(["rents"])
+    .populate(['modules'])
     .then(lecturers => {
       if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
       res.json(lecturers);
