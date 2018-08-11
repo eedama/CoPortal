@@ -43,6 +43,7 @@
                   <md-select v-model="lecturer.modules[i]" :name="`modules-${i}`" :id="`modules-${i}`">
                     <md-option :disabled="lecturer.modules.filter(lm => lm == module._id).length > 0" v-for="module in modules" :value="module._id" :key="module._id">{{ module.name }} ({{ module.code }})</md-option>
                   </md-select>
+  
                 </md-field>
               </div>
               <div class="col s2 bottom-align">
@@ -64,8 +65,8 @@
               <div class="row">
                 <div class="col s12">
                   <label>
-                                        {{ lecturer.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                                  </label>
+                                              {{ lecturer.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
+                                        </label>
                 </div>
               </div>
               <div class="col s12">
@@ -110,6 +111,30 @@
       </div>
     </div>
     <div v-show="!addingLecturers" class="row">
+      <md-dialog class="card" style="position:absolute" :md-active.sync="lecturerModule._id != null">
+        <md-dialog-title>Adding modules for {{ lecturerModule.username }}</md-dialog-title>
+  
+        <md-dialog-content>
+          <div class="row" :key="i" v-for="(m,i) in lecturerModule.modules.length">
+            <div class="col s10">
+              <md-field>
+                <label :for="`mmodules-${i}`">Module {{ m }}</label>
+                <md-select v-model="lecturerModule.modules[i]" :name="`mmodules-${i}`" :id="`mmodules-${i}`">
+                  <md-option :disabled="lecturerModule.modules.filter(sm => sm == module._id).length > 0" v-for="module in modules" :value="module._id" :key="module._id">{{ module.name }} ({{ module.code }})</md-option>
+                </md-select>
+              </md-field>
+            </div>
+            <div class="col s2 bottom-align">
+              <a v-on:click="lecturerModule.modules.push(null)" v-show="i == (lecturerModule.modules.length - 1) && lecturerModule.modules[i] != null" class="btn btn-floating waves-effect"><i class="material-icons">add</i></a>
+              <a v-on:click="lecturerModule.modules.splice(i,1)" v-show="i != (lecturerModule.modules.length - 1)" class="btn btn-floating red waves-effect"><i class="material-icons">close</i></a>
+            </div>
+          </div>
+        </md-dialog-content>
+        <md-dialog-actions>
+          <md-button class="md-primary" @click="AddNewModule(null)">Close</md-button>
+          <md-button class="md-primary" @click="AddNewModule('submit')">Save Changes</md-button>
+        </md-dialog-actions>
+      </md-dialog>
       <md-dialog class="card" style="position:absolute" :md-active.sync="showEditProfile">
         <md-dialog-actions>
           <md-button class="md-icon-button right" @click="activeEditProfile(null)">
@@ -150,8 +175,8 @@
             <div class="row" v-show="lecturer.idNumber.length > 6">
               <div class="col s10 offset-s1 m8 offset-m2">
                 <label>
-                                {{ lecturer.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                          </label>
+                                      {{ lecturer.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
+                                </label>
               </div>
               <div class="col s10 offset-s1 m8 offset-m2">
                 <md-field>
@@ -201,16 +226,45 @@
           <md-card>
             <md-card-header>
               <div class="md-title">{{ lecturer.lastname }} {{ lecturer.firstname}}</div>
-              <div class="md-subhead">
-                <p v-for="m in lecturer.modules" :key="m._id"><a class="waves-effect">{{ m.name }} ( {{ m.code }} )</a></p>
-              </div>
-            </md-card-header>
+             <div class="md-subhead">Lecturers {{ lecturer.modules.length }} {{ lecturer.modules.length == 1 ? 'module' : 'modules' }}</div>
+             </md-card-header>
+  
+            <md-card-content>
+              <md-subheader>Modules</md-subheader>
+  
+              <md-list>
+                <md-list-item v-for="modul in lecturer.modules" :key="modul._id" :class="{'waves-effect':!modul.removed}">
+                  <md-icon class="md-primary">book</md-icon>
+                  <div class="md-list-item-text">
+                    <span>{{ modul.name }}</span>
+                    <span>{{ modul.removed ? 'Unassign ' + modul.code : modul.code }}</span>
+                  </div>
+                  <md-button v-show="!modul.removed" v-on:click="modul.removed = true" class="md-icon-button md-list-action">
+                    <md-icon>delete</md-icon>
+                  </md-button>
+                  <md-button v-show="modul.removed" v-on:click="DeleteModule(lecturer._id,modul._id)" class="md-icon-button md-list-action">
+                    <md-icon>done</md-icon>
+                  </md-button>
+                  <md-button v-show="modul.removed" v-on:click="modul.removed = false" class="md-icon-button md-list-action">
+                    <md-icon>close</md-icon>
+                  </md-button>
+                </md-list-item>
+                <md-list-item v-on:click="AddNewModule(lecturer)" class="waves-effect">
+                  <md-icon class="md-primary">add</md-icon>
+                  <div class="md-list-item-text">
+                    <span>Add new Module</span>
+                    <span></span>
+                  </div>
+                </md-list-item>
+              </md-list>
+            </md-card-content>
   
             <md-card-expand>
               <md-card-actions md-alignment="space-between">
                 <div>
-                  <md-button v-on:click="activeEditProfile(lecturer)"> <md-icon>account_circle</md-icon> {{ lecturer.username }}</md-button>
-               
+                  <md-button v-on:click="activeEditProfile(lecturer)">
+                    <md-icon>account_circle</md-icon> {{ lecturer.username }}</md-button>
+  
                 </div>
   
                 <div>
@@ -244,6 +298,14 @@
                       <div class="md-list-item-text">
                         <span>{{ lecturer.gender }}</span>
                         <span>Gender</span>
+                      </div>
+                    </md-list-item>
+  
+                    <md-list-item v-if="lecturer.isSouthAfrican != null" class="waves-effect">
+                      <md-icon class="md-primary">flag</md-icon>
+                      <div class="md-list-item-text">
+                        <span>{{ lecturer.isSouthAfrican ? "South African" : "Non South African" }}</span>
+                        <span>Nationality</span>
                       </div>
                     </md-list-item>
   
@@ -297,6 +359,13 @@ export default {
   name: "LecturerList",
   data() {
     return {
+      lecturerModule: {
+        _id: null,
+        username: "",
+        modules: [null],
+        oldModules: []
+      },
+      txtSearch: "",
       options: [],
       searchText: "", // If value is falsy, reset searchText & searchItem
       items: [],
@@ -361,7 +430,7 @@ export default {
       .get(this.$store.state.settings.baseLink + "/l/lecturers/all")
       .then(results => {
         this.lecturers = results.data;
-        console.log(this.lecturers)
+        console.log(this.lecturers);
         // this.filteredLecturers = results.data;
       })
       .catch(err => {
@@ -375,6 +444,69 @@ export default {
     this.LoadModules();
   },
   methods: {
+    AddNewModule(lecturer) {
+      if (lecturer == null) {
+        this.lecturerModule._id = null;
+        this.lecturerModule.username = "";
+        this.lecturerModule.modules = [null];
+        this.lecturerModule.oldModules = null;
+      } else if (lecturer == "submit") {
+        var newModules = this.lecturerModule.modules.filter(
+          s =>
+            s != null &&
+            this.lecturerModule.oldModules.filter(om => om._id == s).length == 0
+        );
+
+        if (newModules == 0) {
+          swal(
+            "No change made",
+            "Student is already assigned to the selected modules",
+            "success"
+          );
+        } else {
+          axios
+            .post(
+              this.$store.state.settings.baseLink +
+                "/m/assign/to/lecturer/" +
+                this.lecturerModule._id,
+              {
+                modules: newModules
+              }
+            )
+            .then(result => {
+              var names = this.modules.filter(
+                m => newModules.filter(nm => nm == m._id).length > 0
+              );
+              var stu = this.lecturers.find(
+                s => s._id == this.lecturerModule._id
+              );
+              names.forEach(name => {
+                stu.modules.push(name);
+              });
+
+              swal(
+                "Modules successfully assigned",
+                `${newModules.length} new modules are now assigned to ${
+                  this.lecturerModule.username
+                }`,
+                "success"
+              );
+              this.AddNewModule(null);
+            })
+            .catch(err => {
+              if (err.response != null && err.response.status == 512) {
+                swal(err.response.data, "error");
+              } else {
+                swal("Unable to load lecturers", err.message, "error");
+              }
+            });
+        }
+      } else {
+        this.lecturerModule._id = lecturer._id;
+        this.lecturerModule.username = lecturer.username;
+        this.lecturerModule.oldModules = lecturer.modules;
+      }
+    },
     activeEditProfile(lecturer) {
       if (lecturer != null) {
         this.lecturer = lecturer;
@@ -421,6 +553,40 @@ export default {
         })
         .catch(err => {
           swal("An error has occurred", err.message, "error");
+        });
+    },
+    DeleteModule(lecturerID, moduleID) {
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/m/unassign/module/" +
+            moduleID +
+            "/from/lecturer/" +
+            lecturerID
+        )
+        .then(result => {
+          var victim = this.lecturers.find(l => l._id == lecturerID);
+          var index = victim.modules.indexOf(
+            victim.modules.find(m => m._id == moduleID)
+          );
+          if (index >= 0) {
+            this.lecturers[this.lecturers.indexOf(victim)].modules.splice(
+              index,
+              1
+            );
+          }
+          swal(
+            "Module was unassigned successfully",
+            "You can reassign the link again",
+            "success"
+          );
+        })
+        .catch(err => {
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal("Unable to load lecturers", err.message, "error");
+          }
         });
     },
     LoadModules() {
@@ -541,9 +707,14 @@ export default {
       if (this.txtError.length > 2) return;
 
       axios
-        .post(this.$store.state.settings.baseLink + "/a/update/lecturer/" + this.lecturer._id, {
-          lecturer: this.lecturer
-        })
+        .post(
+          this.$store.state.settings.baseLink +
+            "/a/update/lecturer/" +
+            this.lecturer._id,
+          {
+            lecturer: this.lecturer
+          }
+        )
         .then(results => {
           this.lecturers = results.data;
           this.lecturer = {
@@ -560,7 +731,7 @@ export default {
           };
           this.activeEditProfile(null);
 
-            swal("Profile successfully updated", "success");
+          swal("Profile successfully updated", "success");
         })
         .catch(err => {
           if (err.response != null && err.response.status == 512) {
