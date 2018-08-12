@@ -14,14 +14,14 @@
     <div class="row">
       <div v-if="!$store.state.user.isLoggedIn" v-on:click="$router.push('/login')" class="col m6 offset-m3 s12 pointer bigButton center-align waves-effect">
         <div class="card-panel hoverable">
-          <h5 class="text-xs-center">Login</h5>
+          <h5 class="center-align"><i style="font-size:100%" class="material-icons left">lock</i> <span>Login</span></h5>
         </div>
       </div>
     </div>
     <div v-if="$store.state.user.isLoggedIn" class="row">
       <div v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)" :key="i" v-on:click="$router.push(option.link)" class="col m4 offset-m1 s6 pointer bigButton center-align waves-effect">
         <div class="card-panel hoverable">
-          <h5 class="text-xs-center">{{ option.text }}</h5>
+          <h5 class="center-align"><i style="font-size:100%" class="material-icons left">{{ option.icon }}</i> <span>{{ option.text }}</span></h5>
         </div>
       </div>
     </div>
@@ -46,6 +46,7 @@ export default {
       options: [
         {
           text: "Profile",
+          icon:'account_circle',
           link:
             this.$store.state.user.type +
             "/dashboard/for/" +
@@ -54,26 +55,31 @@ export default {
         },
         {
           text: "Set test",
+          icon: "assignment",
           link: "/test/set",
           auth: ["LECTURER"]
         },
         {
           text: "Students",
+          icon: "people",
           link: "/student/list",
           auth: ["LECTURER", "ADMIN"]
         },
         {
           text: "Lecturers",
+          icon: "supervised_user_circle",
           link: "/lecturer/list",
           auth: ["ADMIN"]
         },
         {
           text: "Modules",
+          icon: "books",
           link: "/module/list",
           auth: ["ADMIN", "LECTURER"]
         },
         {
           text: "Test list",
+          icon: "file_copy",
           link: "/test/list",
           auth: ["STUDENT", "LECTURER", "ADMIN"]
         }
