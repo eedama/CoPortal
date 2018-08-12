@@ -2,113 +2,22 @@
   <div>
     <div class="row">
       <div class="col s8 offset-s2">
-        <md-button v-on:click="$router.back()" class="right">
+        <md-button v-on:click="addingLecturers ? addingLecturers = false : $router.back()" class="right">
           <md-icon>keyboard_backspace</md-icon>
           <span>Back</span>
         </md-button>
       </div>
     </div>
-    <div class="row">
+
+    <div v-show="!addingLecturers" class="row">
       <div class="col s8 offset-s2 center-align">
-        <a v-on:click="addingLecturers = !addingLecturers" :class="{'red':addingLecturers}" class="btn waves-effect">{{ !addingLecturers ? 'Add Lecturer' : 'Cancel'}}</a>
+        <a v-on:click="addingLecturers = !addingLecturers" class="btn waves-effect">Add Lecturer</a>
       </div>
     </div>
     <div v-show="addingLecturers" class="row" style="height:80vh">
-      <div class="col m8 offset-m2 col s12 center-align">
-        <div class="card row">
-          <div class="card-content">
-            <div class="row">
-              <div class="col s12 center-align">
-                <h5>Adding a lecturer</h5>
-              </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="lecturer.firstname" id="Firstname" name="Firstname" type="text" />
-                <label class="text-center" for="Firstname">Firstname</label>
-              </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="lecturer.lastname" id="Lastname" name="Lastname" type="text" />
-                <label class="text-center" for="Lastname">Lastname</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-model="lecturer.username" id="Username" name="Username" type="text" />
-                <label class="text-center" for="Username">Username</label>
-              </div>
-            </div>
-            <div class="row" :key="m" v-for="(m,i) in lecturer.modules.length">
-              <div class="col s10">
-                <md-field>
-                  <label :for="`modules-${i}`">Module {{ m }}</label>
-                  <md-select v-model="lecturer.modules[i]" :name="`modules-${i}`" :id="`modules-${i}`">
-                    <md-option :disabled="lecturer.modules.filter(lm => lm == module._id).length > 0" v-for="module in modules" :value="module._id" :key="module._id">{{ module.name }} ({{ module.code }})</md-option>
-                  </md-select>
-  
-                </md-field>
-              </div>
-              <div class="col s2 bottom-align">
-                <a v-on:click="lecturer.modules.push(null)" v-if="i == (lecturer.modules.length - 1) && lecturer.modules[i] != null" class="btn btn-floating waves-effect"><i class="material-icons">add</i></a>
-                <a v-on:click="lecturer.modules.splice(i,1)" v-if="i != (lecturer.modules.length - 1)" class="btn btn-floating red waves-effect"><i class="material-icons">close</i></a>
-              </div>
-            </div>
-  
-            <div class="row">
-              <div class="col s12">
-                <md-field>
-                  <label>ID Number</label>
-                  <md-input v-model="lecturer.idNumber" maxlength="13"></md-input>
-                </md-field>
-              </div>
-            </div>
-  
-            <div class="row" v-show="lecturer.idNumber.length > 6">
-              <div class="row">
-                <div class="col s12">
-                  <label>
-                                              {{ lecturer.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                                        </label>
-                </div>
-              </div>
-              <div class="col s12">
-                <md-field>
-                  <label for="Gender">Gender</label>
-                  <md-select v-model="lecturer.gender" name="Gender" id="Gender">
-                    <md-option disabled>Pick a gender</md-option>
-                    <md-option value="Male">Male</md-option>
-                    <md-option value="Female">Female</md-option>
-                  </md-select>
-                </md-field>
-              </div>
-              <div class="col s12">
-                <md-datepicker md-immediately v-model="lecturer.dob">
-                  <label>Date of birth</label>
-                </md-datepicker>
-              </div>
-            </div>
-  
-            <div class="row">
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="lecturer.password" id="Password" name="Password" type="password" />
-                <label class="text-center" for="Password">Password</label>
-              </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="lecturer.confirmPassword" id="ConfirmPassword" name="ConfirmPassword" type="password" />
-                <label class="text-center" for="ConfirmPassword">Confirm Password</label>
-              </div>
-            </div>
-            <div class="row" v-show="txtError.length > 0">
-              <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <label class="text-center red-text">{{ txtError }}</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-on:click="SubmitLecturer()" type="submit" value="Submit lecturer" class="btn center-align tg-btn" />
-              </div>
-            </div>
-          </div>
+        <div class="col s12 m8 offset-m2 l6 offset-l3">
+            <add-lecturer v-on:submitted="AddedNewLecturer"></add-lecturer>  
         </div>
-      </div>
     </div>
     <div v-show="!addingLecturers" class="row">
       <md-dialog class="card" style="position:absolute" :md-active.sync="lecturerModule._id != null">
@@ -221,64 +130,24 @@
       <div v-show="filteredLecturers.length == 0" class="col s12 center-align">
         <p class="red-text">No results found</p>
       </div>
-      <div v-if="lecturer != null" v-for="(lecturer,i) in filteredLecturers" :key="i + lecturer._id" class="col s12 m6 l4 xl3 pointer">
+      <div v-show="isFullscreen == null || isFullscreen == lecturer._id" v-for="(lecturer,i) in filteredLecturers" :key="i + lecturer._id" :class="{'s10 offset-s1 m8 offset-m2 l6 offset-l3':isFullscreen == lecturer._id,'m6 l4 xl3':isFullscreen == null,'hidden':isFullscreen != lecturer._id}" class="col">
         <div class="col s12">
-          <md-card>
+          <md-card class="hoverable">
             <md-card-header>
+              <md-card-header-text>
               <div class="md-title">{{ lecturer.lastname }} {{ lecturer.firstname}}</div>
              <div class="md-subhead">Lecturers {{ lecturer.modules.length }} {{ lecturer.modules.length == 1 ? 'module' : 'modules' }}</div>
+            
+              </md-card-header-text>
+            <md-menu md-size="big" md-direction="bottom-end">
+              <md-button v-on:click=" isFullscreen == lecturer._id ? isFullscreen = null : isFullscreen = lecturer._id" class="md-icon-button waves-effect">
+                <md-icon>{{ isFullscreen == lecturer._id ? 'close' : 'fullscreen'}}</md-icon>
+              </md-button>
+            </md-menu>
              </md-card-header>
   
             <md-card-content>
-              <md-subheader>Modules</md-subheader>
-  
-              <md-list>
-                <md-list-item v-for="modul in lecturer.modules" :key="modul._id" :class="{'waves-effect':!modul.removed}">
-                  <md-icon class="md-primary">book</md-icon>
-                  <div class="md-list-item-text">
-                    <span>{{ modul.name }}</span>
-                    <span>{{ modul.removed ? 'Unassign ' + modul.code : modul.code }}</span>
-                  </div>
-                  <md-button v-show="!modul.removed" v-on:click="modul.removed = true" class="md-icon-button md-list-action">
-                    <md-icon>delete</md-icon>
-                  </md-button>
-                  <md-button v-show="modul.removed" v-on:click="DeleteModule(lecturer._id,modul._id)" class="md-icon-button md-list-action">
-                    <md-icon>done</md-icon>
-                  </md-button>
-                  <md-button v-show="modul.removed" v-on:click="modul.removed = false" class="md-icon-button md-list-action">
-                    <md-icon>close</md-icon>
-                  </md-button>
-                </md-list-item>
-                <md-list-item v-on:click="AddNewModule(lecturer)" class="waves-effect">
-                  <md-icon class="md-primary">add</md-icon>
-                  <div class="md-list-item-text">
-                    <span>Add new Module</span>
-                    <span></span>
-                  </div>
-                </md-list-item>
-              </md-list>
-            </md-card-content>
-  
-            <md-card-expand>
-              <md-card-actions md-alignment="space-between">
-                <div>
-                  <md-button v-on:click="activeEditProfile(lecturer)">
-                    <md-icon>account_circle</md-icon> {{ lecturer.username }}</md-button>
-  
-                </div>
-  
-                <div>
-                </div>
-                <md-card-expand-trigger>
-                  <md-button class="md-icon-button">
-                    <md-icon>keyboard_arrow_down</md-icon>
-                  </md-button>
-                </md-card-expand-trigger>
-              </md-card-actions>
-  
-              <md-card-expand-content>
-                <md-card-content>
-                  <md-list class="md-double-line">
+  <md-list class="md-double-line">
                     <md-list-item v-if="lecturer.idNumber" class="waves-effect">
                       <md-icon class="md-primary">account_circle</md-icon>
                       <div class="md-list-item-text">
@@ -309,10 +178,62 @@
                       </div>
                     </md-list-item>
   
+                  </md-list>
+            </md-card-content>
+  
+            <md-card-expand>
+              <md-card-actions md-alignment="space-between">
+                <div>
+                  <md-button v-on:click="activeEditProfile(lecturer)">
+                    <md-icon>account_circle</md-icon> {{ lecturer.username }}</md-button>
+  
+                </div>
+  
+                <div>
+                </div>
+                <md-card-expand-trigger>
+                  <md-button class="md-icon-button">
+                    <md-icon>keyboard_arrow_down</md-icon>
+                  </md-button>
+                </md-card-expand-trigger>
+              </md-card-actions>
+  
+              <md-card-expand-content>
+                <md-card-content>
+                  <md-subheader>Modules</md-subheader>
+  
+                  <md-list>
+              <md-list-item v-for="modul in lecturer.modules" :key="modul._id" :class="{'waves-effect':!modul.removed}">
+                <md-icon class="md-primary">book</md-icon>
+                  <div v-on:click="!modul.removed ? goToModule(modul._id) : null" class="md-list-item-text">
+                    <span>{{ modul.name }}</span>
+                    <span>{{ modul.removed ? 'Unassign ' + modul.code : modul.code }}</span>
+                  </div>
+                  <md-button style="z-index:10" v-show="!modul.removed" v-on:click="modul.removed = true" class="md-icon-button md-list-action">
+                    <md-icon>delete</md-icon>
+                  </md-button>
+                  <md-button style="z-index:10" v-show="modul.removed" v-on:click="DeleteModule(lecturer._id,modul._id)" class="md-icon-button md-list-action">
+                    <md-icon>done</md-icon>
+                  </md-button>
+                  <md-button style="z-index:10" v-show="modul.removed" v-on:click="modul.removed = false" class="md-icon-button md-list-action">
+                    <md-icon>close</md-icon>
+                  </md-button>
+                </md-list-item>
+                <md-list-item v-on:click="AddNewModule(lecturer)" class="waves-effect">
+                  <md-icon class="md-primary">add</md-icon>
+                  <div class="md-list-item-text">
+                    <span>Add new Module</span>
+                    <span></span>
+                  </div>
+                </md-list-item>
+                 <md-divider></md-divider>
+
+                                <md-subheader>Lecturer settings</md-subheader>
+  
                     <md-list-item v-on:click="lecturer.removed = !lecturer.removed" class="waves-effect">
                       <md-icon class="md-primary">delete</md-icon>
                       <div class="md-list-item-text">
-                        <span>{{ lecturer.removed ? 'Are you sure?':'Delete' }}</span>
+                        <span>{{ lecturer.removed ? 'Are you sure?':'Delete lecturer' }}</span>
                       </div>
   
                       <md-button v-show="lecturer.removed" v-on:click="DeleteLecturer(lecturer._id)" class="md-icon-button md-list-action">
@@ -323,7 +244,7 @@
                         <md-icon>close</md-icon>
                       </md-button>
                     </md-list-item>
-                  </md-list>
+              </md-list>
                 </md-card-content>
               </md-card-expand-content>
             </md-card-expand>
@@ -354,6 +275,8 @@ import * as moment from "moment";
 const axios = require("axios");
 
 import "vue-material/dist/vue-material.min.css";
+import AddLecturer from './AddLecturer'
+
 
 export default {
   name: "LecturerList",
@@ -387,9 +310,9 @@ export default {
       addingLecturers: false,
       //
       txtSearch: "",
-      lecturers: [],
       modules: [],
-      showEditProfile: false
+      showEditProfile: false,
+      isFullscreen: null
     };
   },
   watch: {
@@ -414,6 +337,8 @@ export default {
       }
     }
   },
+  props:['lecturerIDs'],
+  components: { AddLecturer },
   computed: {
     filteredLecturers() {
       return this.lecturers.filter(
@@ -426,7 +351,29 @@ export default {
     }
   },
   mounted() {
-    axios
+      this.Reload();
+  },
+  methods: {
+    Reload(){
+      if(this.lecturerIDs != null){
+    axios.get(this.$store.state.settings.baseLink + "/l/lecturers/of/ids/" + this.lecturerIDs)
+          .then(results => {
+            this.lecturers = results.data;
+            if(this.lecturers.length == 1){
+              this.isFullscreen = this.lecturers[0]._id;
+            }
+            console.log(this.lecturers);
+            // this.filteredLecturers = results.data;
+          })
+          .catch(err => {
+            if (err.response != null && err.response.status == 512) {
+              swal(err.response.data, "error");
+            } else {
+              swal("Unable to load lecturers", "Try again later", "error");
+            }
+          });
+      }else{
+      axios
       .get(this.$store.state.settings.baseLink + "/l/lecturers/all")
       .then(results => {
         this.lecturers = results.data;
@@ -440,10 +387,16 @@ export default {
           swal("Unable to load lecturers", "Try again later", "error");
         }
       });
-
+    }
     this.LoadModules();
-  },
-  methods: {
+    },
+    AddedNewLecturer(isAdded){
+      if(isAdded){
+        this.Reload();
+      }else{
+
+      }
+    },
     AddNewModule(lecturer) {
       if (lecturer == null) {
         this.lecturerModule._id = null;

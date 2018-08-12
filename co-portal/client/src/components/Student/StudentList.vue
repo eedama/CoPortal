@@ -2,109 +2,21 @@
   <div>
     <div class="row">
       <div class="col s8 offset-s2">
-        <md-button v-on:click="$router.back()" class="right">
+        <md-button v-on:click="addingStudents ? addingStudents = false : $router.back()" class="right">
           <md-icon>keyboard_backspace</md-icon>
           <span>Back</span>
         </md-button>
       </div>
     </div>
   
-    <div class="row">
+    <div v-show="!addingStudents" class="row">
       <div class="col s8 offset-s2 center-align">
-        <a v-on:click="addingStudents = !addingStudents" :class="{'red':addingStudents}" class="btn waves-effect">{{ !addingStudents ? 'Add Student' : 'Cancel'}}</a>
+        <a v-on:click="addingStudents = !addingStudents" class="btn waves-effect">Add new student</a>
       </div>
     </div>
     <div v-show="addingStudents" class="row" style="height:80vh">
-      <div class="col m6 offset-m3 col s12 center-align">
-        <div class="card row">
-          <div class="card-content">
-            <div class="row">
-              <div class="col s12 center-align z-depth-3 cardBar">
-                <h5>Adding a student</h5>
-              </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="student.firstname" id="Firstname" name="Firstname" type="text" />
-                <label class="text-center" for="Firstname">Firstname</label>
-              </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="student.lastname" id="Lastname" name="Lastname" type="text" />
-                <label class="text-center" for="Lastname">Lastname</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-model="student.username" id="Username" name="Username" type="text" />
-                <label class="text-center" for="Username">Username</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="student.password" id="Password" name="Password" type="password" />
-                <label class="text-center" for="Password">Password</label>
-              </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="student.confirmPassword" id="ConfirmPassword" name="ConfirmPassword" type="password" />
-                <label class="text-center" for="ConfirmPassword">Confirm Password</label>
-              </div>
-            </div>
-            <div class="row" :key="m" v-for="(m,i) in student.modules.length">
-              <div class="col s10">
-                <md-field>
-                  <label :for="`modules-${i}`">Module {{ m }}</label>
-                  <md-select v-model="student.modules[i]" :name="`modules-${i}`" :id="`modules-${i}`">
-                    <md-option :disabled="student.modules.filter(sm => sm == module._id).length > 0" v-for="module in modules" :value="module._id" :key="module._id">{{ module.name }} ({{ module.code }})</md-option>
-                  </md-select>
-                </md-field>
-              </div>
-              <div class="col s2 bottom-align">
-                <a v-on:click="student.modules.push(null)" v-if="i == (student.modules.length - 1) && student.modules[i] != null" class="btn btn-floating waves-effect"><i class="material-icons">add</i></a>
-                <a v-on:click="student.modules.splice(i,1)" v-if="i != (student.modules.length - 1)" class="btn btn-floating red waves-effect"><i class="material-icons">close</i></a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s12">
-                <md-field>
-                  <label>ID Number</label>
-                  <md-input v-model="student.idNumber" maxlength="13"></md-input>
-                </md-field>
-              </div>
-            </div>
-            <div class="row" v-show="student.idNumber.length > 6">
-              <div class="row">
-                <div class="col s12">
-                  <label>
-                                  {{ student.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                            </label>
-                </div>
-              </div>
-              <div class="col s12">
-                <md-field>
-                  <label for="Gender">Gender</label>
-                  <md-select v-model="student.gender" name="Gender" id="Gender">
-                    <md-option disabled>Pick a gender</md-option>
-                    <md-option value="Male">Male</md-option>
-                    <md-option value="Female">Female</md-option>
-                  </md-select>
-                </md-field>
-              </div>
-              <div class="col s12">
-                <md-datepicker md-immediately v-model="student.dob">
-                  <label>Date of birth</label>
-                </md-datepicker>
-              </div>
-            </div>
-            <div class="row" v-show="txtError.length > 0">
-              <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <label class="text-center red-text">{{ txtError }}</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-on:click="SubmitStudent()" type="submit" value="Submit student" class="btn center-align tg-btn" />
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="col s12 m8 offset-m2 l6 offset-l3">
+       <add-student v-on:submitted="AddedNewStudent"></add-student>  
       </div>
     </div>
     <div v-show="!addingStudents" class="row">
@@ -222,7 +134,7 @@
       </div>
       <div v-show="isFullscreen == null || isFullscreen == student._id" v-for="(student,i) in filteredStudents" :key="i" :class="{'s10 offset-s1 m8 offset-m2 l6 offset-l3':isFullscreen == student._id,'m6 l4 xl3':isFullscreen == null,'hidden':isFullscreen != student._id}"
         class="col">
-        <md-card>
+        <md-card class="hoverable">
           <md-card-header>
             <md-card-header-text>
               <div class="md-title">{{ student.lastname }} {{ student.firstname}}</div>
@@ -230,24 +142,9 @@
             </md-card-header-text>
   
             <md-menu md-size="big" md-direction="bottom-end">
-              <md-button class="md-icon-button" md-menu-trigger>
-                <md-icon>more_vert</md-icon>
+              <md-button v-on:click=" isFullscreen == student._id ? isFullscreen = null : isFullscreen = student._id" class="md-icon-button waves-effect">
+                <md-icon>{{ isFullscreen == student._id ? 'close' : 'fullscreen'}}</md-icon>
               </md-button>
-  
-              <md-menu-content class="card">
-                <md-menu-item v-show="isFullscreen == student._id" v-on:click="isFullscreen = null" class="waves-effect">
-                  <span>Normal screen</span>
-                  <md-icon>close</md-icon>
-                </md-menu-item>
-                <md-menu-item v-on:click="isFullscreen = student._id" class="waves-effect">
-                  <span>Full screen</span>
-                  <md-icon>fullscreen</md-icon>
-                </md-menu-item>
-                <md-menu-item class="waves-effect">
-                  <span>Send a message</span>
-                  <md-icon>message</md-icon>
-                </md-menu-item>
-              </md-menu-content>
             </md-menu>
           </md-card-header>
   
@@ -275,11 +172,37 @@
                   <span>Nationality</span>
                 </div>
               </md-list-item>
+            </md-list>
+          </md-card-content>
+  
+  
+          <md-card-expand>
+            <md-card-actions md-alignment="space-between">
+              <div>
+                <md-button v-on:click="activeEditProfile(student)">
+                  <md-icon>account_circle</md-icon> {{ student.username }}
+                </md-button>
+              </div>
+  
+              <div>
+              </div>
+              <md-card-expand-trigger>
+                <md-button v-on:click="GetPastTestsFor(student)" class="md-icon-button">
+                    <md-icon>keyboard_arrow_down</md-icon>
+                  </md-button>
+              </md-card-expand-trigger>
+            </md-card-actions>
+  
+            <md-card-expand-content>
+              <md-card-content>
+  
+                <md-list class="md-double-line">
+
               <md-subheader>Modules</md-subheader>
   
               <md-list-item v-for="modul in student.modules" :key="modul._id" :class="{'waves-effect':!modul.removed}">
                 <md-icon class="md-primary">book</md-icon>
-                <div class="md-list-item-text">
+                <div v-on:click="!modul.removed ? goToModule(modul._id) : null" class="md-list-item-text">
                   <span>{{ modul.name }}</span>
                   <span>{{ modul.removed ? 'Unassign ' + modul.code : modul.code }}</span>
                 </div>
@@ -300,32 +223,8 @@
                   <span></span>
                 </div>
               </md-list-item>
+              <md-subheader>Past tests</md-subheader>
   
-            </md-list>
-          </md-card-content>
-  
-  
-          <md-card-expand>
-            <md-card-actions md-alignment="space-between">
-              <div>
-                <md-button v-on:click="activeEditProfile(student)">
-                  <md-icon>account_circle</md-icon> {{ student.username }}
-                </md-button>
-              </div>
-  
-              <div>
-              </div>
-              <md-card-expand-trigger>
-                <md-button v-on:click="GetPastTestsFor(student)">
-                  Past Tests
-                </md-button>
-              </md-card-expand-trigger>
-            </md-card-actions>
-  
-            <md-card-expand-content>
-              <md-card-content>
-  
-                <md-list class="md-double-line">
                   <md-list-item v-on:click="goToSolution(pastTest.solutionId)" v-for="(pastTest,v) in student.pastTests" :key="v" href="#" class="waves-effect">
                     <md-icon class="md-primary">account_circle</md-icon>
                     <div class="md-list-item-text">
@@ -333,9 +232,8 @@
                       <span>{{pastTest.title}}</span>
                     </div>
                   </md-list-item>
-                </md-list>
-  
-                <md-list class="md-double-line">
+                         <md-subheader>Student settings</md-subheader>
+       
                   <md-list-item v-on:click="student.removed = !student.removed" class="waves-effect">
                     <md-icon class="md-primary">delete</md-icon>
                     <div class="md-list-item-text">
@@ -367,6 +265,8 @@ import swal from "sweetalert";
 import * as moment from "moment";
 
 const axios = require("axios");
+
+import AddStudent from "./AddStudent";
 
 export default {
   name: "StidentList",
@@ -421,6 +321,8 @@ export default {
       }
     }
   },
+  props:['studentIDs'],
+  components: { AddStudent },
   computed: {
     filteredStudents() {
       return this.students.filter(
@@ -433,7 +335,28 @@ export default {
     }
   },
   mounted() {
-    axios
+    this.Reload();
+  },
+  methods: {
+    Reload(){
+      if(this.studentIDs != null){
+        axios.get(this.$store.state.settings.baseLink + "/s/students/of/ids/" + this.studentIDs)
+          .then(results => {
+            this.students = results.data;
+            if(this.students.length == 1){
+              this.isFullscreen = this.students[0]._id;
+            }
+            console.log(this.students);
+          })
+          .catch(err => {
+            if (err.response != null && err.response.status == 512) {
+              swal(err.response.data, "error");
+            } else {
+              swal("Unable to load students", "Try again later", "error");
+            }
+          });
+      }else{
+      axios
       .get(this.$store.state.settings.baseLink + "/s/students/all")
       .then(results => {
         this.students = results.data;
@@ -449,9 +372,16 @@ export default {
           swal("Unable to load students", "Try again later", "error");
         }
       });
-    this.LoadModules();
-  },
-  methods: {
+    }
+      this.LoadModules();
+    },
+    AddedNewStudent(isAdded){
+      if(isAdded){
+        this.Reload();
+      }else{
+
+      }
+    },
     AddNewModule(student) {
       if (student == null) {
         this.studentModule._id = null;
@@ -789,10 +719,6 @@ export default {
 </script>
 
 <style scoped>
-.cardBar {
-  background-color: black;
-  color: white;
-  width: 100%;
-}
+
 </style>
 
