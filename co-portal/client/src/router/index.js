@@ -9,6 +9,7 @@ import TestMarks from '@/components/TestMarks'
 import StudentList from '@/components/Student/StudentList'
 import ModuleList from '@/components/Module/ModuleList'
 import LecturerList from '@/components/Lecturer/LecturerList'
+import ModuleView from '@/components/Module/ModuleView'
 
 Vue.use(Router)
 
@@ -60,6 +61,7 @@ const router = new Router({
       meta: {
         authLevel: ['LECTURER'],
       },
+      props: true,
       component: SetTest
     },
     /**
@@ -71,6 +73,7 @@ const router = new Router({
       meta: {
         authLevel: ['LECTURER', 'ADMIN'],
       },
+      props: true,
       component: StudentList
     },
     /**
@@ -85,6 +88,7 @@ const router = new Router({
       meta: {
         authLevel: ['ADMIN'],
       },
+      props: true,
       component: LecturerList
     },
     /**
@@ -101,6 +105,15 @@ const router = new Router({
         authLevel: ['ADMIN', 'LECTURER', 'STUDENT'],
       },
       component: ModuleList
+    },
+    {
+      path: '/module/view',
+      name: 'ModuleView',
+      meta: {
+        authLevel: ['ADMIN', 'LECTURER', 'STUDENT'],
+      },
+      props: true,
+      component: ModuleView
     }
     /**
      * Lecturer routes END

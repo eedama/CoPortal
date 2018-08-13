@@ -34,6 +34,54 @@ Vue.mixin({
   methods: {
     getMoment(value) {
       return moment(value);
+    },
+    goToModule(moduleID) {
+      this.$router.push({
+        name: "ModuleView",
+        params: {
+          moduleID: moduleID
+        }
+      })
+    },
+    goToLecturer(lecturerIDs){
+      this.$router.push({
+        name:"LecturerList",
+        params:{
+          lecturerIDs:lecturerIDs
+        }
+      })
+    },
+    goToStudent(studentIDs){
+      this.$router.push({
+        name:"StudentList",
+        params:{
+          studentIDs:studentIDs
+        }
+      })
+    },
+    goToSolution(solutionID){
+      this.$router.push({
+        name: "TestMarks",
+        params: {
+          solutionId: solutionID
+        }
+      });
+    },
+    goToTakeTest(questionaire){
+      this.$router.push({
+          name: "TakeTest",
+          params: { 
+            dbQuestionaire: questionaire
+          }
+      });
+    },
+    setATestForModule(moduleID){
+      this.$router.push({
+        name:"SetTest",
+        params:{
+          moduleID:moduleID
+        }
+      })
     }
   }
 })

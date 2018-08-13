@@ -21,11 +21,11 @@ router.post("/delete/:studentID", function (req, res) {
     student.active = false;
     student.removed = true;
     student.save(function (err) {
-      if (err) res.status(512).send("Server error : " + err.message);
+      if (err) return res.status(512).send("Server error : " + err.message);
       res.send(studentID);
     })
   }).catch(err => {
-    res.status(512).send("Server error : " + err.message);
+    return res.status(512).send("Server error : " + err.message);
   });
 
 });
@@ -33,6 +33,29 @@ router.post("/delete/:studentID", function (req, res) {
 router.get("/students/all", function (req, res) {
   Student.find({
       "active": true
+    })
+    .populate(["rents"])
+    .populate(['modules'])
+    .then(students => {
+      if (students == null) res.send("Error : 9032rtu834g9erbo");
+      res.json(students);
+    });
+});
+
+router.get("/students/of/ids/:studentIDs", function (req, res) {
+  var studentIDs = req.params.studentIDs;
+  if(!Array.isArray(studentIDs)){
+    studentIDs = [studentIDs];
+  }
+  console.log(studentIDs);
+
+  studentIDs = studentIDs.map(l => mongoose.Types.ObjectId(l));
+
+  Student.find({
+      "active": true,
+      '_id': {
+        $in: studentIDs
+      }
     })
     .populate(["rents"])
     .populate(['modules'])
@@ -67,7 +90,7 @@ router.get("/students/all/fullnames", function (req, res) {
 router.get('/all/past/tests/for/:studentId', function (req, res) {
   var studentId = req.params.studentId;
   Student.findById(studentId).populate('solutions').then(s => {
-    if (s == null) res.status(512).send("Student not found");
+    if (s == null) return res.status(512).send("Student not found");
     console.log(s);
     var answer = [];
     s.solutions.forEach(solution => {
@@ -83,12 +106,12 @@ router.get('/all/past/tests/for/:studentId', function (req, res) {
           console.log(answer);
           res.json(answer);
         } else {
-          res.status(512).send("Server error : questionaire does not exist");
+          return res.status(512).send("Server error : questionaire does not exist");
         }
       });
     });
   }).catch(err => {
-    res.status(512).send("Server error : " + err.message);
+    return res.status(512).send("Server error : " + err.message);
   });
 });
 
@@ -96,14 +119,14 @@ router.get('/all/past/tests/for/:studentId', function (req, res) {
 router.get("/:id/get", function (req, res) {
   let id = req.params.id;
   if (id == null) {
-    res.status(404);
+    return res.status(404);
     res.send("Invalid ID > " + id);
   } else {
     Student.findById(id)
       .populate(['modules'])
       .then(student => {
         if (student == null) {
-          res.status(404);
+          return res.status(404);
           res.send("No student with id : " + id);
         } else {
           res.json(student);
@@ -119,7 +142,7 @@ router.get("/:id/get", function (req, res) {
 router.post("/:text/search", function (req, res) {
   let txtSearch = req.params.text;
   if (txtSearch == null || txtSearch.length < 2) {
-    res.status(404);
+    return res.status(404);
     res.send("Cannot search for - " + txtSearch);
   } else {
     Student.find({
@@ -128,7 +151,7 @@ router.post("/:text/search", function (req, res) {
       }
     }).then(answer => {
       if (answer == null || answer.length <= 0) {
-        res.status(512).send("No results for : " + txtSearch);
+        return res.status(512).send("No results for : " + txtSearch);
       } else {
         res.json(answer);
       }

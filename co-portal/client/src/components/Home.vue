@@ -54,12 +54,6 @@ export default {
           auth: ["STUDENT", "LECTURER", "ADMIN"]
         },
         {
-          text: "Set test",
-          icon: "assignment",
-          link: "/test/set",
-          auth: ["LECTURER"]
-        },
-        {
           text: "Students",
           icon: "people",
           link: "/student/list",
@@ -75,7 +69,7 @@ export default {
           text: "Modules",
           icon: "books",
           link: "/module/list",
-          auth: ["ADMIN", "LECTURER"]
+          auth: ["ADMIN", "LECTURER","STUDENT"]
         },
         {
           text: "Test list",

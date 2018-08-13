@@ -69,6 +69,7 @@
               <th>Description</th>
               <th>Lecturers</th>
               <th>Total students</th>
+              <th>Total tests</th>
               <th>More details</th>
             </tr>
           </thead>
@@ -84,6 +85,7 @@
                 </a>
               </td>
               <td><a class="pointer">{{ module.students.length }}</a></td>
+              <td><a class="pointer">{{ module.questionaires.length }}</a></td>
               <td><a class="pointer btn black" v-on:click="goToModule(module._id)">View</a></td>
             </tr>
           </tbody>

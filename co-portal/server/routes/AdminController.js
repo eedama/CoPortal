@@ -44,13 +44,13 @@ router.post("/add/lecturer", function (req, res) {
     Lecturer.findOne({
       username: lecturer.username
     }).then(l => {
-      if (l != null) res.status(512).send("Username " + lecturer.username + " is already taken.");
+      if (l != null) return res.status(512).send("Username " + lecturer.username + " is already taken.");
       lecturer.save(function (err) {
-        if (err) res.status(512).send("Server error : " + err.message);
+        if (err) return res.status(512).send("Server error : " + err.message);
         modules.map(m => {
           m.lecturers.push(lecturer._id);
           m.save(function (err) {
-            if (err) res.status(512).send("Server error : " + err.message);
+            if (err) return res.status(512).send("Server error : " + err.message);
             Lecturer.find({
                 "active": true
               }).populate(['modules'])
@@ -62,7 +62,7 @@ router.post("/add/lecturer", function (req, res) {
         });
       });
     }).catch(err => {
-      res.status(512).send("Server error : " + err.message);
+      return res.status(512).send("Server error : " + err.message);
     });
   }).catch(err => {
     console.log(err);
@@ -83,7 +83,7 @@ router.post("/update/lecturer/:lecturerID", function (req, res) {
   });
 
   Lecturer.findById(lecturerID).then(l => {
-    if (l == null) res.status(512).send(lecturer.username + " does not exist.");
+    if (l == null) return res.status(512).send(lecturer.username + " does not exist.");
 
     l.lastname = lecturer.lastname;
     l.firstname = lecturer.firstname;
@@ -94,7 +94,7 @@ router.post("/update/lecturer/:lecturerID", function (req, res) {
     l.isSouthAfrican = lecturer.isSouthAfrican;
 
     l.save(function (err) {
-      if (err) res.status(512).send("Server error : " + err.message);
+      if (err) return res.status(512).send("Server error : " + err.message);
       Lecturer.find({
           "active": true
         })
@@ -105,7 +105,7 @@ router.post("/update/lecturer/:lecturerID", function (req, res) {
         });
     });
   }).catch(err => {
-    res.status(512).send("Server error : " + err.message);
+    return res.status(512).send("Server error : " + err.message);
   });
 });
 
@@ -139,13 +139,13 @@ router.post("/add/student", function (req, res) {
     Student.findOne({
       username: student.username
     }).then(l => {
-      if (l != null) res.status(512).send("Username " + student.username + " is already taken.");
+      if (l != null) return res.status(512).send("Username " + student.username + " is already taken.");
       student.save(function (err) {
-        if (err) res.status(512).send("Server error : " + err.message);
+        if (err) return res.status(512).send("Server error : " + err.message);
         modules.map(m => {
           m.students.push(student._id);
           m.save(function (err) {
-            if (err) res.status(512).send("Server error : " + err.message);
+            if (err) return res.status(512).send("Server error : " + err.message);
             Student.find({
                 "active": true
               })
@@ -158,7 +158,7 @@ router.post("/add/student", function (req, res) {
         });
       });
     }).catch(err => {
-      res.status(512).send("Server error : " + err.message);
+      return res.status(512).send("Server error : " + err.message);
     });
   }).catch(err => {
     console.log(err);
@@ -178,7 +178,7 @@ router.post("/update/student/:studentID", function (req, res) {
   });
 
   Student.findById(studentID).then(s => {
-    if (s == null) res.status(512).send(student.username + " does not exist.");
+    if (s == null) return res.status(512).send(student.username + " does not exist.");
 
     s.lastname = student.lastname;
     s.firstname = student.firstname;
@@ -189,7 +189,7 @@ router.post("/update/student/:studentID", function (req, res) {
     s.isSouthAfrican = student.isSouthAfrican;
 
     s.save(function (err) {
-      if (err) res.status(512).send("Server error : " + err.message);
+      if (err) return res.status(512).send("Server error : " + err.message);
       Student.find({
           "active": true
         })
@@ -200,7 +200,7 @@ router.post("/update/student/:studentID", function (req, res) {
         });
     });
   }).catch(err => {
-    res.status(512).send("Server error : " + err.message);
+    return res.status(512).send("Server error : " + err.message);
   });
 });
 

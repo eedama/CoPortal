@@ -156,9 +156,13 @@
       };
     },
     mounted() {
-      var elems = document.querySelectorAll(".datepicker");
-      var instances = this.$materialize.Datepicker.init(elems);
+      if(this.moduleID == null){
+        this.$router.back();
+      }else{
+        this.Reload();
+      }
     },
+    props:['moduleID'],
     methods: {
       AddQuestion() {
         this.addingQuestion = true;
@@ -250,7 +254,8 @@
             title: this.title,
             lecturerId: this.$store.state.user.id,
             questions: this.questions,
-            timeLimit: this.questionaire.timeLimit
+            timeLimit: this.questionaire.timeLimit,
+            moduleId:this.moduleID
           })
           .then(results => {
             console.log(results.data);
@@ -259,7 +264,7 @@
           })
           .catch(err => {
             if (err.response != null && err.response.status == 512) {
-              alert(err.response.data);
+              swal(err.response.data,"error");
             } else {
               swal("Unable to submit questionaire", err.message, "error");
             }
