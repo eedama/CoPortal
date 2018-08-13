@@ -1,0 +1,90 @@
+'use strict';
+
+var _mongoose = require('mongoose');
+
+var _mongoose2 = _interopRequireDefault(_mongoose);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Schema = _mongoose2.default.Schema;
+
+var SolutionSchema = new _mongoose2.default.Schema({
+    _id: {
+        type: Schema.Types.ObjectId,
+        default: _mongoose2.default.Types.ObjectId()
+    },
+    questionaireId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Questionaire'
+    },
+    studentId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Student'
+    },
+    answers: Array,
+    mark: Number,
+    feedbacks: Array,
+    isMemo: {
+        type: Boolean,
+        default: false
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    },
+    removed: {
+        type: Boolean,
+        default: false
+    }
+});
+
+SolutionSchema.pre("save", function (next) {
+    var _this = this;
+
+    var mark = 0;
+    if (this.isMemo) {
+        this.mark = this.answers.length;
+        next();
+    } else {
+        console.log("Deep in the Pussy!");
+        var Model = _mongoose2.default.model('Solution', SolutionSchema);
+        Model.findOne({
+            questionaireId: this.questionaireId,
+            isMemo: true
+        }).then(function (s) {
+            if (s == null) throw "Test does not have a memorandum";
+
+            _this.answers.forEach(function (answer, i) {
+                var solution = s.answers.find(function (v) {
+                    return v.question.id == answer.question.id;
+                });
+                if (solution == null) throw "Test does not have a memorandum";
+                if (answer.answer == solution.answer) {
+                    mark++;
+                }
+            });
+            _this.mark = mark;
+            next();
+        }).catch(function (err) {
+            console.log("An error occured while calculating your mark, " + err.message);
+            next(new Error(err.message));
+        });
+    }
+});
+
+SolutionSchema.methods.findSimilarTypes = function (cb) {
+    return this.model('Animal').find({
+        type: this.type
+    }, cb);
+};
+
+SolutionSchema.index({
+    questionaireId: 1,
+    studentId: 1,
+    date: 1
+}, {
+    unique: true
+});
+
+var Solution = _mongoose2.default.model('Solution', SolutionSchema);
+module.exports = Solution;

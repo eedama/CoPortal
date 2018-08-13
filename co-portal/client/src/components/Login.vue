@@ -126,7 +126,7 @@ export default {
 <style scoped>
 .screen{
       /* The image used */
-    background-image: url("../assets/img/cupOfCoffee.jpg");
+    background-image: url("/assets/img/cupOfCoffee.jpg");
 
     /* Full height */
     height: 100vh; 

@@ -46,7 +46,7 @@ export default {
       options: [
         {
           text: "Profile",
-          icon:'account_circle',
+          icon: "account_circle",
           link:
             this.$store.state.user.type +
             "/dashboard/for/" +
@@ -69,7 +69,7 @@ export default {
           text: "Modules",
           icon: "books",
           link: "/module/list",
-          auth: ["ADMIN", "LECTURER","STUDENT"]
+          auth: ["ADMIN", "LECTURER", "STUDENT"]
         },
         {
           text: "Test list",
@@ -103,17 +103,17 @@ export default {
   color: white;
 }
 
-.screen{
-      /* The image used */
-    background-image: url("../assets/img/plain-white.png");
+.screen {
+  /* The image used */
+  background-image: url("assets/img/plain-white.png");
 
-    /* Full height */
-    height: 100vh; 
-    padding-top:200px;
+  /* Full height */
+  height: 100vh;
+  padding-top: 200px;
 
-    /* Center and scale the image nicely */
-    background-position:top;
-    background-repeat: no-repeat;
-    background-size: fit;
+  /* Center and scale the image nicely */
+  background-position: top;
+  background-repeat: no-repeat;
+  background-size: fit;
 }
 </style>
