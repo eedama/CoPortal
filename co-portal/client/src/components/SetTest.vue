@@ -1,12 +1,17 @@
 <template>
   <div class="hello">
     <div class="row">
+      <div class="col s8 offset-s2">
+        <md-button v-on:click="$router.back()" class="right">
+          <md-icon>keyboard_backspace</md-icon>
+          <span>Back</span>
+        </md-button>
+      </div>
+    </div>
+    <div class="row">
       <div class="input-field center-align col s12 m8 offset-m2">
         <input v-model="title" id="title" type="text" class="validate">
         <label for="title">Title</label>
-      </div>
-      <div v-if="!addingQuestion && currentPage == 0" class="col s12 center-align">
-        <button class="btn green" v-on:click="AddQuestion()">Add Question</button>
       </div>
       <div v-if="currentPage == 1" class="col s12 center-align">
         <h3>Memorandum creation</h3>
@@ -26,6 +31,11 @@
           </div>
         </div>
   
+      </div>
+    </div>
+    <div class="row">
+      <div v-if="!addingQuestion && currentPage == 0" class="col s12 center-align">
+        <button class="btn green" v-on:click="AddQuestion()">Add Question</button>
       </div>
     </div>
     <div v-if="addingQuestion && currentPage == 0" class="row">
@@ -54,147 +64,246 @@
       </div>
     </div>
     <div v-if="!addingQuestion && questions.length > 0 && currentPage == 0" class="row">
+      <!--
+        <div class="col s12 m8 offset-m2 card-panel row p-10">
+          <div class="col s12 row">
+            <div class="switch">
+              <label>
+                  <input v-model="hasExpiryDatetime" type="checkbox">
+                  <span class="lever"></span>
+                  {{ hasExpiryDatetime ?  'Has expiry date/time' : 'No expiry date/time' }} 
+                </label>
+            </div>
+          </div>
+          <div v-show="hasExpiryDatetime" class="col s12 l6 input-field">
+            <input v-model="questionaire.expiryDate" id="ExpiryDate" type="date" class="datepicker">
+            <label for="ExpiryDate">Expiry date</label>
+          </div>
+          <div v-show="hasExpiryDatetime" class="col s12 m6 input-field">
+            <input v-model="questionaire.expiryTime" id="ExpiryTime" type="time" class="validate">
+            <label for="ExpiryTime">Expiry time</label>
+          </div>
+        </div>
+        -->
+      <div class="col s12 m8 offset-m2 card-panel row p-10">
+        <div class="col s12 row">
+          <div class="switch">
+            <label>
+                  <input v-model="hasTimeLimit" type="checkbox">
+                  <span class="lever"></span>
+                  {{ hasTimeLimit ? 'Has time limit' : 'No time limit' }}
+                </label>
+          </div>
+        </div>
+        <label v-show="hasTimeLimit" class="col s12">Time limit</label>
+        <div v-show="hasTimeLimit" class="col s4 m2" style="padding:5px" v-for="limit in timeLimits" :key="limit">
+          <div class="chip waves pointer" v-on:click="questionaire.timeLimit = limit" :class="{'selectedTag':questionaire.timeLimit == limit}">
+            {{ limit }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="!addingQuestion && questions.length > 0 && currentPage == 0" class="row">
       <div class="col s12 m8 offset-m2 right-align">
         <button class="btn green" v-on:click="SubmitQuestionaire()"><i class="material-icons">done</i></button>
       </div>
     </div>
-    <div v-if="currentPage == 1">
-      <TakeTest :questions="questions" />
+    <div v-if="currentPage == 1 && dbQuestionaire != null">
+      <TakeTest :dbQuestionaire="dbQuestionaire" :isMemo="true" />
     </div>
   </div>
 </template>
 
 <script>
-import swal from "sweetalert";
-import TakeTest from "./TakeTest";
-
-const axios = require("axios");
-
-export default {
-  name: "SetTest",
-  components: {
-    TakeTest
-  },
-  data() {
-    return {
-      currentPage: 0,
-      title: "",
-      questionaire: {
+  import swal from "sweetalert";
+  import TakeTest from "./TakeTest";
+  
+  const axios = require("axios");
+  
+  export default {
+    name: "SetTest",
+    components: {
+      TakeTest
+    },
+    data() {
+      return {
+        hasTimeLimit: false,
+        hasExpiryDatetime: false,
+        currentPage: 0,
         title: "",
-        answers: []
-      },
-      addingQuestion: false,
-      answers: [
-        {
+        questionaire: {
+          title: "",
+          answers: [],
+          expiryDate: null,
+          expiryTime: null,
+          timeLimit: null
+        },
+        addingQuestion: false,
+        answers: [{
           value: "Jacob Zuma"
-        }
-      ],
-      questions: [],
-      msg: "Welcome to Your Vue.js App"
-    };
-  },
-  methods: {
-    AddQuestion() {
-      this.addingQuestion = true;
+        }],
+        dbQuestionaire: null,
+        questions: [],
+        timeLimits: [
+          "10 minutes",
+          "30 minutes",
+          "45 minutes",
+          "1 hour",
+          "1.5 hours",
+          "2 hours"
+        ],
+        msg: "Welcome to Your Vue.js App"
+      };
     },
-    AddAnswer() {
-      this.answers.push({});
-    },
-    RemoveAnswer() {
-      this.answers.pop();
-    },
-    DeleteQuestion(question) {
-      swal({
-        title: "Are you sure?",
-        text: "Once deleted, you will not be able to recover this question",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true
-      }).then(willDelete => {
-        if (willDelete) {
-          var index = this.questions.indexOf(question);
-          this.questions.splice(index, 1);
-          swal("Question has been deleted!", {
-            icon: "success"
-          });
-        }
-      });
-    },
-    SaveQuestion() {
-      if (this.questionaire.title.length < 2) {
-        swal("Incomplete question", "Please provide a valid question", "error");
-        return;
+    mounted() {
+      if(this.moduleID == null){
+        this.$router.back();
+      }else{
+        this.Reload();
       }
-
-      if (this.questionaire.answers.length < 1) {
-        swal(
-          "Incomplete question",
-          "Please provide atleast one answer to the question",
-          "error"
-        );
-        return;
-      }
-
-      axios
-        .get(this.$store.state.settings.baseLink + "/s/students/all/names")
-        .then(results => {
-          this.users = [];
-          alert(results);
-          console.log(results);
-        })
-        .catch(err => {
-          alert(err);
-          console.log(err);
+    },
+    props:['moduleID'],
+    methods: {
+      AddQuestion() {
+        this.addingQuestion = true;
+      },
+      AddAnswer() {
+        this.answers.push({});
+      },
+      RemoveAnswer() {
+        this.answers.pop();
+      },
+      DeleteQuestion(question) {
+        swal({
+          title: "Are you sure?",
+          text: "Once deleted, you will not be able to recover this question",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true
+        }).then(willDelete => {
+          if (willDelete) {
+            var index = this.questions.indexOf(question);
+            this.questions.splice(index, 1);
+            swal("Question has been deleted!", {
+              icon: "success"
+            });
+          }
         });
-
-      this.questions.push({
-        id:
-          this.questionaire.title +
-          "-" +
-          (Math.random() + 100) +
-          "-" +
-          this.questions.length,
-        title: this.questionaire.title,
-        answers: this.questionaire.answers
-      });
-
-      this.questionaire.title = "";
-      this.questionaire.answers = [];
-      this.addingQuestion = false;
-    },
-    SubmitQuestionaire() {
-      if (this.title.length < 3) {
-        swal(
-          "Incomplete questionaire",
-          "Please provide a title for your questionaire",
-          "error"
-        );
-        return;
+      },
+      SaveQuestion() {
+        if (this.questionaire.title.length < 2) {
+          swal("Incomplete question", "Please provide a valid question", "error");
+          return;
+        }
+  
+        if (this.questionaire.answers.length < 1) {
+          swal(
+            "Incomplete question",
+            "Please provide atleast one answer to the question",
+            "error"
+          );
+          return;
+        }
+  
+        this.questions.push({
+          id: this.questionaire.title +
+            "-" +
+            Date.now() +
+            "-" +
+            this.questions.length,
+          title: this.questionaire.title,
+          answers: this.questionaire.answers,
+          expiryDate: this.hasExpiryDatetime ?
+            this.questionaire.expiryDate :
+            null,
+          expiryTime: this.hasExpiryDatetime ?
+            this.questionaire.expiryTime :
+            null,
+          timeLimit: this.hasTimeLimit ? this.questionaire.timeLimit : null
+        });
+  
+        this.questionaire.title = "";
+        this.questionaire.answers = [];
+        this.addingQuestion = false;
+      },
+      SubmitQuestionaire() {
+        if (this.title.length < 3) {
+          swal(
+            "Incomplete questionaire",
+            "Please provide a title for your questionaire",
+            "error"
+          );
+          return;
+        }
+  
+        if (
+          this.hasTimeLimit &&
+          (this.questionaire.timeLimit == null ||
+            this.questionaire.timeLimit.length < 2)
+        ) {
+          swal(
+            "Invalid time limit",
+            "Please provide a valid time limit",
+            "error"
+          );
+          return;
+        }
+  
+        axios
+          .post(this.$store.state.settings.baseLink + "/l/add/questionaire", {
+            title: this.title,
+            lecturerId: this.$store.state.user.id,
+            questions: this.questions,
+            timeLimit: this.questionaire.timeLimit,
+            moduleId:this.moduleID
+          })
+          .then(results => {
+            console.log(results.data);
+            this.dbQuestionaire = results.data;
+            this.currentPage = 1;
+          })
+          .catch(err => {
+            if (err.response != null && err.response.status == 512) {
+              swal(err.response.data,"error");
+            } else {
+              swal("Unable to submit questionaire", err.message, "error");
+            }
+          });
       }
-      this.currentPage = 1;
     }
-  }
-};
+  };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1,
-h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
+  .p-10 {
+    padding: 10px;
+  }
+  
+  h1,
+  h2 {
+    font-weight: normal;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+  
+  a {
+    color: #42b983;
+  }
+  
+  .pointer {
+    cursor: pointer;
+  }
+  
+  .selectedTag {
+    background-color: #42b983 !important;
+  }
 </style>

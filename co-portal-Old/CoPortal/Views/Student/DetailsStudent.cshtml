@@ -20,6 +20,9 @@
                 </div>
             </div>
             <div class="row card-content">
+                <div class="col-xs-12">
+                    <img class="img-responsive" style="width:100%" src="~/Content/img/slide/slide-03.jpeg" alt="Chicago">
+                </div>
                 <div class="col-sm-6">
                     <p>
                         <span class="title">@Html.DisplayNameFor(model => model.Name) : </span>
@@ -57,15 +60,15 @@
                             <th>view Course</th>
                         </tr>
                         @foreach (var item in Model.CourseEnrollments)
-            {
-                <tr>
-                    <td>@Html.DisplayFor(modelItem => item.Course.Name)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Course.Code)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Course.Description)</td>
-                    <td>@Html.DisplayFor(modelItem => item.FeesPaid)</td>
-                    <td>@Html.ActionLink("view", "CourseDetails", new { item.Course.Id })</td>
-                </tr>
-}
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.Course.Name)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Course.Code)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Course.Description)</td>
+                                <td>@Html.DisplayFor(modelItem => item.FeesPaid)</td>
+                                <td>@Html.ActionLink("view", "CourseDetails", new { item.Course.Id })</td>
+                            </tr>
+                        }
                     </table>
                 </div>
 

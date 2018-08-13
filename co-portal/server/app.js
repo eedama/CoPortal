@@ -7,11 +7,14 @@ var bodyParser = require("body-parser");
 
 var app = express();
 
-import mongoose from "mongoose";
+import mongoose, {
+    mongo
+} from "mongoose";
 import adminController from "./routes/AdminController";
 import studentController from "./routes/StudentController";
 import lecturerController from "./routes/LecturerController";
-import notificationController from "./routes/NotificationController";
+import moduleController from "./routes/ModuleController";
+import accountController from "./routes/AccountController";
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -50,10 +53,11 @@ mongoose.connect("mongodb://localhost:27017/JMRdb", {
 
 mongoose
     .connect("mongodb://localhost:27017/CoportalDB?authSource=admin", {
-        // auth: {
-        //     user: "admin",
-        //     password: "Mulavhelesi@1"
-        // },
+        //  auth: {
+        //      user: "admin",
+        //      password: "Mulavhelesi@1"
+        //  },
+        useNewUrlParser: true,
         reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
         reconnectInterval: 500, // Reconnect every 500ms
         dbName: "CoportalDB"
@@ -65,7 +69,8 @@ mongoose
 app.use("/s", studentController);
 app.use("/l", lecturerController);
 app.use("/a", adminController);
-app.use("/n", notificationController);
+app.use("/m", moduleController);
+app.use("/acc", accountController);
 
 /// catch 404 and forwarding to error handler
 app.use(function (req, res, next) {

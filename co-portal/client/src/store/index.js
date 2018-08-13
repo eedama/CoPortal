@@ -4,7 +4,6 @@ import Vuex from 'vuex';
 import user from './modules/user';
 import settings from './modules/settings';
 import collections from './modules/collections';
-import cache from './modules/cache';
 
 Vue.use(Vuex);
 
@@ -14,8 +13,7 @@ const store = new Vuex.Store({
   modules: {
     user,
     settings,
-    collections,
-    cache
+    collections
   },
   strict: debug,
 });

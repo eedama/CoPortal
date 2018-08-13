@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 var Schema = mongoose.Schema;
 
-const StudentSchema = new mongoose.Schema({
+const LecturerSchema = new mongoose.Schema({
     _id: {
         type: Schema.Types.ObjectId,
         default: mongoose.Types.ObjectId()
@@ -20,7 +20,6 @@ const StudentSchema = new mongoose.Schema({
     },
     firstname: String,
     lastname: String,
-    room: String,
     gender: String,
     email: String,
     profilePic: String,
@@ -34,25 +33,11 @@ const StudentSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    nextOfKin: {
-        name: String,
-        surname: String,
-        relationship: String,
-        contact: Number
-    },
-    sponsor: String,
-    lease: {
-        rentDueOn: String,
-        startDate: Date,
-        endDate: Date,
-        rentAmount: Number,
-        depositAmount: Number
-    }, // ForeignKey
+    dob: Date,
     lastUpdatedAt: {
         type: Date,
         default: Date.now()
     },
-    dob: Date,
     lastActivityDate: {
         type: Date,
         default: Date.now()
@@ -66,9 +51,9 @@ const StudentSchema = new mongoose.Schema({
         default: false
     },
     // Relationships
-    solutions: [{
+    questionaires: [{
         type: Schema.Types.ObjectId,
-        ref: 'Solution'
+        ref: 'Questionaire'
     }],
     modules: [{
         type: Schema.Types.ObjectId,
@@ -76,15 +61,15 @@ const StudentSchema = new mongoose.Schema({
     }],
 });
 
-StudentSchema.methods.findSimilarTypes = function (cb) {
+LecturerSchema.methods.findSimilarTypes = function (cb) {
     return this.model('Animal').find({
         type: this.type
     }, cb);
 };
 
-StudentSchema.index({
+LecturerSchema.index({
     '$**': 'text'
 });
 
-const Student = mongoose.model('Student', StudentSchema);
-module.exports = Student;
+const Lecturer = mongoose.model('Lecturer', LecturerSchema);
+module.exports = Lecturer;

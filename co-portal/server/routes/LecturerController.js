@@ -2,205 +2,314 @@ var express = require("express");
 var router = express.Router();
 import mongoose from "mongoose";
 
+import Questionaire from "../models/Questionaire";
+import Solution from "../models/Solution";
 import Student from "../models/Student";
-
-import Rent from "../models/Rent";
+import Lecturer from "../models/Lecturer";
+import Module from "../models/Module";
 
 /*
-  TODO: Get one student - DONE
+  TODO: Get one lecturer - DONE
         Get a list of them - DONE
-        Search for a student - DONE
-        Add a student
-        Remove a student (Not to delete)
-        Edit student details
-        Login student
+        Search for a lecturer - DONE
+        Add a lecturer
+        Remove a lecturer (Not to delete)
+        Edit lecturer details
+        Login lecturer
 */
 
-router.get("/rents/all", function (req, res) {
-  Rent.find().then(rents => {
-    if (rents == null) res.send("Error : 90ty32rtu834g9erbo");
-    res.json(rents);
-  });
-});
-
-router.get("/students/all", function (req, res) {
-  Student.find({
+router.get("/lecturers/all", function (req, res) {
+  Lecturer.find({
       "active": true
     })
     .populate(["rents"])
-    .then(students => {
-      if (students == null) res.send("Error : 9032rtu834g9erbo");
-      res.json(students);
+    .populate(['modules'])
+    .then(lecturers => {
+      if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
+      res.json(lecturers);
     });
 });
 
-router.get("/students/all/names", function (req, res) {
-  Student.find({
+router.get("/lecturers/of/ids/:lecturerIDs", function (req, res) {
+  var lecturerIDs = req.params.lecturerIDs;
+  if (!Array.isArray(lecturerIDs)) {
+    lecturerIDs = [lecturerIDs];
+  }
+  console.log(lecturerIDs);
+
+  lecturerIDs = lecturerIDs.map(l => mongoose.Types.ObjectId(l));
+
+  Lecturer.find({
+      "active": true,
+      '_id': {
+        $in: lecturerIDs
+      }
+    })
+    .populate(["rents"])
+    .populate(['modules'])
+    .then(lecturers => {
+      if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
+      res.json(lecturers);
+    });
+});
+
+router.post("/delete/:lecturerID", function (req, res) {
+  var lecturerID = req.params.lecturerID;
+  Lecturer.findById(lecturerID).then(lecturer => {
+    lecturer.active = false;
+    lecturer.removed = true;
+    lecturer.save(function (err) {
+      if (err) return res.status(512).send("Server error : " + err.message);
+      res.send(lecturerID);
+    })
+  }).catch(err => {
+    return res.status(512).send("Server error : " + err.message);
+  });
+
+})
+
+router.post("/add/questionaire", function (req, res) {
+  var questionaire = new Questionaire({
+    _id: mongoose.Types.ObjectId(),
+    lecturerID: req.body.lecturerId,
+    title: req.body.title,
+    questions: req.body.questions,
+    timeLimit: req.body.timeLimit,
+    moduleID: req.body.moduleId
+  });
+
+
+  Lecturer.findById(questionaire.lecturerID).then(lecturer => {
+    if (lecturer == null) return res.status(512).send("Lecturer does not exist");
+    Module.findById(questionaire.moduleID).then(module => {
+      if (module == null) return res.status(512).send("Module does not exist");
+      if (module.lecturers.filter(l => l == req.body.lecturerId).length == 0) return res.status(512).send(lecturer.username + " is not a lecturer of " + module.name + " " + module.code);
+      questionaire.save(function (err) {
+        if (err) res.send(err);
+        if (lecturer.questionaires == null) lecturer.questionaires = [];
+        lecturer.questionaires.push(questionaire._id);
+        lecturer.save(function (err) {
+          if (err) res.send(err);
+          if (module.questionaires == null) module.questionaires = [];
+          module.questionaires.push(questionaire._id);
+          module.save(function (err) {
+            if (err) return res.status(512).send("Server error : " + err.message);
+            console.log(questionaire);
+            res.json(questionaire);
+          });
+        });
+      });
+    });
+  })
+});
+
+router.post("/submit/questionaire", function (req, res) {
+  var solution = new Solution({
+    _id: mongoose.Types.ObjectId(),
+    studentId: req.body.solution.isMemo ? null : req.body.studentId,
+    questionaireId: req.body.solution.id,
+    isMemo: req.body.solution.isMemo,
+    answers: req.body.solution.answers
+  });
+  console.log(solution);
+
+  if (!req.body.solution.isMemo) {
+    solution.save(function (err) {
+      if (err) res.send(err);
+      Student.findById(req.body.studentId).then(student => {
+        if (student == null) new Error("Student does not exist");
+        student.solutions.push(solution._id);
+        student.save(function (err) {
+          if (err) return res.status(512).send("Server error : " + err.message);
+          console.log(solution);
+          res.json(solution);
+        })
+      }).catch(err => {
+        return res.status(512).send("Server error : " + err.message);
+      })
+    });
+  } else {
+    solution.save(function (err) {
+      if (err) return res.status(512).send("Server error : " + err.message);
+      res.json(solution);
+    });
+  }
+});
+
+router.get("/get/solution/id/for/:questionaireId", function (req, res) {
+  var questionaireId = req.params.questionaireId;
+  Solution.findOne({
+    questionaireId: questionaireId,
+    isMemo: true
+  }).then(solution => {
+    if (solution == null) return res.status(512).send("No solution for this questionaire");
+    res.json({
+      id: solution._id
+    });
+  }).catch(err => {
+    return res.status(512).send("Server error : " + err.message);
+  });
+});
+
+router.post('/feedback/submit/:questionaireId', function (req, res) {
+  var questionaireId = req.params.questionaireId;
+  console.log("Submitting feedback " + questionaireId)
+  Solution.findOne({
+      questionaireId: questionaireId,
+      isMemo: true
+    })
+    .then(s => {
+      if (s == null) throw "Test does not have a memorandum";
+      console.log(s.feedbacks);
+      if (s.feedbacks == null) s.feedbacks = [];
+
+      s.feedbacks.push({
+        _id: mongoose.Types.ObjectId(),
+        from: {
+          id: req.body.fromId,
+          name: req.body.from,
+          type: req.body.fromType
+        },
+        message: req.body.message,
+        date: req.body.date,
+        status: 'sent'
+      });
+
+      s.save(function (err) {
+        if (err) throw "Unable to save feedback";
+        //var answer = s.feedbacks.filter(f => req.body.existingId.indexOf(f._id) < 0);
+        res.json(s.feedbacks);
+      });
+    })
+    .catch(err => {
+      return res.statusCode = 402;
+      res.send(err.message);
+    });
+});
+
+router.get('/feedback/reload/:questionaireId', function (req, res) {
+  var questionaireId = req.params.questionaireId;
+  Solution.findOne({
+      questionaireId: questionaireId,
+      isMemo: true
+    })
+    .then(s => {
+      if (s == null) throw "Test does not have a memorandum";
+
+      if (s.feedbacks == null) s.feedbacks = [];
+      //var answer = s.feedbacks.filter(f => req.body.existingId.indexOf(f._id) < 0);
+      res.json(s.feedbacks);
+    })
+    .catch(err => {
+      return res.statusCode = 402;
+      console.log("Error " + err.message);
+      res.send(err.message);
+    });
+});
+
+router.get("/all/questionaire", function (req, res) {
+
+  Questionaire.find().then(questionaires => {
+    // randomizeQuestions
+    questionaires = shuffle(questionaires);
+    questionaires.forEach((questionaire) => {
+      questionaire.questions = shuffle(questionaire.questions);
+      questionaire.questions.forEach(question => {
+        question.answers = shuffle(question.answers);
+      });
+    });
+    res.json(questionaires);
+  }).catch(err => {
+    return res.statusCode = 400;
+    res.send(err);
+  });
+
+});
+
+router.get("/get/solutions/:solutionId", function (req, res) {
+  var solutionId = req.params.solutionId;
+  Solution.findById(solutionId).populate('studentId').then(solution => {
+    if (solution == null) res.send("Can not find that solution");
+    console.log(solution);
+    console.log(solutionId + " id");
+    res.json(solution);
+  }).catch(err => {
+    return res.statusCode = 404;
+    res.send(err);
+  });
+});
+
+function shuffle(array) {
+  var m = array.length,
+    t, i;
+
+  // While there remain elements to shuffle…
+  while (m) {
+
+    // Pick a remaining element…
+    i = Math.floor(Math.random() * m--);
+
+    // And swap it with the current element.
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+
+  return array;
+}
+
+router.get("/lecturers/all/usernames", function (req, res) {
+  Lecturer.find({
     "active": true
-  }, "_id username").then(students => {
-    if (students == null) res.send("Error : 9032rtu834g9erbo");
-    res.json(students);
+  }, "_id username").then(lecturers => {
+    if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
+    res.json(lecturers);
+  });
+});
+
+router.get("/lecturers/all/fullnames", function (req, res) {
+  Lecturer.find({
+    "active": true
+  }, "_id firstname lastname").then(lecturers => {
+    if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
+    res.json(lecturers);
   });
 });
 
 router.get("/:id/get", function (req, res) {
   let id = req.params.id;
   if (id == null) {
-    res.status(404);
+    return res.status(404);
     res.send("Invalid ID > " + id);
   } else {
-    Student.findById(id).then(student => {
-      if (student == null) {
-        res.status(404);
-        res.send("No student with id : " + id);
+    Lecturer.findById(id).then(lecturer => {
+      if (lecturer == null) {
+        return res.status(404);
+        res.send("No lecturer with id : " + id);
       } else {
-        res.json(student);
+        res.json(lecturer);
       }
     });
   }
 });
 
-/**
- * POST methods
- */
-
 router.post("/:text/search", function (req, res) {
-  let text = req.params.text;
-  if (text == null || text.length < 3) {
-    res.status(404);
-    res.send("Cannot search for - " + text);
+  let txtSearch = req.params.text;
+  if (txtSearch == null || txtSearch.length < 2) {
+    return res.status(404);
+    res.send("Cannot search for - " + txtSearch);
   } else {
-    Student.find({
-      where: {
-        [Op.or]: [{
-            lastName: {
-              [Op.like]: "%" + text + "%"
-            }
-          },
-          {
-            firstName: {
-              [Op.like]: "%" + text + "%"
-            }
-          }
-        ]
+    Lecturer.find({
+      $text: {
+        $search: new RegExp('^' + txtSearch + '$', "i")
       }
     }).then(answer => {
-      if (answer == null || answer.length != 1) {
-        res.send("firstname or lastname that match : " + text);
+      if (answer == null || answer.length <= 0) {
+        return res.status(512).send("No results for : " + txtSearch);
       } else {
         res.json(answer);
       }
     });
   }
 });
-
-router.post("/login", function (req, res) {
-  //Dont forget this is just to disable the nigga
-  if (req.body.useEmail) {
-    Student.findOne({
-      email: req.body.email,
-      password: req.body.pass
-    }).then(student => {
-      if (student == null) {
-        res.status(500);
-        res.send("Incorrect log in details");
-      } else {
-        res.json(student);
-      }
-    });
-  } else {
-    Student.findOne({
-      contactNumbers: req.body.numbers,
-      password: req.body.pass
-    }).then(student => {
-      if (student == null) {
-        res.status(500);
-        res.send("Incorrect log in details");
-      } else {
-        res.json(student);
-      }
-    });
-  }
-});
-
-router.post("/add", function (req, res) {
-  console.log(req.body);
-  req.body._id = mongoose.Types.ObjectId();
-  Student.find()
-    .or([{
-        username: req.body.username
-      },
-      {
-        contactNumbers: req.body.contactNumbers
-      },
-      {
-        firstName: req.body.firstName,
-        surname: req.body.surname
-      }
-    ])
-    .then(s => {
-      console.log(s);
-      if (s.length == 0) {
-        if (req.body.username == null || req.body.username.length < 2) {
-          res.status(404);
-          res.send("Username is required");
-        } else if (req.body.firstName == null || req.body.surname == null) {
-          res.status(404);
-          res.send("Name can not be null");
-        } else if (
-          req.body.contactNumbers.length != 10 &&
-          !isNaN(req.body.contactNumbers)
-        ) {
-          res.status(404);
-          res.send("Contact numbers must be 10 digits long");
-        } else {
-          var student = new Student(req.body);
-          student.save(function (err) {
-            if (err) {
-              console.log("Error .....");
-              console.log(err);
-              res.status(402);
-              res.send(err);
-            }
-            res.send(student._id);
-          });
-        }
-      } else {
-        res.status(400);
-        res.send("User already exist");
-      }
-    });
-});
-
-router.post("/:id/remove", function (req, res) {
-  //Dont forget this is just to disable the nigga
-  let id = req.params.id;
-  if (id == null) {
-    res.status(404);
-    res.send("Invalid ID > " + id);
-  } else {
-    Student.findById(id).then(student => {
-      if (student == null) {
-        res.status(404);
-        res.send("No student with id : " + id);
-      } else {
-        student.active = false;
-        student.save(function (err) {
-          if (err) {
-            console.log("Error .....");
-            console.log(err);
-            res.status(402);
-            res.send(err);
-          }
-          res.json(student);
-        });
-      }
-    });
-  }
-});
-
-router.post("/:id/update", function (req, res) {
-  //Dont forget this is just to disable the nigga
-});
-
 module.exports = router;

@@ -6,8 +6,11 @@ const AdminSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         default: mongoose.Types.ObjectId()
     },
-    userName: String,
-    pass: String,
+    username: {
+        type: String,
+        unique: true
+    },
+    password: String,
     email: String,
     role: {
         type: String,
@@ -44,7 +47,6 @@ AdminSchema.methods.findSimilarTypes = function (cb) {
         type: this.type
     }, cb);
 };
-
 
 const Admin = mongoose.model('Admin', AdminSchema);
 module.exports = Admin;

@@ -5,10 +5,6 @@
 </template>
 
 <script>
-import "materialize-css/dist/css/materialize.min.css";
-var materialize = require("materialize-css/dist/js/materialize.min.js");
-import "vue-animate/dist/vue-animate.min.css";
-
 export default {
   name: "App"
 };
@@ -20,7 +16,6 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
 }
 
 .pointer {

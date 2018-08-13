@@ -11,10 +11,13 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "emoji-mart-vue": "^2.6.3",
     "materialize-css": "^1.0.0-rc.1",
+    "moment": "^2.22.2",
     "sweetalert": "^2.1.0",
     "vue": "^2.5.2",
     "vue-animate": "0.0.4",
+    "vue-material": "^1.0.0-beta-10.2",
     "vue-router": "^3.0.1",
     "vue-typer": "^1.2.0",
     "vuex": "^3.0.1"
