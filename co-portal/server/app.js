@@ -38,29 +38,17 @@ app.use(function (req, res, next) {
     );
     next();
 });
-// Local Host
-/*
-mongoose.connect("mongodb://localhost:27017/JMRdb", {
-    reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
-    reconnectInterval: 500, // Reconnect every 500ms
-    dbName: 'JMRdb'
-}).then((answer) => {
-    console.log("Successfully connected to MONGO!");
-});
-*/
-
-//    Server
 
 mongoose
-    .connect("mongodb://localhost:27017/CoportalDB?authSource=admin", {
-        //  auth: {
-        //      user: "admin",
-        //      password: "Mulavhelesi@1"
-        //  },
+    .connect("mongodb://localhost:27017/CoportalLiveDB?authSource=admin", {
+        auth: {
+            user: "admin",
+            password: "Mulavhelesi@1"
+        },
         useNewUrlParser: true,
         reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
         reconnectInterval: 500, // Reconnect every 500ms
-        dbName: "CoportalDB"
+        dbName: "CoportalLiveDB"
     })
     .then(answer => {
         console.log("Successfully connected to MONGO!");
