@@ -109,7 +109,7 @@ export default {
 
 .screen {
   /* The image used */
-  background-image: url("../assets/img/plain-white.png");
+  background-image: url("/static/img/plain-white.png");
 
   /* Full height */
   height: 100vh;

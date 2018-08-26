@@ -134,7 +134,7 @@ export default {
 <style scoped>
 .screen {
   /* The image used */
-  background-image: url("../assets/img/cupOfCoffee.jpg");
+  background-image: url("/static/img/cupOfCoffee.jpg");
   /* Full height */
   height: 100vh;
   /* Center and scale the image nicely */
