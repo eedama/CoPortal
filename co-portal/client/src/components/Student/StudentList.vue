@@ -16,7 +16,7 @@
     </div>
     <div v-show="addingStudents" class="row" style="height:80vh">
       <div class="col s12 m8 offset-m2 l6 offset-l3">
-       <add-student v-on:submitted="AddedNewStudent"></add-student>  
+        <add-student v-on:submitted="AddedNewStudent"></add-student>
       </div>
     </div>
     <div v-show="!addingStudents" class="row">
@@ -30,7 +30,7 @@
               <md-field>
                 <label :for="`mmodules-${i}`">Module {{ m }}</label>
                 <md-select v-model="studentModule.modules[i]" :name="`mmodules-${i}`" :id="`mmodules-${i}`">
-                  <md-option :disabled="studentModule.modules.filter(sm => sm == module._id).length > 0" v-for="module in modules" :value="module._id" :key="module._id">{{ module.name }} ({{ module.code }})</md-option>
+                  <md-option :disabled="studentModule.modules.filter(sm => sm == _module._id).length > 0" v-for="_module in modules" :value="_module._id" :key="_module._id">{{ _module.name }} ({{ _module.code }})</md-option>
                 </md-select>
               </md-field>
             </div>
@@ -42,7 +42,12 @@
         </md-dialog-content>
         <md-dialog-actions>
           <md-button class="md-primary" @click="AddNewModule(null)">Close</md-button>
-          <md-button class="md-primary" @click="AddNewModule('submit')">Save Changes</md-button>
+          <md-button v-if="!isLoading" class="md-primary" @click="AddNewModule('submit')">Save Changes</md-button>
+          <div class="row">
+            <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+              <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+            </div>
+          </div>
         </md-dialog-actions>
       </md-dialog>
       <md-dialog class="card" style="position:absolute" :md-active.sync="showEditProfile">
@@ -85,8 +90,8 @@
             <div class="row" v-show="student.idNumber.length > 6">
               <div class="col s10 offset-s1 m8 offset-m2">
                 <label>
-                                            {{ student.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                                      </label>
+                                                    {{ student.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
+                                              </label>
               </div>
               <div class="col s10 offset-s1 m8 offset-m2">
                 <md-field>
@@ -128,8 +133,11 @@
             <label class="text-center" for="Search">Search</label>
           </div>
         </div>
+        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+        </div>
       </div>
-      <div v-show="filteredStudents.length == 0" class="col s12 center-align">
+      <div v-show="filteredStudents.length == 0 && !isLoading" class="col s12 center-align">
         <p class="red-text">No results found</p>
       </div>
       <div v-show="isFullscreen == null || isFullscreen == student._id" v-for="(student,i) in filteredStudents" :key="i" :class="{'s10 offset-s1 m8 offset-m2 l6 offset-l3':isFullscreen == student._id,'m6 l4 xl3':isFullscreen == null,'hidden':isFullscreen != student._id}"
@@ -188,8 +196,8 @@
               </div>
               <md-card-expand-trigger>
                 <md-button v-on:click="GetPastTestsFor(student)" class="md-icon-button">
-                    <md-icon>keyboard_arrow_down</md-icon>
-                  </md-button>
+                  <md-icon>keyboard_arrow_down</md-icon>
+                </md-button>
               </md-card-expand-trigger>
             </md-card-actions>
   
@@ -197,33 +205,33 @@
               <md-card-content>
   
                 <md-list class="md-double-line">
-
-              <md-subheader>Modules</md-subheader>
   
-              <md-list-item v-for="modul in student.modules" :key="modul._id" :class="{'waves-effect':!modul.removed}">
-                <md-icon class="md-primary">book</md-icon>
-                <div v-on:click="!modul.removed ? goToModule(modul._id) : null" class="md-list-item-text">
-                  <span>{{ modul.name }}</span>
-                  <span>{{ modul.removed ? 'Unassign ' + modul.code : modul.code }}</span>
-                </div>
-                <md-button v-show="!modul.removed" v-on:click="modul.removed = true" class="md-icon-button md-list-action">
-                  <md-icon>delete</md-icon>
-                </md-button>
-                <md-button v-show="modul.removed" v-on:click="DeleteModule(student._id,modul._id)" class="md-icon-button md-list-action">
-                  <md-icon>done</md-icon>
-                </md-button>
-                <md-button v-show="modul.removed" v-on:click="modul.removed = false" class="md-icon-button md-list-action">
-                  <md-icon>close</md-icon>
-                </md-button>
-              </md-list-item>
-              <md-list-item v-on:click="AddNewModule(student)" class="waves-effect">
-                <md-icon class="md-primary">add</md-icon>
-                <div class="md-list-item-text">
-                  <span>Add new Module</span>
-                  <span></span>
-                </div>
-              </md-list-item>
-              <md-subheader>Past tests</md-subheader>
+                  <md-subheader>Modules</md-subheader>
+  
+                  <md-list-item v-for="modul in student.modules" :key="modul._id" :class="{'waves-effect':!modul.removed}">
+                    <md-icon class="md-primary">book</md-icon>
+                    <div v-on:click="!modul.removed ? goToModule(modul._id) : null" class="md-list-item-text">
+                      <span>{{ modul.name }}</span>
+                      <span>{{ modul.removed ? 'Unassign ' + modul.code : modul.code }}</span>
+                    </div>
+                    <md-button v-show="!modul.removed" v-on:click="modul.removed = true" class="md-icon-button md-list-action">
+                      <md-icon>delete</md-icon>
+                    </md-button>
+                    <md-button v-show="modul.removed" v-on:click="DeleteModule(student._id,modul._id)" class="md-icon-button md-list-action">
+                      <md-icon>done</md-icon>
+                    </md-button>
+                    <md-button v-show="modul.removed" v-on:click="modul.removed = false" class="md-icon-button md-list-action">
+                      <md-icon>close</md-icon>
+                    </md-button>
+                  </md-list-item>
+                  <md-list-item v-on:click="AddNewModule(student)" class="waves-effect">
+                    <md-icon class="md-primary">add</md-icon>
+                    <div class="md-list-item-text">
+                      <span>Add new Module</span>
+                      <span></span>
+                    </div>
+                  </md-list-item>
+                  <md-subheader>Past tests</md-subheader>
   
                   <md-list-item v-on:click="goToSolution(pastTest.solutionId)" v-for="(pastTest,v) in student.pastTests" :key="v" href="#" class="waves-effect">
                     <md-icon class="md-primary">account_circle</md-icon>
@@ -232,8 +240,8 @@
                       <span>{{pastTest.title}}</span>
                     </div>
                   </md-list-item>
-                         <md-subheader>Student settings</md-subheader>
-       
+                  <md-subheader>Student settings</md-subheader>
+  
                   <md-list-item v-on:click="student.removed = !student.removed" class="waves-effect">
                     <md-icon class="md-primary">delete</md-icon>
                     <div class="md-list-item-text">
@@ -297,7 +305,8 @@ export default {
       modules: [],
       selectedStudent: null,
       showEditProfile: false,
-      isFullscreen: null
+      isFullscreen: null,
+      isLoading: false
     };
   },
   watch: {
@@ -321,8 +330,10 @@ export default {
       }
     }
   },
-  props:['studentIDs'],
-  components: { AddStudent },
+  props: ["studentIDs"],
+  components: {
+    AddStudent
+  },
   computed: {
     filteredStudents() {
       return this.students.filter(
@@ -338,48 +349,55 @@ export default {
     this.Reload();
   },
   methods: {
-    Reload(){
-      if(this.studentIDs != null){
-        axios.get(this.$store.state.settings.baseLink + "/s/students/of/ids/" + this.studentIDs)
+    Reload() {
+      this.isLoading = true;
+      if (this.studentIDs != null) {
+        axios
+          .get(
+            this.$store.state.settings.baseLink +
+              "/s/students/of/ids/" +
+              this.studentIDs
+          )
           .then(results => {
+            this.isLoading = false;
             this.students = results.data;
-            if(this.students.length == 1){
+            if (this.students.length == 1) {
               this.isFullscreen = this.students[0]._id;
             }
-            console.log(this.students);
           })
           .catch(err => {
+            this.isLoading = false;
             if (err.response != null && err.response.status == 512) {
               swal(err.response.data, "error");
             } else {
               swal("Unable to load students", "Try again later", "error");
             }
           });
-      }else{
-      axios
-      .get(this.$store.state.settings.baseLink + "/s/students/all")
-      .then(results => {
-        this.students = results.data;
-        console.log(this.students);
-        this.students.map(s => {
-          s.show = true;
-        });
-      })
-      .catch(err => {
-        if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
-        } else {
-          swal("Unable to load students", "Try again later", "error");
-        }
-      });
-    }
+      } else {
+        axios
+          .get(this.$store.state.settings.baseLink + "/s/students/all")
+          .then(results => {
+            this.isLoading = false;
+            this.students = results.data;
+            this.students.map(s => {
+              s.show = true;
+            });
+          })
+          .catch(err => {
+            this.isLoading = false;
+            if (err.response != null && err.response.status == 512) {
+              swal(err.response.data, "error");
+            } else {
+              swal("Unable to load students", "Try again later", "error");
+            }
+          });
+      }
       this.LoadModules();
     },
-    AddedNewStudent(isAdded){
-      if(isAdded){
+    AddedNewStudent(isAdded) {
+      if (isAdded) {
         this.Reload();
-      }else{
-
+      } else {
       }
     },
     AddNewModule(student) {
@@ -389,6 +407,7 @@ export default {
         this.studentModule.modules = [null];
         this.studentModule.oldModules = null;
       } else if (student == "submit") {
+        this.isLoading = true;
         var newModules = this.studentModule.modules.filter(
           s =>
             s != null &&
@@ -412,6 +431,7 @@ export default {
               }
             )
             .then(result => {
+              this.isLoading = false;
               var names = this.modules.filter(
                 m => newModules.filter(nm => nm == m._id).length > 0
               );
@@ -432,6 +452,7 @@ export default {
               this.AddNewModule(null);
             })
             .catch(err => {
+              this.isLoading = false;
               if (err.response != null && err.response.status == 512) {
                 swal(err.response.data, "error");
               } else {
@@ -459,7 +480,8 @@ export default {
           idNumber: "",
           gender: "",
           dob: "",
-          isSouthAfrican: false
+          isSouthAfrican: false,
+          isLoading: true
         };
       }
       this.showEditProfile = !this.showEditProfile;
@@ -719,6 +741,5 @@ export default {
 </script>
 
 <style scoped>
-
 </style>
 

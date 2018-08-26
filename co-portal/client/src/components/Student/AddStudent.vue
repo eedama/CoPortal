@@ -42,7 +42,7 @@
                 <md-field>
                   <label :for="`modules-${i}`">Module {{ m }}</label>
                   <md-select v-model="student.modules[i]" :name="`modules-${i}`" :id="`modules-${i}`">
-                    <md-option :disabled="student.modules.filter(sm => sm == module._id).length > 0" v-for="module in modules" :value="module._id" :key="module._id">{{ module.name }} ({{ module.code }})</md-option>
+                    <md-option :disabled="student.modules.filter(sm => sm == _module._id).length > 0" v-for="_module in modules" :value="_module._id" :key="_module._id">{{ _module.name }} ({{ _module.code }})</md-option>
                   </md-select>
                 </md-field>
               </div>
@@ -63,8 +63,8 @@
               <div class="row">
                 <div class="col s12">
                   <label>
-                                      {{ student.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                                </label>
+                                            {{ student.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
+                                      </label>
                 </div>
               </div>
               <div class="col s12">
@@ -90,7 +90,8 @@
             </div>
             <div class="row">
               <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-on:click="SubmitStudent()" type="submit" value="Submit student" class="btn center-align tg-btn" />
+                <input v-if="!isLoading" v-on:click="SubmitStudent()" type="submit" value="Submit student" class="btn center-align tg-btn" />
+                <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
               </div>
             </div>
           </div>
@@ -101,145 +102,156 @@
 </template>
 
 <script>
-  import swal from "sweetalert";
-  import * as moment from "moment";
-  
-  const axios = require("axios");
-  
-  export default {
-    name: "AddStudent",
-    data() {
-      return {
-        txtError: "",
-        student: {
-          firstname: "",
-          lastname: "",
-          username: "",
-          password: "",
-          confirmPassword: "",
-          modules: [null],
-          idNumber: "",
-          gender: "",
-          dob: "",
-          isSouthAfrican: false
-        },
-        done: false,
-        modules: []
-      };
-    },
-    watch: {
-      "student.idNumber": function(newVal, oldVal) {
-        if (newVal.length >= 6) {
-          this.student.dob = new Date(
-            newVal.substring(0, 2),
-            newVal.substring(2, 4) - 1,
-            newVal.substring(4, 6)
-          );
-  
-          if (newVal.length >= 10) {
-            var genderCode = newVal.substring(6, 10);
-            this.student.gender = parseInt(genderCode) < 5000 ? "Female" : "Male";
-  
-            if (newVal.length == 13) {
-              this.student.isSouthAfrican =
-                parseInt(newVal.substring(10, 11)) == 0;
-            }
+import swal from "sweetalert";
+import * as moment from "moment";
+
+const axios = require("axios");
+
+export default {
+  name: "AddStudent",
+  data() {
+    return {
+      txtError: "",
+      student: {
+        firstname: "",
+        lastname: "",
+        username: "",
+        password: "",
+        confirmPassword: "",
+        modules: [null],
+        idNumber: "",
+        gender: "",
+        dob: "",
+        isSouthAfrican: false
+      },
+      done: false,
+      modules: [],
+      isLoading: false
+    };
+  },
+  watch: {
+    "student.idNumber": function(newVal, oldVal) {
+      if (newVal.length >= 6) {
+        this.student.dob = new Date(
+          newVal.substring(0, 2),
+          newVal.substring(2, 4) - 1,
+          newVal.substring(4, 6)
+        );
+
+        if (newVal.length >= 10) {
+          var genderCode = newVal.substring(6, 10);
+          this.student.gender = parseInt(genderCode) < 5000 ? "Female" : "Male";
+
+          if (newVal.length == 13) {
+            this.student.isSouthAfrican =
+              parseInt(newVal.substring(10, 11)) == 0;
           }
         }
       }
-    },
-    mounted() {
-      this.done = false;
-      this.LoadModules();
-    },
-    methods: {
-      LoadModules() {
-        axios
-          .get(this.$store.state.settings.baseLink + "/m/modules/all")
-          .then(results => {
-            this.modules = results.data;
-            this.options = [];
-            this.modules.map(s => {
-              this.options.push({
-                value: s._id,
-                text: s.name + " ( " + s.code + " )"
-              });
-            });
-          })
-          .catch(err => {
-            if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "error");
-            } else {
-              swal("Unable to load modules", "Try again later", "error");
-            }
-          });
-      },
-      SubmitStudent() {
-        this.txtError = "";
-        if (this.student.lastname.length < 2) {
-          this.txtError = "Please enter a valid lastname";
-        }
-  
-        if (this.student.firstname.length < 2) {
-          this.txtError = "Please enter a valid firstname";
-        }
-  
-        if (this.student.password != this.student.confirmPassword) {
-          this.txtError = "Passwords do not match";
-        }
-  
-        if (this.student.password.length < 6) {
-          this.txtError =
-            "Please enter a valid password , passwords must be more than 6 charactors long";
-        }
-        if (this.student.username.length < 2) {
-          this.txtError = "Please enter a valid username";
-        }
-  
-        if (this.student.gender.length < 2) {
-          this.txtError = "Please pick a valid gender";
-        }
-  
-        if (this.student.dob.length < 2) {
-          this.txtError = "Please pick a valid date of birth";
-        }
-  
-        if (this.student.idNumber < 6) {
-          this.txtError = "Please enter a valid id number";
-        }
-  
-        if (this.student.modules.filter(m => m != null).length <= 0) {
-          this.txtError = "Please select at least one module";
-        }
-  
-        if (this.txtError.length > 2) return;
-  
-        axios
-          .post(this.$store.state.settings.baseLink + "/a/add/student", {
-            student: this.student
-          })
-          .then(results => {
-            this.done = true;
-            this.$emit('submitted', true);
-          })
-          .catch(err => {
-            if (err.response != null && err.response.status == 512) {
-              this.txtError = err.response.data;
-            } else {
-              swal("Unable to submit the student", err.message, "error");
-            }
-            this.$emit('submitted', false);
-          });
-      }
     }
-  };
+  },
+  mounted() {
+    this.done = false;
+    this.LoadModules();
+  },
+  methods: {
+    LoadModules() {
+      this.isLoading = true;
+      axios
+        .get(this.$store.state.settings.baseLink + "/m/modules/all")
+        .then(results => {
+          this.isLoading = false;
+          this.modules = results.data;
+          this.options = [];
+          this.modules.map(s => {
+            this.options.push({
+              value: s._id,
+              text: s.name + " ( " + s.code + " )"
+            });
+          });
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal("Unable to load modules", "Try again later", "error");
+          }
+        });
+    },
+    SubmitStudent() {
+      this.txtError = "";
+      this.isLoading = true;
+      if (this.student.lastname.length < 2) {
+        this.txtError = "Please enter a valid lastname";
+      }
+
+      if (this.student.firstname.length < 2) {
+        this.txtError = "Please enter a valid firstname";
+      }
+
+      if (this.student.password != this.student.confirmPassword) {
+        this.txtError = "Passwords do not match";
+      }
+
+      if (this.student.password.length < 6) {
+        this.txtError =
+          "Please enter a valid password , passwords must be more than 6 charactors long";
+      }
+      if (this.student.username.length < 2) {
+        this.txtError = "Please enter a valid username";
+      }
+
+      if (this.student.gender.length < 2) {
+        this.txtError = "Please pick a valid gender";
+      }
+
+      if (this.student.dob.length < 2) {
+        this.txtError = "Please pick a valid date of birth";
+      }
+
+      if (this.student.idNumber < 6) {
+        this.txtError = "Please enter a valid id number";
+      }
+
+      if (this.student.modules.filter(m => m != null).length <= 0) {
+        this.txtError = "Please select at least one module";
+      }
+
+      if (this.txtError.length > 2) {
+        this.isLoading = false;
+        return;
+      }
+      return;
+
+      axios
+        .post(this.$store.state.settings.baseLink + "/a/add/student", {
+          student: this.student
+        })
+        .then(results => {
+          this.isLoading = false;
+          this.done = true;
+          this.$emit("submitted", true);
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            this.txtError = err.response.data;
+          } else {
+            swal("Unable to submit the student", err.message, "error");
+          }
+          this.$emit("submitted", false);
+        });
+    }
+  }
+};
 </script>
 
 <style scoped>
-  .cardBar {
-    background-color: black;
-    color: white;
-    width: 100%;
-  }
+.cardBar {
+  background-color: black;
+  color: white;
+  width: 100%;
+}
 </style>
 

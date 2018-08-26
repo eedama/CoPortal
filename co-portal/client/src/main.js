@@ -85,6 +85,10 @@ Vue.mixin({
           moduleID: moduleID
         }
       })
+    },
+    Logout() {
+      this.$store.commit("logout");
+      this.$router.push("/login");
     }
   }
 })
