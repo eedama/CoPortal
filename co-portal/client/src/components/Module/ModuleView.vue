@@ -1,18 +1,18 @@
 <template>
   <div>
-
+  
     <md-dialog style="width:50%;position:absolute" class="card row" :md-active.sync="addNotes">
-   <md-card class="col s12 m8 offset-m2">
+      <md-card class="col s12 m8 offset-m2">
         <md-card-header>
           <div class="md-title">Adding notes</div>
         </md-card-header>
-
+  
         <md-card-content>
-                    <md-field>
+          <md-field>
             <label>Title</label>
             <md-input v-model="notes.title" required></md-input>
           </md-field>
-          <md-field >
+          <md-field>
             <label>Description</label>
             <md-textarea v-model="notes.description" required></md-textarea>
           </md-field>
@@ -28,7 +28,7 @@
         <md-button class="md-primary" @click="addNotes = false">Close</md-button>
       </md-dialog-actions>
     </md-dialog>
-
+  
     <md-dialog class="card" style="position:absolute" :md-active.sync="addStudent">
       <md-content style="overflow-y:scroll" class="row">
         <add-student v-on:submitted="AddedNewStudent"></add-student>
@@ -54,6 +54,9 @@
             <div class="md-subhead center-align">{{ module.description }}</div>
           </md-card-header>
         </md-card>
+      </div>
+      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
       </div>
       <div class="col s12">
         <md-tabs>
@@ -118,7 +121,7 @@
                           <span>{{ questionaire.title }}</span>
                           <span>{{ questionaire.questions.length }} {{ questionaire.questions.length == 1 ? 'question' : 'questions' }}</span>
                         </div>
-                         <md-caption class="right">{{ getMoment(questionaire.date).fromNow() }}</md-caption>
+                        <md-caption class="right">{{ getMoment(questionaire.date).fromNow() }}</md-caption>
                       </md-list-item>
                     </md-list>
                   </md-card-content>
@@ -229,21 +232,27 @@ export default {
   name: "ModuleView",
   data() {
     return {
-      module: null,
+      module: {
+        students: [],
+        lecturers: []
+      },
       txtStudentSearch: "",
       txtLecturerSearch: "",
-      txtError:'',
+      txtError: "",
       addStudent: false,
-      addNotes:false,
-      notes:{
-        title:'',
-        description:'',
-        file:null
+      addNotes: false,
+      notes: {
+        title: "",
+        description: "",
+        file: null
       },
-      notesFile:''
+      notesFile: "",
+      isLoading: false
     };
   },
-  components: { AddStudent },
+  components: {
+    AddStudent
+  },
   computed: {
     filteredLecturers() {
       return this.module.lecturers.filter(
@@ -263,159 +272,118 @@ export default {
             .indexOf(this.txtStudentSearch.toLowerCase()) >= 0
       );
     },
-    filteredTests(){
-
+    filteredTests() {
       return this.module.questionaires;
     }
   },
   mounted() {
-    if(this.moduleID == null){
+    if (this.moduleID == null) {
       this.$router.back();
-    }else{
-    this.Reload();
+    } else {
+      this.Reload();
     }
   },
   props: ["moduleID"],
   methods: {
-    handleNotesFileUpload(){
+    handleNotesFileUpload() {
       this.notesFile = this.$refs.notesFile.files[0];
     },
-    UploadNotes(){
+    UploadNotes() {
       this.txtError = "";
-      if(this.notes.title.length < 2){
+      if (this.notes.title.length < 2) {
         this.txtError = "Please provide a valid title";
       }
-      
-      if(this.notes.description.length < 2){
+
+      if (this.notes.description.length < 2) {
         this.txtError = "Please provide a valid description";
       }
 
-      if(this.notes.file == null){
+      if (this.notes.file == null) {
         this.txtError = "Please select a valid file";
       }
 
-      if(this.txtError.length > 2){
+      if (this.txtError.length > 2) {
         return;
       }
 
       let formData = new FormData();
-      formData.append('file', this.notesFile,'file')
-      axios.post(this.$store.state.settings.baseLink + "/m/add/notes/title/" + this.notes.title + "/description/" + this.notes.description,
+      formData.append("file", this.notesFile, "file");
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/m/add/notes/title/" +
+            this.notes.title +
+            "/description/" +
+            this.notes.description,
           formData,
           {
             headers: {
-                'Content-Type': 'multipart/form-data'
+              "Content-Type": "multipart/form-data"
             }
           }
-        ).then(result => {
-          console.log('SUCCESS!!');
+        )
+        .then(result => {
+          console.log("SUCCESS!!");
         })
         .catch(err => {
-          console.log('FAILURE!!');
+          console.log("FAILURE!!");
         });
       alert();
     },
-    AddedNewStudent(isAdded){
-      if(isAdded){
+    AddedNewStudent(isAdded) {
+      if (isAdded) {
         this.Reload();
-      }else{
-
+      } else {
       }
     },
-    Reload(){
+    Reload() {
+      this.isLoading = true;
       axios
-      .get(
-        this.$store.state.settings.baseLink + "/m/get/module/" + this.moduleID
-      )
-      .then(results => {
-        this.module = results.data;
-        console.log(this.module);
-      })
-      .catch(err => {
-        if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
-        } else {
-          swal("Unable to load the module", "Try again later", "error");
-        }
-      });
+        .get(
+          this.$store.state.settings.baseLink + "/m/get/module/" + this.moduleID
+        )
+        .then(results => {
+          this.isLoading = false;
+          this.module = results.data;
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal("Unable to load the module", "Try again later", "error");
+          }
+        });
     },
     DeepSearch() {
       alert("Deep searching for " + this.txtSearch);
     },
     getSolutionFor(questionaire) {
+      this.isLoading = true;
       axios
-        .get(this.$store.state.settings.baseLink + "/m/get/solution/id/for/" + questionaire._id + "/by/" + this.$store.state.user.type + "/of/id/" + this.$store.state.user.id)
+        .get(
+          this.$store.state.settings.baseLink +
+            "/m/get/solution/id/for/" +
+            questionaire._id +
+            "/by/" +
+            this.$store.state.user.type +
+            "/of/id/" +
+            this.$store.state.user.id
+        )
         .then(results => {
-          if(results.data.id == null){
+          this.isLoading = false;
+          if (results.data.id == null) {
             this.goToTakeTest(questionaire);
-          }else{
+          } else {
             this.goToSolution(results.data.id);
           }
         })
         .catch(err => {
+          this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
             swal(err.response.data, "Try again later", "error");
           } else {
             swal("Unable to load the questionaire", "Try again later", "error");
-          }
-        });
-    },
-    GetPastTestsFor(module) {
-      axios
-        .get(
-          this.$store.state.settings.baseLink +
-            "/s/all/past/tests/for/" +
-            module._id
-        )
-        .then(results => {
-          this.modules.map(s => {
-            if (s._id == module._id) {
-              s.pastTests = [];
-              results.data.forEach(element => {
-                s.pastTests.push({
-                  solutionId: element.solutionId,
-                  title: element.title,
-                  mark: element.mark,
-                  date: element.date
-                });
-              });
-              this.selectedStudent = s;
-            }
-          });
-        })
-        .catch(err => {
-          if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
-          } else {
-            swal("Unable to load modules", err.message, "error");
-          }
-        });
-    },
-    SubmitModule() {
-      this.txtError = "";
-      if (this.module.name.length < 2) {
-        this.txtError = "Please enter a valid module name";
-      }
-
-      if (this.module.code.length < 2) {
-        this.txtError = "Please enter a valid module code";
-      }
-
-      if (this.txtError.length > 2) return;
-
-      axios
-        .post(this.$store.state.settings.baseLink + "/m/add/new/module", {
-          module: this.module
-        })
-        .then(results => {
-          this.modules = results.data;
-          this.addingModules = false;
-        })
-        .catch(err => {
-          if (err.response != null && err.response.status == 512) {
-            this.txtError = err.response.data;
-          } else {
-            swal("Unable to submit the module", err.message, "error");
           }
         });
     }

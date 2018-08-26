@@ -89,8 +89,8 @@
             <div class="row" v-show="lecturer.idNumber.length > 6">
               <div class="col s10 offset-s1 m8 offset-m2">
                 <label>
-                                          {{ lecturer.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                                    </label>
+                                                {{ lecturer.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
+                                          </label>
               </div>
               <div class="col s10 offset-s1 m8 offset-m2">
                 <md-field>
@@ -120,9 +120,15 @@
           <md-button class="red" @click="activeEditProfile(null)">
             Cancel
           </md-button>
-          <md-button v-on:click="UpdateLecturer()" class="right">
+          <md-button v-if="!isLoading" v-on:click="UpdateLecturer()" class="right">
             Save changes
           </md-button>
+          <div class="row">
+            <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+              <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+            </div>
+          </div>
+  
         </md-dialog-actions>
       </md-dialog>
   
@@ -224,6 +230,11 @@
                       <md-button style="z-index:10" v-show="modul.removed" v-on:click="DeleteModule(lecturer._id,modul._id)" class="md-icon-button md-list-action">
                         <md-icon>done</md-icon>
                       </md-button>
+                      <div v-show="modul.removed" class="row">
+                        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+                          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+                        </div>
+                      </div>
                       <md-button style="z-index:10" v-show="modul.removed" v-on:click="modul.removed = false" class="md-icon-button md-list-action">
                         <md-icon>close</md-icon>
                       </md-button>
@@ -248,6 +259,11 @@
                       <md-button v-show="lecturer.removed" v-on:click="DeleteLecturer(lecturer._id)" class="md-icon-button md-list-action">
                         <md-icon>done</md-icon>
                       </md-button>
+                      <div v-show="lecturer.removed" class="row">
+                        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+                          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+                        </div>
+                      </div>
   
                       <md-button v-show="lecturer.removed" class="md-icon-button md-list-action">
                         <md-icon>close</md-icon>
@@ -514,9 +530,11 @@ export default {
       // this.items = _.unionWith(this.items, [this.options[0]], _.isEqual);
     },
     DeleteLecturer(lecturerID) {
+      this.isLoading = true;
       axios
         .post(this.$store.state.settings.baseLink + "/l/delete/" + lecturerID)
         .then(result => {
+          this.isLoading = false;
           var victim = this.lecturers.find(l => l._id == lecturerID);
           var index = this.lecturers.indexOf(victim);
           this.lecturers.splice(index, 1);
@@ -527,6 +545,7 @@ export default {
           );
         })
         .catch(err => {
+          this.isLoading = false;
           swal("An error has occurred", err.message, "error");
         });
     },
@@ -585,75 +604,8 @@ export default {
           }
         });
     },
-    SubmitLecturer() {
-      this.txtError = "";
-      if (this.lecturer.lastname.length < 2) {
-        this.txtError = "Please enter a valid lastname";
-      }
-
-      if (this.lecturer.firstname.length < 2) {
-        this.txtError = "Please enter a valid firstname";
-      }
-
-      if (this.lecturer.password != this.lecturer.confirmPassword) {
-        this.txtError = "Passwords do not match";
-      }
-
-      if (this.lecturer.password.length < 6) {
-        this.txtError =
-          "Please enter a valid password , passwords must be more than 6 charactors long";
-      }
-      if (this.lecturer.username.length < 2) {
-        this.txtError = "Please enter a valid username";
-      }
-
-      if (this.lecturer.gender.length < 2) {
-        this.txtError = "Please pick a valid gender";
-      }
-
-      if (this.lecturer.dob.length < 2) {
-        this.txtError = "Please pick a valid date of birth";
-      }
-
-      if (this.lecturer.idNumber < 6) {
-        this.txtError = "Please enter a valid id number";
-      }
-
-      if (this.lecturer.modules.filter(m => m != null).length <= 0) {
-        this.txtError = "Please select at least one module";
-      }
-
-      if (this.txtError.length > 2) return;
-
-      axios
-        .post(this.$store.state.settings.baseLink + "/a/add/lecturer", {
-          lecturer: this.lecturer
-        })
-        .then(results => {
-          this.lecturers = results.data;
-          this.lecturer = {
-            firstname: "",
-            lastname: "",
-            username: "",
-            password: "",
-            confirmPassword: "",
-            modules: [null],
-            idNumber: "",
-            gender: "",
-            dob: "",
-            isSouthAfrican: false
-          };
-          this.addingLecturers = false;
-        })
-        .catch(err => {
-          if (err.response != null && err.response.status == 512) {
-            this.txtError = err.response.data;
-          } else {
-            swal("Unable to submit the lecturer", err.message, "error");
-          }
-        });
-    },
     UpdateLecturer() {
+      this.isLoading = true;
       this.txtError = "";
       if (this.lecturer.lastname.length < 2) {
         this.txtError = "Please enter a valid lastname";
@@ -679,7 +631,10 @@ export default {
         this.txtError = "Please enter a valid id number";
       }
 
-      if (this.txtError.length > 2) return;
+      if (this.txtError.length > 2) {
+        this.isLoading = false;
+        return;
+      }
 
       axios
         .post(
@@ -691,6 +646,7 @@ export default {
           }
         )
         .then(results => {
+          this.isLoading = false;
           this.lecturers = results.data;
           this.lecturer = {
             firstname: "",
@@ -709,6 +665,7 @@ export default {
           swal("Profile successfully updated", "success");
         })
         .catch(err => {
+          this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {

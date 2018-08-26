@@ -90,8 +90,8 @@
             <div class="row" v-show="student.idNumber.length > 6">
               <div class="col s10 offset-s1 m8 offset-m2">
                 <label>
-                                                    {{ student.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                                              </label>
+                                                        {{ student.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
+                                                  </label>
               </div>
               <div class="col s10 offset-s1 m8 offset-m2">
                 <md-field>
@@ -121,9 +121,14 @@
           <md-button class="red" @click="activeEditProfile(null)">
             Cancel
           </md-button>
-          <md-button v-on:click="UpdateStudent()" class="right">
+          <md-button v-if="!isLoading" v-on:click="UpdateStudent()" class="right">
             Save changes
           </md-button>
+          <div class="row">
+            <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+              <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+            </div>
+          </div>
         </md-dialog-actions>
       </md-dialog>
       <div class="row">
@@ -217,9 +222,14 @@
                     <md-button v-show="!modul.removed" v-on:click="modul.removed = true" class="md-icon-button md-list-action">
                       <md-icon>delete</md-icon>
                     </md-button>
-                    <md-button v-show="modul.removed" v-on:click="DeleteModule(student._id,modul._id)" class="md-icon-button md-list-action">
+                    <md-button v-if="!isLoading" v-show="modul.removed" v-on:click="DeleteModule(student._id,modul._id)" class="md-icon-button md-list-action">
                       <md-icon>done</md-icon>
                     </md-button>
+                    <div v-show="modul.removed" class="row">
+                      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+                        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+                      </div>
+                    </div>
                     <md-button v-show="modul.removed" v-on:click="modul.removed = false" class="md-icon-button md-list-action">
                       <md-icon>close</md-icon>
                     </md-button>
@@ -248,10 +258,14 @@
                       <span>{{ student.removed ? 'Are you sure?':'Delete' }}</span>
                     </div>
   
-                    <md-button v-show="student.removed" v-on:click="DeleteStudent(student._id)" class="md-icon-button md-list-action">
+                    <md-button v-if="!isLoading" v-show="student.removed" v-on:click="DeleteStudent(student._id)" class="md-icon-button md-list-action">
                       <md-icon>done</md-icon>
                     </md-button>
-  
+                    <div v-show="student.removed" class="row">
+                      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+                        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+                      </div>
+                    </div>
                     <md-button v-show="student.removed" class="md-icon-button md-list-action">
                       <md-icon>close</md-icon>
                     </md-button>
@@ -487,9 +501,11 @@ export default {
       this.showEditProfile = !this.showEditProfile;
     },
     DeleteStudent(studentID) {
+      this.isLoading = true;
       axios
         .post(this.$store.state.settings.baseLink + "/s/delete/" + studentID)
         .then(result => {
+          this.isLoading = false;
           var victim = this.students.find(s => s._id == studentID);
           var index = this.students.indexOf(victim);
           this.students.splice(index, 1);
@@ -500,6 +516,7 @@ export default {
           );
         })
         .catch(err => {
+          this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
             swal(err.response.data, "error");
           } else {
@@ -508,6 +525,7 @@ export default {
         });
     },
     DeleteModule(studentID, moduleID) {
+      this.isLoading = true;
       axios
         .post(
           this.$store.state.settings.baseLink +
@@ -517,6 +535,7 @@ export default {
             studentID
         )
         .then(result => {
+          this.isLoading = false;
           var victim = this.students.find(s => s._id == studentID);
           var index = victim.modules.indexOf(
             victim.modules.find(m => m._id == moduleID)
@@ -534,6 +553,7 @@ export default {
           );
         })
         .catch(err => {
+          this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
             swal(err.response.data, "error");
           } else {
@@ -604,76 +624,8 @@ export default {
           }
         });
     },
-    SubmitStudent() {
-      this.txtError = "";
-      if (this.student.lastname.length < 2) {
-        this.txtError = "Please enter a valid lastname";
-      }
-
-      if (this.student.firstname.length < 2) {
-        this.txtError = "Please enter a valid firstname";
-      }
-
-      if (this.student.password != this.student.confirmPassword) {
-        this.txtError = "Passwords do not match";
-      }
-
-      if (this.student.password.length < 6) {
-        this.txtError =
-          "Please enter a valid password , passwords must be more than 6 charactors long";
-      }
-      if (this.student.username.length < 2) {
-        this.txtError = "Please enter a valid username";
-      }
-
-      if (this.student.gender.length < 2) {
-        this.txtError = "Please pick a valid gender";
-      }
-
-      if (this.student.dob.length < 2) {
-        this.txtError = "Please pick a valid date of birth";
-      }
-
-      if (this.student.idNumber < 6) {
-        this.txtError = "Please enter a valid id number";
-      }
-
-      if (this.student.modules.filter(m => m != null).length <= 0) {
-        this.txtError = "Please select at least one module";
-      }
-
-      if (this.txtError.length > 2) return;
-
-      axios
-        .post(this.$store.state.settings.baseLink + "/a/add/student", {
-          student: this.student
-        })
-        .then(results => {
-          this.students = results.data;
-          this.students = {
-            firstname: "",
-            lastname: "",
-            username: "",
-            password: "",
-            confirmPassword: "",
-            modules: [null],
-            idNumber: "",
-            gender: "",
-            dob: "",
-            isSouthAfrican: false
-          };
-          this.addingStudents = false;
-        })
-        .catch(err => {
-          if (err.response != null && err.response.status == 512) {
-            alert(err.response.data);
-            this.txtError = err.response.data;
-          } else {
-            swal("Unable to submit the student", err.message, "error");
-          }
-        });
-    },
     UpdateStudent() {
+      this.isLoading = true;
       this.txtError = "";
       if (this.student.lastname.length < 2) {
         this.txtError = "Please enter a valid lastname";
@@ -699,7 +651,10 @@ export default {
         this.txtError = "Please enter a valid id number";
       }
 
-      if (this.txtError.length > 2) return;
+      if (this.txtError.length > 2) {
+        this.isLoading = false;
+        return;
+      }
 
       axios
         .post(
@@ -711,6 +666,7 @@ export default {
           }
         )
         .then(results => {
+          this.isLoading = false;
           this.students = results.data;
           this.student = {
             firstname: "",
@@ -729,6 +685,7 @@ export default {
           swal("Profile successfully updated", "success");
         })
         .catch(err => {
+          this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {
