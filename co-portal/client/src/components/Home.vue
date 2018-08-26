@@ -7,7 +7,7 @@
           <span v-if="$store.state.user.isLoggedIn">Welcome back <a class="pointer waves-effect">{{ $store.state.user.username }}</a></span>
         </h5>
       </div> <div class="col s10 offset-s1 m8 offset-m2 center-align">
-        <img src="../assets/logo.png" class="responsive-img">
+        <img src="../assets/logo.png" class="responsive-img"> 
       </div>
       
     </div>
@@ -42,7 +42,11 @@ export default {
     return {
       showEmoji: false,
       txtSearch: "",
-      titleText: ["Welcome to Co-Portal.", "Please take a test"],
+      titleText: [
+        "Welcome to Co-Portal.",
+        "Please login",
+        "Contact admin for your login info"
+      ],
       options: [
         {
           text: "Profile",

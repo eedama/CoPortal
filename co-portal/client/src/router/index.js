@@ -11,6 +11,8 @@ import ModuleList from '@/components/Module/ModuleList'
 import LecturerList from '@/components/Lecturer/LecturerList'
 import ModuleView from '@/components/Module/ModuleView'
 
+import AddStudentTemp from '@/components/admin/AddStudentTemp'
+
 Vue.use(Router)
 
 import store from '../store';
@@ -114,15 +116,34 @@ const router = new Router({
       },
       props: true,
       component: ModuleView
-    }
+    },
     /**
      * Lecturer routes END
+     */
+    /**
+     * Admin routes START
+     */
+    {
+      path: '/temp/add/student',
+      name: 'TempAddStudent',
+      meta: {
+        authLevel: ['ADMIN'],
+      },
+      props: true,
+      component: AddStudentTemp
+    }
+    /**
+     * Admin routes END
      */
   ]
 });
 
 router.beforeEach((to, from, next) => {
   var userType = store.state.user.type;
+  if (userType == "ADMIN" && to.name != "TempAddStudent" && store.state.user.username == 'tempadmin') {
+    next('/temp/add/student')
+    return;
+  }
   if (to.meta.authLevel != null) {
     if (userType == null) {
       swal("You are not Authorized to access this page!", "You must be logged in to access this page.", "error").then((value) => {
