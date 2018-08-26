@@ -136,7 +136,13 @@ export default {
   mounted() {
     this.isLoading = true;
     axios
-      .get(this.$store.state.settings.baseLink + "/m/modules/all")
+      .get(
+        this.$store.state.settings.baseLink +
+          "/m/modules/all/for/" +
+          this.$store.state.user.id +
+          "/" +
+          this.$store.state.user.type
+      )
       .then(results => {
         this.isLoading = false;
         this.modules = results.data;

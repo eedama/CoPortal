@@ -22,7 +22,10 @@ import Solution from '../models/Solution';
          Get all from user (done)
 */
 
-router.get("/modules/all", function (req, res) {
+router.get("/modules/all/for/:userID/:userType", function (req, res) {
+    var userID = req.params.userID;
+    var userType = req.params.userType;
+
     Module.find()
         .populate(["lecturers"])
         .populate(["students"])
@@ -30,6 +33,7 @@ router.get("/modules/all", function (req, res) {
         .populate(["notes"])
         .then(modules => {
             if (modules == null) return res.status(512).send("No modules where found");
+            modules = modules.filter(m => userType == "ADMIN" || m.students.filter(s => s._id == userID).length >= 0 || m.lecturers.filter(l => l._id == userID).length >= 0);
             res.json(modules);
         }).catch(err => {
             return res.status(512).send("Server error : " + err.message);
@@ -239,50 +243,52 @@ router.post("/unassign/module/:moduleID/from/student/:studentID", function (req,
     });
 });
 
-router.get('/get/solution/id/for/:questionaireID/by/:userType/of/id/:userID',function(req,res){
-  var questionaireID = req.params.questionaireID;
-  var userType = req.params.userType;
-  var userID = req.params.userID;
-  
-  var studentID = (userType == "LECTURER" || userType == "ADMIN") ? null : userID;
-  var isMemo = (userType == "LECTURER" || userType == "ADMIN");
+router.get('/get/solution/id/for/:questionaireID/by/:userType/of/id/:userID', function (req, res) {
+    var questionaireID = req.params.questionaireID;
+    var userType = req.params.userType;
+    var userID = req.params.userID;
 
-  console.log(studentID + " " + isMemo)
-  Solution.findOne({
-    questionaireId: questionaireID,
-    studentId: studentID,
-    isMemo: isMemo
-  }).then(solution => {
-    if(solution == null && (userType == "LECTURER" || userType == "ADMIN")){
-        return res.status(512).send("No solution for this questionaire");
-        return;
-    }else if(solution == null){
-        res.json({
-            id: null
-        });
-    }else{
-        res.json({
-            id: solution._id
-        });     
-    } 
-    
-  }).catch(err => {
-    return res.status(512).send("Server error : " + err.message);
-  });
-  
+    var studentID = (userType == "LECTURER" || userType == "ADMIN") ? null : userID;
+    var isMemo = (userType == "LECTURER" || userType == "ADMIN");
+
+    console.log(studentID + " " + isMemo)
+    Solution.findOne({
+        questionaireId: questionaireID,
+        studentId: studentID,
+        isMemo: isMemo
+    }).then(solution => {
+        if (solution == null && (userType == "LECTURER" || userType == "ADMIN")) {
+            return res.status(512).send("No solution for this questionaire");
+            return;
+        } else if (solution == null) {
+            res.json({
+                id: null
+            });
+        } else {
+            res.json({
+                id: solution._id
+            });
+        }
+
+    }).catch(err => {
+        return res.status(512).send("Server error : " + err.message);
+    });
+
 });
 
-var multer  = require('multer')
-var upload = multer({ dest: 'uploads/' })
+var multer = require('multer')
+var upload = multer({
+    dest: 'uploads/'
+})
 
-router.post('/add/notes/title/:title/description/:description',upload.single('file'),function(req,res){
+router.post('/add/notes/title/:title/description/:description', upload.single('file'), function (req, res) {
     var title = req.params.title;
     var description = req.params.description;
     console.log(title);
     console.log(__dirname);
     console.log(req.file);
     console.log(req.files);
-    
+
     res.send("Done");
 });
 
