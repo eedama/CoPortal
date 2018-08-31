@@ -222,8 +222,7 @@ export default {
         this.isLoading = false;
         return;
       }
-      return;
-
+      
       axios
         .post(this.$store.state.settings.baseLink + "/a/add/student", {
           student: this.student
