@@ -25,16 +25,31 @@ router.get("/modules/all", function (req, res) {
     .populate(["lecturers"])
     .populate(["students"])
     .populate(["questionaires"])
-    .populate(["notes"])
+    .populate({
+      path: 'notes',
+      select: 'title description type date'
+    })
     .then(modules => {
       if (modules == null)
         return res.status(512).send("No modules where found");
+
       res.json(modules);
     })
     .catch(err => {
       return res.status(512).send("Server error : " + err.message);
     });
 });
+
+router.get("/get/lecturer/notes/:notesID", function (req, res) {
+  var notesID = req.params.notesID;
+  LectureNote.findById(notesID).then(notes => {
+      if (notes == null) return res.status(512).send("No notes where found");
+      res.json(notes);
+    })
+    .catch(err => {
+      return res.status(512).send("Server error : " + err.message);
+    });
+})
 
 router.get("/modules/all/for/:userID/:userType", function (req, res) {
   var userID = req.params.userID;
@@ -44,7 +59,10 @@ router.get("/modules/all/for/:userID/:userType", function (req, res) {
     .populate(["lecturers"])
     .populate(["students"])
     .populate(["questionaires"])
-    .populate(["notes"])
+    .populate({
+      path: 'notes',
+      select: 'title description type date'
+    })
     .then(modules => {
       if (modules == null)
         return res.status(512).send("No modules where found");
@@ -107,42 +125,6 @@ router.post("/add/new/module", function (req, res) {
         });
     });
   });
-});
-
-router.post("/add/notes/for/:moduleId/by/:lectureId", function (req, res) {
-  var moduleId = req.params.moduleId;
-  var lectureId = req.params.lectureId;
-
-  Module.findById(moduleId)
-    .then(module => {
-      if (module == null) new Error("Module does not exist");
-      if (module.lecturers.indexOf(lectureId) < 0)
-        new Error("Lecturer does not exist / Is not incharge of this module");
-
-      var lecturerNote = new LectureNote({
-        _id: mongoose.Types.ObjectId(),
-        lecturerId: lecturerId,
-        moduleId: moduleId,
-        title: req.body.title,
-        size: req.body.size,
-        thumbnail: req.body.thumbnail,
-        description: req.body.description,
-        //     file: Attachment.saveFile(req.body.document),
-        type: req.body.type
-      });
-
-      lecturerNote.save(function (err) {
-        if (err) return res.status(512).send("Server error : " + err.message);
-        module.notes.push(lecturerNote._id);
-        module.save(function (err) {
-          if (err) return res.status(512).send("Server error : " + err.message);
-          res.json(lecturerNote._id);
-        });
-      });
-    })
-    .catch(err => {
-      return res.status(512).send("Server error : " + err.message);
-    });
 });
 
 router.post("/assign/to/lecturer/:lecturerID", function (req, res) {
@@ -345,23 +327,42 @@ router.get(
   }
 );
 
-var multer = require("multer");
-var upload = multer({
-  dest: "uploads/"
-});
-
 router.post(
   "/add/notes/title/:title/description/:description",
-  upload.single("file"),
   function (req, res) {
     var title = req.params.title;
     var description = req.params.description;
-    console.log(title);
-    console.log(__dirname);
-    console.log(req.file);
-    console.log(req.files);
+    var file = req.body.file;
+    var lecturerId = req.body.lecturerId == "ADMIN" ? null : req.body.lecturerId;
+    var moduleId = req.body.moduleId;
+    Module.findById(moduleId)
+      .then(module => {
+        if (module == null) new Error("Module does not exist");
+        if (module.lecturers.indexOf(lecturerId) < 0 && lecturerId != null)
+          new Error("Lecturer does not exist / Is not incharge of this module");
 
-    res.send("Done");
+        var lecturerNote = new LectureNote({
+          lecturerId: lecturerId, //ForeignKey
+          moduleId: moduleId, //ForeignKey
+          title: title,
+          description: description,
+          file: file,
+          type: file.fileType
+        });
+
+        lecturerNote.save(function (err) {
+          if (err) return res.status(512).send("Server error : " + err.message);
+          module.notes.push(lecturerNote._id);
+          module.save(function (err) {
+            if (err) return res.status(512).send("Server error : " + err.message);
+            res.json(lecturerNote._id);
+          });
+        });
+      })
+      .catch(err => {
+        return res.status(512).send("Server error : " + err.message);
+      });
+
   }
 );
 

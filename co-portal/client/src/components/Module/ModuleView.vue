@@ -1,7 +1,7 @@
 <template>
   <div>
   
-    <md-dialog style="width:50%;position:absolute" class="card row" :md-active.sync="addNotes">
+    <md-dialog style="position:absolute;top:25%" class="card" :md-active.sync="addNotes">
       <md-card class="col s12 m8 offset-m2">
         <md-card-header>
           <div class="md-title">Adding notes</div>
@@ -24,7 +24,8 @@
         </md-card-content>
       </md-card>
       <md-dialog-actions>
-        <md-button class="md-primary" @click="UploadNotes()">Upload notes</md-button>
+        <ball-pulse-loader v-if="isUploading" color="#000000" size="20px"></ball-pulse-loader>
+        <md-button v-if="!isUploading" class="md-primary" @click="UploadNotes()">Upload notes</md-button>
         <md-button class="md-primary" @click="addNotes = false">Close</md-button>
       </md-dialog-actions>
     </md-dialog>
@@ -83,11 +84,11 @@
                   </md-card-header>
                   <md-card-content>
                     <md-list class="md-double-line">
-                      <md-list-item class="waves-effect">
+                      <md-list-item v-on:click="DownloadNotes(notes)" v-for="(notes,i) in module.notes" :key="i" class="waves-effect">
                         <md-icon class="md-primary">library_books</md-icon>
                         <div class="md-list-item-text">
-                          <span>The life of life</span>
-                          <span>{{ getMoment(new Date()).format('YYYY-MM-DD hh:mm') }}</span>
+                          <span>{{ notes.title }}</span>
+                          <span>{{ getMoment(notes.date).format('YYYY-MM-DD hh:mm') }}</span>
                         </div>
                       </md-list-item>
                     </md-list>
@@ -211,9 +212,85 @@
             </div>
           </md-tab>
           <md-tab id="tab-announcement" md-label="Announcements">
-            <md-empty-state md-icon="announcement" md-label="No announcements" :md-description="`All the announcements about ${module.name} (${module.code}) will be posted here.`">
+            <md-empty-state v-if="announcements.length == 0" md-icon="announcement" md-label="No announcements" :md-description="`All the announcements about ${module.name} (${module.code}) will be posted here.`">
               <md-button class="md-primary md-raised">Add an announcement</md-button>
             </md-empty-state>
+            <div v-if="$store.state.user.type != 'STUDENT' && !isAddingAnnouncements" class="row">
+              <div v-on:click="isAddingAnnouncements = true" class="col s8 card card-panel offset-s2 m6 offset-m3 text-center center-align hoverable pointer waves-effect">
+                <h5 class="center-align center text-center">Send an announcement</h5>
+              </div>
+            </div>
+  
+            <md-card v-if="$store.state.user.type != 'STUDENT' && isAddingAnnouncements">
+              <md-header>
+                <md-button class="md-icon-button right" v-on:click="isAddingAnnouncements = false">
+                  <md-icon>close</md-icon>
+                </md-button>
+              </md-header>
+              <md-content>
+                <div class="row">
+                  <div class="input-field col s8 offset-s2 m6 offset-m3 center-align text-center">
+                    <label class="center-align text-center">Sending an announcement</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+                    <input v-model="announcement.title" id="ModuleDescription" name="ModuleDescription" type="text" />
+                    <label class="text-center" for="ModuleDescription">Title</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+                    <input v-model="announcement.message" id="ModuleDescription" name="ModuleDescription" type="text" />
+                    <label class="text-center" for="ModuleDescription">Message</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                    <label>Send to : </label>
+                  </div>
+                  <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                    <form action="#">
+                      <p>
+                        <label>
+                             <input v-model="announcement.isToAll" :value="false" class="with-gap" name="group1" type="radio" checked />
+                             <span>{{ module.name }} students</span>
+                           </label>
+                      </p>
+                      <p>
+                        <label>
+                               <input v-model="announcement.isToAll" :value="true" class="with-gap" name="group1" type="radio" />
+                               <span>All Students</span>
+                             </label>
+                      </p>
+                    </form>
+                  </div>
+                </div>
+              </md-content>
+              <md-card-actions>
+                <ball-pulse-loader v-if="isUploading" color="#000000" size="20px"></ball-pulse-loader>
+                <md-button v-if="!isUploading" v-on:click="SendAnnouncement()" class="md-primary">Send announcement</md-button>
+              </md-card-actions>
+            </md-card>
+            <md-card class="hoverable" v-show="!isAddingAnnouncements" v-for="(announcement,i) in announcements" :key="i">
+              <md-list class="md-triple-line">
+                <md-list-item>
+                  <md-avatar>
+                    <img src="https://placeimg.com/40/40/people/1" alt="People">
+                  </md-avatar>
+  
+                  <div class="md-list-item-text">
+                    <span>Ali Connors &nbsp;&bull; 4 hrs ago</span>
+                    <span>Brunch this weekend?</span>
+                    <p>I'll be in your neighborhood doing errands this week. Do you want to meet?</p>
+                  </div>
+  
+                  <md-button class="md-icon-button md-list-action">
+                    <md-icon class="md-primary">star</md-icon>
+                  </md-button>
+                </md-list-item>
+              </md-list>
+            </md-card>
           </md-tab>
         </md-tabs>
       </div>
@@ -227,6 +304,7 @@ import swal from "sweetalert";
 const axios = require("axios");
 
 import AddStudent from "../Student/AddStudent";
+import * as download from "../../assets/lib/js/download.js";
 
 export default {
   name: "ModuleView",
@@ -236,6 +314,12 @@ export default {
         students: [],
         lecturers: []
       },
+      announcement: {
+        title: "",
+        message: "",
+        isToAll: false
+      },
+      announcements: [{}, {}],
       txtStudentSearch: "",
       txtLecturerSearch: "",
       txtError: "",
@@ -246,8 +330,10 @@ export default {
         description: "",
         file: null
       },
-      notesFile: "",
-      isLoading: false
+      notesFile: null,
+      isLoading: false,
+      isUploading: false,
+      isAddingAnnouncements: false
     };
   },
   components: {
@@ -263,12 +349,12 @@ export default {
             .indexOf(this.txtLecturerSearch.toLowerCase()) >= 0
       );
     },
-    filteredStudents() {
-      return this.module.students.filter(
+    filteredStudenSendAnnouncementts() {
+      return this.SendAnnouncementmodule.students.filter(
         l =>
-          this.txtStudentSearch.length < 1 ||
-          JSON.stringify(l)
-            .toLowerCase()
+          this.txtSendAnnouncementStudentSearch.length < 1 ||
+          JSON.strSendAnnouncementingify(l)
+            .toLowSendAnnouncementerCase()
             .indexOf(this.txtStudentSearch.toLowerCase()) >= 0
       );
     },
@@ -285,10 +371,80 @@ export default {
   },
   props: ["moduleID"],
   methods: {
+    DownloadNotes(notes) {
+      this.isLoading = true;
+      axios
+        .get(
+          this.$store.state.settings.baseLink +
+            "/m/get/lecturer/notes/" +
+            notes._id
+        )
+        .then(results => {
+          this.isLoading = false;
+          var data = results.data.file.base64StringFile;
+          var fileName = results.data.file.fileName;
+          var type = results.data.type;
+
+          var notes = download.download(data, fileName, type);
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal(err.message, "Try again later", "error");
+          }
+        });
+    },
+    getFile(file) {
+      var reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onerror = () => {
+          reader.abort();
+          reject(new Error("Error parsing file"));
+        };
+        reader.onload = function() {
+          //This will result in an array that will be recognized by C#.NET WebApi as a byte[]
+          let bytes = Array.from(new Uint8Array(this.result));
+
+          //if you want the base64encoded file you would use the below line:
+          let base64StringFile = btoa(
+            bytes.map(item => String.fromCharCode(item)).join("")
+          );
+
+          //Resolve the promise with your custom file structure
+          resolve({
+            bytes: bytes,
+            base64StringFile:
+              "data:" + file.type + ";base64," + base64StringFile,
+            fileName: file.name,
+            fileType: file.type
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    },
     handleNotesFileUpload() {
-      this.notesFile = this.$refs.notesFile.files[0];
+      if (this.notes.file.target.files.length > 0) {
+        this.isUploading = true;
+        this.getFile(this.notes.file.target.files[0])
+          .then(file => {
+            this.isUploading = false;
+            this.notesFile = file;
+            console.log(file);
+          })
+          .catch(err => {
+            swal("Unable to upload selected file", err.message, "error");
+            this.isUploading = false;
+            this.notesFile = null;
+          });
+      } else {
+        swal("No file selected", "Please select a file", "error");
+        this.notesFile = null;
+      }
     },
     UploadNotes() {
+      this.isUploading = true;
       this.txtError = "";
       if (this.notes.title.length < 2) {
         this.txtError = "Please provide a valid title";
@@ -298,16 +454,15 @@ export default {
         this.txtError = "Please provide a valid description";
       }
 
-      if (this.notes.file == null) {
+      if (this.notesFile == null) {
         this.txtError = "Please select a valid file";
       }
 
       if (this.txtError.length > 2) {
+        this.isUploading = false;
         return;
       }
 
-      let formData = new FormData();
-      formData.append("file", this.notesFile, "file");
       axios
         .post(
           this.$store.state.settings.baseLink +
@@ -315,20 +470,28 @@ export default {
             this.notes.title +
             "/description/" +
             this.notes.description,
-          formData,
           {
-            headers: {
-              "Content-Type": "multipart/form-data"
-            }
+            file: this.notesFile,
+            moduleId: this.moduleID,
+            lecturerId:
+              this.$store.state.user.type == "ADMIN"
+                ? "ADMIN"
+                : this.$store.state.user.id
           }
         )
         .then(result => {
-          console.log("SUCCESS!!");
+          this.isUploading = false;
+          this.addNotes = false;
+          swal("Notes successfully uploaded.");
         })
         .catch(err => {
-          console.log("FAILURE!!");
+          this.isUploading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal(err.message, "Try again later", "error");
+          }
         });
-      alert();
     },
     AddedNewStudent(isAdded) {
       if (isAdded) {
@@ -380,6 +543,34 @@ export default {
         })
         .catch(err => {
           this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "Try again later", "error");
+          } else {
+            swal("Unable to load the questionaire", "Try again later", "error");
+          }
+        });
+    },
+    SendAnnouncement() {
+      this.isUploading = true;
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/m/announcements/add/for/" +
+            this.moduleID +
+            "/by/" +
+            this.$store.state.user.type +
+            "/of/id/" +
+            this.$store.state.user.id,
+          {
+            announcement: this.announcement
+          }
+        )
+        .then(results => {
+          this.isUploading = false;
+          swal("Success", "Announcement successfully sent.", "success");
+        })
+        .catch(err => {
+          this.isUploading = false;
           if (err.response != null && err.response.status == 512) {
             swal(err.response.data, "Try again later", "error");
           } else {
