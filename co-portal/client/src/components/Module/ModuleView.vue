@@ -280,9 +280,9 @@
                   </md-avatar>
   
                   <div class="md-list-item-text">
-                    <span>Ali Connors &nbsp;&bull; 4 hrs ago</span>
-                    <span>Brunch this weekend?</span>
-                    <p>I'll be in your neighborhood doing errands this week. Do you want to meet?</p>
+                    <span>Sirwali Joseph &nbsp;&bull; {{ i + 1 }} hrs ago</span>
+                    <span>Test reminder</span>
+                    <p>Do not forget that you are going to be writing a test next week Tuesday</p>
                   </div>
   
                   <md-button class="md-icon-button md-list-action">
@@ -414,7 +414,7 @@ export default {
 
           //Resolve the promise with your custom file structure
           resolve({
-            bytes: bytes,
+            bytes: new Array(),
             base64StringFile:
               "data:" + file.type + ";base64," + base64StringFile,
             fileName: file.name,
