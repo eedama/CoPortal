@@ -1,26 +1,28 @@
 import mongoose from 'mongoose';
 var Schema = mongoose.Schema;
 
-const DocumentSchema = new mongoose.Schema({
+const LectureNoteSchema = new mongoose.Schema({
     _id: {
         type: Schema.Types.ObjectId,
         default: mongoose.Types.ObjectId()
     },
-    adminID: {
+    lecturerId: {
         type: Schema.Types.ObjectId,
-        ref: 'Admin'
+        ref: 'Lecturer'
+    },
+    moduleId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Module'
     }, //ForeignKey
     title: String,
-    location: String,
+    size: String,
     thumbnail: {
         type: String,
-        default: "ic_picture_as_pdf_black_24dp"
-    },
-    description: String,
-    type: {
-        type: Object,
         default: null
     },
+    description: String,
+    file: Object,
+    type: String,
     date: {
         type: Date,
         default: Date.now
@@ -31,11 +33,18 @@ const DocumentSchema = new mongoose.Schema({
     }
 });
 
-DocumentSchema.methods.findSimilarTypes = function (cb) {
+LectureNoteSchema.methods.findSimilarTypes = function (cb) {
     return this.model('Animal').find({
         type: this.type
     }, cb);
 };
+LectureNoteSchema.index({
+    lecturerId: 1,
+    moduleId: 1,
+    date: 1
+}, {
+    unique: true
+});
 
-const Document = mongoose.model('Document', DocumentSchema);
-module.exports = Document;
+const LectureNote = mongoose.model('LectureNote', LectureNoteSchema);
+module.exports = LectureNote;

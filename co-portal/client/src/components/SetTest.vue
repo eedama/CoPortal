@@ -1,6 +1,14 @@
 <template>
   <div class="hello">
     <div class="row">
+      <div class="col s8 offset-s2">
+        <md-button v-on:click="$router.back()" class="right">
+          <md-icon>keyboard_backspace</md-icon>
+          <span>Back</span>
+        </md-button>
+      </div>
+    </div>
+    <div class="row">
       <div class="input-field center-align col s12 m8 offset-m2">
         <input v-model="title" id="title" type="text" class="validate">
         <label for="title">Title</label>
@@ -57,34 +65,34 @@
     </div>
     <div v-if="!addingQuestion && questions.length > 0 && currentPage == 0" class="row">
       <!--
-      <div class="col s12 m8 offset-m2 card-panel row p-10">
-        <div class="col s12 row">
-          <div class="switch">
-            <label>
-                <input v-model="hasExpiryDatetime" type="checkbox">
-                <span class="lever"></span>
-                {{ hasExpiryDatetime ?  'Has expiry date/time' : 'No expiry date/time' }} 
-              </label>
+          <div class="col s12 m8 offset-m2 card-panel row p-10">
+            <div class="col s12 row">
+              <div class="switch">
+                <label>
+                    <input v-model="hasExpiryDatetime" type="checkbox">
+                    <span class="lever"></span>
+                    {{ hasExpiryDatetime ?  'Has expiry date/time' : 'No expiry date/time' }} 
+                  </label>
+              </div>
+            </div>
+            <div v-show="hasExpiryDatetime" class="col s12 l6 input-field">
+              <input v-model="questionaire.expiryDate" id="ExpiryDate" type="date" class="datepicker">
+              <label for="ExpiryDate">Expiry date</label>
+            </div>
+            <div v-show="hasExpiryDatetime" class="col s12 m6 input-field">
+              <input v-model="questionaire.expiryTime" id="ExpiryTime" type="time" class="validate">
+              <label for="ExpiryTime">Expiry time</label>
+            </div>
           </div>
-        </div>
-        <div v-show="hasExpiryDatetime" class="col s12 l6 input-field">
-          <input v-model="questionaire.expiryDate" id="ExpiryDate" type="date" class="datepicker">
-          <label for="ExpiryDate">Expiry date</label>
-        </div>
-        <div v-show="hasExpiryDatetime" class="col s12 m6 input-field">
-          <input v-model="questionaire.expiryTime" id="ExpiryTime" type="time" class="validate">
-          <label for="ExpiryTime">Expiry time</label>
-        </div>
-      </div>
-      -->
+          -->
       <div class="col s12 m8 offset-m2 card-panel row p-10">
         <div class="col s12 row">
           <div class="switch">
             <label>
-                <input v-model="hasTimeLimit" type="checkbox">
-                <span class="lever"></span>
-                {{ hasTimeLimit ? 'Has time limit' : 'No time limit' }}
-              </label>
+                    <input v-model="hasTimeLimit" type="checkbox">
+                    <span class="lever"></span>
+                    {{ hasTimeLimit ? 'Has time limit' : 'No time limit' }}
+                  </label>
           </div>
         </div>
         <label v-show="hasTimeLimit" class="col s12">Time limit</label>
@@ -97,7 +105,10 @@
     </div>
     <div v-if="!addingQuestion && questions.length > 0 && currentPage == 0" class="row">
       <div class="col s12 m8 offset-m2 right-align">
-        <button class="btn green" v-on:click="SubmitQuestionaire()"><i class="material-icons">done</i></button>
+        <button v-if="!isLoading" class="btn green" v-on:click="SubmitQuestionaire()"><i class="material-icons">done</i></button>
+      </div>
+      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
       </div>
     </div>
     <div v-if="currentPage == 1 && dbQuestionaire != null">
@@ -146,13 +157,17 @@ export default {
         "1.5 hours",
         "2 hours"
       ],
-      msg: "Welcome to Your Vue.js App"
+      isLoading: false
     };
   },
   mounted() {
-    var elems = document.querySelectorAll(".datepicker");
-    var instances = this.$materialize.Datepicker.init(elems);
+    if (this.moduleID == null) {
+      this.$router.back();
+    } else {
+      this.Reload();
+    }
   },
+  props: ["moduleID"],
   methods: {
     AddQuestion() {
       this.addingQuestion = true;
@@ -218,12 +233,14 @@ export default {
       this.addingQuestion = false;
     },
     SubmitQuestionaire() {
+      this.isLoading = true;
       if (this.title.length < 3) {
         swal(
           "Incomplete questionaire",
           "Please provide a title for your questionaire",
           "error"
         );
+        this.isLoading = false;
         return;
       }
 
@@ -237,6 +254,7 @@ export default {
           "Please provide a valid time limit",
           "error"
         );
+        this.isLoading = false;
         return;
       }
 
@@ -245,16 +263,18 @@ export default {
           title: this.title,
           lecturerId: this.$store.state.user.id,
           questions: this.questions,
-          timeLimit: this.questionaire.timeLimit
+          timeLimit: this.questionaire.timeLimit,
+          moduleId: this.moduleID
         })
         .then(results => {
-          console.log(results.data);
+          this.isLoading = false;
           this.dbQuestionaire = results.data;
           this.currentPage = 1;
         })
         .catch(err => {
+          this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            alert(err.response.data);
+            swal(err.response.data, "error");
           } else {
             swal("Unable to submit questionaire", err.message, "error");
           }

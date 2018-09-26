@@ -70,5 +70,13 @@ SolutionSchema.methods.findSimilarTypes = function (cb) {
     }, cb);
 };
 
+SolutionSchema.index({
+    questionaireId: 1,
+    studentId: 1,
+    date: 1
+}, {
+    unique: true
+});
+
 const Solution = mongoose.model('Solution', SolutionSchema);
 module.exports = Solution;

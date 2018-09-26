@@ -1,6 +1,19 @@
 <template>
   <div>
-    <h4 class="text-xs-center">Please select a test you want to take.</h4>
+    <div class="row">
+      <div class="col s8 offset-s2">
+        <md-button v-on:click="$router.back()" class="right">
+            <md-icon>keyboard_backspace</md-icon>
+          <span>Back</span>
+        </md-button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+      </div>
+    </div>
+    <h4 v-if="!isLoading" class="text-xs-center">Please select a test you want to take.</h4>
     <div class="row">
       <div v-for="(test,i) in tests" :key="i" v-on:click="TakeTest(test)" class="col m4 offset-m1 s6 pointer">
         <div class="card-panel hoverable">
@@ -33,12 +46,15 @@ export default {
     };
   },
   mounted() {
+    this.isLoading = true;
     axios
       .get(this.$store.state.settings.baseLink + "/l/all/questionaire")
       .then(results => {
+        this.isLoading = false;
         this.tests = results.data;
       })
       .catch(err => {
+        this.isLoading = false;
         swal("Unable to load questionaires", err.message, "error");
       });
   },
@@ -73,34 +89,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.home {
-  text-align: center;
-}
-
-.right {
-  float: initial !important;
-}
-
-.left {
-  float: initial !important;
-}
-
-h1,
-h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
 </style>

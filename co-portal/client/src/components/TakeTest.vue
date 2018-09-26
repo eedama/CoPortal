@@ -1,5 +1,13 @@
 <template>
   <div class="row">
+    <div class="row">
+      <div class="col s8 offset-s2">
+        <md-button v-on:click="$router.back()" class="right">
+          <md-icon>keyboard_backspace</md-icon>
+          <span>Back</span>
+        </md-button>
+      </div>
+    </div>
     <div class="col s10 offset-s1">
       <div v-if="currentPage == i" v-for="(question,i) in Questionaire.questions" :key="i" class="row">
         <div class="col s10 offset-s1 row card-panel">
@@ -10,9 +18,9 @@
             <form>
               <h6 class="pointer" v-for="(answer,j) in question.answers" :key="j">
                 <label>
-                    <input v-model="solutions[i]" :value="answer" :id="answer + '-' + j" class="with-gap" :name="question.id" type="radio"/>
-                    <span :for="answer + '-' + j">{{ answer }}</span>
-                  </label>
+                        <input v-model="solutions[i]" :value="answer" :id="answer + '-' + j" class="with-gap" :name="question.id" type="radio"/>
+                        <span :for="answer + '-' + j">{{ answer }}</span>
+                      </label>
               </h6>
             </form>
           </div>
@@ -29,7 +37,8 @@
         <div class="col s9 right-align">
           <button class="btn red" v-if="currentPage > 0" v-on:click="changePage(false)">Previous</button>
           <button class="btn" v-if="(currentPage+ 1) < Questionaire.questions.length" v-on:click="changePage(true)">Next</button>
-          <button class="btn green" v-if="(currentPage+1) == Questionaire.questions.length" v-on:click="SubmitQuiz()">Done</button>
+          <button class="btn green" v-if="(currentPage+1) == Questionaire.questions.length && !isLoading" v-on:click="SubmitQuiz()">Done</button>
+          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>   
         </div>
       </div>
     </div>
@@ -47,7 +56,8 @@ export default {
       currentPage: 0,
       solutions: [],
       Questionaire: null,
-      txtError: ""
+      txtError: "",
+      isLoading: false
     };
   },
   mounted() {
@@ -73,6 +83,7 @@ export default {
       isForward ? this.currentPage++ : this.currentPage--;
     },
     SubmitQuiz() {
+      this.isLoading = true;
       this.txtError = "";
       var hasError = false;
       this.solutions.map((s, i) => {
@@ -82,7 +93,10 @@ export default {
           this.currentPage = i;
         }
       });
-      if (hasError) return;
+      if (hasError) {
+        this.isLoading = false;
+        return;
+      }
 
       swal({
         title: "Submit?",
@@ -112,17 +126,23 @@ export default {
               }
             )
             .then(results => {
+              this.isLoading = false;
               swal("Submitted!", {
                 icon: "success"
               });
               this.$router.push({
                 name: "TestMarks",
-                params: { solutionId: results.data._id }
+                params: {
+                  solutionId: results.data._id
+                }
               });
             })
             .catch(err => {
+              this.isLoading = false;
               swal("Unable to submit", err.message, "error");
             });
+        } else {
+          this.isLoading = false;
         }
       });
     }

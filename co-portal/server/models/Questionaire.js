@@ -9,7 +9,11 @@ const QuestionaireSchema = new mongoose.Schema({
     lecturerID: {
         type: Schema.Types.ObjectId,
         ref: 'Lecturer'
-    }, // ForeignKey
+    },
+    moduleID: {
+        type: Schema.Types.ObjectId,
+        ref: 'Module'
+    },
     title: String,
     questions: Array,
     timeLimit: {
@@ -24,6 +28,14 @@ const QuestionaireSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
+});
+
+QuestionaireSchema.index({
+    title: 1,
+    questions: 1,
+    moduleID:1
+}, {
+    unique: true
 });
 
 const Questionaire = mongoose.model('Questionaire', QuestionaireSchema);

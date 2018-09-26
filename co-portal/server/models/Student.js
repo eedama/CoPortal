@@ -10,8 +10,14 @@ const StudentSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Admin'
     },
-    idNumber: Number,
-    username: String,
+    idNumber: {
+        type: Number,
+        unique: true
+    },
+    username: {
+        type: String,
+        unique: true
+    },
     firstname: String,
     lastname: String,
     room: String,
@@ -20,6 +26,10 @@ const StudentSchema = new mongoose.Schema({
     profilePic: String,
     password: String,
     contactNumbers: Number,
+    isSouthAfrican: {
+        type: Boolean,
+        default: null
+    },
     active: {
         type: Boolean,
         default: true
@@ -42,6 +52,7 @@ const StudentSchema = new mongoose.Schema({
         type: Date,
         default: Date.now()
     },
+    dob: Date,
     lastActivityDate: {
         type: Date,
         default: Date.now()
@@ -58,7 +69,11 @@ const StudentSchema = new mongoose.Schema({
     solutions: [{
         type: Schema.Types.ObjectId,
         ref: 'Solution'
-    }]
+    }],
+    modules: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Module'
+    }],
 });
 
 StudentSchema.methods.findSimilarTypes = function (cb) {

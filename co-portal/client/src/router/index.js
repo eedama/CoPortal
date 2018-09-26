@@ -7,7 +7,11 @@ import SetTest from '@/components/SetTest'
 import TakeTest from '@/components/TakeTest'
 import TestMarks from '@/components/TestMarks'
 import StudentList from '@/components/Student/StudentList'
+import ModuleList from '@/components/Module/ModuleList'
 import LecturerList from '@/components/Lecturer/LecturerList'
+import ModuleView from '@/components/Module/ModuleView'
+
+import AddStudentTemp from '@/components/admin/AddStudentTemp'
 
 Vue.use(Router)
 
@@ -59,6 +63,7 @@ const router = new Router({
       meta: {
         authLevel: ['LECTURER'],
       },
+      props: true,
       component: SetTest
     },
     /**
@@ -70,6 +75,7 @@ const router = new Router({
       meta: {
         authLevel: ['LECTURER', 'ADMIN'],
       },
+      props: true,
       component: StudentList
     },
     /**
@@ -84,16 +90,60 @@ const router = new Router({
       meta: {
         authLevel: ['ADMIN'],
       },
+      props: true,
       component: LecturerList
-    }
+    },
     /**
      * Lecturer routes END
+     */
+
+    /**
+     * Module routes START
+     */
+    {
+      path: '/module/list',
+      name: 'ModuleList',
+      meta: {
+        authLevel: ['ADMIN', 'LECTURER', 'STUDENT'],
+      },
+      component: ModuleList
+    },
+    {
+      path: '/module/view',
+      name: 'ModuleView',
+      meta: {
+        authLevel: ['ADMIN', 'LECTURER', 'STUDENT'],
+      },
+      props: true,
+      component: ModuleView
+    },
+    /**
+     * Lecturer routes END
+     */
+    /**
+     * Admin routes START
+     */
+    {
+      path: '/temp/add/student',
+      name: 'TempAddStudent',
+      meta: {
+        authLevel: ['ADMIN'],
+      },
+      props: true,
+      component: AddStudentTemp
+    }
+    /**
+     * Admin routes END
      */
   ]
 });
 
 router.beforeEach((to, from, next) => {
   var userType = store.state.user.type;
+  if (userType == "ADMIN" && to.name != "TempAddStudent" && store.state.user.username == 'tempadmin') {
+    next('/temp/add/student')
+    return;
+  }
   if (to.meta.authLevel != null) {
     if (userType == null) {
       swal("You are not Authorized to access this page!", "You must be logged in to access this page.", "error").then((value) => {
