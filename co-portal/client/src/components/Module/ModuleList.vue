@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="screen">
     <div class="row">
       <div class="col s8 offset-s2">
         <md-button v-on:click="$router.back()" class="right">
@@ -211,5 +211,15 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.screen {
+  background-image: url("/static/img/coPortalLogo.jpg");
+  /* Full height */
+  height: 100vh;
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: fit;
+}
 </style>
 

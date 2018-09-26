@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="screen">
   
     <md-dialog style="position:absolute;top:25%" class="card" :md-active.sync="addNotes">
       <md-card class="col s12 m8 offset-m2">
