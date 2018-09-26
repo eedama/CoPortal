@@ -11,6 +11,8 @@ import StudentList from '@/components/Student/StudentList'
 import ModuleList from '@/components/Module/ModuleList'
 import LecturerList from '@/components/Lecturer/LecturerList'
 import ModuleView from '@/components/Module/ModuleView'
+import AllMarks from '@/components/Marks/AllMarks'
+import MarkSheet from '@/components/Marks/MarkSheet'
 
 import AddStudentTemp from '@/components/admin/AddStudentTemp'
 
@@ -139,9 +141,32 @@ const router = new Router({
             },
             props: true,
             component: AddStudentTemp
-        }
+        },
         /**
          * Admin routes END
+         */
+        /**
+         * Marks routes START
+         */
+        {
+            path: '/marks/all',
+            name: 'AllMarks',
+            meta: {
+                authLevel: ['STUDENT'],
+            },
+            props: true,
+            component: AllMarks
+        }, {
+            path: '/marks/sheet',
+            name: 'MarkSheet',
+            meta: {
+                authLevel: ['LECTURER', 'ADMIN'],
+            },
+            props: true,
+            component: AddStudentTemp
+        }
+        /**
+         * Marks routes END
          */
     ]
 });

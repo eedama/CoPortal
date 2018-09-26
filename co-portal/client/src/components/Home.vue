@@ -80,6 +80,18 @@
             icon: "file_copy",
             link: "/test/list",
             auth: ["STUDENT", "LECTURER", "ADMIN"]
+          },
+          {
+            text: "Marks",
+            icon: "done_all",
+            link: "/marks/all",
+            auth: ["STUDENT"]
+          },
+          {
+            text: "Mark sheet",
+            icon: "done_all",
+            link: "/marks/sheet",
+            auth: ["LECTURER", "ADMIN"]
           }
         ]
       };
