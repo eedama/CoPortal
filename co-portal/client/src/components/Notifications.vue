@@ -10,28 +10,40 @@
       <div class="col s10 offset-s1 m8 offset-m2 center-align">
         <img src="../assets/logo.png" class="responsive-img">
       </div>
+    </div>
+    <div v-if="$store.state.user.isLoggedIn" class="row">
+      <div class="col s6 offset-s3 row center-align">
+          <div class="card-panel switch">
+    <label>
+      Show new notifications only
+      <input type="checkbox">
+      <span class="lever"></span>
+      Include seen notifications
+    </label>
+  </div>
+      </div>
+      <md-list class="md-triple-line col s12">
+        <md-list-item style="margin-bottom:15px" v-for="(announcement,i) in announcements" :key="i" class="hoverable col m6 offset-m3 s10 offset-s1 pointer white center-align waves-effect">
+          <md-avatar>
+            <img src="https://placeimg.com/40/40/people/1" alt="People">
+          </md-avatar>
   
+          <div class="md-list-item-text">
+            <span>Sirwali Joseph &nbsp;&bull; {{ i + 1 }} hrs ago</span>
+            <span>Test reminder</span>
+            <p class="flow-text">Do not forget that you are going to be writing a test next week Tuesday</p>
+          </div>
+  
+          <md-button class="md-icon-button md-list-action">
+            <md-icon class="md-primary">close</md-icon>
+          </md-button>
+        </md-list-item>
+      </md-list>
     </div>
-    <div class="row">
-      <div v-if="!$store.state.user.isLoggedIn" v-on:click="$router.push('/login')" class="col m6 offset-m3 s12 pointer bigButton center-align waves-effect">
+        <div v-if="$store.state.user.isLoggedIn" class="row">
+      <div v-on:click="$router.push('/')" class="col m2 offset-m5 s12 pointer center-align waves-effect">
         <div class="card-panel hoverable">
-          <h5 class="center-align"><i style="font-size:100%" class="material-icons left">lock</i> <span>Login</span></h5>
-        </div>
-      </div>
-    </div>
-    <div v-if="$store.state.user.isLoggedIn" class="row">
-      <div v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)" :key="i" v-on:click="$router.push(option.link)" class="col m4 offset-m1 s6 pointer bigButton center-align waves-effect">
-        <div class="card-panel hoverable">
-          <h5 class="center-align">
-            <i style="font-size:100%" :class="{'notificationRing':i==0}" class="material-icons left">{{ option.icon }}</i>
-            <span>{{ option.text }}</span></h5>
-        </div>
-      </div>
-    </div>
-    <div v-if="$store.state.user.isLoggedIn" class="row">
-      <div v-on:click="Logout()" class="col m2 offset-m5 s12 pointer center-align waves-effect">
-        <div class="card-panel hoverable red">
-          <h5 class="text-xs-center">Log out <i class="material-icons right">exit_to_app</i> </h5>
+          <h5 class="text-xs-center"><i class="material-icons center">home</i> <span>Home</span></h5>
         </div>
       </div>
     </div>
@@ -54,7 +66,7 @@
         options: [{
             text: "Notifications",
             icon: "notifications",
-            link:"/notifications/all",
+            link: "/notifications/all",
             auth: ["STUDENT", "LECTURER", "ADMIN"]
           },
           {
