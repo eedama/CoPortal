@@ -349,12 +349,12 @@ export default {
             .indexOf(this.txtLecturerSearch.toLowerCase()) >= 0
       );
     },
-    filteredStudenSendAnnouncementts() {
-      return this.SendAnnouncementmodule.students.filter(
+    filteredStudents() {
+      return this.module.students.filter(
         l =>
-          this.txtSendAnnouncementStudentSearch.length < 1 ||
-          JSON.strSendAnnouncementingify(l)
-            .toLowSendAnnouncementerCase()
+          this.txtStudentSearch.length < 1 ||
+          JSON.stringify(l)
+            .toLowerCase()
             .indexOf(this.txtStudentSearch.toLowerCase()) >= 0
       );
     },
