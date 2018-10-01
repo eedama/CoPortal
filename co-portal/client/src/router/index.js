@@ -172,8 +172,8 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   var userType = store.state.user.type;
-  if (userType == null && this.a.app.$session.has('user')) {
-    var user = this.a.app.$session.get('user');
+  if (userType == null && router.app.$session.has('user')) {
+    var user = router.app.$session.get('user');
     store.commit("login", user);
     userType = store.state.user.type;
   }
