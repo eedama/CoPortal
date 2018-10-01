@@ -38,6 +38,14 @@
                 <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
               </div>
             </div>
+            <div v-if="pastUsers.length > 0" class="row">
+              <div class="col s12 left-align">
+                <label>You can log in as : </label>
+              </div>
+              <div class="col s2" v-for="(user,i) in pastUsers" :key="i">
+                <input v-if="!isLoading" v-on:click="LoginAsUser(user)" type="submit" :value="user.username" class="btn-flat center-align tg-btn" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -57,12 +65,12 @@ export default {
       username: "",
       password: "",
       txtError: "",
-      isLoading: false
+      isLoading: false,
+      pastUsers: []
     };
   },
   mounted() {
-    var elems = document.querySelectorAll(".datepicker");
-    var instances = this.$materialize.Datepicker.init(elems);
+    this.pastUsers = this.$session.get("users");
   },
   methods: {
     SubmitLogin() {
@@ -84,38 +92,7 @@ export default {
         })
         .then(results => {
           this.isLoading = false;
-          switch (results.data.userType) {
-            case "ADMIN":
-              this.$store.commit("login", {
-                id: results.data.user._id,
-                username: results.data.user.username,
-                password: results.data.user.password,
-                type: "ADMIN",
-                isLoggedIn: true
-              });
-              this.$router.push("/");
-              break;
-            case "LECTURER":
-              this.$store.commit("login", {
-                id: results.data.user._id,
-                username: results.data.user.username,
-                password: results.data.user.password,
-                type: "LECTURER",
-                isLoggedIn: true
-              });
-              this.$router.push("/");
-              break;
-            case "STUDENT":
-              this.$store.commit("login", {
-                id: results.data.user._id,
-                username: results.data.user.username,
-                password: results.data.user.password,
-                type: "STUDENT",
-                isLoggedIn: true
-              });
-              this.$router.push("/");
-              break;
-          }
+          this.Login(results);
         })
         .catch(err => {
           this.isLoading = false;
@@ -125,6 +102,10 @@ export default {
             swal("Unable to log you in", "Try again later", "error");
           }
         });
+    },
+    LoginAsUser(user) {
+      this.$store.commit("login", user);
+      this.$router.push("/");
     }
   }
 };
