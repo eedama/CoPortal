@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 var Schema = mongoose.Schema;
 
-const MarkSheet = new mongoose.Schema({
+const MarkSheetSchema = new mongoose.Schema({
     _id: {
         type: Schema.Types.ObjectId,
         default: mongoose.Types.ObjectId()
