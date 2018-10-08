@@ -7,6 +7,7 @@ import Solution from "../models/Solution";
 import Student from "../models/Student";
 import Lecturer from "../models/Lecturer";
 import Module from "../models/Module";
+import MarkSheet from "../models/MarkSheet";
 
 /*
   TODO: Get one lecturer - DONE
@@ -312,4 +313,55 @@ router.post("/:text/search", function (req, res) {
     });
   }
 });
+
+router.post("/sheet/add", function (req, res) {
+  if (!req.body.markSheet.type || req.body.markSheet.type.length == 0) {
+    req.body.markSheet.type = 'UNKNOWN';
+  }
+  if (!req.body.markSheet.date) {
+    req.body.markSheet.date = Date.now;
+  }
+  var markSheet = new MarkSheet({
+    _id: mongoose.Types.ObjectId(),
+    id: req.body.markSheet.id,
+    title: req.body.markSheet.title,
+    type: req.body.markSheet.type.toUpperCase(),
+    date: req.body.markSheet.date
+  });
+
+  // lecturerID
+  // moduleID
+  Lecturer.findById(req.body.markSheet.lecturerID).then(lecturer => {
+    if (lecturer == null)
+      return res.status(512).send("Lecturer was not found");
+    Module.findById(req.body.markSheet.moduleID).then(_module => {
+      if (_module == null) return res.status(512).send("Module was not found");
+      var victim = lecturer.modules.find(m => m == req.body.markSheet.moduleID);
+      if (!victim) return res.status(512).send("Lecturer is not incharge of this module");
+      markSheet.save(function (err) {
+        if (err)
+          return res.status(512).send("Server error : " + err.message);
+        res.json(markSheet);
+      });
+    });
+  });
+
+  if (txtSearch == null || txtSearch.length < 2) {
+    return res.status(404);
+    res.send("Cannot search for - " + txtSearch);
+  } else {
+    Lecturer.find({
+      $text: {
+        $search: new RegExp('^' + txtSearch + '$', "i")
+      }
+    }).then(answer => {
+      if (answer == null || answer.length <= 0) {
+        return res.status(512).send("No results for : " + txtSearch);
+      } else {
+        res.json(answer);
+      }
+    });
+  }
+});
+
 module.exports = router;
