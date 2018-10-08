@@ -21,4 +21,9 @@ export default {
 .pointer {
   cursor: pointer;
 }
+
+.md-active {
+  background-color: transparent !important;
+  border-bottom: 2px solid black !important;
+}
 </style>

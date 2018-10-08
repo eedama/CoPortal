@@ -162,7 +162,7 @@ const router = new Router({
         authLevel: ['LECTURER', 'ADMIN'],
       },
       props: true,
-      component: AddStudentTemp
+      component: MarkSheet
     }
     /**
      * Marks routes END
