@@ -338,6 +338,8 @@ router.post("/sheet/add", function (req, res) {
       if (_module == null) return res.status(512).send("Module was not found");
       var victim = lecturer.modules.find(m => m == req.body.markSheet.moduleID);
       if (!victim) return res.status(512).send("Lecturer is not incharge of this module");
+      markSheet.lecturerID = req.body.markSheet.lecturerID;
+      markSheet.moduleID = req.body.markSheet.moduleID;
       markSheet.save(function (err) {
         if (err)
           return res.status(512).send("Server error : " + err.message);
@@ -347,4 +349,15 @@ router.post("/sheet/add", function (req, res) {
   });
 });
 
+router.get("/sheet/get/all/for/:lecturerID", function (req, res) {
+  var lecturerID = req.params.lecturerID;
+  MarkSheet.find({
+    lecturerId: lecturerID
+  }).then(sheets => {
+    if (sheets == null) return res.status(512).send("Lecturer does not have any marksheets");
+    res.json(sheets);
+  }).catch(err => {
+    return res.status(512).send("Server error: " + err.message);
+  });
+});
 module.exports = router;
