@@ -352,7 +352,7 @@ router.post("/sheet/add", function (req, res) {
 router.get("/sheet/get/all/for/:lecturerID", function (req, res) {
   var lecturerID = req.params.lecturerID;
   MarkSheet.find({
-    lecturerId: lecturerID
+    lecturerID: lecturerID
   }).then(sheets => {
     if (sheets == null) return res.status(512).send("Lecturer does not have any marksheets");
     res.json(sheets);
