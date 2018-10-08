@@ -345,23 +345,6 @@ router.post("/sheet/add", function (req, res) {
       });
     });
   });
-
-  if (txtSearch == null || txtSearch.length < 2) {
-    return res.status(404);
-    res.send("Cannot search for - " + txtSearch);
-  } else {
-    Lecturer.find({
-      $text: {
-        $search: new RegExp('^' + txtSearch + '$', "i")
-      }
-    }).then(answer => {
-      if (answer == null || answer.length <= 0) {
-        return res.status(512).send("No results for : " + txtSearch);
-      } else {
-        res.json(answer);
-      }
-    });
-  }
 });
 
 module.exports = router;
