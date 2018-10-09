@@ -361,7 +361,7 @@ router.get("/sheet/get/all/for/:lecturerID", function (req, res) {
   });
 });
 
-router.get("/sheet/update/mark/by/:lecturerID", function (req, res) {
+router.post("/sheet/update/mark/by/:lecturerID", function (req, res) {
   var lecturerID = req.params.lecturerID;
   var sheetID = req.body.markSheetID;
   var studentID = req.body.studentID;
