@@ -1,6 +1,6 @@
 <template>
   <div class="screen">
-    <div class="row">
+    <div  v-show="!printing" class="row">
       <div class="col s8 offset-s2">
         <md-button v-on:click="$router.back()" class="right">
           <md-icon>keyboard_backspace</md-icon>
@@ -14,30 +14,25 @@
       </div>
     </div>
     <div class="row">
-      <div class="col s2 m3 row">
+      <div v-show="!printing" class="col s2 m3 row">
         <div class="col s12 center">
           <md-subheader><label class="markValue">Modules</label></md-subheader>
         </div>
-        <div class="col s12 pointer center-align waves-effect" v-on:click="selectedModuleIndex = i" v-for="(module,i) in filteredModules" :key="i">
+        <div class="col s12 pointer center-align waves-effect" v-on:click="SwitchModule(i)" v-for="(module,i) in filteredModules" :key="i">
           <div class="hoverable card-panel" :class="{'black':selectedModuleIndex==i}">
             <h6 class="center-align">
               <span>{{ module.name }} 
-                    <br /><label class="center-align">{{ module.code }}</label></span></h6>
+                            <br /><label class="center-align">{{ module.code }}</label></span></h6>
           </div>
         </div>
       </div>
-      <div class="col s10 m9 row center-align">
+      <div :class="{'s12 m12':printing}" class="col s10 m9 row center-align">
         <md-card class="white col s12 m10 offset-m1 center">
           <md-card-header>
             <md-card-header-text>
               <div class="md-title">{{ currentModule.name }}</div>
               <div class="md-subhead">{{ currentModule.code }}</div>
             </md-card-header-text>
-            <md-menu md-size="big" md-direction="bottom-end">
-              <md-button class="md-icon-button">
-                <md-icon>more_vert</md-icon>
-              </md-button>
-            </md-menu>
           </md-card-header>
           <md-card-expand>
             <md-card-content>
@@ -60,13 +55,13 @@
                       <p>Pick a marksheet to view/update</p>
                     </div>
                     <div class="col s6 m4" v-for="(sheet,i) in filteredSheets.filter(f => txtSearchSheet.length < 2 || JSON.stringify(f).toString().indexOf(txtSearchSheet) >= 0)" :key="i">
-                      <div v-on:click="SearchForMarkSheetId(sheet.id)" class="card-panel center-align pointer waves-effect">{{ sheet.id }} - {{ sheet.title }}</div>
+                      <div v-on:click="SelectMarkSheetById(sheet)" class="card-panel center-align pointer waves-effect">{{ sheet.id }} - {{ sheet.title }}</div>
                     </div>
                   </div>
                 </div>
-                <div v-if="markSheetId != null" class="col s12 row">
+                <div style="overflow-y:visible" v-if="markSheetId != null" class="col s12 row">
   
-                  <div class="col s12">
+                  <div  v-show="!printing" class="col s12">
                     <md-button v-on:click="markSheetId = null" class="right md-icon-button">
                       <md-icon>close</md-icon>
                     </md-button>
@@ -77,9 +72,12 @@
                   </div>
   
                   <md-table class="col s12" v-model="searched" md-sort="name" md-sort-order="asc" md-fixed-header>
-                    <md-table-toolbar>
+                    <md-table-toolbar  v-show="!printing">
                       <md-field md-clearable class="md-toolbar-section-end">
                         <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
+                      </md-field>
+                      <md-field md-clearable class="md-toolbar-section-end">
+                        <md-button v-on:click="PrintMarkSheet" class="md-icon-button"><md-icon>print</md-icon></md-button>
                       </md-field>
                     </md-table-toolbar>
   
@@ -87,16 +85,20 @@
                     </md-table-empty-state>
   
                     <md-table-row slot="md-table-row" slot-scope="{ item }">
-                      <md-table-cell md-label="ID number" md-sort-by="id" md-numeric>{{ item.id }}</md-table-cell>
-                      <md-table-cell md-label="Full Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-                      <md-table-cell v-show="!item.editting" md-label="Mark" md-sort-by="id">{{ item.mark }}</md-table-cell>
-                      <md-table-cell v-show="item.editting" md-label="Mark">
-                        <md-input v-model="item.mark" placeholder="mark obtained"></md-input>
+                      <md-table-cell md-label="Username" md-sort-by="username" md-numeric>{{ item.username }}</md-table-cell>
+                      <md-table-cell md-label="Full Name" md-sort-by="lastname + firstname">{{ item.lastname }} {{ item.firstname }}</md-table-cell>
+                      <md-table-cell md-label="Gender" md-sort-by="gender">{{ item.gender }}</md-table-cell>
+                      <md-table-cell md-label="mark" md-sort-by="mark">
+                        <span v-show="!item.editting">{{ item.mark }}</span>
+                        <md-input type="number" v-show="item.editting" v-model="item.mark" placeholder="mark obtained"></md-input>
                       </md-table-cell>
-                      <md-table-cell md-label="Actions">
+                      <md-table-cell v-show="!printing" md-label="Actions">
                         <div>
-                          <md-button v-on:click="item.editting = false" v-show="item.editting" class="md-icon-button md-mini">
+                          <md-button v-on:click="UpdateMarkFor(item)" v-show="item.editting" class="md-icon-button md-mini">
                             <md-icon>done</md-icon>
+                          </md-button>
+                          <md-button v-on:click="item.editting = false" v-show="item.editting" class="md-icon-button md-mini">
+                            <md-icon>close</md-icon>
                           </md-button>
                           <md-button v-on:click="item.editting = true" v-show="!item.editting" class="md-icon-button md-mini">
                             <md-icon>edit</md-icon>
@@ -105,7 +107,7 @@
                       </md-table-cell>
                     </md-table-row>
                   </md-table>
-                  <md-card-actions>
+                  <md-card-actions v-show="!printing">
                     <md-button class="btn-flat">Save changes</md-button>
                   </md-card-actions>
                 </div>
@@ -145,9 +147,9 @@
                       </md-datepicker>
                     </md-field>
                   </md-list-item>
-                   <md-list-item>
+                  <md-list-item>
                     <md-field class="col s8 offset-s2 m6 offset-m3 center-align text-center center-align">
-                        <p class="red-text">{{ markSheet.error }}</p>
+                      <p class="red-text">{{ markSheet.error }}</p>
                     </md-field>
                   </md-list-item>
                 </md-list>
@@ -163,17 +165,17 @@
                   <div class="row col s12">
                     <div class="col s10 offset-s1 chat" :class="{'right-align':feedback.from.id == $store.state.user.id}" v-for="(feedback,i) in feedbacks" :key="i">
                       <span class="chip message" :class="{'notSent':feedback.status != 'sent','black white-text':feedback.from.type != 'STUDENT'}">
-                                                                   <span class="from" :class="{'white-text':feedback.from.type != 'STUDENT'}">{{ feedback.from.name }}</span> : {{ feedback.message }}
+                                                                           <span class="from" :class="{'white-text':feedback.from.type != 'STUDENT'}">{{ feedback.from.name }}</span> : {{ feedback.message }}
                       </span>
                       <p class="time">{{ feedback.status != 'sent' ? feedback.status : getMoment(feedback.date).fromNow() }}</p>
                     </div>
                   </div>
                   <div class="col s10 switch">
                     <label>
-                                                                    <input v-on:change="toggleAutoRefresh" v-model="autoRefreshChats" type="checkbox">
-                                                                    <span class="lever"></span>
-                                                                    {{ autoRefreshChats ?  'Auto refreshing every 5 seconds' : 'Auto refresh is off, Use the button on the right to get the latest messages' }} 
-                                                                  </label>
+                                                                            <input v-on:change="toggleAutoRefresh" v-model="autoRefreshChats" type="checkbox">
+                                                                            <span class="lever"></span>
+                                                                            {{ autoRefreshChats ?  'Auto refreshing every 5 seconds' : 'Auto refresh is off, Use the button on the right to get the latest messages' }} 
+                                                                          </label>
                   </div>
                   <div class="col s2 right-align">
                     <a v-if="!isLoading" class="btn-floating transparent waves-effect right-align" v-on:click="refreshFeedbacks"><i class="material-icons black-text">refresh</i></a>
@@ -222,6 +224,7 @@ export default {
   name: "StidentList",
   data() {
     return {
+      printing: false,
       // Create sheet Variables
       markSheet: {
         id: "",
@@ -259,148 +262,7 @@ export default {
         4523,
         56236
       ],
-      users: [
-        {
-          id: 1,
-          name: "Shawna Dubbin",
-          editting: false,
-          mark: 90,
-          title: "Assistant Media Planner"
-        },
-        {
-          id: 2,
-          name: "Odette Demageard",
-          editting: false,
-          mark: 90,
-          title: "Account Coordinator"
-        },
-        {
-          id: 3,
-          name: "Vera Taleworth",
-          editting: false,
-          mark: 90,
-          title: "Community Outreach Specialist"
-        },
-        {
-          id: 4,
-          name: "Lonnie Izkovitz",
-          editting: false,
-          mark: 90,
-          title: "Operator"
-        },
-        {
-          id: 5,
-          name: "Thatcher Stave",
-          editting: false,
-          mark: 90,
-          title: "Software Test Engineer III"
-        },
-        {
-          id: 6,
-          name: "Karim Chipping",
-          editting: false,
-          mark: 90,
-          title: "Safety Technician II"
-        },
-        {
-          id: 7,
-          name: "Helge Holyard",
-          editting: false,
-          mark: 90,
-          title: "Internal Auditor"
-        },
-        {
-          id: 8,
-          name: "Rod Titterton",
-          editting: false,
-          mark: 90,
-          title: "Technical Writer"
-        },
-        {
-          id: 9,
-          name: "Gawen Applewhite",
-          editting: false,
-          mark: 90,
-          title: "GIS Technical Architect"
-        },
-        {
-          id: 10,
-          name: "Nero Mulgrew",
-          editting: false,
-          mark: 90,
-          title: "Staff Scientist"
-        },
-        {
-          id: 11,
-          name: "Cybill Rimington",
-          editting: false,
-          mark: 90,
-          title: "Assistant Professor"
-        },
-        {
-          id: 12,
-          name: "Maureene Eggleson",
-          editting: false,
-          mark: 90,
-          title: "Recruiting Manager"
-        },
-        {
-          id: 13,
-          name: "Cortney Caulket",
-          editting: false,
-          mark: 90,
-          title: "Safety Technician IV"
-        },
-        {
-          id: 14,
-          name: "Selig Swynfen",
-          editting: false,
-          mark: 90,
-          title: "Environmental Specialist"
-        },
-        {
-          id: 15,
-          name: "Ingar Raggles",
-          editting: false,
-          mark: 90,
-          title: "VP Sales"
-        },
-        {
-          id: 16,
-          name: "Karmen Mines",
-          editting: false,
-          mark: 90,
-          title: "Administrative Officer"
-        },
-        {
-          id: 17,
-          name: "Salome Judron",
-          editting: false,
-          mark: 90,
-          title: "Staff Scientist"
-        },
-        {
-          id: 18,
-          name: "Clarinda Marieton",
-          editting: false,
-          mark: 90,
-          title: "Paralegal"
-        },
-        {
-          id: 19,
-          name: "Paxon Lotterington",
-          editting: false,
-          mark: 90,
-          title: "Marketing Assistant"
-        },
-        {
-          id: 20,
-          name: "Maura Thoms",
-          editting: false,
-          mark: 90,
-          title: "Actuary"
-        }
-      ],
+      users: [],
       // end
       txtSearch: "",
       txtSearchSheet: "",
@@ -416,6 +278,7 @@ export default {
       sheetActions: ["View/Update", "Create new"],
       modules: [],
       sheets: [],
+      selectedMarkSheet: null,
       feedbacks: [
         {
           from: "Mr Tshepi",
@@ -459,7 +322,6 @@ export default {
   },
   mounted() {
     this.isLoading = true;
-    this.searchOnTable();
     axios
       .get(
         this.$store.state.settings.baseLink +
@@ -474,13 +336,14 @@ export default {
         this.modules.map(s => {
           s.show = true;
         });
+        this.SwitchModule(0);
       })
       .catch(err => {
         this.isLoading = false;
         if (err.response != null && err.response.status == 512) {
           swal(err.response.data, "error");
         } else {
-          swal("Unable to load modules", "Try again later", "error");
+          swal("Unable to load modules", err.message, "error");
         }
       });
 
@@ -502,6 +365,78 @@ export default {
       });
   },
   methods: {
+    PrintMarkSheet() {
+      this.printing = true;
+      setTimeout(() => {
+        window.print();
+        this.printing = false;
+      }, 100);
+    },
+    SwitchModule(i) {
+      this.selectedModuleIndex = i;
+      this.selectedMarkSheet = null;
+      this.markSheetId = null;
+      this.txtSearchSheet = "";
+
+      axios
+        .get(
+          this.$store.state.settings.baseLink +
+            "/s/students/all/for/module/" +
+            this.currentModule["_id"]
+        )
+        .then(results => {
+          results.data.map(u => {
+            u.mark = null;
+            u.editting = true;
+            return u;
+          });
+          this.users = results.data;
+          this.searchOnTable();
+        })
+        .catch(err => {
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal(
+              "Unable load students for " + this.currentModule.name,
+              err.message,
+              "error"
+            );
+          }
+        });
+    },
+    UpdateMarkFor(item) {
+      if (isNaN(item.mark)) {
+        return;
+      }
+
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/l/sheet/update/mark/by/" +
+            this.$store.state.user.id,
+          {
+            markSheetID: this.selectedMarkSheet["_id"],
+            studentID: item["_id"],
+            mark: item.mark
+          }
+        )
+        .then(results => {
+          this.sheets.filter(s => s["_id"] == results.data["_id"]).map(v => {
+            return results.data;
+          });
+          this.SelectMarkSheetById(results.data);
+          this.searchOnTable();
+        })
+        .catch(err => {
+          item.editting = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal("Unable update marks for student", err.message, "error");
+          }
+        });
+    },
     CreateMarkSheet() {
       this.markSheet.error = "";
       this.isLoading = true;
@@ -527,6 +462,7 @@ export default {
           this.isLoading = false;
           this.sheets.push(results.data);
           this.selectedMarkSheetAction = 0;
+          this.selectedMarkSheet = results.data;
           this.markSheetId = this.txtSearchSheet = results.data.id;
         })
         .catch(err => {
@@ -546,8 +482,24 @@ export default {
         }
       });
     },
-    SearchForMarkSheetId(value) {
-      this.markSheetId = this.txtSearchSheet = value;
+    SelectMarkSheetById(value) {
+      this.selectedMarkSheet = value;
+      this.markSheetId = this.txtSearchSheet = value.id;
+
+      this.users.map(u => {
+        var userID = u["_id"];
+        var marks = this.selectedMarkSheet.studentMarks.filter(
+          s => s.studentID == userID
+        );
+        if (!marks || marks.length == 0) {
+          u.mark = null;
+          u.editting = true;
+        } else {
+          u.mark = marks[0].mark;
+          u.editting = false;
+        }
+        return u;
+      });
     },
     searchOnTable() {
       this.searched = searchByName(this.users, this.search);
