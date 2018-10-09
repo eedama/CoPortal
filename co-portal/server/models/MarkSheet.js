@@ -16,6 +16,13 @@ const MarkSheetSchema = new mongoose.Schema({
     },
     id: String,
     title: String,
+    studentMarks: [{
+        studentID: {
+            type: Schema.Types.ObjectId,
+            ref: 'Student'
+        },
+        mark: Number
+    }],
     type: {
         type: String,
         enum: ['PRACTICALTEST', 'THEORYTEST', 'HOMECLASSTEST', 'EXAM', 'ONLINETEST', 'UNKNOWN'],
