@@ -360,4 +360,33 @@ router.get("/sheet/get/all/for/:lecturerID", function (req, res) {
     return res.status(512).send("Server error: " + err.message);
   });
 });
+
+router.get("/sheet/update/mark/by/:lecturerID", function (req, res) {
+  var lecturerID = req.params.lecturerID;
+  var sheetID = req.body.markSheetID;
+  var studentID = req.body.studentID;
+  var mark = req.body.mark;
+  MarkSheet.findOne({
+    lecturerID: lecturerID,
+    '_id': sheetID
+  }).then(sheet => {
+    if (sheet == null) return res.status(512).send("Marksheet does not exist");
+    var marks = sheet.studentMarks.filter(s => s.studentID == studentID);
+    if (!marks || marks.length == 0) {
+      sheet.studentMarks.push({
+        studentID: studentID,
+        mark: mark
+      })
+    } else {
+      sheet.studentMarks.filter(s => s.studentID == studentID)[0].marks = marks;
+    }
+    sheet.save(function (err) {
+      if (err)
+        return res.status(512).send("Server error : " + err.message);
+      res.json(sheet);
+    });
+  }).catch(err => {
+    return res.status(512).send("Server error: " + err.message);
+  });
+});
 module.exports = router;
