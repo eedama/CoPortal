@@ -42,9 +42,24 @@ router.get("/students/all", function (req, res) {
     });
 });
 
+router.get("/students/all/for/module/:moduleID", function (req, res) {
+  var moduleID = req.params.moduleID;
+  Student.find({
+      "active": true,
+      "modules": moduleID
+    })
+    .populate(['modules'])
+    .then(students => {
+      if (students == null) res.send("Error : 9032rtu834g9erbo");
+      res.json(students);
+    }).catch(err => {
+      return res.status(512).send("Server error : " + err.message);
+    });
+});
+
 router.get("/students/of/ids/:studentIDs", function (req, res) {
   var studentIDs = req.params.studentIDs;
-  if(!Array.isArray(studentIDs)){
+  if (!Array.isArray(studentIDs)) {
     studentIDs = [studentIDs];
   }
   console.log(studentIDs);
