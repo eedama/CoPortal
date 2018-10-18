@@ -18,16 +18,19 @@ const AnnouncementSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Module'
     },
+    title: String,
     message: String,
     type: String,
     done: {
         type: Boolean,
         default: false
     },
-    seen: {
-        type: Boolean,
-        default: false
-    },
+    seenBy: [{
+        type: Schema.Types.ObjectId
+    }],
+    deletedBy: [{
+        type: Schema.Types.ObjectId
+    }],
     date: {
         type: Date,
         default: Date.now
