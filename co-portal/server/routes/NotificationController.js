@@ -44,6 +44,10 @@ router.post("/announcements/get/for/:userID", function (req, res) {
       return true;
     });
 
+    announcements.forEach(element => {
+      element.seenBy = undefined;
+      element.deletedBy = undefined;
+    });
     res.json(announcements);
   });
 });
