@@ -21,14 +21,16 @@ import Module from "../models/Module";
 router.post("/announcements/get/for/:userID", function (req, res) {
   var userID = req.params.userID;
   var userType = req.body.userType;
+  var moduleId = req.body.moduleID;
   var withSeen = req.body.seen;
   var withDeleted = req.body.deleted;
-  console.log(userType)
+
   if (!userType || (userType != 'ADMIN' && userType != 'LECTURER' && userType != 'STUDENT')) {
     return res.status(512).send("Invalid user");
   }
   Announcement.find({
-    removed: false
+    removed: false,
+    moduleId: moduleId
   }).then(announcements => {
     if (announcements == null) return res.status(512).send("No announcements where found");
     announcements = announcements.filter(a => a.deletedBy.filter(deleted => deleted == userID).length == 0)
