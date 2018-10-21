@@ -20,11 +20,42 @@
       </div>
     </div>
     <div v-if="$store.state.user.isLoggedIn" class="row">
-      <div v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)" :key="i" v-on:click="$router.push(option.link)" class="col m4 offset-m1 s6 pointer bigButton center-align waves-effect">
-        <div class="card-panel hoverable">
-          <h5 class="center-align">
-            <i style="font-size:100%" :class="{'notificationRing':i==0}" class="material-icons left">{{ option.icon }}</i>
-            <span>{{ option.text }}</span></h5>
+      <div class="col s12 m6">
+  
+        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+          <md-card-header class="left">Annnouncements</md-card-header >
+        </div>
+        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+        </div>
+        <md-list class="md-triple-line col s12 center-align">
+          <md-list-item v-on:click="AnnouncementClick(announcement)" style="margin-bottom:15px" v-for="(announcement,i) in announcements" :key="i" class="hoverable col s12 m10 pointer white center-align waves-effect">
+            <md-avatar>
+              <img src="https://placeimg.com/40/40/people/1" alt="People">
+            </md-avatar>
+  
+            <div class="md-list-item-text">
+              <span>{{ announcement.lecturerId ?  announcement.lecturerId.lastname + " " + announcement.lecturerId.firstname : "Admin" }} &nbsp;&bull; {{ getMoment(announcement.date).fromNow() }}</span>
+              <span>{{ announcement.title }}</span>
+              <p>{{ announcement.message }}</p>
+            </div>
+  
+            <md-button class="md-icon-button md-list-action">
+              <md-icon class="md-primary">thumb_up</md-icon>
+            </md-button>
+          </md-list-item>
+        </md-list>
+      </div>
+      <div class="col s12 m6 row">
+        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+          <md-card-header class="left">Portal</md-card-header>
+        </div>
+        <div v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)" :key="i" v-on:click="$router.push(option.link)" class="col s12 l8 pointer bigButton waves-effect">
+          <div class="card-panel hoverable">
+            <h5 class="center-align">
+              <i style="font-size:100%" :class="{'notificationRing':i==0}" class="material-icons left">{{ option.icon }}</i>
+              <span>{{ option.text }}</span></h5>
+          </div>
         </div>
       </div>
     </div>
@@ -39,12 +70,15 @@
 </template>
 
 <script>
+import swal from "sweetalert";
+const axios = require("axios");
 export default {
   name: "Home",
   data() {
     return {
-      announcements: ["", "", ""],
+      announcements: [],
       showEmoji: false,
+      isLoading: false,
       txtSearch: "",
       titleText: [
         "Welcome to Co-Portal.",
@@ -52,12 +86,6 @@ export default {
         "Contact admin for your login info"
       ],
       options: [
-        {
-          text: "Notifications",
-          icon: "notifications",
-          link: "/notifications/all",
-          auth: ["STUDENT", "LECTURER", "ADMIN"]
-        },
         {
           text: "Students",
           icon: "people",
@@ -97,14 +125,40 @@ export default {
       ]
     };
   },
+  mounted() {
+    if (this.$store.state.user.isLoggedIn) {
+      this.isLoading = true;
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/n/announcements/get/for/" +
+            this.$store.state.user.id,
+          {
+            userType: this.$store.state.user.type,
+            moduleID: null
+          }
+        )
+        .then(results => {
+          this.isLoading = false;
+          console.log(results.data);
+          this.announcements = results.data;
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal(err.message, "Try again later", "error");
+          }
+        });
+    }
+  },
   methods: {
-    addEmoji(emoji) {
-      alert(this.$emoji);
-      this.txtSearch += emoji.native;
-      this.showEmoji = !this.showEmoji;
-    },
-    OpenEmojis(emoji) {
-      this.showEmoji = !this.showEmoji;
+    AnnouncementClick(announcement) {
+      swal({
+        title: announcement.title,
+        text: announcement.message
+      });
     }
   }
 };

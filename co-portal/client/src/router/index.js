@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/Home'
-import Notifications from '@/components/Notifications'
 import Login from '@/components/Login'
 import TestList from '@/components/TestList'
 import SetTest from '@/components/SetTest'
@@ -29,13 +28,6 @@ const router = new Router({
         authLevel: null,
       },
       component: Home
-    }, {
-      path: '/notifications/all',
-      name: 'Notifications',
-      meta: {
-        authLevel: ['STUDENT', 'ADMIN', 'LECTURER'],
-      },
-      component: Notifications
     }, {
       path: '/login',
       name: 'Login',
