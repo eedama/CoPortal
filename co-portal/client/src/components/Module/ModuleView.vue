@@ -60,7 +60,7 @@
         <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
       </div>
       <div class="col s12">
-        <md-tabs>
+        <md-tabs @md-changed="ChangeTab">
           <md-tab id="tab-home" md-label="Home">
             <div class="row">
               <div class="col s12 m6 xl3">
@@ -254,7 +254,7 @@
                       <p>
                         <label>
                              <input v-model="announcement.isToAll" :value="false" class="with-gap" name="group1" type="radio" checked />
-                             <span>{{ module.name }} students</span>
+                             <span>{{ module.name }} ({{ module.code }}) students</span>
                            </label>
                       </p>
                       <p>
@@ -280,13 +280,13 @@
                   </md-avatar>
   
                   <div class="md-list-item-text">
-                    <span>Sirwali Joseph &nbsp;&bull; {{ i + 1 }} hrs ago</span>
-                    <span>Test reminder</span>
-                    <p>Do not forget that you are going to be writing a test next week Tuesday</p>
+                    <span>{{ announcement.lecturerId ?  announcement.lecturerId.lastname + " " + announcement.lecturerId.firstname : "Admin" }} &nbsp;&bull; {{ getMoment(announcement.date).fromNow() }}</span>
+                    <span>{{ announcement.title }}</span>
+                    <p>{{ announcement.message }}</p>
                   </div>
   
                   <md-button class="md-icon-button md-list-action">
-                    <md-icon class="md-primary">star</md-icon>
+                    <md-icon class="md-primary">thumb_up</md-icon>
                   </md-button>
                 </md-list-item>
               </md-list>
@@ -319,7 +319,7 @@ export default {
         message: "",
         isToAll: false
       },
-      announcements: [{}, {}],
+      announcements: [],
       txtStudentSearch: "",
       txtLecturerSearch: "",
       txtError: "",
@@ -371,6 +371,33 @@ export default {
   },
   props: ["moduleID"],
   methods: {
+    ChangeTab(selected) {
+      if (selected == "tab-announcement") {
+        axios
+          .post(
+            this.$store.state.settings.baseLink +
+              "/n/announcements/get/for/" +
+              this.$store.state.user.id,
+            {
+              userType: this.$store.state.user.type,
+              moduleID: this.moduleID
+            }
+          )
+          .then(results => {
+            this.isLoading = false;
+            this.announcements = results.data;
+            console.log(results);
+          })
+          .catch(err => {
+            this.isLoading = false;
+            if (err.response != null && err.response.status == 512) {
+              swal(err.response.data, "error");
+            } else {
+              swal(err.message, "Try again later", "error");
+            }
+          });
+      }
+    },
     DownloadNotes(notes) {
       this.isLoading = true;
       axios
@@ -555,7 +582,7 @@ export default {
       axios
         .post(
           this.$store.state.settings.baseLink +
-            "/m/announcements/add/for/" +
+            "/n/announcements/add/for/" +
             this.moduleID +
             "/by/" +
             this.$store.state.user.type +
