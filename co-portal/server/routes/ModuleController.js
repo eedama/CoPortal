@@ -342,6 +342,7 @@ router.post(
           new Error("Lecturer does not exist / Is not incharge of this module");
 
         var lecturerNote = new LectureNote({
+          _id: mongoose.Types.ObjectId(),
           lecturerId: lecturerId, //ForeignKey
           moduleId: moduleId, //ForeignKey
           title: title,

@@ -64,6 +64,7 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
     moduleID = notification.isToAll ? null : moduleID;
     userId = userType != 'LECTURER' ? null : userId
     var announcement = new Announcement({
+      _id: mongoose.Types.ObjectId(),
       lecturerId: userId,
       moduleId: moduleID,
       title: notification.title,
