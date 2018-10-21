@@ -29,27 +29,29 @@ router.post("/announcements/get/for/:userID", function (req, res) {
     return res.status(512).send("Invalid user");
   }
   Announcement.find({
-    removed: false,
-    moduleId: moduleId
-  }).then(announcements => {
-    if (announcements == null) return res.status(512).send("No announcements where found");
-    announcements = announcements.filter(a => a.deletedBy.filter(deleted => deleted == userID).length == 0)
+      removed: false,
+      moduleId: moduleId
+    })
+    .populate('lecturerId')
+    .then(announcements => {
+      if (announcements == null) return res.status(512).send("No announcements where found");
+      announcements = announcements.filter(a => a.deletedBy.filter(deleted => deleted == userID).length == 0)
 
-    announcements = announcements.filter(async a => {
-      if (a.moduleId == null) return true;
-      var m = await Module.findById(a.moduleId);
-      if (m == null) return false;
-      if (userType == 'STUDENT') return m.students.filter(s => s == userID).length > 0;
-      if (userType == 'LECTURER') return m.lecturers.filter(l => l == userID).length > 0;
-      return true;
-    });
+      announcements = announcements.filter(async a => {
+        if (a.moduleId == null) return true;
+        var m = await Module.findById(a.moduleId);
+        if (m == null) return false;
+        if (userType == 'STUDENT') return m.students.filter(s => s == userID).length > 0;
+        if (userType == 'LECTURER') return m.lecturers.filter(l => l == userID).length > 0;
+        return true;
+      });
 
-    announcements.forEach(element => {
-      element.seenBy = undefined;
-      element.deletedBy = undefined;
+      announcements.forEach(element => {
+        element.seenBy = undefined;
+        element.deletedBy = undefined;
+      });
+      res.json(announcements);
     });
-    res.json(announcements);
-  });
 });
 
 router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", function (req, res) {
