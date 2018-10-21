@@ -5,6 +5,9 @@
       <md-card class="col s12">
         <md-card-header>
           <div class="md-title">Send a announcement</div>
+          <md-button v-on:click="isAddingAnnouncements = false" class="right">
+          <md-icon>close</md-icon>
+        </md-button>
         </md-card-header>
               <md-content>
                 <div class="row">
@@ -272,6 +275,7 @@ export default {
         )
         .then(results => {
           this.isLoading = false;
+          this.isAddingAnnouncements = false;
           swal("Success", "Announcement successfully sent.", "success");
         })
         .catch(err => {
