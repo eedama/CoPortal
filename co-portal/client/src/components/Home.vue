@@ -1,5 +1,53 @@
 <template>
   <div class="screen">
+    
+    <md-dialog v-if="$store.state.user.isLoggedIn && ($store.state.user.type=='LECTUERE' || $store.state.user.type=='ADMIN')" style="position:absolute;top:25%;width:100%" class="card" :md-active.sync="isAddingAnnouncements">
+      <md-card class="col s12">
+        <md-card-header>
+          <div class="md-title">Send a announcement</div>
+        </md-card-header>
+              <md-content>
+                <div class="row">
+                  <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+                    <input v-model="announcement.title" id="ModuleDescription" name="ModuleDescription" type="text" />
+                    <label class="text-center" for="ModuleDescription">Title</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+                    <input v-model="announcement.message" id="ModuleDescription" name="ModuleDescription" type="text" />
+                    <label class="text-center" for="ModuleDescription">Message</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                    <label>Send to : </label>
+                  </div>
+                  <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                    <form action="#">
+                      <p v-for="(module,i) in modules" :key="i">
+                        <label>
+                             <input v-model="announcement.module" :value="module._id" class="with-gap" name="group1" type="radio" />
+                             <span>{{ module.name }} ({{ module.code }}) students</span>
+                           </label>
+                      </p>
+                      <p>
+                        <label>
+                               <input v-model="announcement.module" :value="null" class="with-gap" name="group1" type="radio" checked />
+                               <span>All Students</span>
+                             </label>
+                      </p>
+                    </form>
+                  </div>
+                </div>
+              </md-content>
+      </md-card>
+              <md-card-actions>
+                <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+                <md-button v-if="!isLoading" v-on:click="SendAnnouncement()" class="md-primary">Send announcement</md-button>
+              </md-card-actions>
+    </md-dialog>
+
     <div class="row">
       <div class="col s6 offset-s3 center-align">
         <h5 class="center-align">
@@ -29,6 +77,15 @@
           <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
         </div>
         <md-list class="md-triple-line col s12 center-align">
+          <md-list-item v-on:click="isAddingAnnouncements = true" style="margin-bottom:15px" class="hoverable col s12 m10 pointer white center-align waves-effect">
+           <md-avatar>
+              <md-icon>add</md-icon>
+            </md-avatar>
+  
+            <div class="md-list-item-text center-align">
+              <span>Add new Announcement</span>
+            </div>
+          </md-list-item>
           <md-list-item v-on:click="AnnouncementClick(announcement)" style="margin-bottom:15px" v-for="(announcement,i) in announcements" :key="i" class="hoverable col s12 m10 pointer white center-align waves-effect">
             <md-avatar>
               <img src="https://placeimg.com/40/40/people/1" alt="People">
@@ -53,7 +110,7 @@
         <div v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)" :key="i" v-on:click="$router.push(option.link)" class="col s12 l8 pointer bigButton waves-effect">
           <div class="card-panel hoverable">
             <h5 class="center-align">
-              <i style="font-size:100%" :class="{'notificationRing':i==0}" class="material-icons left">{{ option.icon }}</i>
+              <i style="font-size:100%" class="material-icons left">{{ option.icon }}</i>
               <span>{{ option.text }}</span></h5>
           </div>
         </div>
@@ -76,7 +133,15 @@ export default {
   name: "Home",
   data() {
     return {
+      announcement: {
+        title: "",
+        message: "",
+        isToAll: true,
+        moduleID: null
+      },
       announcements: [],
+      modules: [],
+      isAddingAnnouncements: false,
       showEmoji: false,
       isLoading: false,
       txtSearch: "",
@@ -151,6 +216,35 @@ export default {
             swal(err.message, "Try again later", "error");
           }
         });
+      if (
+        this.$store.state.user.type == "LECTURER" ||
+        this.$store.state.user.type == "ADMIN"
+      ) {
+        this.isLoading = true;
+        axios
+          .get(
+            this.$store.state.settings.baseLink +
+              "/m/modules/all/for/" +
+              this.$store.state.user.id +
+              "/" +
+              this.$store.state.user.type
+          )
+          .then(results => {
+            this.isLoading = false;
+            this.modules = results.data;
+            this.modules.map(s => {
+              s.show = true;
+            });
+          })
+          .catch(err => {
+            this.isLoading = false;
+            if (err.response != null && err.response.status == 512) {
+              swal(err.response.data, "error");
+            } else {
+              swal("Unable to load modules", "Try again later", "error");
+            }
+          });
+      }
     }
   },
   methods: {
@@ -159,6 +253,35 @@ export default {
         title: announcement.title,
         text: announcement.message
       });
+    },
+    SendAnnouncement() {
+      this.isLoading = true;
+      this.announcement.isToAll = this.announcement.module == null;
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/n/announcements/add/for/" +
+            this.announcement.module +
+            "/by/" +
+            this.$store.state.user.type +
+            "/of/id/" +
+            this.$store.state.user.id,
+          {
+            announcement: this.announcement
+          }
+        )
+        .then(results => {
+          this.isLoading = false;
+          swal("Success", "Announcement successfully sent.", "success");
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "Try again later", "error");
+          } else {
+            swal("Unable to send announcement", "Try again later", "error");
+          }
+        });
     }
   }
 };

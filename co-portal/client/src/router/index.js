@@ -26,6 +26,7 @@ const router = new Router({
       name: 'Home',
       meta: {
         authLevel: null,
+        showNav: false
       },
       component: Home
     }, {
@@ -33,6 +34,7 @@ const router = new Router({
       name: 'Login',
       meta: {
         authLevel: null,
+        showNav: false
       },
       component: Login
     }, {
@@ -40,6 +42,7 @@ const router = new Router({
       name: 'TestList',
       meta: {
         authLevel: ['STUDENT', 'ADMIN', 'LECTURER'],
+        showNav: true
       },
       component: TestList
     }, {
@@ -47,6 +50,7 @@ const router = new Router({
       name: 'TakeTest',
       meta: {
         authLevel: ['STUDENT', 'ADMIN', 'LECTURER'],
+        showNav: true
       },
       props: true,
       component: TakeTest
@@ -55,6 +59,7 @@ const router = new Router({
       name: 'TestMarks',
       meta: {
         authLevel: ['STUDENT', 'ADMIN', 'LECTURER'],
+        showNav: true
       },
       props: true,
       component: TestMarks
@@ -63,6 +68,7 @@ const router = new Router({
       name: 'SetTest',
       meta: {
         authLevel: ['LECTURER'],
+        showNav: true
       },
       props: true,
       component: SetTest
@@ -75,6 +81,7 @@ const router = new Router({
       name: 'StudentList',
       meta: {
         authLevel: ['LECTURER', 'ADMIN'],
+        showNav: true
       },
       props: true,
       component: StudentList
@@ -90,6 +97,7 @@ const router = new Router({
       name: 'LecturerList',
       meta: {
         authLevel: ['ADMIN'],
+        showNav: true
       },
       props: true,
       component: LecturerList
@@ -106,6 +114,7 @@ const router = new Router({
       name: 'ModuleList',
       meta: {
         authLevel: ['ADMIN', 'LECTURER', 'STUDENT'],
+        showNav: true
       },
       component: ModuleList
     },
@@ -114,6 +123,7 @@ const router = new Router({
       name: 'ModuleView',
       meta: {
         authLevel: ['ADMIN', 'LECTURER', 'STUDENT'],
+        showNav: true
       },
       props: true,
       component: ModuleView
@@ -129,6 +139,7 @@ const router = new Router({
       name: 'TempAddStudent',
       meta: {
         authLevel: ['ADMIN'],
+        showNav: true
       },
       props: true,
       component: AddStudentTemp
@@ -144,6 +155,7 @@ const router = new Router({
       name: 'AllMarks',
       meta: {
         authLevel: ['STUDENT'],
+        showNav: true
       },
       props: true,
       component: AllMarks
@@ -152,6 +164,7 @@ const router = new Router({
       name: 'MarkSheet',
       meta: {
         authLevel: ['LECTURER', 'ADMIN'],
+        showNav: true
       },
       props: true,
       component: MarkSheet
