@@ -41,7 +41,7 @@ app.use(function (req, res, next) {
 });
 
 mongoose
-    .connect("mongodb://localhost:27017/CoportalGPDevDB?authSource=admin", {
+    .connect("mongodb://localhost:27017/CoportalGPLiveDB?authSource=admin", {
         auth: {
             user: "admin",
             password: "Mulavhelesi@1"
@@ -49,7 +49,7 @@ mongoose
         useNewUrlParser: true,
         reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
         reconnectInterval: 500, // Reconnect every 500ms
-        dbName: "CoportalGPDevDB"
+        dbName: "CoportalGPLiveDB"
     })
     .then(answer => {
         console.log("Successfully connected to MONGO!");
