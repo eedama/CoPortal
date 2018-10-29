@@ -7,6 +7,7 @@ import Solution from "../models/Solution";
 import Student from "../models/Student";
 import Lecturer from "../models/Lecturer";
 import Module from "../models/Module";
+import MarkSheet from "../models/MarkSheet";
 
 /*
   TODO: Get one lecturer - DONE
@@ -311,5 +312,81 @@ router.post("/:text/search", function (req, res) {
       }
     });
   }
+});
+
+router.post("/sheet/add", function (req, res) {
+  if (!req.body.markSheet.type || req.body.markSheet.type.length == 0) {
+    req.body.markSheet.type = 'UNKNOWN';
+  }
+  if (!req.body.markSheet.date) {
+    req.body.markSheet.date = Date.now;
+  }
+  var markSheet = new MarkSheet({
+    _id: mongoose.Types.ObjectId(),
+    id: req.body.markSheet.id,
+    title: req.body.markSheet.title,
+    type: req.body.markSheet.type.toUpperCase(),
+    date: req.body.markSheet.date
+  });
+
+  // lecturerID
+  // moduleID
+  Lecturer.findById(req.body.markSheet.lecturerID).then(lecturer => {
+    if (lecturer == null)
+      return res.status(512).send("Lecturer was not found");
+    Module.findById(req.body.markSheet.moduleID).then(_module => {
+      if (_module == null) return res.status(512).send("Module was not found");
+      var victim = lecturer.modules.find(m => m == req.body.markSheet.moduleID);
+      if (!victim) return res.status(512).send("Lecturer is not incharge of this module");
+      markSheet.lecturerID = req.body.markSheet.lecturerID;
+      markSheet.moduleID = req.body.markSheet.moduleID;
+      markSheet.save(function (err) {
+        if (err)
+          return res.status(512).send("Server error : " + err.message);
+        res.json(markSheet);
+      });
+    });
+  });
+});
+
+router.get("/sheet/get/all/for/:lecturerID", function (req, res) {
+  var lecturerID = req.params.lecturerID;
+  MarkSheet.find({
+    lecturerID: lecturerID
+  }).then(sheets => {
+    if (sheets == null) return res.status(512).send("Lecturer does not have any marksheets");
+    res.json(sheets);
+  }).catch(err => {
+    return res.status(512).send("Server error: " + err.message);
+  });
+});
+
+router.post("/sheet/update/mark/by/:lecturerID", function (req, res) {
+  var lecturerID = req.params.lecturerID;
+  var sheetID = req.body.markSheetID;
+  var studentID = req.body.studentID;
+  var mark = req.body.mark;
+  MarkSheet.findOne({
+    lecturerID: lecturerID,
+    '_id': sheetID
+  }).then(sheet => {
+    if (sheet == null) return res.status(512).send("Marksheet does not exist");
+    var marks = sheet.studentMarks.filter(s => s.studentID == studentID);
+    if (!marks || marks.length == 0) {
+      sheet.studentMarks.push({
+        studentID: studentID,
+        mark: mark
+      })
+    } else {
+      sheet.studentMarks.filter(s => s.studentID == studentID)[0].marks = marks;
+    }
+    sheet.save(function (err) {
+      if (err)
+        return res.status(512).send("Server error : " + err.message);
+      res.json(sheet);
+    });
+  }).catch(err => {
+    return res.status(512).send("Server error: " + err.message);
+  });
 });
 module.exports = router;

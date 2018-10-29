@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="screen">
     <div class="row">
       <div class="col s8 offset-s2">
         <md-button v-on:click="$router.back()" class="right">
@@ -14,6 +14,9 @@
           <input v-on:keypress.enter="DeepSearch" v-model="txtSearch" id="Password" name="Search" type="search" />
           <label class="text-center" for="Search">Search</label>
         </div>
+      </div>
+      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
       </div>
     </div>
   
@@ -51,8 +54,9 @@
               </div>
             </div>
             <div class="row">
-              <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-on:click="SubmitModule()" type="submit" value="Submit module" class="btn center-align tg-btn" />
+              <div class="col s8 offset-s2 m6 offset-m3 center-align text-center">
+                <input v-if="!isLoading" v-on:click="SubmitModule()" type="submit" value="Submit module" class="btn center-align tg-btn" />
+                <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
               </div>
             </div>
           </div>
@@ -114,7 +118,8 @@ export default {
       },
       addingModules: false,
       modules: [],
-      selectedStudent: null
+      selectedStudent: null,
+      isLoading: false
     };
   },
   computed: {
@@ -129,16 +134,24 @@ export default {
     }
   },
   mounted() {
+    this.isLoading = true;
     axios
-      .get(this.$store.state.settings.baseLink + "/m/modules/all")
+      .get(
+        this.$store.state.settings.baseLink +
+          "/m/modules/all/for/" +
+          this.$store.state.user.id +
+          "/" +
+          this.$store.state.user.type
+      )
       .then(results => {
+        this.isLoading = false;
         this.modules = results.data;
-        console.log(this.modules);
         this.modules.map(s => {
           s.show = true;
         });
       })
       .catch(err => {
+        this.isLoading = false;
         if (err.response != null && err.response.status == 512) {
           swal(err.response.data, "error");
         } else {
@@ -158,38 +171,8 @@ export default {
         }
       });
     },
-    GetPastTestsFor(module) {
-      axios
-        .get(
-          this.$store.state.settings.baseLink +
-            "/s/all/past/tests/for/" +
-            module._id
-        )
-        .then(results => {
-          this.modules.map(s => {
-            if (s._id == module._id) {
-              s.pastTests = [];
-              results.data.forEach(element => {
-                s.pastTests.push({
-                  solutionId: element.solutionId,
-                  title: element.title,
-                  mark: element.mark,
-                  date: element.date
-                });
-              });
-              this.selectedStudent = s;
-            }
-          });
-        })
-        .catch(err => {
-          if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
-          } else {
-            swal("Unable to load modules", err.message, "error");
-          }
-        });
-    },
     SubmitModule() {
+      this.isLoading = true;
       this.txtError = "";
       if (this.module.name.length < 2) {
         this.txtError = "Please enter a valid module name";
@@ -199,17 +182,22 @@ export default {
         this.txtError = "Please enter a valid module code";
       }
 
-      if (this.txtError.length > 2) return;
+      if (this.txtError.length > 2) {
+        this.isLoading = false;
+        return;
+      }
 
       axios
         .post(this.$store.state.settings.baseLink + "/m/add/new/module", {
           module: this.module
         })
         .then(results => {
+          this.isLoading = false;
           this.modules = results.data;
           this.addingModules = false;
         })
         .catch(err => {
+          this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {
@@ -223,5 +211,15 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.screen {
+  background-image: url("/static/img/coPortalLogo.jpg");
+  /* Full height */
+  height: 100vh;
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: fit;
+}
 </style>
 

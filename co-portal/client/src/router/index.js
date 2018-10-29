@@ -10,12 +10,15 @@ import StudentList from '@/components/Student/StudentList'
 import ModuleList from '@/components/Module/ModuleList'
 import LecturerList from '@/components/Lecturer/LecturerList'
 import ModuleView from '@/components/Module/ModuleView'
+import AllMarks from '@/components/Marks/AllMarks'
+import MarkSheet from '@/components/Marks/MarkSheet'
+
+import AddStudentTemp from '@/components/admin/AddStudentTemp'
 
 Vue.use(Router)
 
 import store from '../store';
 import swal from "sweetalert";
-
 
 const router = new Router({
   routes: [{
@@ -23,6 +26,7 @@ const router = new Router({
       name: 'Home',
       meta: {
         authLevel: null,
+        showNav: false
       },
       component: Home
     }, {
@@ -30,6 +34,7 @@ const router = new Router({
       name: 'Login',
       meta: {
         authLevel: null,
+        showNav: false
       },
       component: Login
     }, {
@@ -37,6 +42,7 @@ const router = new Router({
       name: 'TestList',
       meta: {
         authLevel: ['STUDENT', 'ADMIN', 'LECTURER'],
+        showNav: true
       },
       component: TestList
     }, {
@@ -44,6 +50,7 @@ const router = new Router({
       name: 'TakeTest',
       meta: {
         authLevel: ['STUDENT', 'ADMIN', 'LECTURER'],
+        showNav: true
       },
       props: true,
       component: TakeTest
@@ -52,6 +59,7 @@ const router = new Router({
       name: 'TestMarks',
       meta: {
         authLevel: ['STUDENT', 'ADMIN', 'LECTURER'],
+        showNav: true
       },
       props: true,
       component: TestMarks
@@ -60,6 +68,7 @@ const router = new Router({
       name: 'SetTest',
       meta: {
         authLevel: ['LECTURER'],
+        showNav: true
       },
       props: true,
       component: SetTest
@@ -72,6 +81,7 @@ const router = new Router({
       name: 'StudentList',
       meta: {
         authLevel: ['LECTURER', 'ADMIN'],
+        showNav: true
       },
       props: true,
       component: StudentList
@@ -87,6 +97,7 @@ const router = new Router({
       name: 'LecturerList',
       meta: {
         authLevel: ['ADMIN'],
+        showNav: true
       },
       props: true,
       component: LecturerList
@@ -103,6 +114,7 @@ const router = new Router({
       name: 'ModuleList',
       meta: {
         authLevel: ['ADMIN', 'LECTURER', 'STUDENT'],
+        showNav: true
       },
       component: ModuleList
     },
@@ -111,18 +123,70 @@ const router = new Router({
       name: 'ModuleView',
       meta: {
         authLevel: ['ADMIN', 'LECTURER', 'STUDENT'],
+        showNav: true
       },
       props: true,
       component: ModuleView
-    }
+    },
     /**
      * Lecturer routes END
+     */
+    /**
+     * Admin routes START
+     */
+    {
+      path: '/temp/add/student',
+      name: 'TempAddStudent',
+      meta: {
+        authLevel: ['ADMIN'],
+        showNav: true
+      },
+      props: true,
+      component: AddStudentTemp
+    },
+    /**
+     * Admin routes END
+     */
+    /**
+     * Marks routes START
+     */
+    {
+      path: '/marks/all',
+      name: 'AllMarks',
+      meta: {
+        authLevel: ['STUDENT'],
+        showNav: true
+      },
+      props: true,
+      component: AllMarks
+    }, {
+      path: '/marks/sheet',
+      name: 'MarkSheet',
+      meta: {
+        authLevel: ['LECTURER', 'ADMIN'],
+        showNav: true
+      },
+      props: true,
+      component: MarkSheet
+    }
+    /**
+     * Marks routes END
      */
   ]
 });
 
 router.beforeEach((to, from, next) => {
   var userType = store.state.user.type;
+  if (userType == null && router.app.$session.has('user')) {
+    var user = router.app.$session.get('user');
+    store.commit("login", user);
+    userType = store.state.user.type;
+  }
+
+  if (userType == "ADMIN" && to.name != "TempAddStudent" && store.state.user.username == 'tempadmin') {
+    next('/temp/add/student')
+    return;
+  }
   if (to.meta.authLevel != null) {
     if (userType == null) {
       swal("You are not Authorized to access this page!", "You must be logged in to access this page.", "error").then((value) => {

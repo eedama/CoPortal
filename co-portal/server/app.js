@@ -15,6 +15,7 @@ import studentController from "./routes/StudentController";
 import lecturerController from "./routes/LecturerController";
 import moduleController from "./routes/ModuleController";
 import accountController from "./routes/AccountController";
+import notificationController from "./routes/NotificationController";
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -40,7 +41,7 @@ app.use(function (req, res, next) {
 });
 
 mongoose
-    .connect("mongodb://localhost:27017/CoportalLiveDB?authSource=admin", {
+    .connect("mongodb://localhost:27017/CoportalGPDevDB?authSource=admin", {
         auth: {
             user: "admin",
             password: "Mulavhelesi@1"
@@ -48,7 +49,7 @@ mongoose
         useNewUrlParser: true,
         reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
         reconnectInterval: 500, // Reconnect every 500ms
-        dbName: "CoportalLiveDB"
+        dbName: "CoportalGPDevDB"
     })
     .then(answer => {
         console.log("Successfully connected to MONGO!");
@@ -59,6 +60,7 @@ app.use("/l", lecturerController);
 app.use("/a", adminController);
 app.use("/m", moduleController);
 app.use("/acc", accountController);
+app.use("/n", notificationController);
 
 /// catch 404 and forwarding to error handler
 app.use(function (req, res, next) {

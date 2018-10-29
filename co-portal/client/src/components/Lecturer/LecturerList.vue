@@ -8,16 +8,16 @@
         </md-button>
       </div>
     </div>
-
+  
     <div v-show="!addingLecturers" class="row">
       <div class="col s8 offset-s2 center-align">
         <a v-on:click="addingLecturers = !addingLecturers" class="btn waves-effect">Add Lecturer</a>
       </div>
     </div>
     <div v-show="addingLecturers" class="row" style="height:80vh">
-        <div class="col s12 m8 offset-m2 l6 offset-l3">
-            <add-lecturer v-on:submitted="AddedNewLecturer"></add-lecturer>  
-        </div>
+      <div class="col s12 m8 offset-m2 l6 offset-l3">
+        <add-lecturer v-on:submitted="AddedNewLecturer"></add-lecturer>
+      </div>
     </div>
     <div v-show="!addingLecturers" class="row">
       <md-dialog class="card" style="position:absolute" :md-active.sync="lecturerModule._id != null">
@@ -29,7 +29,7 @@
               <md-field>
                 <label :for="`mmodules-${i}`">Module {{ m }}</label>
                 <md-select v-model="lecturerModule.modules[i]" :name="`mmodules-${i}`" :id="`mmodules-${i}`">
-                  <md-option :disabled="lecturerModule.modules.filter(sm => sm == module._id).length > 0" v-for="module in modules" :value="module._id" :key="module._id">{{ module.name }} ({{ module.code }})</md-option>
+                  <md-option :disabled="lecturerModule.modules.filter(sm => sm == _module._id).length > 0" v-for="_module in modules" :value="_module._id" :key="_module._id">{{ _module.name }} ({{ _module.code }})</md-option>
                 </md-select>
               </md-field>
             </div>
@@ -41,7 +41,12 @@
         </md-dialog-content>
         <md-dialog-actions>
           <md-button class="md-primary" @click="AddNewModule(null)">Close</md-button>
-          <md-button class="md-primary" @click="AddNewModule('submit')">Save Changes</md-button>
+          <md-button v-if="!isLoading" class="md-primary" @click="AddNewModule('submit')">Save Changes</md-button>
+          <div class="row">
+            <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+              <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+            </div>
+          </div>
         </md-dialog-actions>
       </md-dialog>
       <md-dialog class="card" style="position:absolute" :md-active.sync="showEditProfile">
@@ -84,8 +89,8 @@
             <div class="row" v-show="lecturer.idNumber.length > 6">
               <div class="col s10 offset-s1 m8 offset-m2">
                 <label>
-                                      {{ lecturer.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                                </label>
+                                                {{ lecturer.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
+                                          </label>
               </div>
               <div class="col s10 offset-s1 m8 offset-m2">
                 <md-field>
@@ -115,9 +120,15 @@
           <md-button class="red" @click="activeEditProfile(null)">
             Cancel
           </md-button>
-          <md-button v-on:click="UpdateLecturer()" class="right">
+          <md-button v-if="!isLoading" v-on:click="UpdateLecturer()" class="right">
             Save changes
           </md-button>
+          <div class="row">
+            <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+              <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+            </div>
+          </div>
+  
         </md-dialog-actions>
       </md-dialog>
   
@@ -126,59 +137,63 @@
           <input v-on:keypress.enter="DeepSearch" v-model="txtSearch" id="Password" name="Search" type="search" />
           <label class="center-align" for="Search">Search....</label>
         </div>
+        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+        </div>
       </div>
-      <div v-show="filteredLecturers.length == 0" class="col s12 center-align">
+      <div v-show="filteredLecturers.length == 0 && !isLoading" class="col s12 center-align">
         <p class="red-text">No results found</p>
       </div>
-      <div v-show="isFullscreen == null || isFullscreen == lecturer._id" v-for="(lecturer,i) in filteredLecturers" :key="i + lecturer._id" :class="{'s10 offset-s1 m8 offset-m2 l6 offset-l3':isFullscreen == lecturer._id,'m6 l4 xl3':isFullscreen == null,'hidden':isFullscreen != lecturer._id}" class="col">
+      <div v-show="isFullscreen == null || isFullscreen == lecturer._id" v-for="(lecturer,i) in filteredLecturers" :key="i + lecturer._id" :class="{'s10 offset-s1 m8 offset-m2 l6 offset-l3':isFullscreen == lecturer._id,'m6 l4 xl3':isFullscreen == null,'hidden':isFullscreen != lecturer._id}"
+        class="col">
         <div class="col s12">
           <md-card class="hoverable">
             <md-card-header>
               <md-card-header-text>
-              <div class="md-title">{{ lecturer.lastname }} {{ lecturer.firstname}}</div>
-             <div class="md-subhead">Lecturers {{ lecturer.modules.length }} {{ lecturer.modules.length == 1 ? 'module' : 'modules' }}</div>
-            
+                <div class="md-title">{{ lecturer.lastname }} {{ lecturer.firstname}}</div>
+                <div class="md-subhead">Lecturers {{ lecturer.modules.length }} {{ lecturer.modules.length == 1 ? 'module' : 'modules' }}</div>
+  
               </md-card-header-text>
-            <md-menu md-size="big" md-direction="bottom-end">
-              <md-button v-on:click=" isFullscreen == lecturer._id ? isFullscreen = null : isFullscreen = lecturer._id" class="md-icon-button waves-effect">
-                <md-icon>{{ isFullscreen == lecturer._id ? 'close' : 'fullscreen'}}</md-icon>
-              </md-button>
-            </md-menu>
-             </md-card-header>
+              <md-menu md-size="big" md-direction="bottom-end">
+                <md-button v-on:click=" isFullscreen == lecturer._id ? isFullscreen = null : isFullscreen = lecturer._id" class="md-icon-button waves-effect">
+                  <md-icon>{{ isFullscreen == lecturer._id ? 'close' : 'fullscreen'}}</md-icon>
+                </md-button>
+              </md-menu>
+            </md-card-header>
   
             <md-card-content>
-  <md-list class="md-double-line">
-                    <md-list-item v-if="lecturer.idNumber" class="waves-effect">
-                      <md-icon class="md-primary">account_circle</md-icon>
-                      <div class="md-list-item-text">
-                        <span>{{ lecturer.idNumber }}</span>
-                        <span>ID number</span>
-                      </div>
-                    </md-list-item>
-                    <md-list-item v-if="lecturer.dob" class="waves-effect">
-                      <md-icon class="md-primary">cake</md-icon>
-                      <div class="md-list-item-text">
-                        <span>{{ getMoment(lecturer.dob).format('YYYY-MM-DD') }}</span>
-                        <span>Date of birth</span>
-                      </div>
-                    </md-list-item>
-                    <md-list-item v-if="lecturer.gender" class="waves-effect">
-                      <md-icon class="md-primary">wc</md-icon>
-                      <div class="md-list-item-text">
-                        <span>{{ lecturer.gender }}</span>
-                        <span>Gender</span>
-                      </div>
-                    </md-list-item>
+              <md-list class="md-double-line">
+                <md-list-item v-if="lecturer.idNumber" class="waves-effect">
+                  <md-icon class="md-primary">account_circle</md-icon>
+                  <div class="md-list-item-text">
+                    <span>{{ lecturer.idNumber }}</span>
+                    <span>ID number</span>
+                  </div>
+                </md-list-item>
+                <md-list-item v-if="lecturer.dob" class="waves-effect">
+                  <md-icon class="md-primary">cake</md-icon>
+                  <div class="md-list-item-text">
+                    <span>{{ getMoment(lecturer.dob).format('YYYY-MM-DD') }}</span>
+                    <span>Date of birth</span>
+                  </div>
+                </md-list-item>
+                <md-list-item v-if="lecturer.gender" class="waves-effect">
+                  <md-icon class="md-primary">wc</md-icon>
+                  <div class="md-list-item-text">
+                    <span>{{ lecturer.gender }}</span>
+                    <span>Gender</span>
+                  </div>
+                </md-list-item>
   
-                    <md-list-item v-if="lecturer.isSouthAfrican != null" class="waves-effect">
-                      <md-icon class="md-primary">flag</md-icon>
-                      <div class="md-list-item-text">
-                        <span>{{ lecturer.isSouthAfrican ? "South African" : "Non South African" }}</span>
-                        <span>Nationality</span>
-                      </div>
-                    </md-list-item>
+                <md-list-item v-if="lecturer.isSouthAfrican != null" class="waves-effect">
+                  <md-icon class="md-primary">flag</md-icon>
+                  <div class="md-list-item-text">
+                    <span>{{ lecturer.isSouthAfrican ? "South African" : "Non South African" }}</span>
+                    <span>Nationality</span>
+                  </div>
+                </md-list-item>
   
-                  </md-list>
+              </md-list>
             </md-card-content>
   
             <md-card-expand>
@@ -203,32 +218,37 @@
                   <md-subheader>Modules</md-subheader>
   
                   <md-list>
-              <md-list-item v-for="modul in lecturer.modules" :key="modul._id" :class="{'waves-effect':!modul.removed}">
-                <md-icon class="md-primary">book</md-icon>
-                  <div v-on:click="!modul.removed ? goToModule(modul._id) : null" class="md-list-item-text">
-                    <span>{{ modul.name }}</span>
-                    <span>{{ modul.removed ? 'Unassign ' + modul.code : modul.code }}</span>
-                  </div>
-                  <md-button style="z-index:10" v-show="!modul.removed" v-on:click="modul.removed = true" class="md-icon-button md-list-action">
-                    <md-icon>delete</md-icon>
-                  </md-button>
-                  <md-button style="z-index:10" v-show="modul.removed" v-on:click="DeleteModule(lecturer._id,modul._id)" class="md-icon-button md-list-action">
-                    <md-icon>done</md-icon>
-                  </md-button>
-                  <md-button style="z-index:10" v-show="modul.removed" v-on:click="modul.removed = false" class="md-icon-button md-list-action">
-                    <md-icon>close</md-icon>
-                  </md-button>
-                </md-list-item>
-                <md-list-item v-on:click="AddNewModule(lecturer)" class="waves-effect">
-                  <md-icon class="md-primary">add</md-icon>
-                  <div class="md-list-item-text">
-                    <span>Add new Module</span>
-                    <span></span>
-                  </div>
-                </md-list-item>
-                 <md-divider></md-divider>
-
-                                <md-subheader>Lecturer settings</md-subheader>
+                    <md-list-item v-for="modul in lecturer.modules" :key="modul._id" :class="{'waves-effect':!modul.removed}">
+                      <md-icon class="md-primary">book</md-icon>
+                      <div v-on:click="!modul.removed ? goToModule(modul._id) : null" class="md-list-item-text">
+                        <span>{{ modul.name }}</span>
+                        <span>{{ modul.removed ? 'Unassign ' + modul.code : modul.code }}</span>
+                      </div>
+                      <md-button style="z-index:10" v-show="!modul.removed" v-on:click="modul.removed = true" class="md-icon-button md-list-action">
+                        <md-icon>delete</md-icon>
+                      </md-button>
+                      <md-button style="z-index:10" v-show="modul.removed" v-on:click="DeleteModule(lecturer._id,modul._id)" class="md-icon-button md-list-action">
+                        <md-icon>done</md-icon>
+                      </md-button>
+                      <div v-show="modul.removed" class="row">
+                        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+                          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+                        </div>
+                      </div>
+                      <md-button style="z-index:10" v-show="modul.removed" v-on:click="modul.removed = false" class="md-icon-button md-list-action">
+                        <md-icon>close</md-icon>
+                      </md-button>
+                    </md-list-item>
+                    <md-list-item v-on:click="AddNewModule(lecturer)" class="waves-effect">
+                      <md-icon class="md-primary">add</md-icon>
+                      <div class="md-list-item-text">
+                        <span>Add new Module</span>
+                        <span></span>
+                      </div>
+                    </md-list-item>
+                    <md-divider></md-divider>
+  
+                    <md-subheader>Lecturer settings</md-subheader>
   
                     <md-list-item v-on:click="lecturer.removed = !lecturer.removed" class="waves-effect">
                       <md-icon class="md-primary">delete</md-icon>
@@ -239,12 +259,17 @@
                       <md-button v-show="lecturer.removed" v-on:click="DeleteLecturer(lecturer._id)" class="md-icon-button md-list-action">
                         <md-icon>done</md-icon>
                       </md-button>
+                      <div v-show="lecturer.removed" class="row">
+                        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+                          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+                        </div>
+                      </div>
   
                       <md-button v-show="lecturer.removed" class="md-icon-button md-list-action">
                         <md-icon>close</md-icon>
                       </md-button>
                     </md-list-item>
-              </md-list>
+                  </md-list>
                 </md-card-content>
               </md-card-expand-content>
             </md-card-expand>
@@ -275,8 +300,7 @@ import * as moment from "moment";
 const axios = require("axios");
 
 import "vue-material/dist/vue-material.min.css";
-import AddLecturer from './AddLecturer'
-
+import AddLecturer from "./AddLecturer";
 
 export default {
   name: "LecturerList",
@@ -310,9 +334,11 @@ export default {
       addingLecturers: false,
       //
       txtSearch: "",
+      lecturers: [],
       modules: [],
       showEditProfile: false,
-      isFullscreen: null
+      isFullscreen: null,
+      isLoading: false
     };
   },
   watch: {
@@ -337,8 +363,10 @@ export default {
       }
     }
   },
-  props:['lecturerIDs'],
-  components: { AddLecturer },
+  props: ["lecturerIDs"],
+  components: {
+    AddLecturer
+  },
   computed: {
     filteredLecturers() {
       return this.lecturers.filter(
@@ -351,50 +379,57 @@ export default {
     }
   },
   mounted() {
-      this.Reload();
+    this.Reload();
   },
   methods: {
-    Reload(){
-      if(this.lecturerIDs != null){
-    axios.get(this.$store.state.settings.baseLink + "/l/lecturers/of/ids/" + this.lecturerIDs)
+    Reload() {
+      this.isLoading = true;
+      if (this.lecturerIDs != null) {
+        axios
+          .get(
+            this.$store.state.settings.baseLink +
+              "/l/lecturers/of/ids/" +
+              this.lecturerIDs
+          )
           .then(results => {
+            this.isLoading = false;
             this.lecturers = results.data;
-            if(this.lecturers.length == 1){
+            if (this.lecturers.length == 1) {
               this.isFullscreen = this.lecturers[0]._id;
             }
-            console.log(this.lecturers);
             // this.filteredLecturers = results.data;
           })
           .catch(err => {
+            this.isLoading = false;
             if (err.response != null && err.response.status == 512) {
               swal(err.response.data, "error");
             } else {
               swal("Unable to load lecturers", "Try again later", "error");
             }
           });
-      }else{
-      axios
-      .get(this.$store.state.settings.baseLink + "/l/lecturers/all")
-      .then(results => {
-        this.lecturers = results.data;
-        console.log(this.lecturers);
-        // this.filteredLecturers = results.data;
-      })
-      .catch(err => {
-        if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
-        } else {
-          swal("Unable to load lecturers", "Try again later", "error");
-        }
-      });
-    }
-    this.LoadModules();
+      } else {
+        axios
+          .get(this.$store.state.settings.baseLink + "/l/lecturers/all")
+          .then(results => {
+            this.isLoading = false;
+            this.lecturers = results.data;
+            // this.filteredLecturers = results.data;
+          })
+          .catch(err => {
+            this.isLoading = false;
+            if (err.response != null && err.response.status == 512) {
+              swal(err.response.data, "error");
+            } else {
+              swal("Unable to load lecturers", "Try again later", "error");
+            }
+          });
+      }
+      this.LoadModules();
     },
-    AddedNewLecturer(isAdded){
-      if(isAdded){
+    AddedNewLecturer(isAdded) {
+      if (isAdded) {
         this.Reload();
-      }else{
-
+      } else {
       }
     },
     AddNewModule(lecturer) {
@@ -404,6 +439,7 @@ export default {
         this.lecturerModule.modules = [null];
         this.lecturerModule.oldModules = null;
       } else if (lecturer == "submit") {
+        this.isLoading = true;
         var newModules = this.lecturerModule.modules.filter(
           s =>
             s != null &&
@@ -427,6 +463,7 @@ export default {
               }
             )
             .then(result => {
+              this.isLoading = false;
               var names = this.modules.filter(
                 m => newModules.filter(nm => nm == m._id).length > 0
               );
@@ -447,6 +484,7 @@ export default {
               this.AddNewModule(null);
             })
             .catch(err => {
+              this.isLoading = false;
               if (err.response != null && err.response.status == 512) {
                 swal(err.response.data, "error");
               } else {
@@ -492,9 +530,11 @@ export default {
       // this.items = _.unionWith(this.items, [this.options[0]], _.isEqual);
     },
     DeleteLecturer(lecturerID) {
+      this.isLoading = true;
       axios
         .post(this.$store.state.settings.baseLink + "/l/delete/" + lecturerID)
         .then(result => {
+          this.isLoading = false;
           var victim = this.lecturers.find(l => l._id == lecturerID);
           var index = this.lecturers.indexOf(victim);
           this.lecturers.splice(index, 1);
@@ -505,6 +545,7 @@ export default {
           );
         })
         .catch(err => {
+          this.isLoading = false;
           swal("An error has occurred", err.message, "error");
         });
     },
@@ -563,75 +604,8 @@ export default {
           }
         });
     },
-    SubmitLecturer() {
-      this.txtError = "";
-      if (this.lecturer.lastname.length < 2) {
-        this.txtError = "Please enter a valid lastname";
-      }
-
-      if (this.lecturer.firstname.length < 2) {
-        this.txtError = "Please enter a valid firstname";
-      }
-
-      if (this.lecturer.password != this.lecturer.confirmPassword) {
-        this.txtError = "Passwords do not match";
-      }
-
-      if (this.lecturer.password.length < 6) {
-        this.txtError =
-          "Please enter a valid password , passwords must be more than 6 charactors long";
-      }
-      if (this.lecturer.username.length < 2) {
-        this.txtError = "Please enter a valid username";
-      }
-
-      if (this.lecturer.gender.length < 2) {
-        this.txtError = "Please pick a valid gender";
-      }
-
-      if (this.lecturer.dob.length < 2) {
-        this.txtError = "Please pick a valid date of birth";
-      }
-
-      if (this.lecturer.idNumber < 6) {
-        this.txtError = "Please enter a valid id number";
-      }
-
-      if (this.lecturer.modules.filter(m => m != null).length <= 0) {
-        this.txtError = "Please select at least one module";
-      }
-
-      if (this.txtError.length > 2) return;
-
-      axios
-        .post(this.$store.state.settings.baseLink + "/a/add/lecturer", {
-          lecturer: this.lecturer
-        })
-        .then(results => {
-          this.lecturers = results.data;
-          this.lecturer = {
-            firstname: "",
-            lastname: "",
-            username: "",
-            password: "",
-            confirmPassword: "",
-            modules: [null],
-            idNumber: "",
-            gender: "",
-            dob: "",
-            isSouthAfrican: false
-          };
-          this.addingLecturers = false;
-        })
-        .catch(err => {
-          if (err.response != null && err.response.status == 512) {
-            this.txtError = err.response.data;
-          } else {
-            swal("Unable to submit the lecturer", err.message, "error");
-          }
-        });
-    },
     UpdateLecturer() {
+      this.isLoading = true;
       this.txtError = "";
       if (this.lecturer.lastname.length < 2) {
         this.txtError = "Please enter a valid lastname";
@@ -657,7 +631,10 @@ export default {
         this.txtError = "Please enter a valid id number";
       }
 
-      if (this.txtError.length > 2) return;
+      if (this.txtError.length > 2) {
+        this.isLoading = false;
+        return;
+      }
 
       axios
         .post(
@@ -669,6 +646,7 @@ export default {
           }
         )
         .then(results => {
+          this.isLoading = false;
           this.lecturers = results.data;
           this.lecturer = {
             firstname: "",
@@ -687,6 +665,7 @@ export default {
           swal("Profile successfully updated", "success");
         })
         .catch(err => {
+          this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {

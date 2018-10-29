@@ -22,10 +22,7 @@ const LectureNoteSchema = new mongoose.Schema({
     },
     description: String,
     file: Object,
-    type: {
-        type: Object,
-        default: null
-    },
+    type: String,
     date: {
         type: Date,
         default: Date.now

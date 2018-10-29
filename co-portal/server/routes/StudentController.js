@@ -3,6 +3,7 @@ var router = express.Router();
 import mongoose from "mongoose";
 
 import Student from "../models/Student";
+import Module from "../models/Module";
 import Questionaire from "../models/Questionaire";
 
 /*
@@ -42,9 +43,32 @@ router.get("/students/all", function (req, res) {
     });
 });
 
+router.get("/students/all/for/module/:moduleID", function (req, res) {
+  var moduleID = req.params.moduleID;
+  Module.findById(moduleID).then(m => {
+    if (m == null)
+      return res.status(512).send("Module does not exist");
+
+    Student.find({
+        "active": true,
+        "modules": moduleID
+      })
+      .populate(['modules'])
+      .then(students => {
+        if (students == null) res.send("Server error : Try again later");
+        res.json(students);
+      }).catch(err => {
+        return res.status(512).send("Server error : " + err.message);
+      });
+  }).catch(err => {
+    return res.status(512).send("Server error : " + err.message);
+  });
+
+});
+
 router.get("/students/of/ids/:studentIDs", function (req, res) {
   var studentIDs = req.params.studentIDs;
-  if(!Array.isArray(studentIDs)){
+  if (!Array.isArray(studentIDs)) {
     studentIDs = [studentIDs];
   }
   console.log(studentIDs);

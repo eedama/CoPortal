@@ -6,98 +6,99 @@
         </md-empty-state>
       </div>
       <div v-show="!done" class="col s12 center-align">
-          <div class="card row">          
-            <div class="card-header center-align z-depth-3 cardBar">
+        <div class="card row">
+          <div class="card-header center-align z-depth-3 cardBar">
             <h5 style="padding:20px">Adding a lecturer</h5>
           </div>
-            <div class="card-content">
-              <div class="row">
-                <div class="input-field col m4 offset-m1 s12 text-center">
-                  <input v-model="lecturer.firstname" id="Firstname" name="Firstname" type="text" />
-                  <label class="text-center" for="Firstname">Firstname</label>
-                </div>
-                <div class="input-field col m4 offset-m1 s12 text-center">
-                  <input v-model="lecturer.lastname" id="Lastname" name="Lastname" type="text" />
-                  <label class="text-center" for="Lastname">Lastname</label>
-                </div>
+          <div class="card-content">
+            <div class="row">
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="lecturer.firstname" id="Firstname" name="Firstname" type="text" />
+                <label class="text-center" for="Firstname">Firstname</label>
               </div>
-              <div class="row">
-                <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-                  <input v-model="lecturer.username" id="Username" name="Username" type="text" />
-                  <label class="text-center" for="Username">Username</label>
-                </div>
-              </div>
-              <div class="row" :key="m" v-for="(m,i) in lecturer.modules.length">
-                <div class="col s10">
-                  <md-field>
-                    <label :for="`modules-${i}`">Module {{ m }}</label>
-                    <md-select v-model="lecturer.modules[i]" :name="`modules-${i}`" :id="`modules-${i}`">
-                      <md-option :disabled="lecturer.modules.filter(lm => lm == module._id).length > 0" v-for="module in modules" :value="module._id" :key="module._id">{{ module.name }} ({{ module.code }})</md-option>
-                    </md-select>
-    
-                  </md-field>
-                </div>
-                <div class="col s2 bottom-align">
-                  <a v-on:click="lecturer.modules.push(null)" v-if="i == (lecturer.modules.length - 1) && lecturer.modules[i] != null" class="btn btn-floating waves-effect"><i class="material-icons">add</i></a>
-                  <a v-on:click="lecturer.modules.splice(i,1)" v-if="i != (lecturer.modules.length - 1)" class="btn btn-floating red waves-effect"><i class="material-icons">close</i></a>
-                </div>
-              </div>
-    
-              <div class="row">
-                <div class="col s12">
-                  <md-field>
-                    <label>ID Number</label>
-                    <md-input v-model="lecturer.idNumber" maxlength="13"></md-input>
-                  </md-field>
-                </div>
-              </div>
-    
-              <div class="row" v-show="lecturer.idNumber.length > 6">
-                <div class="row">
-                  <div class="col s12">
-                    <label>
-                                                {{ lecturer.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                                          </label>
-                  </div>
-                </div>
-                <div class="col s12">
-                  <md-field>
-                    <label for="Gender">Gender</label>
-                    <md-select v-model="lecturer.gender" name="Gender" id="Gender">
-                      <md-option disabled>Pick a gender</md-option>
-                      <md-option value="Male">Male</md-option>
-                      <md-option value="Female">Female</md-option>
-                    </md-select>
-                  </md-field>
-                </div>
-                <div class="col s12">
-                  <md-datepicker md-immediately v-model="lecturer.dob">
-                    <label>Date of birth</label>
-                  </md-datepicker>
-                </div>
-              </div>
-    
-              <div class="row">
-                <div class="input-field col m4 offset-m1 s12 text-center">
-                  <input v-model="lecturer.password" id="Password" name="Password" type="password" />
-                  <label class="text-center" for="Password">Password</label>
-                </div>
-                <div class="input-field col m4 offset-m1 s12 text-center">
-                  <input v-model="lecturer.confirmPassword" id="ConfirmPassword" name="ConfirmPassword" type="password" />
-                  <label class="text-center" for="ConfirmPassword">Confirm Password</label>
-                </div>
-              </div>
-              <div class="row" v-show="txtError.length > 0">
-                <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                  <label class="text-center red-text">{{ txtError }}</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                  <input v-on:click="SubmitLecturer()" type="submit" value="Submit lecturer" class="btn center-align tg-btn" />
-                </div>
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="lecturer.lastname" id="Lastname" name="Lastname" type="text" />
+                <label class="text-center" for="Lastname">Lastname</label>
               </div>
             </div>
+            <div class="row">
+              <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+                <input v-model="lecturer.username" id="Username" name="Username" type="text" />
+                <label class="text-center" for="Username">Username</label>
+              </div>
+            </div>
+            <div class="row" :key="m" v-for="(m,i) in lecturer.modules.length">
+              <div class="col s10">
+                <md-field>
+                  <label :for="`modules-${i}`">Module {{ m }}</label>
+                  <md-select v-model="lecturer.modules[i]" :name="`modules-${i}`" :id="`modules-${i}`">
+                    <md-option :disabled="lecturer.modules.filter(lm => lm == _module._id).length > 0" v-for="_module in modules" :value="_module._id" :key="_module._id">{{ _module.name }} ({{ _module.code }})</md-option>
+                  </md-select>
+  
+                </md-field>
+              </div>
+              <div class="col s2 bottom-align">
+                <a v-on:click="lecturer.modules.push(null)" v-if="i == (lecturer.modules.length - 1) && lecturer.modules[i] != null" class="btn btn-floating waves-effect"><i class="material-icons">add</i></a>
+                <a v-on:click="lecturer.modules.splice(i,1)" v-if="i != (lecturer.modules.length - 1)" class="btn btn-floating red waves-effect"><i class="material-icons">close</i></a>
+              </div>
+            </div>
+  
+            <div class="row">
+              <div class="col s12">
+                <md-field>
+                  <label>ID Number</label>
+                  <md-input v-model="lecturer.idNumber" maxlength="13"></md-input>
+                </md-field>
+              </div>
+            </div>
+  
+            <div class="row" v-show="lecturer.idNumber.length > 6">
+              <div class="row">
+                <div class="col s12">
+                  <label>
+                                                    {{ lecturer.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
+                                              </label>
+                </div>
+              </div>
+              <div class="col s12">
+                <md-field>
+                  <label for="Gender">Gender</label>
+                  <md-select v-model="lecturer.gender" name="Gender" id="Gender">
+                    <md-option disabled>Pick a gender</md-option>
+                    <md-option value="Male">Male</md-option>
+                    <md-option value="Female">Female</md-option>
+                  </md-select>
+                </md-field>
+              </div>
+              <div class="col s12">
+                <md-datepicker md-immediately v-model="lecturer.dob">
+                  <label>Date of birth</label>
+                </md-datepicker>
+              </div>
+            </div>
+  
+            <div class="row">
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="lecturer.password" id="Password" name="Password" type="password" />
+                <label class="text-center" for="Password">Password</label>
+              </div>
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="lecturer.confirmPassword" id="ConfirmPassword" name="ConfirmPassword" type="password" />
+                <label class="text-center" for="ConfirmPassword">Confirm Password</label>
+              </div>
+            </div>
+            <div class="row" v-show="txtError.length > 0">
+              <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                <label class="text-center red-text">{{ txtError }}</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                <input v-if="!isLoading" v-on:click="SubmitLecturer()" type="submit" value="Submit lecturer" class="btn center-align tg-btn" />
+                <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -129,7 +130,9 @@ export default {
         dob: "",
         isSouthAfrican: false
       },
-      modules: []
+      done: false,
+      modules: [],
+      isLoading: false
     };
   },
   watch: {
@@ -160,12 +163,15 @@ export default {
   },
   methods: {
     LoadModules() {
+      this.isLoading = true;
       axios
         .get(this.$store.state.settings.baseLink + "/m/modules/all")
         .then(results => {
+          this.isLoading = false;
           this.modules = results.data;
         })
         .catch(err => {
+          this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
             swal(err.response.data, "error");
           } else {
@@ -175,6 +181,8 @@ export default {
     },
     SubmitLecturer() {
       this.txtError = "";
+      this.isLoading = true;
+
       if (this.lecturer.lastname.length < 2) {
         this.txtError = "Please enter a valid lastname";
       }
@@ -211,23 +219,30 @@ export default {
         this.txtError = "Please select at least one module";
       }
 
-      if (this.txtError.length > 2) return;
+      if (this.txtError.length > 2) {
+        this.isLoading = false;
+        return;
+      }
 
       axios
         .post(this.$store.state.settings.baseLink + "/a/add/lecturer", {
           lecturer: this.lecturer
         })
         .then(results => {
-            this.done = true;
-            this.$emit('submitted', true);
+          this.isLoading = false;
+
+          this.done = true;
+          this.$emit("submitted", true);
         })
         .catch(err => {
+          this.isLoading = false;
+
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {
             swal("Unable to submit the lecturer", err.message, "error");
           }
-          this.$emit('submitted', false);
+          this.$emit("submitted", false);
         });
     }
   }
@@ -236,10 +251,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .cardBar {
-    background-color: black;
-    color: white;
-    width: 100%;
-  }
+.cardBar {
+  background-color: black;
+  color: white;
+  width: 100%;
+}
 </style>
 
