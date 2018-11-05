@@ -21,7 +21,6 @@ import store from '../store';
 import swal from "sweetalert";
 
 const router = new Router({
-  mode: 'history',
   routes: [{
       path: '/',
       name: 'Home',
