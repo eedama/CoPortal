@@ -80,21 +80,22 @@
           <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
         </div>
         <md-list class="md-triple-line col s12 center-align">
-          <md-list-item v-on:click="isAddingAnnouncements = true" style="margin-bottom:15px" class="hoverable col s12 m10 pointer white center-align waves-effect">
+          <div class="Scroll-first-four">
+          <md-list-item v-if="$store.state.user.type == 'LECTURER' || $store.state.user.type == 'ADMIN'" v-on:click="isAddingAnnouncements = true" style="margin-bottom:15px" class="hoverable col s12 m10 pointer white center-align waves-effect">
            <md-avatar>
               <md-icon>add</md-icon>
             </md-avatar>
   
-            <div class="md-list-item-text center-align">
+            <div  class="md-list-item-text center-align" >
               <span>Add new Announcement</span>
             </div>
           </md-list-item>
-          <md-list-item v-on:click="AnnouncementClick(announcement)" style="margin-bottom:15px" v-for="(announcement,i) in announcements" :key="i" class="hoverable col s12 m10 pointer white center-align waves-effect">
+          <md-list-item v-on:click="AnnouncementClick(announcement)" style="margin-bottom:15px;" v-for="(announcement,i) in announcements" :key="i" class="hoverable col s12 m10 pointer white center-align waves-effect">
             <md-avatar>
               <img src="https://placeimg.com/40/40/people/1" alt="People">
             </md-avatar>
   
-            <div class="md-list-item-text">
+            <div class="md-list-item-text" >
               <span>{{ announcement.lecturerId ?  announcement.lecturerId.lastname + " " + announcement.lecturerId.firstname : "Admin" }} &nbsp;&bull; {{ getMoment(announcement.date).fromNow() }}</span>
               <span>{{ announcement.title }}</span>
               <p>{{ announcement.message }}</p>
@@ -104,10 +105,11 @@
               <md-icon class="md-primary">thumb_up</md-icon>
             </md-button>
           </md-list-item>
+          </div>
         </md-list>
       </div>
-      <div class="col s12 m6 row">
-        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+      <div class="col s12 m6 row" style="margin-top:-6px;">
+        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center" >
           <md-card-header class="left">Portal</md-card-header>
         </div>
         <div v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)" :key="i" v-on:click="$router.push(option.link)" class="col s12 l8 pointer bigButton waves-effect">
@@ -155,6 +157,12 @@ export default {
       ],
       options: [
         {
+          text: "My profile card",
+          icon: "person",
+          link: "/test/list",
+          auth: ["STUDENT", "LECTURER", "ADMIN"]
+        },
+        {
           text: "Students",
           icon: "people",
           link: "/student/list",
@@ -171,13 +179,7 @@ export default {
           icon: "books",
           link: "/module/list",
           auth: ["ADMIN", "LECTURER", "STUDENT"]
-        },
-        {
-          text: "Test list",
-          icon: "file_copy",
-          link: "/test/list",
-          auth: ["STUDENT", "LECTURER", "ADMIN"]
-        },
+        }, 
         {
           text: "Marks",
           icon: "done_all",
@@ -185,7 +187,7 @@ export default {
           auth: ["STUDENT"]
         },
         {
-          text: "Mark sheet",
+          text: "Assessment results",
           icon: "done_all",
           link: "/marks/sheet",
           auth: ["LECTURER", "ADMIN"]
@@ -314,7 +316,15 @@ export default {
   -webkit-animation: ring 2s infinite;
   animation: ring 2s infinite;
 }
-
+.Scroll-first-four
+{
+  overflow: hidden;
+  overflow-y: scroll;
+  height:400px;
+}
+.Scroll-first-four::-webkit-scrollbar { 
+    display: none; 
+}
 @-webkit-keyframes ring {
   0% {
     -webkit-transform: rotate(35deg);
