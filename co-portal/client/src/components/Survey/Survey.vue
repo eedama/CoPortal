@@ -16,7 +16,7 @@
             </div>
             <div v-if="survey.Question == 'Province'" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
               <select class="black-text" v-model="survey.Answer">
-              <option value="None" disabled selected>Choose your province</option>
+              <option value="" disabled selected>Choose your province</option>
               <option class="grey" v-for="province in provinces" :key="province.code" :value="province.name">{{ province.name }}</option>
             </select>
             </div>
@@ -214,8 +214,6 @@ export default {
         }
         this.currentPage = 1;
       } else {
-        alert("We are uploading....");
-
         axios
           .post(this.$store.state.settings.baseLink + "/survey/submit", {
             user: this.Survey,
