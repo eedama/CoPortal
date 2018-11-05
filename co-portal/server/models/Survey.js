@@ -11,12 +11,12 @@ const SurveySchema = new mongoose.Schema({
             type: Schema.Types.ObjectId,
             ref: 'SurveyQuestions'
         },
-        Answer: String
+        Answer: String,
+        Answer2: String
     }],
     name: String,
     surname: String,
     email: String,
-    number: String,
     area: String,
     date: {
         type: Date,

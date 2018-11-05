@@ -28,13 +28,17 @@ router.get("/get/all/surveyquestions", function (req, res) {
 });
 
 router.post("/submit", function (req, res) {
-  var name = req.body.name;
-  var surname = req.body.surname;
+  var user = req.body.user;
+  var surveyAnswers = req.body.survey;
 
   var survey = new Survey();
   survey._id = mongoose.Types.ObjectId();
-  survey.name = name;
-  survey.surname = surname;
+  survey.surveyAnswers = surveyAnswers;
+
+  survey.name = user[0].Answer;
+  survey.surname = user[1].Answer;
+  survey.email = user[2].Answer;
+  survey.area = user[3].Answer;
 
   survey.save((err) => {
     if (err) return res.status(512).send(err);
