@@ -11,14 +11,14 @@
         <div class="col s12">
           <div class="row" v-for="(survey,i) in Survey" :key="i">
             <div v-if="survey.Question != 'Province'" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-              <input v-model="survey.Answer" type="text" />
-              <label class="text-center">Please enter your {{ survey.Question }} <span class="red-text">{{ survey.Optional ? '' : ' *' }}</span></label>
+              <input :id="`survey-${i}`" v-model="survey.Answer" type="text" />
+              <label :for="`survey-${i}`" class="text-center">Enter your {{ survey.Question }} <span class="red-text">{{ survey.Optional ? '' : ' *' }}</span></label>
             </div>
             <div v-if="survey.Question == 'Province'" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
               <select class="black-text" v-model="survey.Answer">
-        <option :value="null" disabled selected>Choose your province</option>
-        <option class="grey" v-for="province in provinces" :key="province.code" :value="province.name">{{ province.name }}</option>
-      </select>
+              <option value="None" disabled selected>Choose your province</option>
+              <option class="grey" v-for="province in provinces" :key="province.code" :value="province.name">{{ province.name }}</option>
+            </select>
             </div>
           </div>
         </div>
