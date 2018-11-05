@@ -13,6 +13,7 @@ const SurveyQuestionsSchema = new mongoose.Schema({
         default: 'UNKNOWN'
     },
     options: Array,
+    optional: Object,
     maxLength: {
         type: Number,
         default: 100
