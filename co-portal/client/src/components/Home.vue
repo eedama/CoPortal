@@ -159,7 +159,7 @@ export default {
         {
           text: "My profile card",
           icon: "person",
-          link: "/test/list",
+          link: "/",
           auth: ["STUDENT", "LECTURER", "ADMIN"]
         },
         {
@@ -179,7 +179,7 @@ export default {
           icon: "books",
           link: "/module/list",
           auth: ["ADMIN", "LECTURER", "STUDENT"]
-        }, 
+        },
         {
           text: "Marks",
           icon: "done_all",
@@ -211,7 +211,7 @@ export default {
         .then(results => {
           this.isLoading = false;
           console.log(results.data);
-          this.announcements = results.data;
+          this.announcements = results.data.reverse();
         })
         .catch(err => {
           this.isLoading = false;
@@ -310,20 +310,22 @@ export default {
   background-position: top;
   background-repeat: no-repeat;
   background-size: fit;
+
+  max-width: 1410px;
+  margin: auto;
 }
 
 .notificationRing {
   -webkit-animation: ring 2s infinite;
   animation: ring 2s infinite;
 }
-.Scroll-first-four
-{
+.Scroll-first-four {
   overflow: hidden;
   overflow-y: scroll;
-  height:400px;
+  height: 400px;
 }
-.Scroll-first-four::-webkit-scrollbar { 
-    display: none; 
+.Scroll-first-four::-webkit-scrollbar {
+  display: none;
 }
 @-webkit-keyframes ring {
   0% {

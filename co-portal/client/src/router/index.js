@@ -12,7 +12,7 @@ import LecturerList from '@/components/Lecturer/LecturerList'
 import ModuleView from '@/components/Module/ModuleView'
 import AllMarks from '@/components/Marks/AllMarks'
 import MarkSheet from '@/components/Marks/MarkSheet'
-
+import Survey from '@/components/Survey/Survey'
 import AddStudentTemp from '@/components/admin/AddStudentTemp'
 
 Vue.use(Router)
@@ -168,6 +168,15 @@ const router = new Router({
       },
       props: true,
       component: MarkSheet
+    }, {
+      path: '/survey',
+      name: 'Survey',
+      meta: {
+        authLevel: null,
+        showNav: false
+      },
+      props: true,
+      component: Survey
     }
     /**
      * Marks routes END
