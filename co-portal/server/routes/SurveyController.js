@@ -30,13 +30,11 @@ router.get("/get/all/surveyquestions", function (req, res) {
 router.post("/submit", function (req, res) {
   var name = req.body.name;
   var surname = req.body.surname;
-  var age = req.body.age;
 
   var survey = new Survey();
   survey._id = mongoose.Types.ObjectId();
   survey.name = name;
   survey.surname = surname;
-  survey.age = age;
 
   survey.save((err) => {
     if (err) return res.status(512).send(err);
