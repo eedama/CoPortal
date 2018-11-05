@@ -6,6 +6,13 @@ const SurveySchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         default: mongoose.Types.ObjectId()
     },
+    surveyAnswers: [{
+        QuestionId: {
+            type: Schema.Types.ObjectId,
+            ref: 'SurveyQuestions'
+        },
+        Answer: String
+    }],
     name: String,
     surname: String,
     email: String,
