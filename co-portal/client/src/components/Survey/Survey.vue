@@ -16,11 +16,14 @@
             </div>
             <div v-if="survey.Question == 'Province'" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
               <select class="black-text" v-model="survey.Answer">
-              <option value="" disabled selected>Choose your province</option>
-              <option class="grey" v-for="province in provinces" :key="province.code" :value="province.name">{{ province.name }}</option>
-            </select>
+                <option value="" disabled selected>Choose your province</option>
+                <option class="grey" v-for="province in provinces" :key="province.code" :value="province.name">{{ province.name }}</option>
+              </select>
             </div>
           </div>
+        </div>
+        <div class="col m8 offset-m2 s12">
+          <p class="center-align black-text"><strong>NB</strong> : If you can not see an option to select your province please refresh this page.<br /><em>Sorry for the inconvenience</em></p>
         </div>
         <div class="col m8 offset-m2 s12">
           <p class="center-align red-text" v-show="txtError.length > 2">{{ txtError }}</p>
@@ -52,23 +55,23 @@
               <div v-if="question.type != 'STRING' && question.options != null">
                 <h6 class="pointer" v-for="(option,d) in question.options" :key="d">
                   <label>
-                              <input v-model="surveyAnswers[i].Answer" :value="option" class="with-gap" :name="question._id" :type="(question.type == 'STRING')  ? 'text': 'radio'" />
-                                <span >{{ option }}</span>
-                              </label>
+                                <input v-model="surveyAnswers[i].Answer" :value="option" class="with-gap" :name="question._id" :type="(question.type == 'STRING')  ? 'text': 'radio'" />
+                                  <span >{{ option }}</span>
+                                </label>
                 </h6>
               </div>
               <div v-else>
                 <h6 class="pointer">
                   <label>
-                               <input v-model="surveyAnswers[i].Answer"  placeholder="Enter Response" class="with-gap center-align"  :type="(question.type == 'STRING')  ? 'text': 'radio'" />
-                            </label>
+                                 <input v-model="surveyAnswers[i].Answer"  placeholder="Enter Response" class="with-gap center-align"  :type="(question.type == 'STRING')  ? 'text': 'radio'" />
+                              </label>
                 </h6>
               </div>
               <div v-if="question.optional && question.optional.answer == surveyAnswers[i].Answer">
                 <h6 class="pointer">
                   <label> 
-                               <input v-model="surveyAnswers[i].Answer2"   :placeholder="question.optional.question" class="with-gap center-align"  type="text" />
-                            </label>
+                                 <input v-model="surveyAnswers[i].Answer2"   :placeholder="question.optional.question" class="with-gap center-align"  type="text" />
+                              </label>
                 </h6>
               </div>
             </form>
@@ -91,155 +94,150 @@
 </template>
 
 <script>
-import swal from "sweetalert";
-const axios = require("axios");
-
-export default {
-  name: "Test",
-  watch: {
-    surveyAnswers(newVal, oldVal) {
-      this.$forceUpdate();
-    }
-  },
-  data() {
-    return {
-      txtError: "",
-      Questionare: [],
-      surveyAnswers: [
-        {
+  import swal from "sweetalert";
+  const axios = require("axios");
+  
+  export default {
+    name: "Test",
+    watch: {
+      surveyAnswers(newVal, oldVal) {
+        this.$forceUpdate();
+      }
+    },
+    data() {
+      return {
+        txtError: "",
+        Questionare: [],
+        surveyAnswers: [{
           QuestionId: String,
           Answer: String,
           Answer2: String
-        }
-      ],
-      Survey: [
-        {
-          Question: "Name",
-          Answer: null
-        },
-        {
-          Question: "Surname",
-          Answer: null
-        },
-        {
-          Question: "Email",
-          Answer: null
-        },
-        {
-          Question: "Province",
-          Answer: null
-        }
-      ],
-      currentPage: 0,
-      provinces: [
-        {
-          name: "Eastern Cape",
-          code: "ZA-EC"
-        },
-        {
-          name: "Free State",
-          code: "ZA-FS"
-        },
-        {
-          name: "Gauteng",
-          code: "ZA-GT"
-        },
-        {
-          name: "KwaZulu-Natal",
-          code: "ZA-NL"
-        },
-        {
-          name: "Limpopo",
-          code: "ZA-LP"
-        },
-        {
-          name: "Mpumalanga",
-          code: "ZA-MP"
-        },
-        {
-          name: "North West",
-          code: "ZA-NW"
-        },
-        {
-          name: "Northern Cape",
-          code: "ZA-NC"
-        },
-        {
-          name: "Western Cape",
-          code: "ZA-WC"
-        }
-      ]
-    };
-  },
-  mounted() {
-    axios
-      .get(
-        this.$store.state.settings.baseLink + "/survey/get/all/surveyquestions"
-      )
-      .then(results => {
-        this.Questionare = results.data;
-        this.surveyAnswers = [];
-        this.Questionare.forEach(question => {
-          this.surveyAnswers.push({
-            QuestionId: question._id,
+        }],
+        Survey: [{
+            Question: "Name",
             Answer: null
+          },
+          {
+            Question: "Surname",
+            Answer: null
+          },
+          {
+            Question: "Email",
+            Answer: null
+          },
+          {
+            Question: "Province",
+            Answer: null
+          }
+        ],
+        currentPage: 0,
+        provinces: [{
+            name: "Eastern Cape",
+            code: "ZA-EC"
+          },
+          {
+            name: "Free State",
+            code: "ZA-FS"
+          },
+          {
+            name: "Gauteng",
+            code: "ZA-GT"
+          },
+          {
+            name: "KwaZulu-Natal",
+            code: "ZA-NL"
+          },
+          {
+            name: "Limpopo",
+            code: "ZA-LP"
+          },
+          {
+            name: "Mpumalanga",
+            code: "ZA-MP"
+          },
+          {
+            name: "North West",
+            code: "ZA-NW"
+          },
+          {
+            name: "Northern Cape",
+            code: "ZA-NC"
+          },
+          {
+            name: "Western Cape",
+            code: "ZA-WC"
+          }
+        ]
+      };
+    },
+    mounted() {
+      axios
+        .get(
+          this.$store.state.settings.baseLink + "/survey/get/all/surveyquestions"
+        )
+        .then(results => {
+          this.Questionare = results.data;
+          this.surveyAnswers = [];
+          this.Questionare.forEach(question => {
+            this.surveyAnswers.push({
+              QuestionId: question._id,
+              Answer: null
+            });
           });
-        });
-      })
-
-      .catch(err => {
-        if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
-        } else {
-          swal("Unable to load Survey", "Try again later", "error");
-        }
-      });
-  },
-  methods: {
-    GoToNextPage(final) {
-      this.txtError = "";
-      if (!final) {
-        var arr = this.Survey.reverse();
-        arr.forEach(survey => {
-          if (
-            !survey.Optional &&
-            (survey.Answer == null || survey.Answer.length < 2)
-          ) {
-            this.txtError = "Please fill in  your " + survey.Question;
+        })
+  
+        .catch(err => {
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal("Unable to load Survey", "Try again later", "error");
           }
         });
-        var arr = this.Survey.reverse();
-        if (this.txtError.length > 2) {
-          return;
-        }
-        this.currentPage = 1;
-      } else {
-        axios
-          .post(this.$store.state.settings.baseLink + "/survey/submit", {
-            user: this.Survey,
-            survey: this.surveyAnswers
-          })
-          .then(results => {
-            swal("Thank you!", "We got your feedback!", "success").then(v => {
-              this.$router.push("/");
-            });
-          })
-          .catch(err => {
-            if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "error");
-            } else {
-              swal("Unable to submit your Survey", "Try again later", "error");
+    },
+    methods: {
+      GoToNextPage(final) {
+        this.txtError = "";
+        if (!final) {
+          var arr = this.Survey.reverse();
+          arr.forEach(survey => {
+            if (!survey.Optional &&
+              (survey.Answer == null || survey.Answer.length < 2)
+            ) {
+              this.txtError = "Please fill in  your " + survey.Question;
             }
           });
+          var arr = this.Survey.reverse();
+          if (this.txtError.length > 2) {
+            return;
+          }
+          this.currentPage = 1;
+        } else {
+          axios
+            .post(this.$store.state.settings.baseLink + "/survey/submit", {
+              user: this.Survey,
+              survey: this.surveyAnswers
+            })
+            .then(results => {
+              swal("Thank you!", "We got your feedback!", "success").then(v => {
+                this.$router.push("/");
+              });
+            })
+            .catch(err => {
+              if (err.response != null && err.response.status == 512) {
+                swal(err.response.data, "error");
+              } else {
+                swal("Unable to submit your Survey", "Try again later", "error");
+              }
+            });
+        }
       }
     }
-  }
-};
+  };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.md-select-menu {
-  width: 100%;
-}
+  .md-select-menu {
+    width: 100%;
+  }
 </style>
