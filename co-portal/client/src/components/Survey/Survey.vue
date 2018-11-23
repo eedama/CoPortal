@@ -1,6 +1,21 @@
 <template>
   <div>
-     <div class="row" v-if="currentPage == -1">
+    <md-dialog class="card" style="position:grid;place-items:center" :md-active.sync="pickProvince">
+      <md-card-header-text class="center-align">
+        <div class="md-subheader center-align">Please pick your province</div>
+      </md-card-header-text>
+      <md-content class="row">
+        <md-list class="md-double-line">
+          <md-list-item v-for="province in provinces" :key="province.code" v-on:click="PickProvince(province.name)" class="waves-effect">
+            <md-icon class="md-primary">map</md-icon>
+            <div class="md-list-item-text">
+              <span>{{ province.name }}</span>
+            </div>
+          </md-list-item>
+        </md-list>
+      </md-content>
+    </md-dialog>
+    <div class="row" v-if="currentPage == -1">
       <div class="col s10 offset-s1 m8 offset-m2 row card-panel">
         <div class="col s12">
           <div class="card-image col l8 offset-l2 m6 offset-m3 s12">
@@ -14,10 +29,10 @@
             </div>
           </div>
           <div class="row">
-          <div v-for="(feature,i) in features" :key="i" class="col s8 offset-s2 m6 offset-m3 text-center card-panel hoverable pointer waves-effect">
-            <p>{{ i + 1 }}. {{ feature }}</p>
+            <div v-for="(feature,i) in features" :key="i" class="col s8 offset-s2 m6 offset-m3 text-center card-panel hoverable pointer waves-effect">
+              <p>{{ i + 1 }}. {{ feature }}</p>
+            </div>
           </div>
-         </div>
         </div>
         <div class="row">
           <div class="col s12 center-align">
@@ -38,21 +53,21 @@
           <div class="card-image col l8 offset-l2 m6 offset-m3 s12">
             <img class="img-responsive" src="static/img/coPortalLogo.jpg">
           </div>
-            <md-button v-on:click="currentPage = -1" class="md-fab">
-              <md-icon>close</md-icon>
-            </md-button>
+          <md-button v-on:click="currentPage = -1" class="md-fab">
+            <md-icon>close</md-icon>
+          </md-button>
         </div>
         <div class="col s12">
           <div class="row" v-for="(survey,i) in Survey" :key="i">
-            <div v-if="survey.Question != 'Province'" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+            <div v-show="survey.Question != 'Province'" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
               <input :id="`survey-${i}`" v-model="survey.Answer" type="text" />
               <label :for="`survey-${i}`" class="text-center">Enter your {{ survey.Question }} <span class="red-text">{{ survey.Optional ? '' : ' *' }}</span></label>
             </div>
-            <div v-if="survey.Question == 'Province'" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-              <select class="black-text" v-model="survey.Answer">
-              <option value="" disabled selected>Choose your province</option>
-              <option class="grey" v-for="province in provinces" :key="province.code" :value="province.name">{{ province.name }}</option>
-            </select>
+            <div v-on:click="pickProvince = true" v-show="survey.Question == 'Province'" class="col s8 waves-effect offset-s2 m6 offset-m3 align-center pointer">
+              <div class="md-list-item-text black-text align-center">
+                <span>{{ (selectedProvince.length == 0) ? 'Tap to select a province' : 'Tap to change your province' }}</span>
+                <label id="survey-22">{{ selectedProvince }}</label>
+              </div>
             </div>
           </div>
         </div>
@@ -75,6 +90,9 @@
           <div class="card-image col l8 offset-l2 m6 offset-m3 s12">
             <img class="img-responsive" src="static/img/coPortalLogo.jpg">
           </div>
+          <md-button v-on:click="currentPage = -1" class="md-fab">
+            <md-icon>close</md-icon>
+          </md-button>
         </div>
   
         <div class="col s10 offset-s1 z-depth-1 row" v-if="question" v-for="(question,i) in Questionare" :key="i">
@@ -86,23 +104,23 @@
               <div v-if="question.type != 'STRING' && question.options != null">
                 <h6 class="pointer" v-for="(option,d) in question.options" :key="d">
                   <label>
-                              <input v-model="surveyAnswers[i].Answer" :value="option" class="with-gap" :name="question._id" :type="(question.type == 'STRING')  ? 'text': 'radio'" />
-                                <span >{{ option }}</span>
-                              </label>
+                                                  <input v-model="surveyAnswers[i].Answer" :value="option" class="with-gap" :name="question._id" :type="(question.type == 'STRING')  ? 'text': 'radio'" />
+                                                    <span >{{ option }}</span>
+                                                  </label>
                 </h6>
               </div>
               <div v-else>
                 <h6 class="pointer">
                   <label>
-                               <input v-model="surveyAnswers[i].Answer"  placeholder="Enter Response" class="with-gap center-align"  :type="(question.type == 'STRING')  ? 'text': 'radio'" />
-                            </label>
+                                                   <input v-model="surveyAnswers[i].Answer"  placeholder="Enter Response" class="with-gap center-align"  :type="(question.type == 'STRING')  ? 'text': 'radio'" />
+                                                </label>
                 </h6>
               </div>
               <div v-if="question.optional && question.optional.answer == surveyAnswers[i].Answer">
                 <h6 class="pointer">
                   <label> 
-                               <input v-model="surveyAnswers[i].Answer2"   :placeholder="question.optional.question" class="with-gap center-align"  type="text" />
-                            </label>
+                                                   <input v-model="surveyAnswers[i].Answer2"   :placeholder="question.optional.question" class="with-gap center-align"  type="text" />
+                                                </label>
                 </h6>
               </div>
             </form>
@@ -137,7 +155,8 @@ export default {
   },
   data() {
     return {
-      features:[
+      pickProvince: false,
+      features: [
         "Serves as a communication tool between a teacher, parent and a learner",
         "Allows a student to write an online assessment and the system marks the assessment and gives results to both students and parents",
         "Allows a teacher to send out previous questions papers or any study material to a student",
@@ -172,6 +191,7 @@ export default {
         }
       ],
       currentPage: -1,
+      selectedProvince: "",
       provinces: [
         {
           name: "Eastern Cape",
@@ -237,13 +257,20 @@ export default {
       });
   },
   methods: {
+    PickProvince(province) {
+      this.selectedProvince = province;
+      this.pickProvince = false;
+    },
     GoToNextPage(final) {
       this.txtError = "";
-      if(this.currentPage == -1){
+      if (this.currentPage == -1) {
         this.currentPage = 0;
-      }else if (!final) {
+      } else if (!final) {
         var arr = this.Survey.reverse();
         arr.forEach(survey => {
+          if (survey.Question == "Province") {
+            survey.Answer = this.selectedProvince;
+          }
           if (
             !survey.Optional &&
             (survey.Answer == null || survey.Answer.length < 2)
