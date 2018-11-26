@@ -52,7 +52,7 @@
     </md-dialog>
 
     <div class="row">
-      <div class="col s6 offset-s3 center-align">
+      <div class="col s6 offset-s3 m8 offset-m2 center-align">
         <h5 class="center-align">
           <vue-typer v-if="!$store.state.user.isLoggedIn" class="center-align" :text='titleText' erase-style='backspace'></vue-typer>
           <span v-if="$store.state.user.isLoggedIn">Welcome back <a class="pointer waves-effect">{{ $store.state.user.username }}</a></span>
@@ -71,7 +71,7 @@
       </div>
     </div>
     <div v-if="$store.state.user.isLoggedIn" class="row">
-      <div class="col s12 m6">
+      <div class="col s12 m6 xl4 push-xl2">
   
         <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
           <md-card-header class="left">Annnouncements</md-card-header >
@@ -108,7 +108,7 @@
           </div>
         </md-list>
       </div>
-      <div class="col s12 m6 row" style="margin-top:-6px;">
+      <div class="col s12 m6 xl4 push-xl2 row" style="margin-top:-6px;">
         <div class="col s8 offset-s2 m8 offset-m2 center-align text-center" >
           <md-card-header class="left">Portal</md-card-header>
         </div>
@@ -307,11 +307,11 @@ export default {
   height: 200vh;
   padding-top: 200px;
   /* Center and scale the image nicely */
-  background-position: top;
+  background-position:center;
   background-repeat: no-repeat;
-  background-size: fit;
+  background-size: cover;
 
-  max-width: 1410px;
+  width:auto;
   margin: auto;
 }
 
