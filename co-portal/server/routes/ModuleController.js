@@ -90,11 +90,13 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
       }
     }
   }).then(markSheet => {
-    markSheet = markSheet.map(m => {
-      m.studentMarks = m.studentMarks.filter(sm => sm.studentID == mongoose.Types.ObjectId(userID))[0];
-      return m;
+    var studentMarks = [];
+    markSheet.forEach(m => {
+      let obj = m;
+      obj.studentMarks = m.studentMarks.filter(sm => sm.studentID == mongoose.Types.ObjectId(userID))[0];
+      studentMarks.push(obj);
     });
-    return res.json(markSheet);
+    return res.json(studentMarks);
   }).catch(err => {
     return res.status(512).send("Server error : " + err.message);
   });
