@@ -90,14 +90,12 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
       }
     }
   }).then(markSheet => {
-    var studentMarks = [];
-    markSheet.forEach(m => {
-      var obj = m;
-      obj.mark = 10;
-      obj.studentMarks = undefined;
-      studentMarks.push(obj);
+    markSheet.map(m => {
+      m.mark = m.studentMarks.filter(sm => sm.studentID == userID)[0];
+      m.studentMarks = undefined;
+      return m;
     });
-    return res.json(studentMarks);
+    return res.json(markSheet);
   }).catch(err => {
     return res.status(512).send("Server error : " + err.message);
   });
