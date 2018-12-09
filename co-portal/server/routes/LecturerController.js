@@ -325,6 +325,7 @@ router.post("/sheet/add", function (req, res) {
     _id: mongoose.Types.ObjectId(),
     id: req.body.markSheet.id,
     title: req.body.markSheet.title,
+    total: req.body.markSheet.total,
     type: req.body.markSheet.type.toUpperCase(),
     date: req.body.markSheet.date
   });

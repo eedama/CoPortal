@@ -271,6 +271,7 @@ export default {
             lecturerID: this.$store.state.user.id,
             moduleID: this.moduleID,
             title: this.title,
+            total: this.questions.length,
             id: results.data._id,
             type: "ONLINETEST"
           };

@@ -94,6 +94,7 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
     markSheet.forEach(m => {
       let obj = m;
       obj.studentMarks = m.studentMarks.filter(sm => sm.studentID == userID)[0];
+      obj.mark = obj.studentMarks[0].mark;
       studentMarks.push(obj);
     });
     return res.json(studentMarks);
