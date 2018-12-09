@@ -90,13 +90,13 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
       }
     }
   }).then(markSheet => {
-    markSheet.map(m => {
+    var mapped = markSheet.map(m => {
       var obj = m;
       obj.mark = m.studentMarks.filter(sm => sm.studentID == userID)[0];
       obj.studentMarks = undefined;
       return obj;
     });
-    return res.json(markSheet);
+    return res.json(mapped);
   }).catch(err => {
     return res.status(512).send("Server error : " + err.message);
   });
