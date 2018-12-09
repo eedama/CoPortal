@@ -10,6 +10,7 @@ import Admin from "../models/Admin";
 import Lecturer from "../models/Lecturer";
 import Student from "../models/Student";
 import Solution from "../models/Solution";
+import MarkSheet from "../models/MarkSheet";
 
 /*
   TODO : Add notification (done)
