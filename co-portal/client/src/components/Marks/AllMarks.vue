@@ -230,7 +230,7 @@ export default {
         axios
           .get(
             this.$store.state.settings.baseLink +
-              "/m/modules/marksheet/for/" +
+              "/m/marksheet/for/" +
               this.$store.state.user.id +
               "/moduleID/" +
               selectedModule._id

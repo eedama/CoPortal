@@ -75,6 +75,14 @@ router.get("/modules/all/for/:userID/:userType", function (req, res) {
     });
 });
 
+
+router.get("/marksheet/for/:userID/moduleID/:moduleID", async function (req, res) {
+  var userID = req.params.userID;
+  var moduleID = req.params.moduleID;
+
+  return await Module.findById(moduleID);
+});
+
 router.get("/get/module/:moduleId", function (req, res) {
   var moduleId = req.params.moduleId;
   Module.findById(moduleId)
