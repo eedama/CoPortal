@@ -76,11 +76,18 @@ router.get("/modules/all/for/:userID/:userType", function (req, res) {
 });
 
 
-router.get("/marksheet/for/:userID/moduleID/:moduleID", async function (req, res) {
+router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
   var userID = req.params.userID;
   var moduleID = req.params.moduleID;
 
-  return res.json(await Module.findById(moduleID));
+  MarkSheet.find({
+    moduleID,
+    'studentMarks.studentID': userID
+  }).then(markSheet => {
+    return res.json(markSheet);
+  }).catch(err => {
+    return res.status(512).send("Server error : " + err.message);
+  });
 });
 
 router.get("/get/module/:moduleId", function (req, res) {
