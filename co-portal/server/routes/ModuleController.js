@@ -92,6 +92,7 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
   }).then(markSheet => {
     markSheet = markSheet.map(m => {
       m.studentMarks = m.studentMarks.filter(sm => sm.studentID == mongoose.Types.ObjectId(userID))[0];
+      return m;
     });
     return res.json(markSheet);
   }).catch(err => {
