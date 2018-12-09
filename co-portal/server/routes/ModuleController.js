@@ -83,7 +83,11 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
 
   MarkSheet.find({
     moduleID,
-    'studentMarks.studentID': userID
+    studentMarks: {
+      $elemMatch: {
+        studentID: userID
+      }
+    }
   }).then(markSheet => {
     return res.json(markSheet);
   }).catch(err => {
