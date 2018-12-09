@@ -85,7 +85,7 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
     moduleID,
     studentMarks: {
       $elemMatch: {
-        studentID: userID
+        studentID: mongoose.Types.ObjectId(userID)
       }
     }
   }).then(markSheet => {
