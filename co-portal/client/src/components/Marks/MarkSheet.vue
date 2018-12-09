@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="row">
-      <div v-show="!printing" class="col s2 m3 row">
+      <div v-show="!printing" class="col s12 m3 row">
         <div class="col s12 center">
           <md-subheader><label class="markValue">Modules</label></md-subheader>
         </div>
@@ -26,7 +26,7 @@
           </div>
         </div>
       </div>
-      <div :class="{'s12 m12':printing}" class="col s10 m9 row center-align">
+      <div :class="{'s12 m12':printing}" class="col s12 m9 row center-align">
         <md-card class="white col s12 m10 offset-m1 center">
           <md-card-header>
             <md-card-header-text>
