@@ -28,7 +28,7 @@
           <div class="hoverable card-panel" :class="{'black':selectedModuleIndex==i}">
             <h6 class="center-align">
               <span>{{ module.name }} 
-                                <br /><label class="center-align">{{ module.code }}</label></span></h6>
+                                      <br /><label class="center-align">{{ module.code }}</label></span></h6>
           </div>
         </div>
       </div>
@@ -51,79 +51,88 @@
             </md-menu>
           </md-card-header>
   
-          <md-card-expand v-for="(marksheet,i) in marks" :key="i">
-            <md-card-content>
+          <md-card-expand>
+            <md-card-content v-show="!currentModule.marks">
+              <div class="row">
+                <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+                  <ball-pulse-loader v-if="!currentModule.marks" color="#000000" size="20px"></ball-pulse-loader>
+                </div>
+              </div>
+            </md-card-content>
+            <md-card-content v-if="currentModule.marks">
               <div class="row">
                 <md-list class="col s12 l4 md-double-line" style="border-right:3px solid #eeeeee">
-                  <md-subheader><label class="markValue">Tests and Practicals</label></md-subheader>
-                  <md-list-item class="pointer  waves-effect" style="border-bottom:2px solid #eeeeee" v-for="k in 3" :key="k">
+                  <md-subheader class="testHeading">
+                    <h6>Tests and Practicals</h6>
+                  </md-subheader>
+                  <md-list-item class="pointer  waves-effect" v-for="(marksheet,k) in currentModule.marks.PRACTICALTEST" :key="k">
                     <div class="md-list-item-text">
-                      <span>Practical test {{k}}</span>
-                      <label class="md-primary"><span class="markValue">90 /</span> <span>100</span></label>
+                      <span>{{ marksheet.title }}</span>
+                      <label class="md-primary"> {{ getMoment(marksheet.date).format('DD/MM/YYYY') }}</label>
                     </div>
                     <div class="md-list-action">
-                      <label class="md-primary"> 03/09/2018</label>
+                      <label class="md-primary"><span class="markValue">{{ marksheet.mark }} /</span> <span>{{ marksheet.total }}</span></label>
                     </div>
                   </md-list-item>
-                  <md-list-item>
+                  <md-list-item v-if="currentModule.marks.PRACTICALTEST && currentModule.marks.PRACTICALTEST.length > 0">
                     <div class="md-list-item-text">
                       <label>Average</label>
                     </div>
                     <div class="md-list-action">
-                      <label class="md-primary"><span class="markValue">70 /</span> <span>100</span></label>
+                      <label class="md-primary"><span class="markValue">{{ currentModule.marks.PRACTICALTEST.map(v => v.mark).reduce((a, b) => a + b, 0) / currentModule.marks.PRACTICALTEST.length }}</span></label>
                     </div>
                   </md-list-item>
                 </md-list>
                 <md-list class="col s12 l4 md-double-line" style="border-right:3px solid #eeeeee">
-                  <md-subheader><label class="markValue">Class tests and Homeworks</label></md-subheader>
-                  <md-list-item class="pointer  waves-effect" style="border-bottom:2px solid #eeeeee" v-for="k in 3" :key="k">
+                  <md-subheader class="testHeading">
+                    <h6>Class tests and Homeworks</h6>
+                  </md-subheader>
+                  <md-list-item class="pointer  waves-effect" v-for="(marksheet,k) in currentModule.marks.THEORYTEST" :key="k">
                     <div class="md-list-item-text">
-                      <span>Class test {{ k }}</span>
-                      <label class="md-primary"><span class="markValue">90 /</span> <span>100</span></label>
+                      <span>{{ marksheet.title }}</span>
+                      <label class="md-primary"> {{ getMoment(marksheet.date).format('DD/MM/YYYY') }}</label>
                     </div>
                     <div class="md-list-action">
-                      <label class="md-primary"> 03/09/2018</label>
+                      <label class="md-primary"><span class="markValue">{{ marksheet.mark }} /</span> <span>{{ marksheet.total }}</span></label>
                     </div>
                   </md-list-item>
-                  <md-list-item>
+                  <md-list-item v-if="currentModule.marks.THEORYTEST && currentModule.marks.THEORYTEST.length > 0">
                     <div class="md-list-item-text">
                       <label>Average</label>
                     </div>
                     <div class="md-list-action">
-                      <label class="md-primary"><span class="markValue">70 /</span> <span>100</span></label>
+                      <label class="md-primary"><span class="markValue">{{ currentModule.marks.THEORYTEST.map(v => v.mark).reduce((a, b) => a + b, 0) / currentModule.marks.THEORYTEST.length }}</span></label>
                     </div>
                   </md-list-item>
                 </md-list>
                 <md-list class="col s12 l4 md-double-line">
-                  <md-subheader><label class="markValue">Online tests and assignments</label></md-subheader>
-                  <md-list-item class="pointer  waves-effect" style="border-bottom:2px solid #eeeeee" v-for="k in 3" :key="k">
+                  <md-subheader class="testHeading">
+                    <h6>Online tests and assignments</h6>
+                  </md-subheader>
+                  <md-list-item class="pointer  waves-effect" v-for="(marksheet,k) in currentModule.marks.ONLINETEST" :key="k">
                     <div class="md-list-item-text">
-                      <span>Life test</span>
-                      <label class="md-primary"><span class="markValue">90 /</span> <span>100</span></label>
+                      <span>{{ marksheet.title }}</span>
+                      <label class="md-primary"> {{ getMoment(marksheet.date).format('DD/MM/YYYY') }}</label>
                     </div>
                     <div class="md-list-action">
-                      <label class="md-primary"> 03/09/2018</label>
+                      <label class="md-primary"><span class="markValue">{{ marksheet.mark }} /</span> <span>{{ marksheet.total }}</span></label>
                     </div>
                   </md-list-item>
-                  <md-list-item>
+                  <md-list-item v-if="currentModule.marks.ONLINETEST && currentModule.marks.ONLINETEST.length > 0">
                     <div class="md-list-item-text">
                       <label>Average</label>
                     </div>
                     <div class="md-list-action">
-                      <label class="md-primary"><span class="markValue">70 /</span> <span>100</span></label>
+                      <label class="md-primary"><span class="markValue">{{ currentModule.marks.ONLINETEST.map(v => v.mark).reduce((a, b) => a + b, 0) / currentModule.marks.ONLINETEST.length }}</span></label>
                     </div>
                   </md-list-item>
                 </md-list>
               </div>
             </md-card-content>
   
-            <md-card-actions md-alignment="space-between">
-              <div>
-                <md-button>Download</md-button>
-                <md-button>Share</md-button>
-              </div>
+            <md-card-actions v-if="false" md-alignment="space-between">
               <md-card-expand-trigger>
-                <md-button>Comments</md-button>
+                <md-button>Chat</md-button>
               </md-card-expand-trigger>
             </md-card-actions>
             <md-card-expand-content>
@@ -132,17 +141,17 @@
                   <div class="row col s12">
                     <div class="col s10 offset-s1 chat" :class="{'right-align':feedback.from.id == $store.state.user.id}" v-for="(feedback,i) in feedbacks" :key="i">
                       <span class="chip message" :class="{'notSent':feedback.status != 'sent','black white-text':feedback.from.type != 'STUDENT'}">
-                                                     <span class="from" :class="{'white-text':feedback.from.type != 'STUDENT'}">{{ feedback.from.name }}</span> : {{ feedback.message }}
+                                                           <span class="from" :class="{'white-text':feedback.from.type != 'STUDENT'}">{{ feedback.from.name }}</span> : {{ feedback.message }}
                       </span>
                       <p class="time">{{ feedback.status != 'sent' ? feedback.status : getMoment(feedback.date).fromNow() }}</p>
                     </div>
                   </div>
                   <div class="col s10 switch">
                     <label>
-                                                      <input v-on:change="toggleAutoRefresh" v-model="autoRefreshChats" type="checkbox">
-                                                      <span class="lever"></span>
-                                                      {{ autoRefreshChats ?  'Auto refreshing every 5 seconds' : 'Auto refresh is off, Use the button on the right to get the latest messages' }} 
-                                                    </label>
+                                                            <input v-on:change="toggleAutoRefresh" v-model="autoRefreshChats" type="checkbox">
+                                                            <span class="lever"></span>
+                                                            {{ autoRefreshChats ?  'Auto refreshing every 5 seconds' : 'Auto refresh is off, Use the button on the right to get the latest messages' }} 
+                                                          </label>
                   </div>
                   <div class="col s2 right-align">
                     <a v-if="!isLoading" class="btn-floating transparent waves-effect right-align" v-on:click="refreshFeedbacks"><i class="material-icons black-text">refresh</i></a>
@@ -176,6 +185,25 @@ import swal from "sweetalert";
 
 const axios = require("axios");
 
+Array.prototype.groupBy = function(prop) {
+  return this.reduce(function(groups, item) {
+    const val = item[prop];
+    groups[val] = groups[val] || [];
+    groups[val].push(item);
+    return groups;
+  }, {});
+};
+
+Array.prototype.Average = function(prop) {
+  let length = this.length;
+  if (length == 0) return 0;
+  var total = 0;
+  this.forEach(c => {
+    total += c[prop];
+  });
+  return total / length;
+};
+
 export default {
   name: "StidentList",
   data() {
@@ -189,7 +217,6 @@ export default {
       },
       selectedModuleIndex: null,
       modules: [],
-      marks: [{}],
       feedbacks: [
         {
           from: "Mr Tshepi",
@@ -223,32 +250,6 @@ export default {
       if (this.selectedModuleIndex == null) {
         return null;
       }
-      var selectedModule = this.filteredModules[this.selectedModuleIndex];
-      if (
-        this.marks.filter(v => v.moduleId == selectedModule._id).length == 0
-      ) {
-        axios
-          .get(
-            this.$store.state.settings.baseLink +
-              "/m/marksheet/for/" +
-              this.$store.state.user.id +
-              "/moduleID/" +
-              selectedModule._id
-          )
-          .then(moduleMarksheet => {
-            this.marks.push(moduleMarksheet);
-          })
-          .catch(err => {
-            swal(
-              `Unable to load marks for ${selectedModule.name} (${
-                selectedModule.code
-              })`,
-              "Try again later or check your internet connection",
-              "error"
-            );
-            console.log("Error", err);
-          });
-      }
       return this.filteredModules[this.selectedModuleIndex];
     }
   },
@@ -264,13 +265,23 @@ export default {
       )
       .then(results => {
         this.isLoading = false;
-        this.modules = results.data;
-        this.modules.map(s => {
-          s.show = true;
+        results.data.map(async _module => {
+          _module.show = true;
+          let marks = await axios.get(
+            this.$store.state.settings.baseLink +
+              "/m/marksheet/for/" +
+              this.$store.state.user.id +
+              "/moduleID/" +
+              _module._id
+          );
+          if (!marks || !marks.data) {
+            alert("There is no marks for " + _module.name + " " + _module.code);
+          } else {
+            _module.marks = marks.data.groupBy("type");
+          }
+          return _module;
         });
-        if (this.modules.length > 0 > 0 && this.selectedModuleIndex == null) {
-          this.selectedModuleIndex = 0;
-        }
+        this.modules = results.data;
       })
       .catch(err => {
         this.isLoading = false;
@@ -302,6 +313,10 @@ export default {
 .markValue {
   font-size: larger;
   font-weight: bold;
+}
+
+.testHeading {
+  background-color: #eee;
 }
 
 .screen {
