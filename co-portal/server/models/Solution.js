@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import MarkSheet from "../models/MarkSheet";
 var Schema = mongoose.Schema;
 
 const SolutionSchema = new mongoose.Schema({
@@ -55,7 +56,6 @@ SolutionSchema.pre("save", function (next) {
                 this.mark = mark;
 
                 // Put the mark to the marksheet
-                var MarkSheet = moongose.model('MarkSheet');
                 var self = this;
                 MarkSheet.findOne({
                     id: this.questionaireId
