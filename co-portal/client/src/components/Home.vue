@@ -156,7 +156,7 @@
           "Contact admin for your login info"
         ],
         options: [{
-            text: "My profile card",
+            text: "My profile",
             icon: "person",
             link: "/",
             auth: ["STUDENT", "LECTURER", "ADMIN"]

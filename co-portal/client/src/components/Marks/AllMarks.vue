@@ -51,7 +51,7 @@
             </md-menu>
           </md-card-header>
   
-          <md-card-expand>
+          <md-card-expand v-for="(marksheet,i) in marks" :key="i">
             <md-card-content>
               <div class="row">
                 <md-list class="col s12 l4 md-double-line" style="border-right:3px solid #eeeeee">
@@ -172,116 +172,147 @@
 </template>
 
 <script>
-  import swal from "sweetalert";
-  
-  const axios = require("axios");
-  
-  export default {
-    name: "StidentList",
-    data() {
-      return {
-        txtSearch: "",
-        txtError: "",
-        module: {
-          name: "",
-          code: "",
-          description: ""
+import swal from "sweetalert";
+
+const axios = require("axios");
+
+export default {
+  name: "StidentList",
+  data() {
+    return {
+      txtSearch: "",
+      txtError: "",
+      module: {
+        name: "",
+        code: "",
+        description: ""
+      },
+      selectedModuleIndex: null,
+      modules: [],
+      marks: [{}],
+      feedbacks: [
+        {
+          from: "Mr Tshepi",
+          message: "You have to improve on your tests",
+          date: new Date(),
+          status: "sent"
         },
-        selectedModuleIndex: null,
-        modules: [],
-        feedbacks: [{
-            from: "Mr Tshepi",
-            message: "You have to improve on your tests",
-            date: new Date(),
-            status: "sent"
-          },
-          {
-            from: "Student",
-            message: "I am trying sir, i study eco everyday",
-            date: new Date(),
-            fromType: "STUDENT",
-            status: "sent"
-          }
-        ],
-        selectedStudent: null,
-        isLoading: false
-      };
-    },
-    computed: {
-      filteredModules() {
-        return this.modules.filter(
-          m =>
+        {
+          from: "Student",
+          message: "I am trying sir, i study eco everyday",
+          date: new Date(),
+          fromType: "STUDENT",
+          status: "sent"
+        }
+      ],
+      selectedStudent: null,
+      isLoading: false
+    };
+  },
+  computed: {
+    filteredModules() {
+      return this.modules.filter(
+        m =>
           this.txtSearch.length < 1 ||
           JSON.stringify(m)
-          .toLowerCase()
-          .indexOf(this.txtSearch.toLowerCase()) >= 0
-        );
-      },
-      currentModule() {
-        if (this.selectedModuleIndex == null) {
-          return null;
-        }
-        return this.filteredModules[this.selectedModuleIndex];
-      }
+            .toLowerCase()
+            .indexOf(this.txtSearch.toLowerCase()) >= 0
+      );
     },
-    mounted() {
-      this.isLoading = true;
-      axios
-        .get(
-          this.$store.state.settings.baseLink +
+    currentModule() {
+      if (this.selectedModuleIndex == null) {
+        return null;
+      }
+      var selectedModule = this.filteredModules[this.selectedModuleIndex];
+      if (
+        this.marks.filter(v => v.moduleId == selectedModule._id).length == 0
+      ) {
+        axios
+          .get(
+            this.$store.state.settings.baseLink +
+              "/m/modules/marksheet/for/" +
+              this.$store.state.user.id +
+              "/moduleID/" +
+              selectedModule._id
+          )
+          .then(moduleMarksheet => {
+            this.marks.push(moduleMarksheet);
+          })
+          .catch(err => {
+            swal(
+              `Unable to load marks for ${selectedModule.name} (${
+                selectedModule.code
+              })`,
+              "Try again later or check your internet connection",
+              "error"
+            );
+            console.log("Error", err);
+          });
+      }
+      return this.filteredModules[this.selectedModuleIndex];
+    }
+  },
+  mounted() {
+    this.isLoading = true;
+    axios
+      .get(
+        this.$store.state.settings.baseLink +
           "/m/modules/all/for/" +
           this.$store.state.user.id +
           "/" +
           this.$store.state.user.type
-        )
-        .then(results => {
-          this.isLoading = false;
-          this.modules = results.data;
-          this.modules.map(s => {
-            s.show = true;
-          });
-        })
-        .catch(err => {
-          this.isLoading = false;
-          if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
-          } else {
-            swal("Unable to load modules", "Try again later", "error");
-          }
+      )
+      .then(results => {
+        this.isLoading = false;
+        this.modules = results.data;
+        this.modules.map(s => {
+          s.show = true;
         });
+        if (this.modules.length > 0 > 0 && this.selectedModuleIndex == null) {
+          this.selectedModuleIndex = 0;
+        }
+      })
+      .catch(err => {
+        this.isLoading = false;
+        if (err.response != null && err.response.status == 512) {
+          swal(err.response.data, "error");
+        } else {
+          swal("Unable to load modules", "Try again later", "error");
+        }
+      });
+  },
+  methods: {
+    DeepSearch() {
+      alert("Deep searching for " + this.txtSearch);
     },
-    methods: {
-      DeepSearch() {
-        alert("Deep searching for " + this.txtSearch);
-      },
-      goToSolution(solutionId) {
-        this.$router.push({
-          name: "TestMarks",
-          params: {
-            solutionId: solutionId
-          }
-        });
-      }
+    goToSolution(solutionId) {
+      this.$router.push({
+        name: "TestMarks",
+        params: {
+          solutionId: solutionId
+        }
+      });
     }
-  };
+  }
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .markValue {
-    font-size: larger;
-    font-weight: bold;
-  }
-  
-  .screen {
-    background-image: url("/static/img/coPortalLogo.jpg");
-    /* Full height */
-    height: 100vh;
-    /* Center and scale the image nicely */
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-size: fit;
-  }
+.markValue {
+  font-size: larger;
+  font-weight: bold;
+}
+
+.screen {
+  background-image: url("/static/img/coPortalLogo.jpg");
+  /* Full height */
+  height: 100vh;
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: fit;
+}
 </style>
 
