@@ -98,6 +98,7 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
         title: m.title,
         date: m.date,
         mark: m.studentMarks.filter(sm => sm.studentID == userID)[0].mark,
+        total: m.total,
         studentID: userID,
         lecturerID: m.lecturerID,
         moduleID: m.moduleID,
