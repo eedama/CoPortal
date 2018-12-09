@@ -90,8 +90,8 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
       }
     }
   }).then(markSheet => {
-    markSheet.map(m => {
-      return {
+    var ms = markSheet.map(m => {
+      var obj = {
         _id: m._id,
         type: m.type,
         id: m.id,
@@ -102,8 +102,9 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
         lecturerID: m.lecturerID,
         moduleID: m.moduleID,
       };
+      return obj;
     });
-    return res.json(markSheet);
+    return res.json(ms);
   }).catch(err => {
     return res.status(512).send("Server error : " + err.message);
   });
