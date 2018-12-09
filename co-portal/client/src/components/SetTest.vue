@@ -267,9 +267,31 @@ export default {
           moduleId: this.moduleID
         })
         .then(results => {
-          this.isLoading = false;
-          this.dbQuestionaire = results.data;
-          this.currentPage = 1;
+          let markSheet = {
+            lecturerID: this.$store.state.user.id,
+            moduleID: this.moduleID,
+            title: this.title,
+            id: results.data._id,
+            type: "ONLINETEST"
+          };
+          let self = this;
+          axios
+            .post(this.$store.state.settings.baseLink + "/l/sheet/add", {
+              markSheet
+            })
+            .then(sheet => {
+              self.isLoading = false;
+              self.dbQuestionaire = results.data;
+              self.currentPage = 1;
+            })
+            .catch(err => {
+              self.isLoading = false;
+              if (err.response != null && err.response.status == 512) {
+                swal(err.response.data, "error");
+              } else {
+                swal("Unable to save mark sheet", err.message, "error");
+              }
+            });
         })
         .catch(err => {
           this.isLoading = false;
