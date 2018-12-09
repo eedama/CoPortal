@@ -92,9 +92,9 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
   }).then(markSheet => {
     var studentMarks = [];
     markSheet.forEach(m => {
-      let obj = {};
-      //  obj.mark = m.studentMarks.filter(sm => sm.studentID == userID)[0];
-      //  obj.studentMarks = undefined;
+      var obj = m;
+      obj.mark = m.studentMarks.filter(sm => sm.studentID == userID)[0];
+      obj.studentMarks = undefined;
       studentMarks.push(obj);
     });
     return res.json(studentMarks);
