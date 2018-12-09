@@ -375,7 +375,7 @@ router.post("/sheet/update/mark/by/:lecturerID", function (req, res) {
         mark
       })
     } else {
-      sheet.studentMarks.filter(s => s.studentID == studentID)[0].marks = marks;
+      sheet.studentMarks.filter(s => s.studentID == studentID)[0].mark = mark;
     }
     sheet.save(function (err) {
       if (err)
