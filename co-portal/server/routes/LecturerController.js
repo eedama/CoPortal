@@ -319,7 +319,7 @@ router.post("/sheet/add", function (req, res) {
     req.body.markSheet.type = 'UNKNOWN';
   }
   if (!req.body.markSheet.date) {
-    req.body.markSheet.date = Date.now;
+    req.body.markSheet.date = Date.now();
   }
   var markSheet = new MarkSheet({
     _id: mongoose.Types.ObjectId(),
