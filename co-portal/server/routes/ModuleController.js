@@ -80,7 +80,7 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", async function (req, res
   var userID = req.params.userID;
   var moduleID = req.params.moduleID;
 
-  return await Module.findById(moduleID);
+  return await res.json(Module.findById(moduleID));
 });
 
 router.get("/get/module/:moduleId", function (req, res) {
