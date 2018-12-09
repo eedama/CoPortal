@@ -100,10 +100,7 @@
                 <span>{{ announcement.title }}</span>
                 <p>{{ announcement.message }}</p>
               </div>
-  
-              <md-button class="md-icon-button md-list-action">
-                <md-icon class="md-primary">thumb_up</md-icon>
-              </md-button>
+              
             </md-list-item>
           </div>
         </md-list>
@@ -132,259 +129,262 @@
 </template>
 
 <script>
-  import swal from "sweetalert";
-  const axios = require("axios");
-  export default {
-    name: "Home",
-    data() {
-      return {
-        announcement: {
-          title: "",
-          message: "",
-          isToAll: true,
-          moduleID: null
+import swal from "sweetalert";
+const axios = require("axios");
+export default {
+  name: "Home",
+  data() {
+    return {
+      announcement: {
+        title: "",
+        message: "",
+        isToAll: true,
+        moduleID: null
+      },
+      announcements: [],
+      modules: [],
+      isAddingAnnouncements: false,
+      showEmoji: false,
+      isLoading: false,
+      txtSearch: "",
+      titleText: [
+        "Welcome to Co-Portal.",
+        "Please login",
+        "Contact admin for your login info"
+      ],
+      options: [
+        {
+          text: "My profile",
+          icon: "person",
+          link: "/",
+          auth: ["STUDENT", "LECTURER", "ADMIN"]
         },
-        announcements: [],
-        modules: [],
-        isAddingAnnouncements: false,
-        showEmoji: false,
-        isLoading: false,
-        txtSearch: "",
-        titleText: [
-          "Welcome to Co-Portal.",
-          "Please login",
-          "Contact admin for your login info"
-        ],
-        options: [{
-            text: "My profile",
-            icon: "person",
-            link: "/",
-            auth: ["STUDENT", "LECTURER", "ADMIN"]
-          },
+        {
+          text: "Students",
+          icon: "people",
+          link: "/student/list",
+          auth: ["LECTURER", "ADMIN"]
+        },
+        {
+          text: "Lecturers",
+          icon: "supervised_user_circle",
+          link: "/lecturer/list",
+          auth: ["ADMIN"]
+        },
+        {
+          text: "Modules",
+          icon: "books",
+          link: "/module/list",
+          auth: ["ADMIN", "LECTURER", "STUDENT"]
+        },
+        {
+          text: "Marks",
+          icon: "done_all",
+          link: "/marks/all",
+          auth: ["STUDENT"]
+        },
+        {
+          text: "Assessment results",
+          icon: "done_all",
+          link: "/marks/sheet",
+          auth: ["LECTURER", "ADMIN"]
+        }
+      ]
+    };
+  },
+  mounted() {
+    if (this.$store.state.user.isLoggedIn) {
+      this.isLoading = true;
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/n/announcements/get/for/" +
+            this.$store.state.user.id,
           {
-            text: "Students",
-            icon: "people",
-            link: "/student/list",
-            auth: ["LECTURER", "ADMIN"]
-          },
-          {
-            text: "Lecturers",
-            icon: "supervised_user_circle",
-            link: "/lecturer/list",
-            auth: ["ADMIN"]
-          },
-          {
-            text: "Modules",
-            icon: "books",
-            link: "/module/list",
-            auth: ["ADMIN", "LECTURER", "STUDENT"]
-          },
-          {
-            text: "Marks",
-            icon: "done_all",
-            link: "/marks/all",
-            auth: ["STUDENT"]
-          },
-          {
-            text: "Assessment results",
-            icon: "done_all",
-            link: "/marks/sheet",
-            auth: ["LECTURER", "ADMIN"]
+            userType: this.$store.state.user.type,
+            moduleID: null
           }
-        ]
-      };
-    },
-    mounted() {
-      if (this.$store.state.user.isLoggedIn) {
+        )
+        .then(results => {
+          this.isLoading = false;
+          console.log(results.data);
+          this.announcements = results.data.reverse();
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal(err.message, "Try again later", "error");
+          }
+        });
+      if (
+        this.$store.state.user.type == "LECTURER" ||
+        this.$store.state.user.type == "ADMIN"
+      ) {
         this.isLoading = true;
         axios
-          .post(
+          .get(
             this.$store.state.settings.baseLink +
-            "/n/announcements/get/for/" +
-            this.$store.state.user.id, {
-              userType: this.$store.state.user.type,
-              moduleID: null
-            }
+              "/m/modules/all/for/" +
+              this.$store.state.user.id +
+              "/" +
+              this.$store.state.user.type
           )
           .then(results => {
             this.isLoading = false;
-            console.log(results.data);
-            this.announcements = results.data.reverse();
+            this.modules = results.data;
+            this.modules.map(s => {
+              s.show = true;
+            });
           })
           .catch(err => {
             this.isLoading = false;
             if (err.response != null && err.response.status == 512) {
               swal(err.response.data, "error");
             } else {
-              swal(err.message, "Try again later", "error");
+              swal("Unable to load modules", "Try again later", "error");
             }
           });
-        if (
-          this.$store.state.user.type == "LECTURER" ||
-          this.$store.state.user.type == "ADMIN"
-        ) {
-          this.isLoading = true;
-          axios
-            .get(
-              this.$store.state.settings.baseLink +
-              "/m/modules/all/for/" +
-              this.$store.state.user.id +
-              "/" +
-              this.$store.state.user.type
-            )
-            .then(results => {
-              this.isLoading = false;
-              this.modules = results.data;
-              this.modules.map(s => {
-                s.show = true;
-              });
-            })
-            .catch(err => {
-              this.isLoading = false;
-              if (err.response != null && err.response.status == 512) {
-                swal(err.response.data, "error");
-              } else {
-                swal("Unable to load modules", "Try again later", "error");
-              }
-            });
-        }
       }
+    }
+  },
+  methods: {
+    AnnouncementClick(announcement) {
+      swal({
+        title: announcement.title,
+        text: announcement.message
+      });
     },
-    methods: {
-      AnnouncementClick(announcement) {
-        swal({
-          title: announcement.title,
-          text: announcement.message
-        });
-      },
-      SendAnnouncement() {
-        this.isLoading = true;
-        this.announcement.isToAll = this.announcement.module == null;
-        axios
-          .post(
-            this.$store.state.settings.baseLink +
+    SendAnnouncement() {
+      this.isLoading = true;
+      this.announcement.isToAll = this.announcement.module == null;
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
             "/n/announcements/add/for/" +
             this.announcement.module +
             "/by/" +
             this.$store.state.user.type +
             "/of/id/" +
-            this.$store.state.user.id, {
-              announcement: this.announcement
-            }
-          )
-          .then(results => {
-            this.isLoading = false;
-            this.isAddingAnnouncements = false;
-            swal("Success", "Announcement successfully sent.", "success");
-          })
-          .catch(err => {
-            this.isLoading = false;
-            if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "Try again later", "error");
-            } else {
-              swal("Unable to send announcement", "Try again later", "error");
-            }
-          });
-      }
+            this.$store.state.user.id,
+          {
+            announcement: this.announcement
+          }
+        )
+        .then(results => {
+          this.isLoading = false;
+          this.isAddingAnnouncements = false;
+          swal("Success", "Announcement successfully sent.", "success");
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "Try again later", "error");
+          } else {
+            swal("Unable to send announcement", "Try again later", "error");
+          }
+        });
     }
-  };
+  }
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .bigButton :hover {
-    background: black;
-    color: white;
+.bigButton :hover {
+  background: black;
+  color: white;
+}
+
+.screen {
+  /* The image used */
+  background-image: url("/static/img/plain-white.png");
+  /* Full height */
+  height: 200vh;
+  padding-top: 200px;
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: auto;
+  margin: auto;
+}
+
+.notificationRing {
+  -webkit-animation: ring 2s infinite;
+  animation: ring 2s infinite;
+}
+
+.Scroll-first-four {
+  overflow: hidden;
+  overflow-y: scroll;
+  height: 400px;
+}
+
+.Scroll-first-four::-webkit-scrollbar {
+  display: none;
+}
+
+@-webkit-keyframes ring {
+  0% {
+    -webkit-transform: rotate(35deg);
   }
-  
-  .screen {
-    /* The image used */
-    background-image: url("/static/img/plain-white.png");
-    /* Full height */
-    height: 200vh;
-    padding-top: 200px;
-    /* Center and scale the image nicely */
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    width: auto;
-    margin: auto;
+  12.5% {
+    -webkit-transform: rotate(-30deg);
   }
-  
-  .notificationRing {
-    -webkit-animation: ring 2s infinite;
-    animation: ring 2s infinite;
+  25% {
+    -webkit-transform: rotate(25deg);
   }
-  
-  .Scroll-first-four {
-    overflow: hidden;
-    overflow-y: scroll;
-    height: 400px;
+  37.5% {
+    -webkit-transform: rotate(-20deg);
   }
-  
-  .Scroll-first-four::-webkit-scrollbar {
-    display: none;
+  50% {
+    -webkit-transform: rotate(15deg);
   }
-  
-  @-webkit-keyframes ring {
-    0% {
-      -webkit-transform: rotate(35deg);
-    }
-    12.5% {
-      -webkit-transform: rotate(-30deg);
-    }
-    25% {
-      -webkit-transform: rotate(25deg);
-    }
-    37.5% {
-      -webkit-transform: rotate(-20deg);
-    }
-    50% {
-      -webkit-transform: rotate(15deg);
-    }
-    62.5% {
-      -webkit-transform: rotate(-10deg);
-    }
-    75% {
-      -webkit-transform: rotate(5deg);
-    }
-    100% {
-      -webkit-transform: rotate(0deg);
-    }
+  62.5% {
+    -webkit-transform: rotate(-10deg);
   }
-  
-  @keyframes ring {
-    0% {
-      -webkit-transform: rotate(35deg);
-      transform: rotate(35deg);
-    }
-    12.5% {
-      -webkit-transform: rotate(-30deg);
-      transform: rotate(-30deg);
-    }
-    25% {
-      -webkit-transform: rotate(25deg);
-      transform: rotate(25deg);
-    }
-    37.5% {
-      -webkit-transform: rotate(-20deg);
-      transform: rotate(-20deg);
-    }
-    50% {
-      -webkit-transform: rotate(15deg);
-      transform: rotate(15deg);
-    }
-    62.5% {
-      -webkit-transform: rotate(-10deg);
-      transform: rotate(-10deg);
-    }
-    75% {
-      -webkit-transform: rotate(5deg);
-      transform: rotate(5deg);
-    }
-    100% {
-      -webkit-transform: rotate(0deg);
-      transform: rotate(0deg);
-    }
+  75% {
+    -webkit-transform: rotate(5deg);
   }
+  100% {
+    -webkit-transform: rotate(0deg);
+  }
+}
+
+@keyframes ring {
+  0% {
+    -webkit-transform: rotate(35deg);
+    transform: rotate(35deg);
+  }
+  12.5% {
+    -webkit-transform: rotate(-30deg);
+    transform: rotate(-30deg);
+  }
+  25% {
+    -webkit-transform: rotate(25deg);
+    transform: rotate(25deg);
+  }
+  37.5% {
+    -webkit-transform: rotate(-20deg);
+    transform: rotate(-20deg);
+  }
+  50% {
+    -webkit-transform: rotate(15deg);
+    transform: rotate(15deg);
+  }
+  62.5% {
+    -webkit-transform: rotate(-10deg);
+    transform: rotate(-10deg);
+  }
+  75% {
+    -webkit-transform: rotate(5deg);
+    transform: rotate(5deg);
+  }
+  100% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+}
 </style>
