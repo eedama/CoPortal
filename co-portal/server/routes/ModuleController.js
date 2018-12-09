@@ -83,12 +83,16 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
 
   MarkSheet.find({
     moduleID,
+    removed: false,
     studentMarks: {
       $elemMatch: {
         studentID: mongoose.Types.ObjectId(userID)
       }
     }
   }).then(markSheet => {
+    markSheet = markSheet.map(m => {
+      m.studentMarks = m.filter(sm => sm.studentID == mongoose.Types.ObjectId(userID))[0];
+    });
     return res.json(markSheet);
   }).catch(err => {
     return res.status(512).send("Server error : " + err.message);
