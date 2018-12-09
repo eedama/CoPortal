@@ -91,9 +91,10 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
     }
   }).then(markSheet => {
     markSheet.map(m => {
-      m.mark = m.studentMarks.filter(sm => sm.studentID == userID)[0];
-      m.studentMarks = undefined;
-      return m;
+      var obj = m;
+      obj.mark = m.studentMarks.filter(sm => sm.studentID == userID)[0];
+      obj.studentMarks = undefined;
+      return obj;
     });
     return res.json(markSheet);
   }).catch(err => {
