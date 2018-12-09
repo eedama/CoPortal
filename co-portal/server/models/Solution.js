@@ -37,7 +37,6 @@ SolutionSchema.pre("save", function (next) {
         this.mark = this.answers.length;
         next();
     } else {
-        console.log("Deep in the Pussy!");
         var Model = mongoose.model('Solution', SolutionSchema);
         Model.findOne({
                 questionaireId: this.questionaireId,
@@ -54,7 +53,25 @@ SolutionSchema.pre("save", function (next) {
                     }
                 });
                 this.mark = mark;
-                next();
+
+                // Put the mark to the marksheet
+                var MarkSheet = moongose.model('MarkSheet');
+                var self = this;
+                MarkSheet.findOne({
+                    id: this.questionaireId
+                }).then(sheet => {
+                    if (sheet == null) throw "Your mark is not added to your marksheet , no marksheet";
+                    sheet.studentMarks.push({
+                        studentID: self.studentId,
+                        mark
+                    })
+                    sheet.save(function (err) {
+                        if (err) throw "Your mark is not added to your marksheet, save failed";
+                        next();
+                    });
+                }).catch(err => {
+                    throw "Your mark is not added to your marksheet , " + err.message;
+                });
             })
             .catch(err => {
                 console.log("An error occured while calculating your mark, " + err.message);
