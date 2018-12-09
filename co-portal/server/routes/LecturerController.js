@@ -367,16 +367,12 @@ router.post("/sheet/update/mark/by/:lecturerID", function (req, res) {
   var sheetID = req.body.markSheetID;
   var studentID = req.body.studentID;
   var mark = req.body.mark;
-  MarkSheet.findOne({
-    lecturerID: lecturerID,
-    '_id': sheetID
-  }).then(sheet => {
-    if (sheet == null) return res.status(512).send("Marksheet does not exist");
-    var marks = sheet.studentMarks.filter(s => s.studentID == studentID);
-    if (!marks || marks.length == 0) {
+  MarkSheet.findById(sheetID).then(sheet => {
+    if (sheet == null || sheet.lecturerID != lecturerID) return res.status(512).send("Marksheet does not exist");
+    if (sheet.studentMarks.filter(s => s.studentID == studentID).length == 0) {
       sheet.studentMarks.push({
-        studentID: studentID,
-        mark: mark
+        studentID,
+        mark
       })
     } else {
       sheet.studentMarks.filter(s => s.studentID == studentID)[0].marks = marks;
