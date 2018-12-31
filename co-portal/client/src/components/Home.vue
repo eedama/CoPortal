@@ -1,6 +1,6 @@
 <template>
   <div class="screen">
-  
+
     <md-dialog v-if="$store.state.user.isLoggedIn && ($store.state.user.type=='LECTUERE' || $store.state.user.type=='ADMIN')" style="position:absolute;top:25%;width:100%" class="card" :md-active.sync="isAddingAnnouncements">
       <md-card class="col s12">
         <md-card-header>
@@ -50,7 +50,7 @@
         <md-button v-if="!isLoading" v-on:click="SendAnnouncement()" class="md-primary">Send announcement</md-button>
       </md-card-actions>
     </md-dialog>
-  
+
     <div class="row">
       <div class="col s6 offset-s3 m8 offset-m2 center-align">
         <h5 class="center-align">
@@ -61,7 +61,7 @@
       <div class="col s10 offset-s1 m8 offset-m2 center-align">
         <img src="../assets/logo.png" class="responsive-img">
       </div>
-  
+
     </div>
     <div class="row">
       <div v-if="!$store.state.user.isLoggedIn" v-on:click="$router.push('/login')" class="col m6 offset-m3 s12 pointer bigButton center-align waves-effect">
@@ -72,7 +72,7 @@
     </div>
     <div v-if="$store.state.user.isLoggedIn" class="row">
       <div class="col s12 m6 xl4 push-xl2">
-  
+
         <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
           <md-card-header class="left">Annnouncements</md-card-header>
         </div>
@@ -85,7 +85,7 @@
               <md-avatar>
                 <md-icon>add</md-icon>
               </md-avatar>
-  
+
               <div class="md-list-item-text center-align">
                 <span>Add new Announcement</span>
               </div>
@@ -94,13 +94,13 @@
               <md-avatar>
                 <img src="https://placeimg.com/40/40/people/1" alt="People">
               </md-avatar>
-  
+
               <div class="md-list-item-text">
                 <span>{{ announcement.lecturerId ?  announcement.lecturerId.lastname + " " + announcement.lecturerId.firstname : "Admin" }} &nbsp;&bull; {{ getMoment(announcement.date).fromNow() }}</span>
                 <span>{{ announcement.title }}</span>
                 <p>{{ announcement.message }}</p>
               </div>
-              
+
             </md-list-item>
           </div>
         </md-list>
@@ -187,6 +187,12 @@ export default {
           text: "Assessment results",
           icon: "done_all",
           link: "/marks/sheet",
+          auth: ["LECTURER", "ADMIN"]
+        },
+        {
+          text: "Report a student",
+          icon: "timeline",
+          link: "/Student/Report",
           auth: ["LECTURER", "ADMIN"]
         }
       ]
