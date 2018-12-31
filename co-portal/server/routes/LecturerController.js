@@ -8,6 +8,7 @@ import Student from "../models/Student";
 import Lecturer from "../models/Lecturer";
 import Module from "../models/Module";
 import MarkSheet from "../models/MarkSheet";
+import Report from "../models/Report";
 
 /*
   TODO: Get one lecturer - DONE
@@ -384,6 +385,27 @@ router.post("/sheet/update/mark/by/:lecturerID", function (req, res) {
     });
   }).catch(err => {
     return res.status(512).send("Server error: " + err.message);
+  });
+});
+
+router.post("/report/student", function (req, res) {
+  var lecturerID = req.params.lecturerID;
+  var subject = req.body.subject;
+  var studentID = req.body.studentID;
+  var message = req.body.message;
+  var method = req.body.method && req.body.method.toUpperCase();
+
+  var report = new Report();
+  report.studentId = studentId;
+  report.lecturerId = lecturerID;
+  report.method = method;
+  report.subject = subject;
+  report.message = message;
+
+  report.save(function (err) {
+    if (err) return res.status(512).send("Unable to save report ");
+    // Will call a service to send the SMS/Email here.
+    return json.send("Report successfully saved");
   });
 });
 module.exports = router;
