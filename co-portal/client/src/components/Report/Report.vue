@@ -17,9 +17,9 @@
         </div>
         <div class="select-container row mt-5">
           <select v-model="Report.Student" class="custom-select custom-selected waves-effect">
-              <option  disabled value="" >Select student</option>
-           <option class="select-option" v-for="(student,t) in students"  :key="t" v-bind:value="student.name"  >{{student.name}}</option>
-            </select>
+                <option  disabled value="" >Select student</option>
+             <option class="select-option" v-for="(student,t) in students"  :key="t" v-bind:value="student.name"  >{{student.name}}</option>
+              </select>
         </div>
         <div class="row">
           <div v-on:click="GoToNextPage(false)" class="col m4 offset-m4 s12 pointer center-align waves-effect">
@@ -50,7 +50,7 @@
           <div class="card-panel hoverable pointer  text-center col s10 offset-m1 offset-s1">
             <div class="Report-que-container">
               <div class="Report-que-header">
-                please select subject to report <span class="report-imp">*</span>
+                Select subject to report <span class="report-imp">*</span>
               </div>
               <div class="Report-que-body">
                 <div style="float:left;" v-for="(subject,g) in Subjects" :key="g">
@@ -65,7 +65,7 @@
           <div class="card-panel hoverable pointer  text-center col s10 offset-m1 offset-s1">
             <div class="Report-que-container">
               <div class="Report-que-header">
-                please type your report <span class="report-imp">*</span>
+                Type your report <span class="report-imp">*</span>
               </div>
               <div class="Report-que-body">
                 <input placeholder="1000 words" v-model="Report.Message" class="with-gap center-align" maxlength="1000" type="text" />
@@ -77,7 +77,7 @@
           <div class="card-panel hoverable pointer  text-center col s10 offset-m1 offset-s1">
             <div class="Report-que-container">
               <div class="Report-que-header">
-                please select method <span class="report-imp">*</span>
+                Select method <span class="report-imp">*</span>
               </div>
               <div class="Report-que-body">
                 <input id="toggle-on1" name="toggle2" value="Email" v-model="Report.Method" type="radio"><label for="toggle-on1">Email</label>
@@ -126,8 +126,8 @@
                 The report is as follows :
               </div>
               <strong style="font-size:22px;font-weight:bold;">
-             {{Report.Message}}
-            </strong>
+               {{Report.Message}}
+              </strong>
               <div style="margin-top:20px;margin-bottom:30px">
                 This report was sent to you by <strong style="font-weight:bold;"> {{Report.Teacher}}</strong> (Teacher)
               </div>
@@ -138,7 +138,7 @@
           </div>
         </div>
         <div class="row">
-          <div v-on:click="GoToNextPage(false)" class="col m4 offset-m4 s12 pointer center-align waves-effect">
+          <div v-on:click="GoToNextPage(true)" class="col m4 offset-m4 s12 pointer center-align waves-effect">
             <div class="card-panel hoverable">
               <h5 class="text-xs-center">Send <i class="material-icons right">exit_to_app</i> </h5>
             </div>
@@ -231,19 +231,20 @@ export default {
           this.currentPage++;
           this.txtError = "";
         }
-      } else if (this.currentPage == 2) {
-        //Code For BackEnd Comes Here
-        //Change the Current Page to 1(On this If statement) once Finished
+      } else if (this.currentPage == 1 && final) {
         axios
-          .post(this.$store.state.settings.baseLink + "BackEnd Link !", {
-            StudentID: this.Student.StudentID,
-            TeacherID: this.Report.TeacherID,
-            Subject: this.Report.Subject,
-            Method: this.Report.Method,
-            Message: this.Report.Message
+          .post(this.$store.state.settings.baseLink + "/l/report/student", {
+            studentID: this.Report.StudentID,
+            teacherID: this.Report.TeacherID,
+            subject: this.Report.Subject,
+            method: this.Report.Method,
+            message: this.Report.Message
           })
           .then(results => {
-            //BackEnd
+            if (results) {
+              swal("Report successfully sent", results.data, "success");
+              this.$router.push("/");
+            }
           })
           .catch(err => {
             this.isLoading = false;
