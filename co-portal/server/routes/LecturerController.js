@@ -411,7 +411,7 @@ router.post("/report/student", function (req, res) {
   });
 });
 
-router.get("get/all/reports", function (req, res) {
+router.get("/get/all/reports", function (req, res) {
   Report.find({}).then(reports => {
     return res.json(reports);
   }).catch(err => {
