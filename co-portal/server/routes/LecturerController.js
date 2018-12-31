@@ -410,4 +410,12 @@ router.post("/report/student", function (req, res) {
     return res.send("Report successfully saved");
   });
 });
+
+router.get("get/all/reports", function (req, res) {
+  Report.find({}).then(reports => {
+    return res.json(reports);
+  }).catch(err => {
+    return res.status(512).send(err);
+  })
+});
 module.exports = router;
