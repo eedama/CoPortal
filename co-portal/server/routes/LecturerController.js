@@ -405,7 +405,7 @@ router.post("/report/student", function (req, res) {
   report.save(function (err) {
     if (err) return res.status(512).send("Unable to save report ");
     // Will call a service to send the SMS/Email here.
-    return json.send("Report successfully saved");
+    return res.send("Report successfully saved");
   });
 });
 module.exports = router;
