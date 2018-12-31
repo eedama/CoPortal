@@ -395,15 +395,17 @@ router.post("/report/student", function (req, res) {
   var message = req.body.message;
   var method = req.body.method && req.body.method.toUpperCase();
 
-  var report = new Report();
-  report.studentId = studentID;
-  report.lecturerId = lecturerID;
-  report.method = method;
-  report.subject = subject;
-  report.message = message;
+  var report = new Report({
+    _id: mongoose.Types.ObjectId(),
+    studentId: studentID,
+    lecturerId: lecturerID,
+    method: method,
+    subject: subject,
+    message: message
+  })
 
   report.save(function (err) {
-    if (err) return res.status(512).send("Unable to save report ");
+    if (err) return res.status(512).send(err);
     // Will call a service to send the SMS/Email here.
     return res.send("Report successfully saved");
   });
