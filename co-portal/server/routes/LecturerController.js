@@ -396,7 +396,7 @@ router.post("/report/student", function (req, res) {
   var method = req.body.method && req.body.method.toUpperCase();
 
   var report = new Report();
-  report.studentId = studentId;
+  report.studentId = studentID;
   report.lecturerId = lecturerID;
   report.method = method;
   report.subject = subject;
