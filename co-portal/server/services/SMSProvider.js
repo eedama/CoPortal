@@ -33,12 +33,12 @@ export default class SMSProvider {
                     },
                     function (error, response, body) {
                         if (error) {
-                            reject(error)
+                            return reject(error)
                         }
-                        resolve(response);
+                        return resolve(response);
                     })
             } else {
-                resolve(true);
+                return resolve(true);
             }
         })
     }

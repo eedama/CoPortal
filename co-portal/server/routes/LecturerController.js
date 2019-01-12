@@ -411,7 +411,7 @@ router.post("/report/student", function (req, res) {
     subject: subject,
     message: message,
     html: html,
-    parents: []
+    parents: new Array()
   })
 
   Student.findById(report.studentId).then(student => {
@@ -434,13 +434,17 @@ router.post("/report/student", function (req, res) {
         _id: parent._id,
         status: status
       });
+      report.markModified("parents");
+      if (report.parents.length > 0) {
+        report.status = `Report was sent to ${report.parents.length} parents , ${report.parents.filter(p => p.status == 'SMSSENT').length} via sms and ${report.parents.filter(p => p.status == 'EMAILSENT').length} via email`;
+      } else {
+        report.status = "Report was not sent to any parent";
+      }
+      report.save(function (err) {
+        if (err) return res.status(512).send(err);
+        return res.send("Report successfully saved");
+      });
     });
-
-    if (report.parents.length > 0) {
-      report.status = `Report was sent to ${report.parents.length} parents , ${report.parents.filter(p => p.status == 'SMSSENT').length} via sms and ${report.parents.filter(p => p.status == 'EMAILSENT').length} via email`;
-    } else {
-      report.status = "Report was not sent to any parent";
-    }
 
     report.save(function (err) {
       if (err) return res.status(512).send(err);
