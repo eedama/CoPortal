@@ -17,9 +17,9 @@
         </div>
         <div class="select-container row mt-5">
           <select v-model="Report.Student" class="custom-select custom-selected waves-effect">
-                <option  disabled value="" >Select student</option>
-             <option class="select-option" v-for="(student,t) in students"  :key="t" v-bind:value="student.name"  >{{student.name}}</option>
-              </select>
+                      <option  disabled value="" >Select student</option>
+                   <option class="select-option" v-for="(student,t) in students"  :key="t" v-bind:value="student.name"  >{{student.name}}</option>
+                    </select>
         </div>
         <div class="row">
           <div v-on:click="GoToNextPage(false)" class="col m4 offset-m4 s12 pointer center-align waves-effect">
@@ -104,16 +104,16 @@
         </div>
         <div class="col s12">
           <div class="card-image col l8 offset-l2 m6 offset-m3 s12 mb-lg-4">
-            <img class="img-responsive" src="static/img/coPortalLogo.jpg">
+            <img class="img-responsive" src="https://coportal.net/static/img/coPortalLogo.jpg">
           </div>
         </div>
         <div class="col m8 offset-m2 s12">
           <p class="center-align red-text" v-show="txtError.length > 2">{{ txtError }}</p>
         </div>
         <div class="row">
-          <div class="Email-cards">
+          <div ref="emailCard" class="Email-cards">
             <div class="Email-header" style="font-size:20px;font-family:sans-serif;letter-spacing:1px; box-sizing:border-box; margin-top:60px;">
-              <img class="corportal" align="left" style="width:160px;height:auto;margin-top:-40px;" src="static/img/logo.1328452.png">
+              <img class="corportal" align="left" style="width:160px;height:auto;margin-top:-40px;" src="https://coportal.net/static/img/logo.1328452.png">
               <span style="">Coportal Communication</span>
             </div>
             <div class="Email-message-header" style="margin-left:15px;margin-top:90px;">
@@ -126,14 +126,14 @@
                 The report is as follows :
               </div>
               <strong style="font-size:22px;font-weight:bold;">
-               {{Report.Message}}
-              </strong>
+                     {{Report.Message}}
+                    </strong>
               <div style="margin-top:20px;margin-bottom:30px">
                 This report was sent to you by <strong style="font-weight:bold;"> {{Report.Teacher}}</strong> (Teacher)
               </div>
               Best Regards,
               <br><span>Coportal Communication</span>
-              <br><img class="corportal" align="left" style="width:160px;height:auto;opacity:0.1" src="static/img/coPortalLogo.jpg">
+              <br><img class="corportal" align="left" style="width:160px;height:auto;opacity:0.1" src="https://coportal.net/static/img/coPortalLogo.jpg">
             </div>
           </div>
         </div>
@@ -232,13 +232,23 @@ export default {
           this.txtError = "";
         }
       } else if (this.currentPage == 1 && final) {
+        var emailTemplate = `
+      <html>
+      <head></head>
+      <body>
+      ${this.$refs.emailCard}
+      </body>
+      </html>
+      `;
+
         axios
           .post(this.$store.state.settings.baseLink + "/l/report/student", {
             studentID: this.Report.StudentID,
             teacherID: this.Report.TeacherID,
             subject: this.Report.Subject,
             method: this.Report.Method,
-            message: this.Report.Message
+            message: this.Report.Message,
+            html: emailTemplate
           })
           .then(results => {
             if (results) {
