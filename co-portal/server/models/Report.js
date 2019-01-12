@@ -20,6 +20,7 @@ const ReportSchema = new mongoose.Schema({
         default: 'EMAIL'
     },
     message: String,
+    html: String,
     subject: String,
     parents: [{
         _id: Schema.Types.ObjectId,

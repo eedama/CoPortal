@@ -17,13 +17,13 @@ export default class EmailProvider {
         });
     }
 
-    sendEmail(to, subject, message) {
+    sendEmail(to, subject, html) {
         return new Promise((resolve, reject) => {
             let mailOptions = {
                 from: '"Coportal " <no-reply@coportal.net>',
                 to: to,
                 subject: subject,
-                text: message
+                html: html
             };
 
             this.client.sendMail(mailOptions).then(res => {

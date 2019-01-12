@@ -397,6 +397,7 @@ router.post("/report/student", function (req, res) {
   var subject = req.body.subject;
   var studentID = req.body.studentID;
   var message = req.body.message;
+  var html = req.body.html;
   var method = req.body.method && req.body.method.toUpperCase();
   if (method != 'EMAIL') {
     method = "SMS";
@@ -409,6 +410,7 @@ router.post("/report/student", function (req, res) {
     method: method,
     subject: subject,
     message: message,
+    html: html,
     parents: []
   })
 
@@ -419,13 +421,10 @@ router.post("/report/student", function (req, res) {
       var status = 'NOTSENT';
       if (report.method == 'SMS' && parent.contactNumbers) {
         var msg = `Hello, ${parent.surname} ${parent.name} please check your email (${parent.email}) you have an email from coportal related to your child ${student.surname} ${student.firstname}`;
-        console.log(msg);
         var smsResponse = await smsProvider.sendSMS(parent.contactNumbers, msg);
-        console.log('sms', smsResponse);
         if (smsResponse) status = 'SMSSENT';
       }
-      var emailResponse = await emailProvider.sendEmail(parent.email, report.subject, report.message);
-      console.log('email', emailResponse);
+      var emailResponse = await emailProvider.sendEmail(parent.email, report.subject, report.html);
       if (emailResponse && status == 'SMSSENT') {
         status = 'SMSANDEMAILSENT';
       } else if (emailResponse) {
