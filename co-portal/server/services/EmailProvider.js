@@ -2,14 +2,14 @@ const nodemailer = require("nodemailer");
 
 export default class EmailProvider {
     constructor() {
+        var password = "coportal12@21"
+        var email = "coportal.reports@gmail.com";
         nodemailer.createTestAccount().then(account => {
             this.client = nodemailer.createTransport({
-                host: "smtp.ethereal.email",
-                port: 587,
-                secure: false, // true for 465, false for other ports
+                service: "Gmail",
                 auth: {
-                    user: account.user, // generated ethereal user
-                    pass: account.pass // generated ethereal password
+                    user: email, // generated ethereal user
+                    pass: password // generated ethereal password
                 }
             });
         }).catch(err => {

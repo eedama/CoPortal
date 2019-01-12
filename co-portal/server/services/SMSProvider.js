@@ -6,6 +6,13 @@ export default class SMSProvider {
         this.password = "7C0BJbUiAJh!BW3yr3fAL6nlL0eW#";
     }
 
+    ConvertNumbers(numbers) {
+        if (numbers && numbers.indexOf('0') == 0) {
+            numbers = '+27' + numbers.slice(1);
+        }
+        return numbers;
+    }
+
     sendSMS(to, message) {
         return new Promise((resolve, reject) => {
             if (process.env.ENABLE_SEND_SMS) {
@@ -20,7 +27,7 @@ export default class SMSProvider {
                         },
                         method: 'POST',
                         body: JSON.stringify([{
-                            to: to,
+                            to: this.ConvertNumbers(to),
                             body: message
                         }])
                     },

@@ -43,7 +43,7 @@ app.use(function (req, res, next) {
 });
 
 mongoose
-    .connect("mongodb://localhost:27017/CoportalGPDevDB?authSource=admin", {
+    .connect("mongodb://68.66.193.181:27017/CoportalGPDevDB?authSource=admin", {
         auth: {
             user: "admin",
             password: "Mulavhelesi@1"
