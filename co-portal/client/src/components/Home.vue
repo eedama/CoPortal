@@ -109,7 +109,7 @@
         <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
           <md-card-header class="left">Portal</md-card-header>
         </div>
-        <div v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)" :key="i" v-on:click="$router.push(option.link)" class="col s12 l8 pointer bigButton waves-effect">
+        <div v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)" :key="i" v-on:click="$router.push(option.link)" class="col s12 pointer bigButton waves-effect">
           <div class="card-panel hoverable">
             <h5 class="center-align">
               <i style="font-size:100%" class="material-icons left">{{ option.icon }}</i>

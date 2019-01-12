@@ -117,7 +117,7 @@
               <span style="">Coportal Communication</span>
             </div>
             <div class="Email-message-header" style="margin-left:15px;margin-top:90px;">
-              <h6 style="font-weight:50;margin-bottom:20px">Dear Parent/Guardian</h6>
+              <h5 style="font-weight:50;margin-bottom:20px">Dear Parent/Guardian</h5>
               <div>
                 Please read the following report concerning <strong style="font-weight:bold;">{{Report.Student}}</strong> for
                 <strong style="font-weight:bold;">{{Report.Subject}}</strong> (Subject)
@@ -232,15 +232,9 @@ export default {
           this.txtError = "";
         }
       } else if (this.currentPage == 1 && final) {
-        var emailTemplate = `
-      <html>
-      <head></head>
-      <body>
-      ${this.$refs.emailCard}
-      </body>
-      </html>
-      `;
-
+        var htmlTemplate = new XMLSerializer().serializeToString(
+          this.$refs.emailCard
+        );
         axios
           .post(this.$store.state.settings.baseLink + "/l/report/student", {
             studentID: this.Report.StudentID,
@@ -248,7 +242,7 @@ export default {
             subject: this.Report.Subject,
             method: this.Report.Method,
             message: this.Report.Message,
-            html: emailTemplate
+            html: htmlTemplate
           })
           .then(results => {
             if (results) {
