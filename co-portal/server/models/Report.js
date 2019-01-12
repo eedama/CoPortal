@@ -21,6 +21,15 @@ const ReportSchema = new mongoose.Schema({
     },
     message: String,
     subject: String,
+    parents: [{
+        _id: Schema.Types.ObjectId,
+        status: {
+            type: String,
+            enum: ['NOTSENT', 'EMAILSENT', 'SMSSENT', 'SMSANDEMAILSENT'],
+            default: 'NOTSENT'
+        }
+    }],
+    status: String,
     date: {
         type: Date,
         default: Date.now()

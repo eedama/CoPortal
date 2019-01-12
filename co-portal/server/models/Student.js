@@ -18,6 +18,21 @@ const StudentSchema = new mongoose.Schema({
         type: String,
         unique: true
     },
+    parents: [{
+        _id: {
+            type: Schema.Types.ObjectId,
+            default: mongoose.Types.ObjectId()
+        },
+        surname: String,
+        name: String,
+        contactNumbers: String,
+        email: String,
+        relationship: {
+            type: String,
+            enum: ['MOTHER', 'FATHER', 'SISTER', 'BROTHER', 'GUARDIAN'],
+            default: 'GUARDIAN'
+        }
+    }],
     firstname: String,
     lastname: String,
     room: String,

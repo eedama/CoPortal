@@ -9,6 +9,10 @@ import Lecturer from "../models/Lecturer";
 import Module from "../models/Module";
 import MarkSheet from "../models/MarkSheet";
 import Report from "../models/Report";
+import SMSProvider from "../services/SMSProvider"
+import EmailProvider from "../services/EmailProvider"
+const smsProvider = new SMSProvider();
+const emailProvider = new EmailProvider();
 
 /*
   TODO: Get one lecturer - DONE
@@ -401,14 +405,46 @@ router.post("/report/student", function (req, res) {
     lecturerId: lecturerID,
     method: method,
     subject: subject,
-    message: message
+    message: message,
+    parents: []
   })
 
-  report.save(function (err) {
-    if (err) return res.status(512).send(err);
-    // Will call a service to send the SMS/Email here.
-    return res.send("Report successfully saved");
+  Student.findById(report.studentId).then(student => {
+    if (!student) return res.status(512).send("Student does not exist");
+    if (!student.parents) return res.status(512).send("Student does not have any parent registered to the system.");
+    student.parents.filter(p => p.email).forEach(async parent => {
+      var status = 'NOTSENT';
+      if (report.method == 'SMS' && parent.contactNumbers) {
+        var msg = `Hello, ${parent.surname} ${parent.name} please check your email (${parent.email}) you have an email from coportal related to your child ${student.surname} ${student.firstname}`;
+        var smsResponse = await smsProvider.sendSMS(parent.contactNumbers, msg);
+        if (smsResponse) status = 'SMSSENT';
+      }
+      var emailResponse = await emailProvider.sendEmail(parent.email, report.subject, report.message);
+      if (emailResponse && status == 'SMSSENT') {
+        status = 'SMSANDEMAILSENT';
+      } else if (emailResponse) {
+        status = 'EMAILSENT';
+      }
+      report.parents.push({
+        _id: parent._id,
+        status: status
+      });
+    });
+
+    if (report.parents.length > 0) {
+      report.status = `Report was sent to ${report.parents.length} parents , ${report.parents.filter(p => p.status == 'SMSSENT').length} via sms and ${report.parents.filter(p => p.status == 'EMAILSENT').length} via email`;
+    } else {
+      report.status = "Report was not sent to any parent";
+    }
+
+    report.save(function (err) {
+      if (err) return res.status(512).send(err);
+      return res.send("Report successfully saved");
+    });
+  }).catch(err => {
+    return res.status(512).send(err);
   });
+
 });
 
 router.get("/get/all/reports", function (req, res) {

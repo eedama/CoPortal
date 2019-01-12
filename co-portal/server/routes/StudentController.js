@@ -19,11 +19,47 @@ import Questionaire from "../models/Questionaire";
 router.post("/delete/:studentID", function (req, res) {
   var studentID = req.params.studentID;
   Student.findById(studentID).then(student => {
+    if (!student) return res.status(512).send("Student does not exist");
     student.active = false;
     student.removed = true;
     student.save(function (err) {
       if (err) return res.status(512).send("Server error : " + err.message);
       res.send(studentID);
+    })
+  }).catch(err => {
+    return res.status(512).send("Server error : " + err.message);
+  });
+
+});
+
+router.post("/add/parent/for/:studentID", function (req, res) {
+  var studentID = req.params.studentID;
+  var _parent = req.body.parent;
+
+  Student.findById(studentID).then(student => {
+    if (!student) return res.status(512).send("Student does not exist");
+    if (!_parent) return res.status(512).send("Invalid parent details provided");
+    var parent = {
+      surname: _parent.surname,
+      name: _parent.name,
+      contactNumbers: _parent.numbers,
+      email: _parent.email,
+      relationship: _parent.relationship && _parent.relationship.toUpperCase()
+    };
+
+    if (!student.parents) {
+      student.parents = [];
+    }
+
+    if (student.parents.find(p => p.surname == parent.surname && p.name == parent.name && p.relationship == parent.relationship)) {
+      return res.status(512).send(`${parent.surname} ${parent.name} is already a ${parent.relationship} of ${student.username}.`);
+    } else {
+      student.parents.push(parent);
+    }
+
+    student.save(function (err) {
+      if (err) return res.status(512).send("Server error : " + err.message);
+      return res.send(`Added ${parent.surname} ${parent.name} as a ${parent.relationship} of ${student.username}.`);
     })
   }).catch(err => {
     return res.status(512).send("Server error : " + err.message);
