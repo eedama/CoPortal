@@ -166,6 +166,12 @@ export default {
           auth: ["LECTURER", "ADMIN"]
         },
         {
+          text: "Edit profile",
+          icon: "account_circle",
+          link: "/student/update",
+          auth: ["STUDENT"]
+        },
+        {
           text: "Lecturers",
           icon: "supervised_user_circle",
           link: "/lecturer/list",
