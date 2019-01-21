@@ -16,6 +16,32 @@ import Module from "../models/Module";
                 - 
 */
 
+router.post("/clear/studentmodules", function (req, res) {
+  Module.find().then(modules => {
+    if (!modules) return res.status(512).send("Modules do not exist");
+    modules.forEach(m => {
+      m.students = [];
+      m.save(function (err) {
+        if (err) console.error('Module removal error', m._id + ' can not be removed');
+        console.log("Removed module " + m._id);
+      })
+    })
+  })
+
+  Student.find().then(students => {
+    if (!students) return res.status(512).send("Students does not exist");
+    students.forEach(s => {
+      s.modules = [];
+      s.save(function (err) {
+        if (err) console.error('Student removal error', s._id + ' can not be removed');
+        console.log("Removed student " + s._id);
+      })
+    })
+  })
+
+  res.send("Student module removal is in progress");
+});
+
 router.post("/add/lecturer", function (req, res) {
   var lecturer = new Lecturer({
     _id: mongoose.Types.ObjectId(),
@@ -120,7 +146,7 @@ router.post("/add/student", function (req, res) {
     gender: req.body.student.gender,
     dob: req.body.student.dob,
     idNumber: req.body.student.idNumber,
-    isSouthAfrican: req.body.student.isSouthAfrican
+    isSouthAfrican: req.body.student.isSouthAfrican,
   });
 
 
@@ -177,6 +203,12 @@ router.post("/update/student/:studentID", function (req, res) {
     isSouthAfrican: req.body.student.isSouthAfrican
   });
 
+  var studentModules = [];
+
+  req.body.student.modules.filter(m => m != null).map(m => {
+    studentModules.push(mongoose.Types.ObjectId(m));
+  });
+
   Student.findById(studentID).then(s => {
     if (s == null) return res.status(512).send(student.username + " does not exist.");
 
@@ -187,7 +219,27 @@ router.post("/update/student/:studentID", function (req, res) {
     s.dob = student.dob;
     s.idNumber = student.idNumber;
     s.isSouthAfrican = student.isSouthAfrican;
+    if (!s.modules) s.modules = [];
 
+    studentModules.filter(v => !s.modules.some(sm => v == sm)).forEach(smm => {
+      s.modules.push(smm);
+    })
+
+    Module.find({
+      '_id': {
+        $in: studentModules
+      }
+    }).then(modules => {
+      if (!modules) console.error('Module addition failed', `Unable to add the modules for ${studentID}`);
+      modules.forEach(_module => {
+        if (!_module.students) _module.students = [];
+        if (!_module.students.some(v => v == studentID)) _module.students.push(studentID);
+        _module.save(function (err) {
+          if (err) console.log('Module addition failed', `Unable to add module ${_module._id} to ${studentID}`)
+          console.log('Module added', `Linked module ${_module._id} to ${studentID}`)
+        });
+      })
+    });
     s.save(function (err) {
       if (err) return res.status(512).send("Server error : " + err.message);
       Student.find({
