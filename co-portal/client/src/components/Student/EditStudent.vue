@@ -28,7 +28,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="input-field col m4 offset-m1 s12 text-center">
+              <div class="input-field active col m4 offset-m1 s12 text-center">
                 <input v-model="student.password" id="Password" name="Password" type="password" />
                 <label class="text-center" for="Password">Password</label>
               </div>
@@ -158,6 +158,8 @@ export default {
   },
   methods: {
     LoadStudent() {
+      this.isLoading = true;
+
       if (this.$store.state.user.type == "STUDENT") {
         this.studentID = this.$store.state.user.id;
       }
@@ -168,13 +170,17 @@ export default {
       axios
         .get(this.$store.state.settings.baseLink + `/s/${this.studentID}/get`)
         .then(results => {
+          this.isLoading = false;
           this.student = results.data;
           if (!this.student.modules || this.student.modules.length == 0) {
             this.student.modules = [null];
+          } else {
+            this.student.modules = this.student.modules.map(v => v._id);
           }
           console.log("student", this.student);
         })
         .catch(err => {
+          this.isLoading = false;
           this.$router.replace("/home");
         });
     },
