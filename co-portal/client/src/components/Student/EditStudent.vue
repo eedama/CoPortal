@@ -5,12 +5,12 @@
         <md-empty-state md-icon="done" md-label="Student was successfully added." md-description="You can now assign the student to more modules / view the student's progress.">
         </md-empty-state>
       </div>
-      <div style="padding-top:30" v-show="!done" class="col m8 offset-m2 center-align center">
+      <div style="padding-top:30" class="col m8 offset-m2 center-align center">
         <div class="card row">
-          <div class="card-header center-align z-depth-3 cardBar">
+          <div v-show="!done" class="card-header center-align z-depth-3 cardBar">
             <h5 style="padding:20px">Editting a student</h5>
           </div>
-          <div class="card-content">
+          <div v-show="!done" class="card-content">
             <div class="row">
               <div class="input-field col m4 offset-m1 s12 text-center">
                 <input v-model="student.firstname" id="Firstname" name="Firstname" type="text" />
@@ -70,10 +70,10 @@
               <div class="col s12">
                 <md-field>
                   <label for="Gender">Gender</label>
-                  <md-select v-model="student.gender" name="Gender" id="Gender">
-                    <md-option disabled>Pick a gender</md-option>
-                    <md-option value="Male">Male</md-option>
-                    <md-option value="Female">Female</md-option>
+                  <md-select style="background-color:white" v-model="student.gender" name="Gender" id="Gender">
+                    <md-option style="background-color:white" disabled>Pick a gender</md-option>
+                    <md-option style="background-color:white" value="Male">Male</md-option>
+                    <md-option style="background-color:white" value="Female">Female</md-option>
                   </md-select>
                 </md-field>
               </div>
@@ -95,6 +95,72 @@
               </div>
             </div>
           </div>
+          <div class="card-header center-align z-depth-3 cardBar">
+            <h5 style="padding:20px">Add parent</h5>
+              <div v-show="student.parents && student.parents.length > 0" class="row">
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <label class="text-center">We already have the following parents in the system</label>
+              </div>
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <p class="text-center" v-for="_parent in student.parents">{{ _parent.surname }} {{ _parent.name }} - {{ _parent.relationship }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="row">
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="parent.firstname" id="Firstname1" name="Firstname1" type="text" />
+                <label class="text-center" for="Firstname1">Firstname</label>
+              </div>
+              <div class="input-field col m4 offset-m1 s12 text-center">
+                <input v-model="parent.lastname" id="Lastname1" name="Lastname1" type="text" />
+                <label class="text-center" for="Lastname1">Lastname</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+                <input v-model="parent.email" id="Username1" name="Username1" type="email" />
+                <label class="text-center" for="Username1">Email</label>
+              </div>
+            </div>
+             <div class="row">
+              <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+                <input v-model="parent.numbers" id="Username2" name="Username2" type="number" />
+                <label class="text-center" for="Username2">Contact Numbers</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                <md-field>
+                  <label for="Relationship">{{ parent.firstname }} {{ parent.lastname }} is my </label>
+                  <md-select style="background-color:white" v-model="parent.relationship" name="Relationship" id="Relationship">
+                    <md-option style="background-color:white" disabled>Pick a your relationship with {{ parent.firstname }} {{ parent.lastname }}</md-option>
+                    <md-option style="background-color:white" value="FATHER">Father</md-option>
+                    <md-option style="background-color:white" value="MOTHER">Mother</md-option>
+                    <md-option style="background-color:white" value="SISTER">Sister</md-option>
+                    <md-option style="background-color:white" value="BROTHER">Brother</md-option>
+                    <md-option style="background-color:white" value="GUARDIAN">Guardian</md-option>
+                  </md-select>
+                </md-field>
+              </div>
+            </div>
+            <div class="row" v-show="txtError.length > 0">
+              <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                <label class="text-center red-text">{{ txtError2 }}</label>
+              </div>
+            </div>
+             <div class="row">
+              <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                <input v-if="!isLoading" v-on:click="SubmitParent()" type="submit" value="Save parent" class="btn center-align tg-btn" />
+                <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                <p v-for="result in parentResults">{{ result }}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -112,6 +178,7 @@ export default {
   data() {
     return {
       txtError: "",
+      txtError2: "",
       student: {
         firstname: "",
         lastname: "",
@@ -124,6 +191,14 @@ export default {
         dob: "",
         isSouthAfrican: false
       },
+      parent: {
+        firstname: "",
+        lastname: "",
+        email: "",
+        numbers: "",
+        relationship: "FATHER"
+      },
+      parentResults:[],
       done: false,
       modules: [],
       isLoading: false
@@ -206,6 +281,70 @@ export default {
           } else {
             swal("Unable to load modules", "Try again later", "error");
           }
+        });
+    },
+    SubmitParent() {
+      this.txtError2 = "";
+      this.isLoading = true;
+      if (this.parent.lastname.length < 2) {
+        this.txtError2 = "Please enter a valid lastname";
+      }
+
+      if (this.parent.firstname.length < 2) {
+        this.txtError2 = "Please enter a valid firstname";
+      }
+      if (this.parent.contacts < 10 || isNaN(this.parent.contacts)) {
+        this.txtError2 = "Please enter valid contact numbers";
+      }
+
+      if (
+        this.parent.email.length < 2 ||
+        this.parent.email.indexOf("@") < 0 ||
+        this.parent.email.indexOf(".") < 0
+      ) {
+        this.txtError2 = "Please enter a email address";
+      }
+
+      if (this.txtError.length > 2) {
+        this.isLoading = false;
+        return;
+      }
+
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/s/add/parent/for/" +
+            this.student._id,
+          {
+            parent: {
+              surname: this.parent.lastname,
+              name: this.parent.firstname,
+              numbers: this.parent.numbers,
+              email: this.parent.email,
+              relationship: this.parent.relationship
+            }
+          }
+        )
+        .then(results => {
+          this.isLoading = false;
+          this.done = true;
+          this.parentResults.push(results.data);
+          swal(
+            "Parent added",
+            `${this.parent.firstname} ${
+              this.parent.lastname
+            } was successfully added as your ${this.parent.relationship}`,
+            "success"
+          );
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            this.txtError2 = err.response.data;
+          } else {
+            swal("Unable to save the parent", err.message, "error");
+          }
+          this.$emit("submitted", false);
         });
     },
     SubmitStudent() {

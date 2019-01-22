@@ -100,7 +100,6 @@
                 <span>{{ announcement.title }}</span>
                 <p>{{ announcement.message }}</p>
               </div>
-
             </md-list-item>
           </div>
         </md-list>
