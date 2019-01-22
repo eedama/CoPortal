@@ -63,16 +63,25 @@
       </div>
 
     </div>
-    <div class="row">
-      <div v-if="!$store.state.user.isLoggedIn" v-on:click="$router.push('/login')" class="col m6 offset-m3 s12 pointer bigButton center-align waves-effect">
+    <div v-if="!$store.state.user.isLoggedIn" class="row">
+      <div v-on:click="$router.push('/login')" class="col m6 offset-m3 s12 pointer bigButton center-align waves-effect">
         <div class="card-panel hoverable">
           <h5 class="center-align"><i style="font-size:100%" class="material-icons left">lock</i> <span>Login</span></h5>
+        </div>
+      </div>
+      </div>
+    <div v-if="!$store.state.user.isLoggedIn" class="row bottomPin">
+      <div class="col s12 center-align">
+        <h5 class="center-align">Meet some of our cool friends that might help boost your career life</h5>
+      </div>
+      <div v-for="(partner,i) in partners" :key="i" v-on:click="GotoExternal(partner.link)" class="col m3 s6 pointer bigButton center-align waves-effect">
+        <div class="card-panel hoverable">
+          <h6 class="center-align"><span>{{ partner.name }}</span></h6>
         </div>
       </div>
     </div>
     <div v-if="$store.state.user.isLoggedIn" class="row">
       <div class="col s12 m6 xl4 push-xl2">
-
         <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
           <md-card-header class="left">Annnouncements</md-card-header>
         </div>
@@ -134,6 +143,16 @@ export default {
   name: "Home",
   data() {
     return {
+      partners: [
+        {
+          link: "https://www.onlinecareerguidance.co.za",
+          name: "Online career guidance"
+        },
+        {
+          link: "http://www.zabursaries.co.za",
+          name: "ZA Bursaries"
+        }
+      ],
       announcement: {
         title: "",
         message: "",
@@ -261,6 +280,9 @@ export default {
     }
   },
   methods: {
+    GotoExternal(url) {
+      window.open(url, "_blank");
+    },
     AnnouncementClick(announcement) {
       swal({
         title: announcement.title,
@@ -303,6 +325,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.bottomPin {
+  position: fixed;
+  bottom: 0;
+}
+
 .bigButton :hover {
   background: black;
   color: white;
