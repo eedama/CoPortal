@@ -112,7 +112,7 @@ router.post("/update/lecturer/:lecturerID", function(req, res) {
     Lecturer.findOne({
         username: new RegExp('\\b' + lecturer.username + '\\b', 'i')
     }).then(ll => {
-        if (ll != null || ll._id != lecturerID) return res.status(512).send("Username " + lecturer.username + " is already taken.");
+        if (ll != null || ll._id.toString() != lecturerID) return res.status(512).send("Username " + lecturer.username + " is already taken.");
         Lecturer.findById(lecturerID).then(l => {
             if (l == null) return res.status(512).send(lecturer.username + " does not exist.");
 
@@ -217,7 +217,7 @@ router.post("/update/student/:studentID", function(req, res) {
     Student.findOne({
         username: new RegExp('\\b' + student.username + '\\b', 'i')
     }).then(ss => {
-        if (ss != null || ss._id != studentID) return res.status(512).send("Username " + student.username + " is already taken.");
+        if (ss != null || ss._id.toString() != studentID) return res.status(512).send("Username " + student.username + " is already taken.");
         Student.findById(studentID).then(s => {
             if (s == null) return res.status(512).send(student.username + " does not exist.");
 
