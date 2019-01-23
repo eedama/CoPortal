@@ -69,7 +69,7 @@ router.post("/add/lecturer", function(req, res) {
     }).then(modules => {
         lecturer.modules = modules.filter(m => m._id);
         Lecturer.findOne({
-            username: lecturer.username
+            username: /^lecturer.username$/i
         }).then(l => {
             if (l != null) return res.status(512).send("Username " + lecturer.username + " is already taken.");
             lecturer.save(function(err) {
@@ -110,7 +110,7 @@ router.post("/update/lecturer/:lecturerID", function(req, res) {
     });
 
     Lecturer.findOne({
-        username: lecturer.username
+        username: /^lecturer.username$/i
     }).then(ll => {
         if (ll != null || ll._id != lecturerID) return res.status(512).send("Username " + lecturer.username + " is already taken.");
         Lecturer.findById(lecturerID).then(l => {
@@ -169,7 +169,7 @@ router.post("/add/student", function(req, res) {
     }).then(modules => {
         student.modules = modules.filter(m => m._id);
         Student.findOne({
-            username: student.username
+            username: /^student.username$/i
         }).then(l => {
             if (l != null) return res.status(512).send("Username " + student.username + " is already taken.");
             student.save(function(err) {
@@ -215,7 +215,7 @@ router.post("/update/student/:studentID", function(req, res) {
         studentModules.push(mongoose.Types.ObjectId(m));
     });
     Student.findOne({
-        username: student.username
+        username: /^student.username$/i
     }).then(ss => {
         if (ss != null || ss._id != studentID) return res.status(512).send("Username " + student.username + " is already taken.");
         Student.findById(studentID).then(s => {
