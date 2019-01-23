@@ -109,30 +109,35 @@ router.post("/update/lecturer/:lecturerID", function(req, res) {
         isSouthAfrican: req.body.lecturer.isSouthAfrican
     });
 
-    Lecturer.findById(lecturerID).then(l => {
-        if (l == null) return res.status(512).send(lecturer.username + " does not exist.");
+    Lecturer.findOne({
+        username: lecturer.username
+    }).then(ll => {
+        if (ll != null || ll._id != lecturerID) return res.status(512).send("Username " + lecturer.username + " is already taken.");
+        Lecturer.findById(lecturerID).then(l => {
+            if (l == null) return res.status(512).send(lecturer.username + " does not exist.");
 
-        l.lastname = lecturer.lastname;
-        l.firstname = lecturer.firstname;
-        l.username = lecturer.username;
-        l.gender = lecturer.gender;
-        l.dob = lecturer.dob;
-        l.idNumber = lecturer.idNumber;
-        l.isSouthAfrican = lecturer.isSouthAfrican;
+            l.lastname = lecturer.lastname;
+            l.firstname = lecturer.firstname;
+            l.username = lecturer.username;
+            l.gender = lecturer.gender;
+            l.dob = lecturer.dob;
+            l.idNumber = lecturer.idNumber;
+            l.isSouthAfrican = lecturer.isSouthAfrican;
 
-        l.save(function(err) {
-            if (err) return res.status(512).send("Server error : " + err.message);
-            Lecturer.find({
-                    "active": true
-                })
-                .populate(['modules'])
-                .then(lecturers => {
-                    if (lecturers == null) res.send("Error : 9032rtu8fg34g9erbo");
-                    res.json(lecturers);
-                });
+            l.save(function(err) {
+                if (err) return res.status(512).send("Server error : " + err.message);
+                Lecturer.find({
+                        "active": true
+                    })
+                    .populate(['modules'])
+                    .then(lecturers => {
+                        if (lecturers == null) res.send("Error : 9032rtu8fg34g9erbo");
+                        res.json(lecturers);
+                    });
+            });
+        }).catch(err => {
+            return res.status(512).send("Server error : " + err.message);
         });
-    }).catch(err => {
-        return res.status(512).send("Server error : " + err.message);
     });
 });
 
@@ -209,51 +214,55 @@ router.post("/update/student/:studentID", function(req, res) {
     req.body.student.modules.filter(m => m != null).map(m => {
         studentModules.push(mongoose.Types.ObjectId(m));
     });
+    Student.findOne({
+        username: student.username
+    }).then(ss => {
+        if (ss != null || ss._id != studentID) return res.status(512).send("Username " + student.username + " is already taken.");
+        Student.findById(studentID).then(s => {
+            if (s == null) return res.status(512).send(student.username + " does not exist.");
 
-    Student.findById(studentID).then(s => {
-        if (s == null) return res.status(512).send(student.username + " does not exist.");
+            s.lastname = student.lastname;
+            s.firstname = student.firstname;
+            s.username = student.username;
+            s.gender = student.gender;
+            s.dob = student.dob;
+            s.idNumber = student.idNumber;
+            s.isSouthAfrican = student.isSouthAfrican;
+            if (!s.modules) s.modules = [];
 
-        s.lastname = student.lastname;
-        s.firstname = student.firstname;
-        s.username = student.username;
-        s.gender = student.gender;
-        s.dob = student.dob;
-        s.idNumber = student.idNumber;
-        s.isSouthAfrican = student.isSouthAfrican;
-        if (!s.modules) s.modules = [];
-
-        studentModules.filter(v => !s.modules.some(sm => v == sm)).forEach(smm => {
-            s.modules.push(smm);
-        })
-
-        Module.find({
-            '_id': {
-                $in: studentModules
-            }
-        }).then(modules => {
-            if (!modules) console.error('Module addition failed', `Unable to add the modules for ${studentID}`);
-            modules.forEach(_module => {
-                if (!_module.students) _module.students = [];
-                if (!_module.students.some(v => v == studentID)) _module.students.push(studentID);
-                _module.save(function(err) {
-                    if (err) console.log('Module addition failed', `Unable to add module ${_module._id} to ${studentID}`)
-                    console.log('Module added', `Linked module ${_module._id} to ${studentID}`)
-                });
+            studentModules.filter(v => !s.modules.some(sm => v == sm)).forEach(smm => {
+                s.modules.push(smm);
             })
-        });
-        s.save(function(err) {
-            if (err) return res.status(512).send("Server error : " + err.message);
-            Student.find({
-                    "active": true
+
+            Module.find({
+                '_id': {
+                    $in: studentModules
+                }
+            }).then(modules => {
+                if (!modules) console.error('Module addition failed', `Unable to add the modules for ${studentID}`);
+                modules.forEach(_module => {
+                    if (!_module.students) _module.students = [];
+                    if (!_module.students.some(v => v == studentID)) _module.students.push(studentID);
+                    _module.save(function(err) {
+                        if (err) console.log('Module addition failed', `Unable to add module ${_module._id} to ${studentID}`)
+                        console.log('Module added', `Linked module ${_module._id} to ${studentID}`)
+                    });
                 })
-                .populate(['modules'])
-                .then(students => {
-                    if (students == null) res.send("Error : 9032rtu8fg34g9erbo");
-                    res.json(students);
-                });
+            });
+            s.save(function(err) {
+                if (err) return res.status(512).send("Server error : " + err.message);
+                Student.find({
+                        "active": true
+                    })
+                    .populate(['modules'])
+                    .then(students => {
+                        if (students == null) res.send("Error : 9032rtu8fg34g9erbo");
+                        res.json(students);
+                    });
+            });
+        }).catch(err => {
+            return res.status(512).send("Server error : " + err.message);
         });
-    }).catch(err => {
-        return res.status(512).send("Server error : " + err.message);
     });
 });
 
