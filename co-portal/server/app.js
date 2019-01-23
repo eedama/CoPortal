@@ -51,7 +51,7 @@ mongoose
         useNewUrlParser: true,
         reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
         reconnectInterval: 500, // Reconnect every 500ms
-        dbName: "CoportalGPDevDB"
+        dbName: "CoportalGParkDB"
     })
     .then(answer => {
         console.log("Successfully connected to MONGO!");
