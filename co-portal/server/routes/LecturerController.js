@@ -420,7 +420,11 @@ router.post("/report/student", function (req, res) {
     student.parents.filter(p => p.email).forEach(async parent => {
       var status = 'NOTSENT';
       if (report.method == 'SMS' && parent.contactNumbers) {
-        var msg = `Hello, ${parent.surname} ${parent.name} please check your email (${parent.email}) you have an email from coportal related to your child ${student.surname} ${student.firstname}`;
+        var msg = `Hello, ${parent.surname} ${parent.name} this is a message from coportal, in relation to your child ${student.surname} ${student.firstname}.
+        ${ report.message }
+        kind regards
+        ${ report.subject } Lecturer.
+        `;
         var smsResponse = await smsProvider.sendSMS(parent.contactNumbers, msg);
         if (smsResponse) status = 'SMSSENT';
       }
