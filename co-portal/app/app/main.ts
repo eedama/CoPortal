@@ -83,8 +83,25 @@ Vue.mixin({
     return {
       isLoading: false,
       toggleSearch: false,
-      master: master
+      master: master,
+      currentPage: 0
     };
+  },
+  methods: {
+    navigate(to, props = null, options = null) {
+      if (to == null) {
+        if (this.currentPage && this.currentPage > 0 && !props) {
+          this.currentPage--;
+        } else {
+          this.$navigator.back();
+        }
+      } else {
+        options = options || {};
+        options.props = props;
+        console.log("Option", options);
+        this.$navigator.navigate(to, options);
+      }
+    }
   }
 });
 

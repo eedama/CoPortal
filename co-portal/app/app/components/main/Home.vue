@@ -1,9 +1,11 @@
 <template>
-  <page class="backgroundImage" actionBarHidden="true" @loaded="pageLoaded()">
-    <GridLayout class="backgroundImageOverlay" rows="auto,*,auto,auto" columns="*,auto">
-      <label colSpan="2" :text="introTxt" fontSize="18" :textWrap="true" class="p-20 text-white bg-dark-blue-overlay topMainText" textAlignment="center"></label>
-      <Image row="2" col="1" src="res://ic_logo" alignSelf="center" stretch="aspectFill" />
-      <Button row="3" colSpan="2" class="bg-dark-blue p-15 text-white" fontSize="18" @tap="navigate('/login')" text="Login"></Button>
+  <page actionBarHidden="true">
+    <GridLayout rows="*" columns="*">
+      <ScrollView row="0">
+        <StackLayout>
+          
+        </StackLayout>
+      </ScrollView>
     </GridLayout>
   </page>
 </template>
@@ -18,9 +20,6 @@ export default {
     return {
       introTxt: "Digitalize your business and keep track of all your earnings."
     };
-  },
-  created() {
-    this.pageLoaded();
   },
   mounted() {
     this.pageLoaded();

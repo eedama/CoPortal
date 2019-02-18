@@ -1,27 +1,35 @@
 <template>
-  <Page>
-    <ActionBar>
-      <GridLayout width="100%" columns="auto, *">
-        <label col="0" @tap="$refs.drawer.nativeView.showDrawer()" class="mdi m-10" fontSize="25%" :text="'mdi-email' | fonticon"></label>
-        <Label class="title" text="Welcome to NativeScript-Vue!" col="1" />
-      </GridLayout>
-    </ActionBar>
-  
+  <Page actionBarHidden="true">
     <RadSideDrawer ref="drawer">
       <StackLayout ~drawerContent backgroundColor="#ffffff">
-        <Label class="drawer-header" text="Drawer" />
-  
-        <Label class="drawer-item" text="Item 1" />
-        <Label class="drawer-item" text="Item 2" />
-        <Label class="drawer-item" text="Item 3" />
+        <GridLayout rows="auto,*">
+          <CardView row="0" class="bg-dark-black" elevation="15">
+            <GridLayout class="p-t-25 p-b-5 p-x-15" rows="auto,auto" columns="*,auto">
+              <Label row="0" col="0" class="h3" text="Sirwali Joseph" />
+              <Label row="1" col="0" class="h4" text="201512860" />
+              <Label row="0" col="1" rowSpan="2" verticalAlignment="center" text="Drawer" />
+            </GridLayout>
+          </CardView>
+          <ScrollView row="1">
+            <StackLayout>
+              <Ripple v-for="(layout,i) in drawerLayouts" :key="i">
+                <GridLayout class="drawer-item p-y-5" rows="auto,auto,auto" columns="auto,*">
+                  <label row="0" col="0" rowSpan="2" textAlignment="center" verticalAlignment="center" class="mdi m-10 text-dark-black" fontSize="25%" :text="'mdi-' + layout.icon | fonticon"></label>
+                  <label row="0" col="1" class="h3 font-weight-bold text-dark-black" fontSize="17%" :text="layout.text"></label>
+                  <label row="1" col="1" class="h4 text-dark-black" fontSize="13%" :text="layout.description"></label>
+                </GridLayout>
+              </Ripple>
+            </StackLayout>
+          </ScrollView>
+        </GridLayout>
       </StackLayout>
   
       <GridLayout ~mainContent columns="*" rows="*">
         <GridLayout rows="auto,auto,*" columns="*,auto">
-          <StackLayout colSpan="2" row="0" class="bg-light-red" v-show="connectionType == 0">
-            <label class="text-white p-5" fontSize="15" textAlignment="center" text="offline"></label>
+          <StackLayout row="0" class="text-dark-black">
+            <label @tap="$refs.drawer.nativeView.showDrawer()" class="mdi m-10" fontSize="35%" :text="'mdi-menu' | fonticon"></label>
           </StackLayout>
-          <StackLayout col="1" row="1" class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
+          <StackLayout col="1" row="0" class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
             <label class="text-white p-x-15 m-x-10 span" textAlignment="center" fontSize="15" text="Demo"></label>
           </StackLayout>
           <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="loggedIn ? '/home' : '/login'" />
@@ -39,16 +47,66 @@ export default {
     return {
       msg: "What???",
       loggedIn: false,
-      connectionType: null
+      connectionType: null,
+      drawerLayouts: [
+        {
+          text: "My profile",
+          icon: "account",
+          link: "/",
+          description: "View and edit personal information",
+          auth: ["STUDENT", "LECTURER", "ADMIN"]
+        },
+        {
+          text: "Students",
+          icon: "account-multiple",
+          link: "/student/list",
+          description: "Students registered to the system",
+          auth: ["LECTURER", "ADMIN"]
+        },
+        {
+          text: "Lecturers",
+          icon: "account-supervisor-circle",
+          link: "/lecturer/list",
+          description: "Lecturers registered to the system",
+          auth: ["ADMIN"]
+        },
+        {
+          text: "Modules",
+          icon: "book-open-page-variant",
+          link: "/module/list",
+          description: "Modules you are registered for",
+          auth: ["ADMIN", "LECTURER", "STUDENT"]
+        },
+        {
+          text: "Marks",
+          icon: "checkbox-multiple-marked-circle-outline",
+          link: "/marks/all",
+          description: "Test results and marksheets",
+          auth: ["STUDENT"]
+        },
+        {
+          text: "Assessment results",
+          icon: "checkbox-multiple-marked-circle-outline",
+          link: "/marks/sheet",
+          description: "Test results and marksheets",
+          auth: ["LECTURER", "ADMIN"]
+        },
+        {
+          text: "Report a student",
+          icon: "account-alert-outline",
+          link: "/Student/Report",
+          description: "Report a student",
+          auth: ["LECTURER", "ADMIN"]
+        },
+        {
+          text: "Log out",
+          icon: "exit-run",
+          link: "/Student/Report",
+          description: "Leave the system",
+          auth: ["LECTURER", "ADMIN"]
+        }
+      ]
     };
-  },
-  beforeCreate() {
-    this.$store.commit("refreshCache", {
-      db: this.$db,
-      api: this.$api,
-      appSettings: this.appSettings,
-      doc: "admin"
-    });
   },
   mounted() {
     connectivity.startMonitoring(conn => {
@@ -71,39 +129,10 @@ export default {
 </script>
 
 <style scoped>
-ActionBar {
-  color: #ffffff;
-}
-
-.title {
-  text-align: left;
-  padding-left: 16;
-}
-
-.message {
-  vertical-align: center;
-  text-align: center;
-  font-size: 20;
-  color: #333333;
-}
-
-.drawer-header {
-  padding: 50 16 16 16;
-  margin-bottom: 16;
-  color: #ffffff;
-  font-size: 24;
-}
-
-.drawer-item {
-  padding: 8 16;
-  color: #333333;
-  font-size: 16;
-}
-
 .ribbon {
   transform: rotate(45deg);
-  margin-top: 20;
-  margin-right: -35;
+  margin-top: 30;
+  margin-right: -20;
   z-index: 10;
   overflow: hidden;
 }
