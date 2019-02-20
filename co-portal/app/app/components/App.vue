@@ -12,8 +12,8 @@
           </CardView>
           <ScrollView row="1">
             <StackLayout>
-              <Ripple v-for="(layout,i) in drawerLayouts" :key="i">
-                <GridLayout class="drawer-item p-y-5" rows="auto,auto,auto" columns="auto,*">
+              <Ripple @tap="goTo(layout)" v-for="(layout,i) in drawerLayouts" :key="i">
+                <GridLayout class="drawer-item p-y-10" rows="auto,auto,auto" columns="auto,*">
                   <label row="0" col="0" rowSpan="2" textAlignment="center" verticalAlignment="center" class="mdi m-10 text-dark-black" fontSize="25%" :text="'mdi-' + layout.icon | fonticon"></label>
                   <label row="0" col="1" class="h3 font-weight-bold text-dark-black" fontSize="17%" :text="layout.text"></label>
                   <label row="1" col="1" class="h4 text-dark-black" fontSize="13%" :text="layout.description"></label>
@@ -24,13 +24,19 @@
         </GridLayout>
       </StackLayout>
   
+      <AbsoluteLayout class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
+        <label class="text-white p-x-15 m-x-10 span" textAlignment="center" fontSize="15" text="Demo"></label>
+      </AbsoluteLayout>
+  
       <GridLayout ~mainContent columns="*" rows="*">
         <GridLayout rows="auto,auto,*" columns="*,auto">
-          <StackLayout row="0" class="text-dark-black">
-            <label @tap="$refs.drawer.nativeView.showDrawer()" class="mdi m-10" fontSize="35%" :text="'mdi-menu' | fonticon"></label>
-          </StackLayout>
-          <StackLayout col="1" row="0" class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
-            <label class="text-white p-x-15 m-x-10 span" textAlignment="center" fontSize="15" text="Demo"></label>
+          <StackLayout orientation="horizontal" row="0" class="text-dark-black">
+            <Ripple verticalAlignment="center" class="m-5" @tap="$refs.drawer.nativeView.showDrawer()">
+              <label class="mdi p-5" fontSize="35%" :text="'mdi-menu' | fonticon"></label>
+            </Ripple>
+            <Ripple verticalAlignment="center" class="m-5" @tap="goTo(notificationsRoute)">
+              <label class="mdi p-5" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
+            </Ripple>
           </StackLayout>
           <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="loggedIn ? '/home' : '/login'" />
         </GridLayout>
@@ -48,6 +54,13 @@ export default {
       msg: "What???",
       loggedIn: false,
       connectionType: null,
+      notificationsRoute: {
+        text: "My profile",
+        icon: "bell",
+        link: "/notifications/list",
+        description: "All your notifications in one place",
+        auth: ["STUDENT", "LECTURER", "ADMIN"]
+      },
       drawerLayouts: [
         {
           text: "My profile",
@@ -124,7 +137,12 @@ export default {
       this.connectionType = conn;
     });
   },
-  methods: {}
+  methods: {
+    goTo(item) {
+      this.$refs.drawer.nativeView.closeDrawer();
+      this.navigate(item.link);
+    }
+  }
 };
 </script>
 
