@@ -5,6 +5,9 @@ import Login from "../components/main/Login.vue";
 import Modules from "../components/pages/Modules.vue";
 import Notifications from "../components/pages/Notifications.vue";
 
+// Components
+import Module from "../components/pages/components/Module.vue";
+
 var appSettings = require("application-settings");
 import {
   Feedback,
@@ -54,6 +57,18 @@ var router = {
       component: Notifications,
       meta: {
         title: "Notifications",
+        authLevel: 0
+      }
+    },
+    /**
+     * Components
+     */
+    "/module/view": {
+      name: "module",
+      path: "/module/view/:moduleId",
+      component: Module,
+      meta: {
+        title: "Module",
         authLevel: 0
       }
     }

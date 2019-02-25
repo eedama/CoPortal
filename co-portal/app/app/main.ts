@@ -101,6 +101,9 @@ Vue.mixin({
         console.log("Option", options);
         this.$navigator.navigate(to, options);
       }
+    },
+    getMoment(val = new Date()) {
+      return moment(val);
     }
   }
 });

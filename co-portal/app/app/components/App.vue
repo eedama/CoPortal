@@ -112,6 +112,13 @@ export default {
           auth: ["LECTURER", "ADMIN"]
         },
         {
+          text: "Settings",
+          icon: "settings",
+          link: "/Student/Report",
+          description: "Customize your portal",
+          auth: ["STUDENT", "LECTURER", "ADMIN"]
+        },
+        {
           text: "Log out",
           icon: "exit-run",
           link: "/Student/Report",
