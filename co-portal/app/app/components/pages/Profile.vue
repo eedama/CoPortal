@@ -21,8 +21,8 @@
                 class="text-dark-black p-x-20 p-y-15"
                 rows="auto,auto"
                 columns="auto,*"
-                v-for="user in users"
-                :key="user.title"
+                v-for="(user,index) in users"
+                :key="index"
               >
                 <label
                   row="0"
@@ -46,21 +46,18 @@
                 <label row="1" col="1" fontSize="15" textAlignment="left" :text="user.body"></label>
               </GridLayout>
                  <label
-                  row="0"
-                  col="0"
-                  class="mdi text-dark-black"
-                  rowSpan="2"
+                  class="text-dark-black p-l-20 p-t-20 p-b-10"
                   verticalAlignment="center"
-                  textAlignment="left"
-                  fontSize="35"
-                  :text="user.icon | fonticon"
+                  fontSize="20"
+                  style="opacity:0.6"
+                  text="Next of kin"
                 ></label>
               <GridLayout
                 class="text-dark-black p-x-20 p-y-15"
                 rows="auto,auto"
                 columns="auto,*,auto"
-                v-for="user in Parents"
-                :key="user.title"
+                v-for="(user,index) in Parents"
+                :key="index"
               >
                 <label
                   row="0"
