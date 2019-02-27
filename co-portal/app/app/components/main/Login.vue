@@ -50,7 +50,7 @@
                     col="1"
                     keyboardType="email"
                     returnKeyType="next"
-                    v-model="user.email"
+                    v-model="username"
                     autocorrect="true"
                     autocapitalizationType="none"
                   ></TextField>
@@ -79,7 +79,7 @@
                     ref="password"
                     secure="true"
                     returnKeyType="done"
-                    v-model="user.password"
+                    v-model="password"
                     @returnPress="submit()"
                     :class="{ light: !isLoading }"
                   ></TextField>
@@ -132,10 +132,8 @@ export default {
   name: "login",
   data() {
     return {
-      user: {
-        password: "",
-        email: ""
-      }
+      password: "",
+      username: ""
     };
   },
   mounted() {
@@ -163,94 +161,55 @@ export default {
       });
     },
     submit() {
-      if (this.email.length == 0) {
+      if (this.username.length == 0) {
         this.$feedback.error({
-          title: "Thumbs up!",
-          message: "Please Enter a valid Email",
-          duration: 3000,
-          onTap: () => console.log("showCustomIcon tapped"),
-          onShow: animating =>
-            console.log(
-              animating ? "showCustomIcon animating" : "showCustomIcon shown"
-            ),
-          onHide: () => console.log("showCustomIcon hidden")
+          title: "Incorrect email",
+          message: "Please Enter a valid email",
+          duration: 3000
         });
         return;
       }
 
       if (this.password.length == 0) {
         this.$feedback.error({
-          title: "Thumbs up!",
+          title: "Invalid password",
           message: "Please Enter a valid password",
-          duration: 3000,
-          onTap: () => console.log("showCustomIcon tapped"),
-          onShow: animating =>
-            console.log(
-              animating ? "showCustomIcon animating" : "showCustomIcon shown"
-            ),
-          onHide: () => console.log("showCustomIcon hidden")
+          duration: 3000
         });
+        return;
       }
 
-      var self = this;
-      this.isLoading = true;
       this.$api
-        .adminLogin({
-          numbers: this.user.numbers,
-          email: this.user.email,
-          pass: this.user.password
-        })
-        .then(response => {
-          var statusCode = response.statusCode;
-          if (statusCode == 200) {
-            var result = response.content.toJSON();
-            this.appSettings.setString("CurrentUserID", result._id);
-            this.$api
-              .getAuthToken()
-              .then(answer => {
-                console.log("tag getting auth after login", answer);
-                this.loginAdmin(self, result);
-                this.isLoading = false;
-                this.navigate("/admin/dashboard", null, {
-                  clearHistory: true,
-                  transition: {
-                    name: "slideTop",
-                    duration: 1000,
-                    curve: "spring"
-                  }
-                });
-              })
-              .catch(err => {
-                this.$feedback.warning({
-                  title: "Access denied!",
-                  duration: 40000,
-                  message: err.message
-                });
-                this.isLoading = false;
-                this.navigate("/home", null, {
-                  clearHistory: true
-                });
+        .loginUser(this.username, this.password)
+
+        .then(results => {
+          switch (results.data.userType) {
+            case "ADMIN":
+              alert("You are an admin and we are not ready for you");
+              return;
+            case "LECTURER":
+              alert("You are an lecturer and we are not ready for you");
+              return;
+            case "STUDENT":
+              var loggedInStudent = {
+                id: results.data.user._id,
+                username: results.data.user.username,
+                type: "STUDENT",
+                isLoggedIn: true
+              };
+              this.$store.commit("login", {
+                id: results.data.user._id,
+                username: results.data.user.username,
+                password: results.data.user.password,
+                type: results.data.userType,
+                isLoggedIn: true
               });
-          } else if (statusCode == 512) {
-            throw new Error(response.content.toString());
-          } else if (statusCode == 500) {
-            throw new Error("Internal server error");
-          } else {
-            throw new Error("Try again later");
+              alert(JSON.stringify(loggedInStudent));
+              break;
           }
         })
         .catch(err => {
-          if (err.message.indexOf("Failed to connect") >= 0) {
-            err.message = "Please check your internet connection";
-          }
-          if (err.message.indexOf("position") >= 0) {
-            err.message = "We are current having issues,please contact admin";
-          }
-          this.$feedback.error({
-            title: "Unable to log in",
-            message: err.message
-          });
-          this.isLoading = false;
+          alert("An error has occured.");
         });
     }
   }

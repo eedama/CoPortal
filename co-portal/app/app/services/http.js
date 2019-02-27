@@ -4,6 +4,11 @@ var appSettings = require("application-settings");
 import * as connectivity from "tns-core-modules/connectivity";
 
 export default class API {
+    constructor(base, master) {
+        this.baseUrl = base;
+        this.master = master;
+        this.auth_token = appSettings.getString("auth_token");
+    }
 
     async handleResponse(result) {
         if (result.statusCode == 401) {
@@ -110,25 +115,24 @@ export default class API {
     }
 
     // All calls
-    adminLogin(user) {
+    loginUser(username, password) {
         return new Promise((resolve, reject) => {
-            if (this.getInternetStatus() == connectivity.connectionType.none) {
-                this.master.feedback.warning({
-                    title: "No internet connection",
-                    duration: 4000,
-                    message: "Please connect to the internet to login."
-                });
-                reject(new Error("No internet connection."));
+            if (!username || !password) {
+                reject(new Error("User Unknown"));
             } else {
+
                 http
-                    .request(this.makePost("/a/login", user))
+                    .request(this.makePost("/acc/login", {
+                        username: username,
+                        password: password
+                    }))
                     .then(async result => {
                         var answer = await this.handleResponse(result);
                         if (answer) {
                             if (answer == true) {
                                 resolve(result);
                             } else {
-                                return this.adminLogin(user);
+                                return this.loginUser(user);
                             }
                         }
                     })
