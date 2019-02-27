@@ -33,3 +33,18 @@ https://coportal.net/demo/
     onHide: () => console.log("showCustomIcon hidden")
   });
  ```
+
+> Margins and Paddings
+
+```
+ m -> margin
+ m-20 -> 20 margin applied to (left,right,top,bottom)
+ m-r-20 -> 20 margin applied to (right)
+ m-b-20 -> 20 margin applied to (bottom)
+```
+```
+ p -> padding
+ p-20 -> 20 padding applied to (left,right,top,bottom)
+ p-r-20 -> 20 padding applied to (right)
+ p-b-20 -> 20 padding applied to (bottom)
+```
