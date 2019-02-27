@@ -2,11 +2,11 @@
 
 ## Server
 
-https://
+https://jmrsquared.com/api/coportal/dev/
 
 ## Client
 
-http:
+https://coportal.net/demo/
 
 
 ## Hints
