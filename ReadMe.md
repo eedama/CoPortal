@@ -13,7 +13,7 @@ https://coportal.net/demo/
 
 > Alerts
  ```
-  this.feedback.successs({
+  this.$feedback.successs({
     title: "Thumbs up!",
     message: "Custom colors and icon. Loaded from the App_Resources folder.",
     duration: 3000,
@@ -24,7 +24,7 @@ https://coportal.net/demo/
  ```
 
  ```
-  this.feedback.error({
+  this.$feedback.error({
     title: "Thumbs up!",
     message: "Custom colors and icon. Loaded from the App_Resources folder.",
     duration: 3000,
