@@ -7,6 +7,8 @@ import Notifications from "../components/pages/Notifications.vue";
 import Profile from "../components/pages/Profile.vue";
 // Components
 import Module from "../components/pages/components/Module.vue";
+// Tests
+import TakeTest from "../components/pages/components/TakeTest.vue";
 
 var appSettings = require("application-settings");
 import {
@@ -60,12 +62,12 @@ var router = {
         authLevel: 0
       }
     },
-    "/": {
+    "/student/profile/view": {
       name: "profile",
-      path: "/",
+      path: "/student/profile/view/:userId",
       component: Profile,
       meta: {
-        title: "Profile",
+        title: "StudentProfile",
         authLevel: 0
       }
     },
@@ -78,6 +80,18 @@ var router = {
       component: Module,
       meta: {
         title: "Module",
+        authLevel: 0
+      }
+    },
+    /**
+     * Tests
+     */
+    "/take/test": {
+      name: "taketest",
+      path: "/take/test/:questionaireId",
+      component: TakeTest,
+      meta: {
+        title: "TakeTest",
         authLevel: 0
       }
     }

@@ -26,30 +26,43 @@
         <TabView tabBackgroundColor="white" selectedTabTextColor="black" androidSelectedTabHighlightColor="black">
           <TabViewItem title="Notes">
             <ScrollView>
-              <WrapLayout>
-                <StackLayout width="50%" v-for="a in 15" :key="a">
-                  <CardView elevation="15" margin="5">
-                    <GridLayout class="p-10" rows="auto,auto,auto" columns="*,auto,auto">
-                      <label row="0" col="0" colSpan="3" :textWrap="true" verticalAlignment="center" textAlignment="center" class="font-weight-bold" fontSize="16%" :text="notification.sender"></label>
-                      <label row="1" col="0" colSpan="3" verticalAlignment="center" textAlignment="center" class="font-weight-bold mdi p-15" fontSize="75%" :text="'mdi-file-pdf' | fonticon "></label>
-                      <label row="2" col="0" verticalAlignment="bottom" class="h4 text-dark-black" text="10 minutes ago"></label>
-                      <Ripple row="2" col="1" verticalAlignment="bottom" textAlignment="right">
-                        <label class="font-weight-bold mdi p-x-5" textAlignment="right" fontSize="20%" :text="'mdi-download' | fonticon "></label>
-                      </Ripple>
-                      <Ripple row="2" col="2" verticalAlignment="bottom" textAlignment="right">
-                        <label class="font-weight-bold mdi p-x-5" textAlignment="right" fontSize="20%" :text="'mdi-share-variant' | fonticon "></label>
-                      </Ripple>
-                    </GridLayout>
-                  </CardView>
-                </StackLayout>
-              </WrapLayout>
+              <StackLayout v-for="a in 15" :key="a">
+                <CardView elevation="15" margin="5">
+                  <GridLayout class="p-10" rows="auto,auto,auto" columns="*,auto,auto">
+                    <label row="0" col="0" colSpan="3" :textWrap="true" verticalAlignment="center" textAlignment="center" class="font-weight-bold" fontSize="16%" :text="notification.sender"></label>
+                    <label row="1" col="0" colSpan="3" verticalAlignment="center" textAlignment="center" class="font-weight-bold mdi p-15" fontSize="75%" :text="'mdi-file-pdf' | fonticon "></label>
+                    <label row="2" col="0" verticalAlignment="bottom" class="h4 text-dark-black" text="10 minutes ago"></label>
+                    <Ripple row="2" col="1" verticalAlignment="bottom" textAlignment="right">
+                      <label class="font-weight-bold mdi p-x-5" textAlignment="right" fontSize="20%" :text="'mdi-download' | fonticon "></label>
+                    </Ripple>
+                    <Ripple row="2" col="2" verticalAlignment="bottom" textAlignment="right">
+                      <label class="font-weight-bold mdi p-x-5" textAlignment="right" fontSize="20%" :text="'mdi-share-variant' | fonticon "></label>
+                    </Ripple>
+                  </GridLayout>
+                </CardView>
+              </StackLayout>
             </ScrollView>
           </TabViewItem>
           <TabViewItem title="Tests">
             <Label text="Content for Tab 2" />
           </TabViewItem>
           <TabViewItem title="Marks">
-            <Label text="Content for Tab 2" />
+            <ScrollView>
+              <WrapLayout>
+                <StackLayout width="50%" v-for="a in 15" :key="a">
+                  <Ripple @tap="TakeTest(a)">
+                    <CardView elevation="15" margin="5">
+                      <GridLayout class="p-10" rows="auto,auto" columns="auto,*,auto">
+                        <label row="0" col="0" rowSpan="2" verticalAlignment="center" textAlignment="center" class="font-weight-bold mdi p-15" fontSize="25%" :text="'mdi-file-document-box-multiple' | fonticon "></label>
+                        <label row="0" col="1" :textWrap="true" verticalAlignment="center" textAlignment="center" fontSize="17%" text="Geography test 101"></label>
+                        <label row="1" col="1" :textWrap="true" verticalAlignment="center" textAlignment="center" fontSize="15%" text="101 Questions"></label>
+                        <label row="1" col="2" verticalAlignment="bottom" class="h4 text-dark-black" text="10 minutes ago"></label>
+                      </GridLayout>
+                    </CardView>
+                  </Ripple>
+                </StackLayout>
+              </WrapLayout>
+            </ScrollView>
           </TabViewItem>
         </TabView>
       </StackLayout>
@@ -85,6 +98,11 @@ export default {
         api: this.$api,
         appSettings: appSettings,
         doc: "admin"
+      });
+    },
+    TakeTest(a) {
+      this.navigate("/take/test", {
+        questionaireId: a
       });
     }
   }
