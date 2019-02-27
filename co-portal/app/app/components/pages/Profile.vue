@@ -16,15 +16,9 @@
       <StackLayout row="1">
         <CardView textAlignment="center" margin="10">
           <ScrollView width="100%">
-            <StackLayout
-              class="m-10"
-              justifyContent="space-between"
-              width="100%"
-              alignSelf="center"
-            >
+            <StackLayout width="100%">
               <GridLayout
-                row="0"
-                class="text-dark-black email-grid m-20"
+                class="text-dark-black p-x-20 p-y-15"
                 rows="auto,auto"
                 columns="auto,*"
                 v-for="user in users"
@@ -33,7 +27,8 @@
                 <label
                   row="0"
                   col="0"
-                  class="mdi text-dark-black m-r-20 m-t-15"
+                  class="mdi text-dark-black m-r-20"
+                  rowSpan="2"
                   verticalAlignment="center"
                   textAlignment="left"
                   fontSize="35"
@@ -42,33 +37,36 @@
                 <label
                   row="0"
                   col="1"
-                  class="font-weight-bold m-b-10"
+                  class="font-weight-bold"
                   fontSize="15"
                   verticalAlignment="center"
                   textAlignment="left"
                   :text="user.title"
                 ></label>
-                <label
-                  row="1"
-                  col="1"
-                  fontSize="15"
-                  textAlignment="left"
-                  class="text-left-margin"
-                  :text="user.body"
-                ></label>
+                <label row="1" col="1" fontSize="15" textAlignment="left" :text="user.body"></label>
               </GridLayout>
+                 <label
+                  row="0"
+                  col="0"
+                  class="mdi text-dark-black"
+                  rowSpan="2"
+                  verticalAlignment="center"
+                  textAlignment="left"
+                  fontSize="35"
+                  :text="user.icon | fonticon"
+                ></label>
               <GridLayout
-                row="0"
-                class="text-dark-black email-grid m-20"
+                class="text-dark-black p-x-20 p-y-15"
                 rows="auto,auto"
-                columns="auto,*"
+                columns="auto,*,auto"
                 v-for="user in Parents"
                 :key="user.title"
               >
                 <label
                   row="0"
                   col="0"
-                  class="mdi text-dark-black m-r-20 m-t-15"
+                  class="mdi text-dark-black m-r-20"
+                  rowSpan="2"
                   verticalAlignment="center"
                   textAlignment="left"
                   fontSize="35"
@@ -77,32 +75,24 @@
                 <label
                   row="0"
                   col="1"
-                  class="font-weight-bold m-b-10"
+                  class="font-weight-bold"
                   fontSize="15"
-                  verticalAlignment="center"
                   textAlignment="left"
                   :text="user.title"
                 ></label>
                 <label
                   row="0"
                   col="2"
-                  class="font-weight-bold p-b-2"
+                  class="font-weight-bold p-x-10 p-b-2"
                   fontSize="15"
-                  width="100"
+                  rowSpan="2"
                   borderRadius="50"
                   style="color:White;background-color:black;"
                   verticalAlignment="center"
                   textAlignment="center"
                   :text="user.badge"
                 ></label>
-                <label
-                  row="1"
-                  col="1"
-                  fontSize="15"
-                  textAlignment="left"
-                  class="text-left-margin"
-                  :text="user.body"
-                ></label>
+                <label row="1" col="1" fontSize="15" textAlignment="left" :text="user.body"></label>
               </GridLayout>
             </StackLayout>
           </ScrollView>
