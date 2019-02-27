@@ -1,6 +1,6 @@
 <template>
   <page actionBarHidden="true">
-    <GridLayout rows="auto,auto,*" columns="*">
+    <GridLayout rows="auto,*" columns="*">
       <StackLayout verticalAlignment="center" row="0" class="m-y-10">
         <Image
           horizontalAlignment="center"
@@ -15,50 +15,84 @@
       </StackLayout>
       <StackLayout row="1">
         <CardView textAlignment="center" margin="10">
-          <FlexboxLayout
-            class="m-10"
-            justifyContent="space-between"
-            width="100%"
-            alignSelf="center"
-            height="100%"
-            flexDirection="column"
-          >
-            <GridLayout
-              row="0"
-              class="text-dark-black email-grid m-20"
-              rows="auto,auto"
-              columns="auto,*"
-              v-for="user in users"
-              :key="user.title"
-            >
-              <label
-                row="0"
-                col="0"
-                class="mdi text-dark-black m-r-20 m-t-15"
-                verticalAlignment="center"
-                textAlignment="left"
-                fontSize="35"
-                :text="user.icon | fonticon"
-              ></label>
-              <label
-                row="0"
-                col="1"
-                class="font-weight-bold m-b-10"
-                fontSize="15"
-                verticalAlignment="center"
-                textAlignment="left"
-                :text="user.title"
-              ></label>
-              <label
-                row="1"
-                col="1"
-                fontSize="15"
-                textAlignment="left"
-                class="text-left-margin"
-                :text="user.body"
-              ></label>
-            </GridLayout>
-          </FlexboxLayout>
+          <ScrollView width="100%">
+            <StackLayout width="100%">
+              <GridLayout
+                class="text-dark-black p-x-20 p-y-15"
+                rows="auto,auto"
+                columns="auto,*"
+                v-for="(user,index) in users"
+                :key="index"
+              >
+                <label
+                  row="0"
+                  col="0"
+                  class="mdi text-dark-black m-r-20"
+                  rowSpan="2"
+                  verticalAlignment="center"
+                  textAlignment="left"
+                  fontSize="35"
+                  :text="user.icon | fonticon"
+                ></label>
+                <label
+                  row="0"
+                  col="1"
+                  class="font-weight-bold"
+                  fontSize="15"
+                  verticalAlignment="center"
+                  textAlignment="left"
+                  :text="user.title"
+                ></label>
+                <label row="1" col="1" fontSize="15" textAlignment="left" :text="user.body"></label>
+              </GridLayout>
+                 <label
+                  class="text-dark-black p-l-20 p-t-20 p-b-10"
+                  verticalAlignment="center"
+                  fontSize="20"
+                  style="opacity:0.6"
+                  text="Next of kin"
+                ></label>
+              <GridLayout
+                class="text-dark-black p-x-20 p-y-15"
+                rows="auto,auto"
+                columns="auto,*,auto"
+                v-for="(user,index) in Parents"
+                :key="index"
+              >
+                <label
+                  row="0"
+                  col="0"
+                  class="mdi text-dark-black m-r-20"
+                  rowSpan="2"
+                  verticalAlignment="center"
+                  textAlignment="left"
+                  fontSize="35"
+                  :text="user.icon | fonticon"
+                ></label>
+                <label
+                  row="0"
+                  col="1"
+                  class="font-weight-bold"
+                  fontSize="15"
+                  textAlignment="left"
+                  :text="user.title"
+                ></label>
+                <label
+                  row="0"
+                  col="2"
+                  class="font-weight-bold p-x-10 p-b-2"
+                  fontSize="15"
+                  rowSpan="2"
+                  borderRadius="50"
+                  style="color:White;background-color:black;"
+                  verticalAlignment="center"
+                  textAlignment="center"
+                  :text="user.badge"
+                ></label>
+                <label row="1" col="1" fontSize="15" textAlignment="left" :text="user.body"></label>
+              </GridLayout>
+            </StackLayout>
+          </ScrollView>
         </CardView>
       </StackLayout>
     </GridLayout>
@@ -85,6 +119,26 @@ export default {
           title: "Modules",
           body: "english,tshivenda,maths",
           icon: "mdi-library"
+        }
+      ],
+      Parents: [
+        {
+          title: "Next of kin",
+          body: "Davis Mudau",
+          badge: "UNCLE".toLowerCase(),
+          icon: "mdi-account-circle"
+        },
+        {
+          title: "Next of kin",
+          body: "Mulaudzi Musalafu",
+          badge: "MOTHER".toLowerCase(),
+          icon: "mdi-account-circle"
+        },
+        {
+          title: "Next of kin",
+          body: "Moshe Davis",
+          badge: "GrandMother".toLowerCase(),
+          icon: "mdi-account-circle"
         }
       ]
     };

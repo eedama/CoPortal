@@ -23,10 +23,6 @@
         </GridLayout>
       </StackLayout>
   
-      <AbsoluteLayout class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
-        <label class="text-white p-x-15 m-x-10 span" textAlignment="center" fontSize="15" text="Demo"></label>
-      </AbsoluteLayout>
-  
       <GridLayout ~mainContent columns="*" rows="*">
         <GridLayout rows="auto,auto,*" columns="*,auto">
           <StackLayout orientation="horizontal" row="0" class="text-dark-black">
@@ -36,6 +32,9 @@
             <Ripple verticalAlignment="center" class="m-5" @tap="goTo(notificationsRoute)">
               <label class="mdi p-5" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
             </Ripple>
+          </StackLayout>
+          <StackLayout row="0" col="1" class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
+            <label class="text-white p-x-15 m-x-10 span" textAlignment="center" fontSize="15" text="Demo"></label>
           </StackLayout>
           <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="loggedIn ? '/home' : '/login'" />
         </GridLayout>
@@ -64,7 +63,7 @@ export default {
         {
           text: "My profile",
           icon: "account",
-          link: "/",
+          link: "/student/profile/view",
           description: "View and edit personal information",
           auth: ["STUDENT", "LECTURER", "ADMIN"]
         },
