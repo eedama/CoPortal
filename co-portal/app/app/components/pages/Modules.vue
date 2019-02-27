@@ -7,11 +7,11 @@
           <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="30%" text="Modules"></label>
         </GridLayout>
       </StackLayout>
-      <ScrollView verticalAlignment="bottom" row="1">
-        <WrapLayout verticalAlignment="bottom">
-          <StackLayout v-for="b in 22" :key="b" width="50%">
-            <CardView textAlignment="center" elevation="5" margin="10">
-              <Ripple @tap="goToModule(a)">
+      <ScrollView row="1">
+        <WrapLayout>
+          <StackLayout v-for="b in 5" :key="b" width="50%" >
+            <CardView height="100" textAlignment="center" elevation="5" margin="10">
+              <Ripple class="p-y-20" @tap="goToModule(b)">
                 <GridLayout rows="auto,auto" columns="*" class="p-10" verticalAlignment="center" textAlignment="center">
                   <label row="0" :textWrap="true" class="font-weight-bold" fontSize="16%" verticalAlignment="center" textAlignment="center" text="Computer Sciences"></label>
                   <label row="1" :textWrap="true" class="text-dark-black" verticalAlignment="center" fontSize="14%" textAlignment="center" text="CSC1A12"></label>

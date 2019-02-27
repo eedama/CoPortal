@@ -36,16 +36,16 @@
           <TabViewItem title="Tests">
             <ScrollView>
               <StackLayout>
-                <Ripple v-for="a in 15" :key="a" @tap="TakeTest(a)">
-                  <CardView elevation="15" margin="5">
-                    <GridLayout class="p-10" rows="auto,auto" columns="auto,*,auto">
+                <CardView v-for="a in 15" :key="a" elevation="15" margin="5">
+                <Ripple @tap="TakeTest(a)">
+                      <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto" columns="auto,*,auto">
                       <label row="0" col="0" rowSpan="2" verticalAlignment="center" textAlignment="center" class="font-weight-bold mdi p-15" fontSize="25%" :text="'mdi-file-document-box-multiple' | fonticon "></label>
-                      <label row="0" col="1" :textWrap="true" fontSize="17%" text="Geography test 101"></label>
-                      <label row="1" col="1" :textWrap="true" fontSize="15%" text="101 Questions"></label>
+                      <label row="0" col="1" verticalAlignment="center" class="font-weight-bold" :textWrap="true" fontSize="17%" text="Geography test 101"></label>
+                      <label row="1" col="1" verticalAlignment="center" :textWrap="true" fontSize="15%" text="101 Questions"></label>
                       <label row="1" col="2" verticalAlignment="center" class="h4 text-dark-black" text="10 minutes ago"></label>
                     </GridLayout>
-                  </CardView>
                 </Ripple>
+                  </CardView>
               </StackLayout>
             </ScrollView>
           </TabViewItem>

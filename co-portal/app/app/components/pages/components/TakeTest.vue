@@ -13,7 +13,7 @@
                         <label row="0" class="text-dark-black m-10 font-weight-bold" :textWrap="true" fontSize="17%" colSpan="2" text="Who is it any way?"></label>
                         <ScrollView class="p-x-15 m-l-25" row="1">
                             <StackLayout :textWrap="true">
-                                <CheckBox class="p-15 text-dark-black" name="circleToggle" boxType="circle" text="Yes" v-for="a in 4" :key="a" :checked="a == 3"></CheckBox>
+                                <CheckBox fillColor="black" class="p-15 text-dark-black" name="circleToggle" boxType="circle" text="Yes" v-for="a in 4" :key="a" :checked="a == 3"></CheckBox>
                             </StackLayout>
                         </ScrollView>
                     </GridLayout>
