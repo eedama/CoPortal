@@ -34,7 +34,7 @@
               <label
                 row="0"
                 col="0"
-                class="mdi text-dark-black m-r-20"
+                class="mdi text-dark-black m-r-20 m-t-15"
                 verticalAlignment="center"
                 textAlignment="left"
                 fontSize="35"
@@ -80,6 +80,11 @@ export default {
           title: "Email",
           body: "mudau.n4@gmail.com",
           icon: "mdi-email"
+        },
+        {
+          title: "Modules",
+          body: "english,tshivenda,maths",
+          icon: "mdi-library"
         }
       ]
     };
