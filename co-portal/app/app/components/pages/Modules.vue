@@ -14,7 +14,7 @@
               <Ripple @tap="goToModule(a)">
                 <GridLayout rows="auto,auto" columns="*" class="p-10" verticalAlignment="center" textAlignment="center">
                   <label row="0" :textWrap="true" class="font-weight-bold" fontSize="16%" verticalAlignment="center" textAlignment="center" text="Computer Sciences"></label>
-                  <label row="1" :textWrap="true" class="text-dark-black" verticalAlignment="center" fontSize="14%" textAlignment="center" text="CSC1A10"></label>
+                  <label row="1" :textWrap="true" class="text-dark-black" verticalAlignment="center" fontSize="14%" textAlignment="center" text="CSC1A12"></label>
                 </GridLayout>
               </Ripple>
             </CardView>

@@ -4,7 +4,7 @@ import Login from "../components/main/Login.vue";
 // Pages
 import Modules from "../components/pages/Modules.vue";
 import Notifications from "../components/pages/Notifications.vue";
-
+import Profile from "../components/pages/Profile.vue";
 // Components
 import Module from "../components/pages/components/Module.vue";
 
@@ -57,6 +57,15 @@ var router = {
       component: Notifications,
       meta: {
         title: "Notifications",
+        authLevel: 0
+      }
+    },
+    "/": {
+      name: "profile",
+      path: "/",
+      component: Profile,
+      meta: {
+        title: "Profile",
         authLevel: 0
       }
     },

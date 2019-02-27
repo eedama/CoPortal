@@ -35,12 +35,13 @@
     "nativescript-social-share": "^1.5.1",
     "nativescript-theme-core": "^1.0.4",
     "nativescript-toast": "^1.4.6",
+    "nativescript-ui-sidedrawer": "^4.3.0",
     "nativescript-vue": "^2.0.0",
     "nativescript-vue-navigator": "0.0.3",
-    "tns-core-modules": "^5.0.2",
+    "tns": "^0.2.0",
+    "tns-core-modules": "^5.2.1",
     "vue-resource": "^1.5.1",
-    "vuex": "^3.0.1",
-    "nativescript-ui-sidedrawer": "^4.3.0"
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
