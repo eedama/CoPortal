@@ -8,7 +8,8 @@
           width="150"
           height="150"
           borderRadius="100%"
-          src="https://avatars2.githubusercontent.com/u/13318139?s=460&v=4"></Image>
+          src="https://avatars2.githubusercontent.com/u/13318139?s=460&v=4"
+        ></Image>
         <label row="0" class="labelTitle m-t-5" textAlignment="center">Joseph Sirwali</label>
         <label row="0" class="labelname" textAlignment="center">joe234</label>
       </StackLayout>
@@ -27,98 +28,34 @@
               class="text-dark-black email-grid m-20"
               rows="auto,auto"
               columns="auto,*"
+              v-for="user in users"
+              :key="user.title"
             >
               <label
                 row="0"
                 col="0"
-                class="mdi text-dark-black m-20"
+                class="mdi text-dark-black m-r-20"
                 verticalAlignment="center"
                 textAlignment="left"
-                fontSize="25%"
-                :text="'mdi-account' | fonticon"
+                fontSize="35"
+                :text="user.icon | fonticon"
               ></label>
               <label
                 row="0"
                 col="1"
-                class="font-weight-bold"
-                fontSize="13%"
+                class="font-weight-bold m-b-10"
+                fontSize="15"
                 verticalAlignment="center"
                 textAlignment="left"
-                text="ID Number"
+                :text="user.title"
               ></label>
               <label
                 row="1"
                 col="1"
-                fontSize="12%"
+                fontSize="15"
                 textAlignment="left"
                 class="text-left-margin"
-                text="99054938382086"
-              ></label>
-            </GridLayout>
-            <GridLayout
-              class="text-dark-black email-grid"
-              row="1"
-              rows="auto,auto"
-              columns="auto,*"
-            >
-              <label
-                row="0"
-                col="0"
-                class="mdi icon-stager"
-                verticalAlignment="center"
-                textAlignment="left"
-                fontSize="40px"
-                :text="'mdi-email' | fonticon"
-              ></label>
-              <label
-                row="0"
-                col="1"
-                class="font-weight-bold"
-                fontSize="13%"
-                verticalAlignment="center"
-                textAlignment="left"
-                text="Email"
-              ></label>
-              <label
-                row="1"
-                col="1"
-                fontSize="12%"
-                textAlignment="left"
-                class="text-left-margin"
-                text="sirwali@gmail.com"
-              ></label>
-            </GridLayout>
-            <GridLayout
-              class="text-dark-black email-grid"
-              row="1"
-              rows="auto,auto"
-              columns="auto,*"
-            >
-              <label
-                row="0"
-                col="0"
-                class="mdi icon-stager"
-                verticalAlignment="center"
-                textAlignment="left"
-                fontSize="40px"
-                :text="'mdi-library' | fonticon"
-              ></label>
-              <label
-                row="0"
-                col="1"
-                class="font-weight-bold"
-                fontSize="13%"
-                verticalAlignment="center"
-                textAlignment="left"
-                text="Modules"
-              ></label>
-              <label
-                row="1"
-                col="1"
-                fontSize="12%"
-                textAlignment="left"
-                class="text-left-margin"
-                text="Physc,EngFal,Lo,Maths"
+                :text="user.body"
               ></label>
             </GridLayout>
           </FlexboxLayout>
@@ -133,13 +70,18 @@ import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
-      notification: {
-        sender: "Admin",
-        time: "3 mins ago",
-        title: "WHO IS THIS?",
-        message: "I think i know you, dont I???"
-      },
-      introTxt: "Digitalize your business and keep track of all your earnings."
+      users: [
+        {
+          title: "ID Number",
+          body: "9606235802082",
+          icon: "mdi-account"
+        },
+        {
+          title: "Email",
+          body: "mudau.n4@gmail.com",
+          icon: "mdi-email"
+        }
+      ]
     };
   },
   mounted() {
