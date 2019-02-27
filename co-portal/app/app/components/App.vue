@@ -5,18 +5,17 @@
         <GridLayout rows="auto,*">
           <CardView row="0" class="bg-dark-black" elevation="15">
             <GridLayout class="p-t-25 p-b-5 p-x-15" rows="auto,auto" columns="*,auto">
-              <Label row="0" col="0" class="h3" text="Sirwali Joseph" />
-              <Label row="1" col="0" class="h4" text="201512860" />
+              <Label row="0" col="0" fontSize="19%" class="font-weight-bold text-white" text="Sirwali Joseph" />
+              <Label row="1" col="0" fontSize="17%" class="h4" text="201512860" />
               <Label row="0" col="1" rowSpan="2" verticalAlignment="center" text="Drawer" />
             </GridLayout>
           </CardView>
           <ScrollView row="1">
             <StackLayout>
               <Ripple @tap="goTo(layout)" v-for="(layout,i) in drawerLayouts" :key="i">
-                <GridLayout class="drawer-item p-y-10" rows="auto,auto,auto" columns="auto,*">
-                  <label row="0" col="0" rowSpan="2" textAlignment="center" verticalAlignment="center" class="mdi m-10 text-dark-black" fontSize="25%" :text="'mdi-' + layout.icon | fonticon"></label>
-                  <label row="0" col="1" class="h3 font-weight-bold text-dark-black" fontSize="17%" :text="layout.text"></label>
-                  <label row="1" col="1" class="h4 text-dark-black" fontSize="13%" :text="layout.description"></label>
+                <GridLayout class="drawer-item p-y-10" rows="auto,auto" columns="auto,*">
+                  <label row="0" col="0" textAlignment="center" verticalAlignment="center" class="mdi m-10 text-dark-black" fontSize="35%" :text="'mdi-' + layout.icon | fonticon"></label>
+                  <label row="0" col="1" verticalAlignment="center" class="font-weight-bold text-dark-black" fontSize="18%" :text="layout.text"></label>
                 </GridLayout>
               </Ripple>
             </StackLayout>
