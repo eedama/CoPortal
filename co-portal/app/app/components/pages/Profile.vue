@@ -4,11 +4,12 @@
       <StackLayout verticalAlignment="center" row="0" class="m-y-10">
         <Image
           horizontalAlignment="center"
-          stretch="aspectFit"
-          src="https://avatars2.githubusercontent.com/u/13318139?s=460&v=4"
-          class="profilelogo"
-        ></Image>
-        <label row="0" class="labelTitle" textAlignment="center">Joseph Sirwali</label>
+          stretch="aspectFill"
+          width="150"
+          height="150"
+          borderRadius="100%"
+          src="https://avatars2.githubusercontent.com/u/13318139?s=460&v=4"></Image>
+        <label row="0" class="labelTitle m-t-5" textAlignment="center">Joseph Sirwali</label>
         <label row="0" class="labelname" textAlignment="center">joe234</label>
       </StackLayout>
       <StackLayout row="1">
@@ -23,17 +24,17 @@
           >
             <GridLayout
               row="0"
-              class="text-dark-black email-grid"
+              class="text-dark-black email-grid m-20"
               rows="auto,auto"
               columns="auto,*"
             >
               <label
                 row="0"
                 col="0"
-                class="mdi text-dark-black icon-stager"
+                class="mdi text-dark-black m-20"
                 verticalAlignment="center"
                 textAlignment="left"
-                fontSize="40px"
+                fontSize="25%"
                 :text="'mdi-account' | fonticon"
               ></label>
               <label
@@ -158,16 +159,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.profilelogo {
-  border-radius: 100%;
-  width: 300px;
-  height: 300px;
-}
-
 .labelTitle {
   color: black;
   font-size: 29px;
-  margin-top: 4px;
   font-weight: bold;
 }
 .labelname {
