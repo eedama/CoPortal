@@ -10,8 +10,8 @@
           borderRadius="100%"
           src="https://avatars2.githubusercontent.com/u/13318139?s=460&v=4"
         ></Image>
-        <label row="0" class="labelTitle m-t-5" textAlignment="center">Joseph Sirwali</label>
-        <label row="0" class="labelname" textAlignment="center">joe234</label>
+        <label row="0" class="labelTitle m-t-5" textAlignment="center">{{this.fullname}}</label>
+        <label row="0" class="labelname" textAlignment="center">{{this.username}}</label>
       </StackLayout>
       <StackLayout row="1">
         <CardView textAlignment="center" margin="10">
@@ -28,7 +28,7 @@
                   row="0"
                   col="0"
                   class="mdi text-dark-black m-r-20"
-                  rowSpan="2"
+                  rowspan="2"
                   verticalAlignment="center"
                   textAlignment="left"
                   fontSize="35"
@@ -45,13 +45,13 @@
                 ></label>
                 <label row="1" col="1" fontSize="15" textAlignment="left" :text="user.body"></label>
               </GridLayout>
-                 <label
-                  class="text-dark-black p-l-20 p-t-20 p-b-10"
-                  verticalAlignment="center"
-                  fontSize="20"
-                  style="opacity:0.6"
-                  text="Next of kin"
-                ></label>
+              <label
+                class="text-dark-black p-l-20 p-t-20 p-b-10"
+                verticalAlignment="center"
+                fontSize="20"
+                style="opacity:0.6"
+                text="Next of kin"
+              ></label>
               <GridLayout
                 class="text-dark-black p-x-20 p-y-15"
                 rows="auto,auto"
@@ -63,7 +63,7 @@
                   row="0"
                   col="0"
                   class="mdi text-dark-black m-r-20"
-                  rowSpan="2"
+                  rowspan="2"
                   verticalAlignment="center"
                   textAlignment="left"
                   fontSize="35"
@@ -82,7 +82,7 @@
                   col="2"
                   class="font-weight-bold p-x-10 p-b-2"
                   fontSize="15"
-                  rowSpan="2"
+                  rowspan="2"
                   borderRadius="50"
                   style="color:White;background-color:black;"
                   verticalAlignment="center"
@@ -104,6 +104,8 @@ import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
+      fullname: "",
+      username: "",
       users: [
         {
           title: "ID Number",
@@ -111,9 +113,9 @@ export default {
           icon: "mdi-account"
         },
         {
-          title: "Email",
-          body: "mudau.n4@gmail.com",
-          icon: "mdi-email"
+          title: "Gender",
+          body: "",
+          icon: "mdi-human"
         },
         {
           title: "Modules",
@@ -145,6 +147,21 @@ export default {
   },
   mounted() {
     this.pageLoaded();
+    this.$api
+      .getProfile("5bab448028100564cc41a083")
+      .then(result => {
+        console.log(result);
+        this.fullname = result.firstname + " " + result.lastname;
+        this.username = result.username;
+        this.users[0].body = result.idNumber;
+        this.users[1].body = results.gender;
+      })
+      .catch(err => {
+        this.$feedback.error({
+          title: "Error has occured",
+          message: error
+        });
+      });
   },
   props: ["moduleId"],
   methods: {
