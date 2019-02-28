@@ -132,7 +132,7 @@ export default class API {
                             if (answer == true) {
                                 resolve(result);
                             } else {
-                                return this.loginUser(user);
+                                return this.loginUser(username, password);
                             }
                         }
                     })
