@@ -2,8 +2,8 @@
   <Page actionBarHidden="true">
     <RadSideDrawer ref="drawer">
       <StackLayout ~drawerContent backgroundColor="#ffffff">
-        <GridLayout rows="auto,*">
-          <CardView v-if="$store.state.cache.cachedUser && $store.state.cache.cachedUser.user" row="0" class="bg-dark-black" elevation="15">
+        <GridLayout v-if="$store.state.cache.cachedUser" rows="auto,*">
+          <CardView v-if="$store.state.cache.cachedUser.user" row="0" class="bg-dark-black" elevation="15">
             <GridLayout class="p-25" rows="auto,auto" columns="*,auto">
               <Label row="0" col="0" fontSize="20%" class="font-weight-bold text-white" :text="`${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`" />
               <Label row="1" col="0" fontSize="18%" class="h4 text-white" :text="$store.state.cache.cachedUser.user.username" />
@@ -26,7 +26,7 @@
       <GridLayout ~mainContent columns="*" rows="*">
         <GridLayout rows="auto,auto,*" columns="*,auto">
           <StackLayout orientation="horizontal" row="0" class="text-dark-black">
-            <Ripple verticalAlignment="center" class="m-5" @tap="$refs.drawer.nativeView.showDrawer()">
+            <Ripple v-if="$store.state.cache.cachedUser" verticalAlignment="center" class="m-5" @tap="$refs.drawer.nativeView.showDrawer()">
               <label class="mdi p-5" fontSize="35%" :text="'mdi-menu' | fonticon"></label>
             </Ripple>
             <Ripple v-if="$store.state.cache.cachedUser" verticalAlignment="center" class="m-5" @tap="goTo(notificationsRoute)">
