@@ -84,7 +84,8 @@ Vue.mixin({
       isLoading: false,
       toggleSearch: false,
       master: master,
-      currentPage: 0
+      currentPage: 0,
+      previousPage: null
     };
   },
   methods: {
@@ -98,7 +99,13 @@ Vue.mixin({
       } else {
         options = options || {};
         options.props = props;
-        console.log("Option", options);
+        var route = to + JSON.stringify(options);
+        if (route == this.appSettings.getString("PrvPage")) {
+          console.log("Going to same page", route);
+          return;
+        }
+        this.appSettings.setString("PrvPage", route);
+
         this.$navigator.navigate(to, options);
       }
     },

@@ -12,13 +12,13 @@ const mutations = {
     }
   },
   cacheUser(state, obj) {
+    state.cachedUser = obj.user;
     var docId = obj.appSettings.getString(state.cachedUserString);
     if (docId != null) {
-      obj.db.updateDocument(docId, obj.user);
-    } else {
-      docId = obj.db.createDocument(obj.user);
-      obj.appSettings.setString(state.cachedUserString, docId);
+      obj.db.deleteDocument(docId);
     }
+    docId = obj.db.createDocument(obj.user);
+    obj.appSettings.setString(state.cachedUserString, docId);
   },
   clearCache(state, obj) {
     state.cachedUser = null;
