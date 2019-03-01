@@ -147,6 +147,7 @@ export default {
   },
   mounted() {
     this.pageLoaded();
+    console.log("im here");
     this.$api
       .getProfile("5bab448028100564cc41a083")
       .then(result => {
@@ -157,6 +158,7 @@ export default {
         this.users[1].body = results.gender;
       })
       .catch(err => {
+        console.log("wow i have an error" + err);
         this.$feedback.error({
           title: "Error has occured",
           message: error

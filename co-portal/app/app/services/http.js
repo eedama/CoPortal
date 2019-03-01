@@ -83,6 +83,19 @@ export default class API {
     });
   }
 
+  makeGet(url) {
+    return {
+      url: this.makeURL(url),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Token " + appSettings.getString("auth_token"),
+        CurrentUserID: appSettings.getString("CurrentUserID"),
+        device_token: appSettings.getString("device_token")
+      },
+      method: "GET"
+    };
+  }
+
   makePost(url, content = {}) {
     return {
       url: this.makeURL(url),
@@ -120,7 +133,7 @@ export default class API {
               if (answer == true) {
                 resolve(result);
               } else {
-                return this.loginUser(username, password);
+                return this.loginUser(user);
               }
             }
           })
@@ -148,6 +161,7 @@ export default class API {
       }
     });
   }
+
   getInternetStatus() {
     return connectivity.getConnectionType();
   }
