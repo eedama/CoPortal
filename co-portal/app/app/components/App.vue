@@ -102,6 +102,13 @@ export default {
           description: "Test results and marksheets",
           auth: ["LECTURER", "ADMIN"]
         },
+         {
+          text: "Timetable",
+          icon: "table",
+          link: "/timetable/view",
+          description: "View Your Table",
+          auth: ["STUDENT"]
+        },
         {
           text: "Report a student",
           icon: "account-alert-outline",

@@ -9,6 +9,7 @@ import Profile from "../components/pages/Profile.vue";
 import Module from "../components/pages/components/Module.vue";
 // Tests
 import TakeTest from "../components/pages/components/TakeTest.vue";
+import Timetable from "../components/pages/components/Timetable.vue";
 
 var appSettings = require("application-settings");
 import {
@@ -50,6 +51,15 @@ var router = {
       component: Modules,
       meta: {
         title: "Modules",
+        authLevel: 0
+      }
+    },
+    "/timetable/view": {
+      name: "timetable",
+      path: "/timetable/list",
+      component: Timetable,
+      meta: {
+        title: "timetable",
         authLevel: 0
       }
     },

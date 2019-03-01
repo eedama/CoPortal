@@ -130,7 +130,7 @@ export default {
     this.pageLoaded();
     console.log("im here");
     this.$api
-      .getProfile("5bab448028100564cc41a083")
+      .getProfile("5c5a6a67b08edb5f2a6161e2")
       .then(result => {
         console.log(result);
         this.fullname = result.firstname + " " + result.lastname;
@@ -148,7 +148,7 @@ export default {
         var Module = ""
         result.modules.forEach(element=>
         {
-         Module +=element.name+ ","
+         Module +=element.code+ " "
         })
         this.users[2].body = Module;
 
