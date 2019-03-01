@@ -19,7 +19,7 @@ import {
 
 var firebase = require("nativescript-plugin-firebase");
 
-master.couchDB = new Couchbase("jmrdb");
+master.couchDB = new Couchbase("coportaldb");
 master.feedback = new Feedback();
 master.appSettings = require("application-settings");
 master.firebase = firebase;

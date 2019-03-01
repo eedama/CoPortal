@@ -3,16 +3,16 @@
     <RadSideDrawer ref="drawer">
       <StackLayout ~drawerContent backgroundColor="#ffffff">
         <GridLayout rows="auto,*">
-          <CardView v-if="$store.state.user.isLoggedIn" row="0" class="bg-dark-black" elevation="15">
+          <CardView v-if="$store.state.cache.cachedUser && $store.state.cache.cachedUser.user" row="0" class="bg-dark-black" elevation="15">
             <GridLayout class="p-25" rows="auto,auto" columns="*,auto">
-              <Label row="0" col="0" fontSize="20%" class="font-weight-bold text-white" :text="$store.state.user.fullName" />
-              <Label row="1" col="0" fontSize="18%" class="h4 text-white" :text="$store.state.user.username" />
-              <Image row="0" rowSpan="2" col="1" textAlignment="right" verticalAlignment="center" stretch="aspectFit" width="80" height="80" borderRadius="100%" :src="$store.state.user.profilePic ? $store.state.user.profilePic : $store.state.settings.defaultProfilePic"></Image>
+              <Label row="0" col="0" fontSize="20%" class="font-weight-bold text-white" :text="`${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`" />
+              <Label row="1" col="0" fontSize="18%" class="h4 text-white" :text="$store.state.cache.cachedUser.user.username" />
+              <Image row="0" rowSpan="2" col="1" textAlignment="right" verticalAlignment="center" stretch="aspectFit" width="80" height="80" borderRadius="100%" :src="$store.state.cache.cachedUser.user.profilePic ? $store.state.cache.cachedUser.user.profilePic : $store.state.settings.defaultProfilePic"></Image>
             </GridLayout>
           </CardView>
           <ScrollView row="1">
             <StackLayout>
-              <Ripple @tap="goTo(layout)" v-for="(layout,i) in drawerLayouts.filter(d => d.auth == null ||  d.auth.some(auth => auth == $store.state.user.type))" :key="i">
+              <Ripple @tap="goTo(layout)" v-for="(layout,i) in drawerLayouts.filter(d => d.auth == null || ($store.state.cache.cachedUser && d.auth.some(auth => auth == $store.state.cache.cachedUser.userType)))" :key="i">
                 <GridLayout class="drawer-item p-y-10" rows="auto,auto" columns="auto,*">
                   <label row="0" col="0" textAlignment="center" verticalAlignment="center" class="mdi m-10 text-dark-black" fontSize="35%" :text="'mdi-' + layout.icon | fonticon"></label>
                   <label row="0" col="1" verticalAlignment="center" class="font-weight-bold text-dark-black" fontSize="18%" :text="layout.text"></label>
@@ -36,7 +36,7 @@
           <StackLayout row="0" col="1" class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
             <label class="text-white p-x-15 m-x-10 span" textAlignment="center" fontSize="15" text="Demo"></label>
           </StackLayout>
-          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="$store.state.user.isLoggedIn ? '/home' : '/login'" />
+          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="$store.state.cache.cachedUser ? '/home' : '/login'" />
         </GridLayout>
       </GridLayout>
     </RadSideDrawer>
@@ -127,6 +127,12 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("refreshCache", {
+      db: this.$db,
+      appSettings: this.appSettings,
+      api: this.$api
+    });
+    console.log("Cached", this.$store.state.cache.cachedUser);
     connectivity.startMonitoring(conn => {
       if (this.connectionType == 0 && conn > 0) {
         this.$feedback.success({
@@ -153,7 +159,11 @@ export default {
           cancelButtonText: "No"
         }).then(result => {
           if (result) {
-            this.$store.commit("logout");
+            this.$store.commit("clearCache", {
+              db: this.$db,
+              appSettings: this.appSettings,
+              api: this.$api
+            });
             this.navigate("/login", null, {
               clearHistory: true
             });
