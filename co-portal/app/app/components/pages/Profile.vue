@@ -8,7 +8,7 @@
           width="150"
           height="150"
           borderRadius="100%"
-          src="https://avatars2.githubusercontent.com/u/13318139?s=460&v=4"
+         :src="$store.state.user.profilePic ? $store.state.user.profilePic : $store.state.settings.defaultProfilePic"
         ></Image>
         <label row="0" class="labelTitle m-t-5" textAlignment="center">{{this.fullname}}</label>
         <label row="0" class="labelname" textAlignment="center">{{this.username}}</label>
@@ -28,7 +28,7 @@
                   row="0"
                   col="0"
                   class="mdi text-dark-black m-r-20"
-                  rowspan="2"
+                  rowSpan="2"
                   verticalAlignment="center"
                   textAlignment="left"
                   fontSize="35"
@@ -63,7 +63,7 @@
                   row="0"
                   col="0"
                   class="mdi text-dark-black m-r-20"
-                  rowspan="2"
+                  rowSpan="2"
                   verticalAlignment="center"
                   textAlignment="left"
                   fontSize="35"
@@ -82,7 +82,7 @@
                   col="2"
                   class="font-weight-bold p-x-10 p-b-2"
                   fontSize="15"
-                  rowspan="2"
+                  rowSpan="2"
                   borderRadius="50"
                   style="color:White;background-color:black;"
                   verticalAlignment="center"
@@ -119,30 +119,11 @@ export default {
         },
         {
           title: "Modules",
-          body: "english,tshivenda,maths",
+          body: "",
           icon: "mdi-library"
         }
       ],
-      Parents: [
-        {
-          title: "Next of kin",
-          body: "Davis Mudau",
-          badge: "UNCLE".toLowerCase(),
-          icon: "mdi-account-circle"
-        },
-        {
-          title: "Next of kin",
-          body: "Mulaudzi Musalafu",
-          badge: "MOTHER".toLowerCase(),
-          icon: "mdi-account-circle"
-        },
-        {
-          title: "Next of kin",
-          body: "Moshe Davis",
-          badge: "GrandMother".toLowerCase(),
-          icon: "mdi-account-circle"
-        }
-      ]
+      Parents: []
     };
   },
   mounted() {
@@ -156,6 +137,21 @@ export default {
         this.username = result.username;
         this.users[0].body = result.idNumber;
         this.users[1].body = result.gender;
+        result.parents.forEach(parent => {
+          this.Parents.push({
+          title: parent.name+ ' '+parent.surname,
+          body: parent.email,
+          badge: parent.relationship.toLowerCase(),
+          icon: "mdi-account-circle"
+          })
+        });
+        var Module = ""
+        result.modules.forEach(element=>
+        {
+         Module +=element.name+ ","
+        })
+        this.users[2].body = Module;
+
       })
       .catch(err => {
         console.log("wow i have an error" + err);
