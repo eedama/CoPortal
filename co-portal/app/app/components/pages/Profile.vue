@@ -128,7 +128,6 @@ export default {
   },
   mounted() {
     this.pageLoaded();
-    console.log("im here");
     if (!this.$store.state.cache.cachedUser) {
       this.navigate("/login", null, {
         clearHistory: true
@@ -137,7 +136,7 @@ export default {
 
     var result =JSON.parse(JSON.stringify(this.$store.state.cache.cachedUser.user));
 
-    console.log("This are module3", result.modules);
+   
     this.fullname = result.firstname + " " + result.lastname;
     this.username = result.username;
     this.users[0].body = result.idNumber;
@@ -152,7 +151,7 @@ export default {
     });
     var Module = "";
     result.modules.forEach(element => {
-      Module += element.name + " ";
+      Module += element.code + " ";
     });
     this.users[2].body = Module;
   },

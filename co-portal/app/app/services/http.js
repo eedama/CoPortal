@@ -161,6 +161,26 @@ export default class API {
       }
     });
   }
+  getModuleInformation(userID)
+  {
+    return new Promise((resolve,reject) =>
+    {
+      if(!userID)
+      {
+        reject(new Error("User Not Defined"));
+      }else
+      {
+        http
+        .request(this.makeGet("/m/modules/all/for/" + userID + "/student"))
+        .then(async results => {
+          resolve(JSON.parse(JSON.stringify(results.content)));
+        })
+        .catch(err => {
+          reject(err);
+        });
+      }
+    })
+  }
 
   getInternetStatus() {
     return connectivity.getConnectionType();

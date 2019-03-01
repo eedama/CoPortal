@@ -9,12 +9,12 @@
       </StackLayout>
       <ScrollView row="1">
         <WrapLayout>
-          <StackLayout v-for="b in 5" :key="b" width="50%" >
+          <StackLayout v-for="module in modules" :key="module._id" width="50%" >
             <CardView height="100" textAlignment="center" elevation="5" margin="10">
-              <Ripple class="p-y-20" @tap="goToModule(b)">
+              <Ripple class="p-y-20" @tap="goToModule(module)">
                 <GridLayout rows="auto,auto" columns="*" class="p-10" verticalAlignment="center" textAlignment="center">
-                  <label row="0" :textWrap="true" class="font-weight-bold" fontSize="16%" verticalAlignment="center" textAlignment="center" text="Computer Sciences"></label>
-                  <label row="1" :textWrap="true" class="text-dark-black" verticalAlignment="center" fontSize="14%" textAlignment="center" text="CSC1A12"></label>
+                  <label row="0" :textWrap="true" class="font-weight-bold" fontSize="16%" verticalAlignment="center" textAlignment="center" :text="module.name"></label>
+                  <label row="1" :textWrap="true" class="text-dark-black" verticalAlignment="center" fontSize="14%" textAlignment="center" :text="module.code"></label>
                 </GridLayout>
               </Ripple>
             </CardView>
@@ -33,11 +33,29 @@ import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
-      introTxt: "Digitalize your business and keep track of all your earnings."
+      introTxt: "Digitalize your business and keep track of all your earnings.",
+      modules: []
     };
   },
   mounted() {
     this.pageLoaded();
+      if (!this.$store.state.cache.cachedUser) {
+      this.navigate("/login", null, {
+        clearHistory: true
+      });
+    }
+
+    this.$api.getModuleInformation(this.$store.state.cache.cachedUser.user._id)
+    .then(module=>
+    {
+console.log(module);
+this.modules = module;
+    })
+    .catch(err=>
+    {
+      console.log(err);
+    })
+
   },
   methods: {
     pageLoaded() {
@@ -48,11 +66,11 @@ export default {
         doc: "admin"
       });
     },
-    goToModule(moduleId) {
+    goToModule(module) {
       this.navigate(
         "/module/view",
         {
-          moduleId: moduleId
+          module: module
         },
         null
       );
