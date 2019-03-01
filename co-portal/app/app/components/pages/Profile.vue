@@ -8,7 +8,7 @@
           width="150"
           height="150"
           borderRadius="100%"
-         :src="$store.state.user.profilePic ? $store.state.user.profilePic : $store.state.settings.defaultProfilePic"
+          :src="$store.state.user.profilePic ? $store.state.user.profilePic : $store.state.settings.defaultProfilePic"
         ></Image>
         <label row="0" class="labelTitle m-t-5" textAlignment="center">{{this.fullname}}</label>
         <label row="0" class="labelname" textAlignment="center">{{this.username}}</label>
@@ -129,37 +129,32 @@ export default {
   mounted() {
     this.pageLoaded();
     console.log("im here");
-    this.$api
-      .getProfile("5c5a6a67b08edb5f2a6161e2")
-      .then(result => {
-        console.log(result);
-        this.fullname = result.firstname + " " + result.lastname;
-        this.username = result.username;
-        this.users[0].body = result.idNumber;
-        this.users[1].body = result.gender;
-        result.parents.forEach(parent => {
-          this.Parents.push({
-          title: parent.name+ ' '+parent.surname,
-          body: parent.email,
-          badge: parent.relationship.toLowerCase(),
-          icon: "mdi-account-circle"
-          })
-        });
-        var Module = ""
-        result.modules.forEach(element=>
-        {
-         Module +=element.code+ " "
-        })
-        this.users[2].body = Module;
-
-      })
-      .catch(err => {
-        console.log("wow i have an error" + err);
-        this.$feedback.error({
-          title: "Error has occured",
-          message: error
-        });
+    if (!this.$store.state.cache.cachedUser) {
+      this.navigate("/login", null, {
+        clearHistory: true
       });
+    }
+
+    var result = this.$store.state.cache.cachedUser.user;
+
+    console.log("This are module", result.modules);
+    this.fullname = result.firstname + " " + result.lastname;
+    this.username = result.username;
+    this.users[0].body = result.idNumber;
+    this.users[1].body = result.gender;
+    result.parents.forEach(parent => {
+      this.Parents.push({
+        title: parent.name + " " + parent.surname,
+        body: parent.email,
+        badge: parent.relationship.toLowerCase(),
+        icon: "mdi-account-circle"
+      });
+    });
+    var Module = "";
+    result.modules.forEach(element => {
+      Module += element.code + " ";
+    });
+    this.users[2].body = Module;
   },
   props: ["moduleId"],
   methods: {
@@ -167,7 +162,7 @@ export default {
       this.$store.commit("refreshCache", {
         db: this.$db,
         api: this.$api,
-      appSettings: this.appSettings,
+        appSettings: this.appSettings,
         doc: "admin"
       });
     }
