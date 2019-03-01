@@ -1,7 +1,7 @@
 const state = {
-  username: "admin",
+  username: "",
   id: "",
-  password: "admin",
+  fullName: "",
   email: "admin@gmail.com",
   numbers: "0760487292",
   type: null,
@@ -14,7 +14,7 @@ const mutations = {
   login(state, user) {
     state.id = user.id;
     state.username = user.username;
-    state.password = user.password;
+    state.fullName = user.fullName;
     state.email = user.email;
     state.numbers = user.numbers;
     state.profilePic = user.profilePic;
@@ -24,7 +24,7 @@ const mutations = {
   logout(state, self) {
     state.id = null;
     state.username = null;
-    state.password = null;
+    state.fullName = null;
     state.email = null;
     state.numbers = null;
     state.profilePic = null;

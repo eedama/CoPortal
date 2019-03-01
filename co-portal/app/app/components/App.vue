@@ -3,16 +3,16 @@
     <RadSideDrawer ref="drawer">
       <StackLayout ~drawerContent backgroundColor="#ffffff">
         <GridLayout rows="auto,*">
-          <CardView row="0" class="bg-dark-black" elevation="15">
-            <GridLayout class="p-t-25 p-b-5 p-x-15" rows="auto,auto" columns="*,auto">
-              <Label row="0" col="0" fontSize="19%" class="font-weight-bold text-white" text="Sirwali Joseph" />
-              <Label row="1" col="0" fontSize="17%" class="h4" text="201512860" />
-              <Label row="0" col="1" rowSpan="2" verticalAlignment="center" text="Drawer" />
+          <CardView v-if="$store.state.user.isLoggedIn" row="0" class="bg-dark-black" elevation="15">
+            <GridLayout class="p-25" rows="auto,auto" columns="*,auto">
+              <Label row="0" col="0" fontSize="20%" class="font-weight-bold text-white" :text="$store.state.user.fullName" />
+              <Label row="1" col="0" fontSize="18%" class="h4 text-white" :text="$store.state.user.username" />
+              <Image row="0" rowSpan="2" col="1" textAlignment="right" verticalAlignment="center" stretch="aspectFit" width="80" height="80" borderRadius="100%" :src="$store.state.user.profilePic ? $store.state.user.profilePic : $store.state.settings.defaultProfilePic"></Image>
             </GridLayout>
           </CardView>
           <ScrollView row="1">
             <StackLayout>
-              <Ripple @tap="goTo(layout)" v-for="(layout,i) in drawerLayouts" :key="i">
+              <Ripple @tap="goTo(layout)" v-for="(layout,i) in drawerLayouts.filter(d => d.auth == null ||  d.auth.some(auth => auth == $store.state.user.type))" :key="i">
                 <GridLayout class="drawer-item p-y-10" rows="auto,auto" columns="auto,*">
                   <label row="0" col="0" textAlignment="center" verticalAlignment="center" class="mdi m-10 text-dark-black" fontSize="35%" :text="'mdi-' + layout.icon | fonticon"></label>
                   <label row="0" col="1" verticalAlignment="center" class="font-weight-bold text-dark-black" fontSize="18%" :text="layout.text"></label>
@@ -29,14 +29,14 @@
             <Ripple verticalAlignment="center" class="m-5" @tap="$refs.drawer.nativeView.showDrawer()">
               <label class="mdi p-5" fontSize="35%" :text="'mdi-menu' | fonticon"></label>
             </Ripple>
-            <Ripple verticalAlignment="center" class="m-5" @tap="goTo(notificationsRoute)">
+            <Ripple v-if="$store.state.user.isLoggedIn" verticalAlignment="center" class="m-5" @tap="goTo(notificationsRoute)">
               <label class="mdi p-5" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
             </Ripple>
           </StackLayout>
           <StackLayout row="0" col="1" class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
             <label class="text-white p-x-15 m-x-10 span" textAlignment="center" fontSize="15" text="Demo"></label>
           </StackLayout>
-          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="loggedIn ? '/home' : '/login'" />
+          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="$store.state.user.isLoggedIn ? '/home' : '/login'" />
         </GridLayout>
       </GridLayout>
     </RadSideDrawer>
@@ -119,9 +119,9 @@ export default {
         {
           text: "Log out",
           icon: "exit-run",
-          link: "/Student/Report",
+          link: "/logout",
           description: "Leave the system",
-          auth: ["LECTURER", "ADMIN"]
+          auth: ["STUDENT", "LECTURER", "ADMIN"]
         }
       ]
     };
@@ -145,7 +145,23 @@ export default {
   methods: {
     goTo(item) {
       this.$refs.drawer.nativeView.closeDrawer();
-      this.navigate(item.link);
+      if (item.link == "/logout") {
+        confirm({
+          title: "Log out",
+          message: "Are you sure you want to log out?",
+          okButtonText: "Yes",
+          cancelButtonText: "No"
+        }).then(result => {
+          if (result) {
+            this.$store.commit("logout");
+            this.navigate("/login", null, {
+              clearHistory: true
+            });
+          }
+        });
+      } else {
+        this.navigate(item.link);
+      }
     }
   }
 };
