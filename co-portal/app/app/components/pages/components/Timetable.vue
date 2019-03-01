@@ -1,35 +1,51 @@
 <template>
   <page actionBarHidden="true">
+    <GridLayout rows="*" columns="*">
+      <StackLayout row="0">
+        <GridLayout rows="auto" columns="*">
+          <label row="0" verticalAlignment="center" textAlignment="center" class="text-dark-black font-weight-bold m-t-0 text-dark-black" fontSize="35%" text="TiMETABLE"></label>
+          </GridLayout>
     <StackLayout>
-      <GridLayout>
-        <ListView for="timetable in timetables" height="50px">
-          <v-template>
-            <CardView
-              verticalAlignment="center"
-              padding="2"
-              margin="2"
-              elevation="10"
-              shadowOffsetHeight="10"
-              shadowOpacity="0.2"
-              shadowRadius="50"
-            >
-              <Ripple>
-                <GridLayout rows="*" columns="auto,auto,auto,auto,auto,auto,auto">
-                  <label col="1" class="h4 text-dark-black" :text="timetable.day"></label>
-                  <label col="2" class="h4 text-dark-black" :text="timetable.moduleCode"></label>
-                  <label col="3" class="h4 text-dark-black" :text="timetable.moduleName"></label>
-                  <label col="4" class="h4 text-dark-black" :text="timetable.venue"></label>
-                  <label col="5" class="h4 text-dark-black" :text="timetable.type"></label>
-                  <label
-                    col="6"
-                    class="h4 text-dark-black"
-                    :text="'${timetable.startTime}.${:}. ${timetable.endTime}'"
-                  ></label>
-                </GridLayout>
-              </Ripple>
-            </CardView>
-          </v-template>
-        </ListView>
+      <GridLayout row="*">
+          <ScrollView>
+            <StackLayout v-for="(day,i) in daysOfTheWeek" :key="i">
+                <label :text="day" textAlignment="center" class="font-weight-bold"></label>
+                <StackLayout v-for="(timeTable,t) in timetables" :key="t">
+                <CardView verticalAlignment="center" padding="2" margin="2" elevation="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50" v-if="day == timeTable.day" >
+                  <GridLayout rows="auto,auto" columns="auto,auto,auto" class="p-4">
+                    <label
+                      row="0"
+                      col="0" colSpan="1"
+                      :textWrap="true"
+                      class="h4 text-dark-black"
+                      :text="timeTable.moduleName"
+                    ></label>
+                    <label
+                      row="1"
+                      col="0"
+                      :textWrap="true"
+                      class="h4 text-dark-black"
+                      :text="timeTable.venue"
+                    ></label>
+                    <label
+                      row="1"
+                      col="1"
+                      :textWrap="true"
+                      class="h4 text-dark-black"
+                      :text="timeTable.type"
+                    ></label>
+                    <label
+                      row="0"
+                      col="1" rowSpan="1"
+                      :textWrap="true"
+                      class="h4 text-dark-black"
+                      :text="timeTable.startTime + '-' + timeTable.endTime"
+                    ></label>
+                  </GridLayout>
+                </CardView>
+                </StackLayout>
+              </StackLayout>
+          </ScrollView>
       </GridLayout>
     </StackLayout>
   </page>
@@ -59,8 +75,11 @@ export default {
           startTime: "10:00",
           endTime: "10:30"
         }
-      ]
+      ],
+    var daysOfTheWeek:String[]; 
+    daysOfTheWeek = ["Monday","Tuesday","Wednesday","Thursday","Friday"]
     };
-  }
+  },
 };
+
 </script>
