@@ -8,7 +8,7 @@
           width="150"
           height="150"
           borderRadius="100%"
-          src="https://avatars2.githubusercontent.com/u/13318139?s=460&v=4"
+          src="https://i.screenshot.net/ekgqirg"
         ></Image>
         <label row="0" class="labelTitle m-t-5" textAlignment="center">{{this.fullname}}</label>
         <label row="0" class="labelname" textAlignment="center">{{this.username}}</label>
