@@ -2,20 +2,31 @@
   <page actionBarHidden="true">
     <StackLayout>
       <GridLayout>
-        <ListView for="timetable in timetables">
+        <ListView for="timetable in timetables" height="50px">
           <v-template>
-            <CardView elevation="15">
-                <Ripple>
-                  <GridLayout rows="*" columns="auto,auto,auto,auto,auto,auto,auto">
-                    <label col="1" class="h4 text-dark-black" :text="timetable.day"></label>
-                    <label col="2" class="h4 text-dark-black" :text="timetable.moduleCode"></label>
-                    <label col="3" class="h4 text-dark-black" :text="timetable.moduleName"></label>
-                    <label col="4" class="h4 text-dark-black" :text="timetable.venue"></label>
-                    <label col="5" class="h4 text-dark-black" :text="timetable.type"></label>
-                    <label col="6" class="h4 text-dark-black" :text="timetable.startTime"></label>
-                    <label col="7" class="h4 text-dark-black" :text="timetable.endTime"></label>
-                  </GridLayout>
-                </Ripple>
+            <CardView
+              verticalAlignment="center"
+              padding="2"
+              margin="2"
+              elevation="10"
+              shadowOffsetHeight="10"
+              shadowOpacity="0.2"
+              shadowRadius="50"
+            >
+              <Ripple>
+                <GridLayout rows="*" columns="auto,auto,auto,auto,auto,auto,auto">
+                  <label col="1" class="h4 text-dark-black" :text="timetable.day"></label>
+                  <label col="2" class="h4 text-dark-black" :text="timetable.moduleCode"></label>
+                  <label col="3" class="h4 text-dark-black" :text="timetable.moduleName"></label>
+                  <label col="4" class="h4 text-dark-black" :text="timetable.venue"></label>
+                  <label col="5" class="h4 text-dark-black" :text="timetable.type"></label>
+                  <label
+                    col="6"
+                    class="h4 text-dark-black"
+                    :text="'${timetable.startTime}.${:}. ${timetable.endTime}'"
+                  ></label>
+                </GridLayout>
+              </Ripple>
             </CardView>
           </v-template>
         </ListView>
