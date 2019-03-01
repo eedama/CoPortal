@@ -3,8 +3,8 @@
     <GridLayout v-if="currentModule" rows="auto,*" columns="*">
       <StackLayout row="0">
         <GridLayout rows="auto,auto" columns="*">
-          <label row="0" verticalAlignment="center" textAlignment="center" class="text-dark-black" fontSize="35%" text="CSC1A20"></label>
-          <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="30%" text="Computer science 3B"></label>
+          <label row="0" verticalAlignment="center" textAlignment="center" class="text-dark-black" fontSize="35%" :text="this.module.code"></label>
+          <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="30%" :text="this.module.name"></label>
         </GridLayout>
       </StackLayout>
       <StackLayout row="1">
@@ -15,7 +15,7 @@
                 <StackLayout width="50%" v-for="a in 15" :key="a">
                   <CardView elevation="15" margin="5">
                     <GridLayout class="p-10" rows="auto,auto,auto" columns="*,auto,auto">
-                      <label row="0" col="0" colSpan="3" :textWrap="true" verticalAlignment="center" textAlignment="center" class="font-weight-bold" fontSize="16%" :text="notification.sender"></label>
+                      <label row="0" col="0" colSpan="3" :textWrap="true" verticalAlignment="center" textAlignment="center" class="font-weight-bold" fontSize="16%" text="notification.sender"></label>
                       <label row="1" col="0" colSpan="3" verticalAlignment="center" textAlignment="center" class="font-weight-bold mdi p-15" fontSize="75%" :text="'mdi-file-pdf' | fonticon "></label>
                       <label row="2" col="0" verticalAlignment="bottom" class="h4 text-dark-black" text="10 minutes ago"></label>
                       <Ripple row="2" col="1" verticalAlignment="bottom" textAlignment="right">

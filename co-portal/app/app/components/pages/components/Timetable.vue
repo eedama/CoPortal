@@ -75,9 +75,7 @@ export default {
           startTime: "10:00",
           endTime: "10:30"
         }
-      ],
-    var daysOfTheWeek:String[]; 
-    daysOfTheWeek = ["Monday","Tuesday","Wednesday","Thursday","Friday"]
+      ]
     };
   },
 };
