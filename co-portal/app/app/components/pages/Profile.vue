@@ -135,9 +135,9 @@ export default {
       });
     }
 
-    var result = this.$store.state.cache.cachedUser.user;
+    var result =JSON.parse(JSON.stringify(this.$store.state.cache.cachedUser.user));
 
-    console.log("This are module", result.modules);
+    console.log("This are module3", result.modules);
     this.fullname = result.firstname + " " + result.lastname;
     this.username = result.username;
     this.users[0].body = result.idNumber;
@@ -152,7 +152,7 @@ export default {
     });
     var Module = "";
     result.modules.forEach(element => {
-      Module += element.code + " ";
+      Module += element.name + " ";
     });
     this.users[2].body = Module;
   },
