@@ -61,8 +61,7 @@
         password: "",
         username: ""
       };
-    },
-    beforeDestroy() {
+    }, beforeDestroy() {
       this.isLoading = false;
     },
     Destroy() {

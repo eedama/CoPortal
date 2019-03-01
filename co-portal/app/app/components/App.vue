@@ -2,8 +2,8 @@
   <Page actionBarHidden="true">
     <RadSideDrawer ref="drawer">
       <StackLayout ~drawerContent backgroundColor="#ffffff">
-        <GridLayout rows="auto,*">
-          <CardView v-if="$store.state.cache.cachedUser && $store.state.cache.cachedUser.user" row="0" class="bg-dark-black" elevation="15">
+        <GridLayout v-if="$store.state.cache.cachedUser" rows="auto,*">
+          <CardView v-if="$store.state.cache.cachedUser.user" row="0" class="bg-dark-black" elevation="15">
             <GridLayout class="p-25" rows="auto,auto" columns="*,auto">
               <Label row="0" col="0" fontSize="20%" class="font-weight-bold text-white" :text="`${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`" />
               <Label row="1" col="0" fontSize="18%" class="h4 text-white" :text="$store.state.cache.cachedUser.user.username" />
@@ -26,17 +26,17 @@
       <GridLayout ~mainContent columns="*" rows="*">
         <GridLayout rows="auto,auto,*" columns="*,auto">
           <StackLayout orientation="horizontal" row="0" class="text-dark-black">
-            <Ripple verticalAlignment="center" class="m-5" @tap="$refs.drawer.nativeView.showDrawer()">
+            <Ripple v-if="$store.state.cache.cachedUser" verticalAlignment="center" class="m-5" @tap="$refs.drawer.nativeView.showDrawer()">
               <label class="mdi p-5" fontSize="35%" :text="'mdi-menu' | fonticon"></label>
             </Ripple>
-            <Ripple v-if="$store.state.user.isLoggedIn" verticalAlignment="center" class="m-5" @tap="goTo(notificationsRoute)">
+            <Ripple v-if="$store.state.cache.cachedUser" verticalAlignment="center" class="m-5" @tap="goTo(notificationsRoute)">
               <label class="mdi p-5" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
             </Ripple>
           </StackLayout>
           <StackLayout row="0" col="1" class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
             <label class="text-white p-x-15 m-x-10 span" textAlignment="center" fontSize="15" text="Demo"></label>
           </StackLayout>
-          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="$store.state.cache.cachedUser ? '/home' : '/login'" />
+             <Navigator  colSpan="2" row="1" rowSpan="2" :defaultRoute="$store.state.cache.cachedUser ? '/student/profile/view' : '/login'" />
         </GridLayout>
       </GridLayout>
     </RadSideDrawer>
@@ -139,6 +139,9 @@ export default {
       appSettings: this.appSettings,
       api: this.$api
     });
+
+ 
+
     console.log("Cached", this.$store.state.cache.cachedUser);
     connectivity.startMonitoring(conn => {
       if (this.connectionType == 0 && conn > 0) {
