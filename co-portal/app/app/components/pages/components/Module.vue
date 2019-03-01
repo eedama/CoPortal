@@ -1,6 +1,6 @@
 <template>
   <page actionBarHidden="true">
-    <GridLayout rows="auto,*" columns="*">
+    <GridLayout v-if="currentModule" rows="auto,*" columns="*">
       <StackLayout row="0">
         <GridLayout rows="auto,auto" columns="*">
           <label row="0" verticalAlignment="center" textAlignment="center" class="text-dark-black" fontSize="35%" text="CSC1A20"></label>
@@ -36,16 +36,16 @@
           <TabViewItem title="Tests">
             <ScrollView>
               <StackLayout>
-                <CardView v-for="a in 15" :key="a" elevation="15" margin="5">
-                <Ripple @tap="TakeTest(a)">
-                      <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto" columns="auto,*,auto">
-                      <label row="0" col="0" rowSpan="2" verticalAlignment="center" textAlignment="center" class="font-weight-bold mdi p-15" fontSize="25%" :text="'mdi-file-document-box-multiple' | fonticon "></label>
-                      <label row="0" col="1" verticalAlignment="center" class="font-weight-bold" :textWrap="true" fontSize="17%" text="Geography test 101"></label>
-                      <label row="1" col="1" verticalAlignment="center" :textWrap="true" fontSize="15%" text="101 Questions"></label>
-                      <label row="1" col="2" verticalAlignment="center" class="h4 text-dark-black" text="10 minutes ago"></label>
+                <CardView v-for="(test,i) in currentModule.questionaires" :key="i" elevation="15" margin="5">
+                  <Ripple @tap="TakeTest(test)">
+                    <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto" columns="auto,*,auto">
+                      <label row="0" rowSpan="2" verticalAlignment="center" textAlignment="center" class="font-weight-bold mdi p-15" fontSize="25%" :text="'mdi-file-document-box-multiple' | fonticon "></label>
+                      <label row="0" col="1" verticalAlignment="center" class="font-weight-bold" :textWrap="true" fontSize="17%" :text="test.title"></label>
+                      <label row="1" col="1" verticalAlignment="center" :textWrap="true" fontSize="15%" :text="test.questions.length + ' Questions'"></label>
+                      <label row="1" col="2" verticalAlignment="center" class="h4 text-dark-black" :text="getMoment(test.date).fromNow()"></label>
                     </GridLayout>
-                </Ripple>
-                  </CardView>
+                  </Ripple>
+                </CardView>
               </StackLayout>
             </ScrollView>
           </TabViewItem>
@@ -56,43 +56,36 @@
 </template>
 
 <script>
-const dialogs = require("ui/dialogs");
-var appSettings = require("application-settings");
-
-import * as connectivity from "tns-core-modules/connectivity";
-export default {
-  data() {
-    return {
-      notification: {
-        sender: "Admin",
-        time: "3 mins ago",
-        title: "WHO IS THIS?",
-        message: "I think i know you, dont I???"
-      },
-      introTxt: "Digitalize your business and keep track of all your earnings."
-    };
-  },
-  mounted() {
-    this.pageLoaded();
-  },
-  props: ["moduleId"],
-  methods: {
-    pageLoaded() {
-      this.$store.commit("refreshCache", {
-        db: this.$db,
-        api: this.$api,
-        appSettings: this.appSettings,
-        doc: "admin"
-      });
+  const dialogs = require("ui/dialogs");
+  var appSettings = require("application-settings");
+  
+  import * as connectivity from "tns-core-modules/connectivity";
+  export default {
+    data() {
+      return {
+        currentModule: null
+      };
     },
-    TakeTest(a) {
-      this.navigate("/take/test", {
-        questionaireId: a
-      });
+    mounted() {
+      this.pageLoaded();
+    },
+    props: ["module"],
+    methods: {
+      pageLoaded() {
+        if(!this.module){
+          this.navigate(null);
+        }
+        this.currentModule = this.module;
+      },
+      TakeTest(test) {
+        this.navigate("/take/test", {
+          dbQuestionaire: test
+        });
+      }
     }
-  }
-};
+  };
 </script>
 
 <style lang="scss" scoped>
+  
 </style>
