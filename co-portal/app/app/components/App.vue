@@ -7,7 +7,7 @@
             <GridLayout class="p-25" rows="auto,auto" columns="*,auto">
               <Label row="0" col="0" fontSize="20%" class="font-weight-bold text-white" :text="$store.state.user.fullName" />
               <Label row="1" col="0" fontSize="18%" class="h4 text-white" :text="$store.state.user.username" />
-              <Image row="0" rowSpan="2" col="1" textAlignment="right" verticalAlignment="center" stretch="aspectFit" width="80" height="80" borderRadius="100%" :src="$store.state.user.profilePic ? $store.state.user.profilePic : $store.state.settings.defaultProfilePic"></Image>
+              <Image row="0" rowSpan="2" col="1" textAlignment="right" verticalAlignment="center" stretch="aspectFit" width="70" height="70" borderRadius="100%" :src="$store.state.user.profilePic ? $store.state.user.profilePic : $store.state.settings.defaultProfilePic"></Image>
             </GridLayout>
           </CardView>
           <ScrollView row="1">

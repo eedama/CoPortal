@@ -8,7 +8,7 @@
           width="150"
           height="150"
           borderRadius="100%"
-          src="https://i.screenshot.net/ekgqirg"
+         :src="$store.state.user.profilePic ? $store.state.user.profilePic : $store.state.settings.defaultProfilePic"
         ></Image>
         <label row="0" class="labelTitle m-t-5" textAlignment="center">{{this.fullname}}</label>
         <label row="0" class="labelname" textAlignment="center">{{this.username}}</label>
