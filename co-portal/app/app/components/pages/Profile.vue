@@ -109,7 +109,7 @@ export default {
       users: [
         {
           title: "ID Number",
-          body: "9606235802082",
+          body: "",
           icon: "mdi-account"
         },
         {
@@ -155,7 +155,7 @@ export default {
         this.fullname = result.firstname + " " + result.lastname;
         this.username = result.username;
         this.users[0].body = result.idNumber;
-        this.users[1].body = results.gender;
+        this.users[1].body = result.gender;
       })
       .catch(err => {
         console.log("wow i have an error" + err);
