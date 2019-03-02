@@ -61,6 +61,10 @@
         password: "",
         username: ""
       };
+    },mounted()
+    {
+    
+ 
     }, beforeDestroy() {
       this.isLoading = false;
     },
@@ -70,7 +74,13 @@
     methods: {
       GoToRegister() {
         this.navigate("/register");
-      },
+      },isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+},
       submit() {
         if (this.username.length == 0) {
           this.$feedback.error({
