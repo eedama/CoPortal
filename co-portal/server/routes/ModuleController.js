@@ -400,8 +400,17 @@ router.post(
       .catch(err => {
         return res.status(512).send("Server error : " + err.message);
       });
-
   }
 );
+
+router.get("/download/notes/:notesId", function (req, res) {
+  var notesID = req.params.notesId;
+   lecturerNote.findById(notesID).then(note => {
+      if (note == null) return res.status(512).send("Unable to find the specified note");
+      return res.send(note.file);
+    }).catch(err =>{
+      return res.status(512).send(err.message);
+    });
+});
 
 module.exports = router;
