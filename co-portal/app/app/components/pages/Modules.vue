@@ -48,12 +48,25 @@ export default {
     this.$api.getModuleInformation(this.$store.state.cache.cachedUser.user._id)
     .then(module=>
     {
-console.log(module);
 this.modules = module;
+
+        if (this.modules.length == 0) {
+          this.$feedback.warning({
+            title: "Modules",
+            message: "Not Currently registered with any module",
+            duration: 3000
+          });
+          return;
+        }
+
     })
     .catch(err=>
     {
-      console.log(err);
+      this.$feedback.error({
+            title: "Modules",
+            message: "Failed to retrieve modules try again later",
+            duration: 3000
+          });
     })
 
   },

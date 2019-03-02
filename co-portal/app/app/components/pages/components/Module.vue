@@ -68,6 +68,7 @@
     },
     mounted() {
       this.pageLoaded();
+    
     },
     props: ["module"],
     methods: {
@@ -75,7 +76,7 @@
         if(!this.module){
           this.navigate(null);
         }
-        this.currentModule = this.module;
+        this.currentModule = this.module;  
       },
       TakeTest(test) {
         this.navigate("/take/test", {
