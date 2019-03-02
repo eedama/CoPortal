@@ -101,10 +101,10 @@ Vue.mixin({
         options = options || {};
         options.props = props;
         var route = to + JSON.stringify(options);
-        if (route == this.appSettings.getString("PrvPage")) {
-          console.log("Going to same page", route);
-          return;
-        }
+        //if (route == this.appSettings.getString("PrvPage")) {
+      //    console.log("Going to same page", route);
+       //   return;
+      //  }
         this.appSettings.setString("PrvPage", route);
 
         this.$navigator.navigate(to, options);
