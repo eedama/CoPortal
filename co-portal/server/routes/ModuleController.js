@@ -105,6 +105,7 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
       };
       return obj;
     });
+    ms.reverse();
     return res.json(ms);
   }).catch(err => {
     return res.status(512).send("Server error : " + err.message);
