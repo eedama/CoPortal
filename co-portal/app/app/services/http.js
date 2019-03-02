@@ -161,45 +161,78 @@ export default class API {
       }
     });
   }
-  getModuleInformation(userID)
-  {
-    return new Promise((resolve,reject) =>
-    {
-      if(!userID)
-      {
+
+  getModuleInformation(userID) {
+    return new Promise((resolve, reject) => {
+      if (!userID) {
         reject(new Error("User Not Defined"));
-      }else
-      {
+      } else {
         http
-        .request(this.makeGet("/m/modules/all/for/" + userID + "/student"))
-        .then(async results => {
-          resolve(JSON.parse(JSON.stringify(results.content)));
-        })
-        .catch(err => {
-          reject(err);
-        });
+          .request(this.makeGet("/m/modules/all/for/" + userID + "/student"))
+          .then(async results => {
+            resolve(JSON.parse(JSON.stringify(results.content)));
+          })
+          .catch(err => {
+            reject(err);
+          });
       }
     })
   }
-  getModuleMarks(userID,moduleID)
-  {
-    return new Promise((resolve,reject)=>{
-      if(!userID || !moduleID)
-      {
+
+  getModuleMarks(userID, moduleID) {
+    return new Promise((resolve, reject) => {
+      if (!userID || !moduleID) {
         reject(new Error("User Not Defined"));
-      }else
-      {
+      } else {
         http
-        .request(this.makeGet("/m/marksheet/for/" + userID + "/moduleID/"+moduleID))
-        .then(async results => {
-          resolve(JSON.parse(JSON.stringify(results.content)));
-        })
-        .catch(err => {
-          reject(err);
-        });
+          .request(this.makeGet("/m/marksheet/for/" + userID + "/moduleID/" + moduleID))
+          .then(async results => {
+            resolve(JSON.parse(JSON.stringify(results.content)));
+          })
+          .catch(err => {
+            reject(err);
+          });
       }
     })
   }
+
+  submitQuiz(studentId, solution) {
+    return new Promise((resolve, reject) => {
+      if (!studentId || !solution) {
+        reject(new Error("Invalid request"));
+      } else {
+        http
+          .request(this.makePost("/l/submit/questionaire", {
+            studentId,
+            solution
+          }))
+          .then(async results => {
+            resolve(JSON.parse(JSON.stringify(results.content)));
+          })
+          .catch(err => {
+            reject(err);
+          });
+      }
+    })
+  }
+
+  getSolutions(solutionId) {
+    return new Promise((resolve, reject) => {
+      if (!solutionId) {
+        reject(new Error("Invalid request"));
+      } else {
+        http
+          .request(this.makeGet("/l/get/solutions/" + solutionId))
+          .then(async results => {
+            resolve(JSON.parse(JSON.stringify(results.content)));
+          })
+          .catch(err => {
+            reject(err);
+          });
+      }
+    })
+  }
+
   getInternetStatus() {
     return connectivity.getConnectionType();
   }
