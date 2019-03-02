@@ -37,7 +37,7 @@
                     <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto,auto" columns="auto,auto,*">
                       <label row="0" rowSpan="3" verticalAlignment="center"  textAlignment="center" class="font-weight-bold mdi p-15" fontSize="39" :text="'mdi-chart-pie' | fonticon "></label>
                       <label row="0" col="1" verticalAlignment="center" class="font-weight-bold" :textWrap="true" fontSize="17%" :text="marked.title"></label>
-                      <label row="0" col="3" verticalAlignment="center" textAlignment="right"     rowSpan="2" :textWrap="true" fontSize="45" :text="marked.mark"></label>
+                      <label row="0" col="3" verticalAlignment="center" textAlignment="right"   :color="colorLoaded(marked.mark)"   rowSpan="2" :textWrap="true" fontSize="45" :text="marked.mark"></label>
                      <label row="2" col="1" verticalAlignment="center" 
                    class="font-weight-bold p-x-10 p-b-2"
                   fontSize="13"
@@ -58,7 +58,7 @@
                   <Ripple @tap="TakeTest(test)">
                     <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto" columns="auto,*,auto">
                       <label row="0" rowSpan="2" verticalAlignment="center" textAlignment="center" class="font-weight-bold mdi p-15" fontSize="25%" :text="'mdi-file-document-box-multiple' | fonticon "></label>
-                      <label row="0" col="1" verticalAlignment="center" class="font-weight-bold" :textWrap="true" fontSize="17%" :text="test.title"></label>
+                      <label row="0" col="1" verticalAlignment="center"  class="font-weight-bold" :textWrap="true" fontSize="17%" :text="test.title"></label>
                       <label row="1" col="1" verticalAlignment="center" :textWrap="true" fontSize="15%" :text="test.questions.length + ' Questions'"></label>
                       <label row="1" col="2" verticalAlignment="center" class="h4 text-dark-black" :text="getMoment(test.date).fromNow()"></label>
                     </GridLayout>
@@ -122,6 +122,15 @@ this.currentMarks = marks;
         this.navigate("/take/test", {
           dbQuestionaire: test
         });
+      },colorLoaded(marked)
+      {
+        if(marked < 50)
+        {
+          return "red"
+        }else
+        {
+          return "green"
+        }
       }
     }
   };
