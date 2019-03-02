@@ -139,7 +139,8 @@
         api: this.$api
       });
   
-      console.log("Cached", this.$store.state.cache.cachedUser);
+
+     
       connectivity.startMonitoring(conn => {
         if (this.connectionType == 0 && conn > 0) {
           this.$feedback.success({
@@ -152,7 +153,9 @@
             message: "Some features are not accessible offline"
           });
         }
-      }
+      })
+
+
     },
     methods: {
       goTo(item) {

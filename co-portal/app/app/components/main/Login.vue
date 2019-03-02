@@ -68,6 +68,8 @@
       appSettings: this.appSettings,
       api: this.$api
     });
+
+    
     }, beforeDestroy() {
       this.isLoading = false;
     },
