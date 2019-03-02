@@ -44,11 +44,11 @@ SolutionSchema.pre("save", function (next) {
                 isMemo: true
             })
             .then(s => {
-                if (s == null) throw "Test does not have a memorandum";
+                if (s == null) throw new Error("Test does not have a memorandum");
 
                 this.answers.forEach((answer, i) => {
                     let solution = s.answers.find(v => v.question.id == answer.question.id);
-                    if (solution == null) throw "Test does not have a memorandum";
+                    if (solution == null) throw new Error("Test does not have a memorandum");
                     if (answer.answer == solution.answer) {
                         mark++;
                     }
@@ -60,17 +60,18 @@ SolutionSchema.pre("save", function (next) {
                 MarkSheet.findOne({
                     id: this.questionaireId
                 }).then(sheet => {
-                    if (sheet == null) throw "Your mark is not added to your marksheet , no marksheet";
+                    if (sheet == null) throw new Error("Your mark is not added to your marksheet , no marksheet");
                     sheet.studentMarks.push({
                         studentID: self.studentId,
                         mark
                     })
                     sheet.save(function (err) {
-                        if (err) throw "Your mark is not added to your marksheet, save failed";
+                        if (err) throw new Error("Your mark is not added to your marksheet, save failed");
                         next();
                     });
                 }).catch(err => {
-                    throw "Your mark is not added to your marksheet , " + err.message;
+                    console.log(err)
+                    next(new Error(err));
                 });
             })
             .catch(err => {
