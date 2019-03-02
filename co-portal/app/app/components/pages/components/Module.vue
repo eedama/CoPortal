@@ -39,10 +39,10 @@
                       <label row="0" col="1" verticalAlignment="center" class="font-weight-bold" :textWrap="true" fontSize="17%" :text="marked.title"></label>
                       <label row="0" col="3" verticalAlignment="center" textAlignment="right"   :color="colorLoaded(marked.mark)"   rowSpan="2" :textWrap="true" fontSize="45" :text="marked.mark"></label>
                      <label row="2" col="1" verticalAlignment="center" 
-                   class="font-weight-bold p-x-10 p-b-2"
+                   class="font-weight-bold p-x-10 p-b-2 bg-light-black"
                   fontSize="13"
                   borderRadius="50"
-                  style="color:White;background-color:black;"
+                  style="color:White;"
                    textAlignment="center"
                      :text="marked.type.toLowerCase()"></label>
                       <label row="2" col="2" verticalAlignment="center"     textAlignment="right"  class="h4 text-dark-black" :text="getMoment(marked.date).fromNow()"></label>
