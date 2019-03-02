@@ -31,7 +31,25 @@
             </ScrollView>
           </TabViewItem>
           <TabViewItem title="Marks">
-            <Label text="Content for Tab 2" />
+             <ScrollView>
+              <StackLayout>
+                <CardView v-for="(marked,i) in currentMarks" :key="i"   elevation="15" margin="5">                  
+                    <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto,auto" columns="auto,auto,*">
+                      <label row="0" rowSpan="3" verticalAlignment="center"  textAlignment="center" class="font-weight-bold mdi p-15" fontSize="39" :text="'mdi-chart-pie' | fonticon "></label>
+                      <label row="0" col="1" verticalAlignment="center" class="font-weight-bold" :textWrap="true" fontSize="17%" :text="marked.title"></label>
+                      <label row="0" col="3" verticalAlignment="center" textAlignment="right"     rowSpan="2" :textWrap="true" fontSize="45" :text="marked.mark"></label>
+                     <label row="2" col="1" verticalAlignment="center" 
+                   class="font-weight-bold p-x-10 p-b-2"
+                  fontSize="13"
+                  borderRadius="50"
+                  style="color:White;background-color:black;"
+                   textAlignment="center"
+                     :text="marked.type.toLowerCase()"></label>
+                      <label row="2" col="2" verticalAlignment="center"     textAlignment="right"  class="h4 text-dark-black" :text="getMoment(marked.date).fromNow()"></label>
+                    </GridLayout>
+                </CardView>
+              </StackLayout>
+            </ScrollView>
           </TabViewItem>
           <TabViewItem title="Tests">
             <ScrollView>
@@ -63,11 +81,33 @@
   export default {
     data() {
       return {
-        currentModule: null
+        currentModule: null,
+        currentMarks:[]
       };
     },
     mounted() {
       this.pageLoaded();
+      this.$api.getModuleMarks(this.$store.state.cache.cachedUser.user._id,this.module._id)
+      .then(marks=>
+      {
+this.currentMarks = marks;
+ if (marks.length == 0) {
+          this.$feedback.warning({
+            title: "Marks",
+            message: "No Marks to display yet",
+            duration: 3000
+          });
+        
+        }
+      })
+      .catch(error=>
+      {
+  this.$feedback.error({
+            title: "Marks",
+            message: "Can not retrieve marks at this time",
+            duration: 3000
+          });
+      })
     
     },
     props: ["module"],
