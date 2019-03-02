@@ -181,7 +181,25 @@ export default class API {
       }
     })
   }
-
+  getModuleMarks(userID,moduleID)
+  {
+    return new Promise((resolve,reject)=>{
+      if(!userID || !moduleID)
+      {
+        reject(new Error("User Not Defined"));
+      }else
+      {
+        http
+        .request(this.makeGet("/m/marksheet/for/" + userID + "/moduleID/"+moduleID))
+        .then(async results => {
+          resolve(JSON.parse(JSON.stringify(results.content)));
+        })
+        .catch(err => {
+          reject(err);
+        });
+      }
+    })
+  }
   getInternetStatus() {
     return connectivity.getConnectionType();
   }
