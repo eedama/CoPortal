@@ -8,7 +8,7 @@
           textAlignment="center"
           class="text-dark-black font-weight-bold m-t-0 text-dark-black"
           fontSize="35%"
-          text="TiMETABLE"
+          text="TIMETABLE"
         ></label>
       </GridLayout>
       <ScrollView>
@@ -99,7 +99,7 @@ export default {
           isCurrentPeriod: false
         },
         {
-          day: "Saturday",
+          day: "Monday",
           moduleCode: "CSC2B10",
           moduleName: "Computer Science 2A",
           venue: "C Les 201",
@@ -124,21 +124,13 @@ export default {
           moduleName: "INFORMATICS 2A",
           venue: "C Les 201",
           type: "TEST",
-          startTime: "10:00",
-          endTime: "10:30",
+          startTime: "1:30",
+          endTime: "2:0 `0",
           isCurrentPeriod: false
         }
       ],
-      daysOfTheWeek: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday"
-      ],
-      orderdDays:[],
+      daysOfTheWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      orderdDays: []
     };
   },
   methods: {
@@ -149,12 +141,11 @@ export default {
         if (timetable.startTime <= nowTime && timetable.endTime >= nowTime) {
           timetable.isCurrentPeriod = true;
         }
-       }
-       if(!(this.orderdDays.some(v=> v==nowDay))){
-          this.orderdDays.push(nowDay);
-        }
+      }
+      if (!this.orderdDays.some(v => v == nowDay)) {
+        this.orderdDays.push(timetable.day);
+      }
     }
-
   },
   mounted() {
     this.timetables.forEach(timetable => {
