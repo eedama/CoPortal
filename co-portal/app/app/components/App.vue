@@ -157,6 +157,12 @@ export default {
       }
       this.connectionType = conn;
     });
+
+         console.log("we are mounted",this.$store.state.cache.cachedUser);
+      if(this.$store.state.cache.cachedUser)
+ this.navigate("/student/profile/view", null, {
+                  clearHistory: true
+                });
   },
   methods: {
     goTo(item) {
