@@ -35,14 +35,15 @@
               <StackLayout>
                 <CardView v-for="(marked,i) in currentMarks" :key="i"   elevation="15" margin="5">                  
                     <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto,auto" columns="auto,auto,*">
-                      <label row="0" rowSpan="3" verticalAlignment="center"  textAlignment="center" class="font-weight-bold mdi p-15" fontSize="39" :text="'mdi-chart-pie' | fonticon "></label>
-                      <label row="0" col="1" verticalAlignment="center" class="font-weight-bold" :textWrap="true" fontSize="17%" :text="marked.title"></label>
+                      <label row="0" rowSpan="3"    verticalAlignment="center"  textAlignment="center" class="font-weight-bold mdi p-15" fontSize="54" :text="'mdi-chart-pie' | fonticon "></label>
+                      <label row="0" col="1" verticalAlignment="center" class="font-weight-bold"  :textWrap="true" fontSize="17%" :text="marked.title"></label>
                       <label row="0" col="3" verticalAlignment="center" textAlignment="right"   :color="colorLoaded(marked.mark)"   rowSpan="2" :textWrap="true" fontSize="45" :text="marked.mark"></label>
                      <label row="2" col="1" verticalAlignment="center" 
-                   class="font-weight-bold p-x-10 p-b-2 bg-light-black"
+                   class="font-weight-bold p-x-10 p-b-2"
                   fontSize="13"
                   borderRadius="50"
-                  style="color:White;"
+                  color="white"
+                  :style="{backgroundColor:colorLoaded(marked.mark)}"
                    textAlignment="center"
                      :text="marked.type.toLowerCase()"></label>
                       <label row="2" col="2" verticalAlignment="center"     textAlignment="right"  class="h4 text-dark-black" :text="getMoment(marked.date).fromNow()"></label>
@@ -126,10 +127,10 @@ this.currentMarks = marks;
       {
         if(marked < 50)
         {
-          return "red"
+          return "darkred"
         }else
         {
-          return "green"
+          return "darkgreen"
         }
       }
     }
