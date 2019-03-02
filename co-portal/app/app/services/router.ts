@@ -9,6 +9,7 @@ import Profile from "../components/pages/Profile.vue";
 import Module from "../components/pages/components/Module.vue";
 // Tests
 import TakeTest from "../components/pages/components/TakeTest.vue";
+import TestMarks from "../components/pages/components/TestMarks.vue";
 import Timetable from "../components/pages/components/Timetable.vue";
 
 var appSettings = require("application-settings");
@@ -102,6 +103,15 @@ var router = {
       component: TakeTest,
       meta: {
         title: "TakeTest",
+        authLevel: 0
+      }
+    },
+    "/test/marks": {
+      name: "testmarks",
+      path: "/test/marks/:solutionId",
+      component: TestMarks,
+      meta: {
+        title: "TestMarks",
         authLevel: 0
       }
     }

@@ -20,6 +20,7 @@
                             </ScrollView>
                         </GridLayout>
                     </CardView>
+                    <label class="m-10" :textWrap="true" verticalAlignment="center" textAlignment="center" color="red" v-if="txtError" :text="txtError"></label>
                 </StackLayout>
             </ScrollView>
             <StackLayout v-if="(currentPage) == Questionaire.questions.length && !isLoading" row="1">
@@ -47,11 +48,12 @@
                         <label class="font-weight-bold mdi p-5" textAlignment="right" fontSize="50%" :text="'mdi-chevron-right' | fonticon "></label>
                     </Ripple>
                 </GridLayout>
-                <GridLayout v-if="(currentPage) == Questionaire.questions.length && !isLoading" class="p-5" rows="auto" columns="auto,*">
-                    <Ripple v-if="(currentPage) == Questionaire.questions.length && !isLoading" class="m-15" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" @tap="SubmitQuiz()">
-                        <label class="font-weight-bold p-5" textAlignment="center" fontSize="20%" text="Submit"></label>
+                <GridLayout v-if="(currentPage) == Questionaire.questions.length && !isLoading" rows="auto" columns="auto,*">
+                    <Ripple class="p-5" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" @tap="SubmitQuiz()">
+                        <label class="font-weight-bold m-15 p-5" textAlignment="center" fontSize="20%" text="Submit"></label>
                     </Ripple>
                 </GridLayout>
+                <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
             </StackLayout>
         </GridLayout>
     </page>
@@ -102,7 +104,70 @@ export default {
       }
       this.$forceUpdate();
     },
-    SubmitQuiz() {}
+    SubmitQuiz() {
+      this.isLoading = true;
+      this.txtError = "";
+      var hasError = false;
+      this.solutions.map((s, i) => {
+        if (s == null) {
+          hasError = true;
+          this.txtError = "Please provide an answer to this question";
+          this.currentPage = i;
+        }
+      });
+      if (hasError) {
+        this.isLoading = false;
+        return;
+      }
+      confirm({
+        title: "Submit confirmation",
+        message: "Are you sure you want to submit?",
+        okButtonText: "Yes",
+        cancelButtonText: "No"
+      }).then(result => {
+        if (!result) {
+          this.isLoading = false;
+        } else {
+          var solution = {
+            id: this.Questionaire._id,
+            isMemo: this.isMemo,
+            answers: []
+          };
+          this.solutions.forEach((v, i) => {
+            solution.answers.push({
+              answer: v,
+              question: this.Questionaire.questions[i]
+            });
+          });
+
+          this.$api
+            .submitQuiz(this.$store.state.cache.cachedUser.user._id, solution)
+            .then(results => {
+              this.isLoading = false;
+              this.$feedback.success({
+                title: "Submitted!",
+                message: "You will get your marks shortly."
+              });
+              this.navigate(
+                "/test/marks",
+                {
+                  solutionId: results.content._id
+                },
+                {
+                  clearHistory: true
+                }
+              );
+            })
+            .catch(err => {
+              this.isLoading = false;
+              this.$feedback.error({
+                title: "Unable to submit",
+                message: err.message
+              });
+            });
+        }
+      });
+    }
   }
 };
 </script>
