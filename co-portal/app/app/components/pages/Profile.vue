@@ -8,8 +8,7 @@
           width="150"
           height="150"
           borderRadius="100%"
-          :src="$store.state.user.profilePic ? $store.state.user.profilePic : $store.state.settings.defaultProfilePic"
-        ></Image>
+          :src="$store.state.cache.cachedUser.user.profilePic ? $store.state.cache.cachedUser.user.profilePic : $store.state.settings.defaultProfilePic"></Image>
         <label row="0" class="labelTitle m-t-5" textAlignment="center">{{this.fullname}}</label>
         <label row="0" class="labelname" textAlignment="center">{{this.username}}</label>
       </StackLayout>
@@ -134,9 +133,10 @@ export default {
       });
     }
 
-    var result =JSON.parse(JSON.stringify(this.$store.state.cache.cachedUser.user));
+    var result = JSON.parse(
+      JSON.stringify(this.$store.state.cache.cachedUser.user)
+    );
 
-   
     this.fullname = result.firstname + " " + result.lastname;
     this.username = result.username;
     this.users[0].body = result.idNumber;

@@ -5,8 +5,8 @@
         <GridLayout v-if="$store.state.cache.cachedUser" rows="auto,*">
           <CardView v-if="$store.state.cache.cachedUser.user" row="0" class="bg-dark-black" elevation="15">
             <GridLayout class="p-25" rows="auto,auto" columns="*,auto">
-              <Label row="0" col="0" fontSize="20%" class="font-weight-bold text-white" :text="`${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`" />
-              <Label row="1" col="0" fontSize="18%" class="h4 text-white" :text="$store.state.cache.cachedUser.user.username" />
+              <Label row="0" col="0" fontSize="20%" class="font-weight-bold text-white p-t-5" :textWrap="true" :text="`${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`" />
+              <Label row="1" col="0" fontSize="18%" class="h4 text-white p-t-5" :text="$store.state.cache.cachedUser.user.username" />
               <Image row="0" rowSpan="2" col="1" textAlignment="right" verticalAlignment="center" stretch="aspectFit" width="80" height="80" borderRadius="100%" :src="$store.state.cache.cachedUser.user.profilePic ? $store.state.cache.cachedUser.user.profilePic : $store.state.settings.defaultProfilePic"></Image>
             </GridLayout>
           </CardView>
@@ -36,7 +36,7 @@
           <StackLayout row="0" col="1" class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
             <label class="text-white p-x-15 m-x-10 span" textAlignment="center" fontSize="15" text="Demo"></label>
           </StackLayout>
-             <Navigator  colSpan="2" row="1" rowSpan="2" :defaultRoute="$store.state.cache.cachedUser ? '/student/profile/view' : '/login'" />
+          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="$store.state.cache.cachedUser ? '/student/profile/view' : '/login'" />
         </GridLayout>
       </GridLayout>
     </RadSideDrawer>
@@ -44,157 +44,151 @@
 </template>
 
 <script lang="ts">
-import * as connectivity from "tns-core-modules/connectivity";
-export default {
-  name: "App",
-  data() {
-    return {
-      msg: "What???",
-      loggedIn: false,
-      connectionType: null,
-      notificationsRoute: {
-        text: "My profile",
-        icon: "bell",
-        link: "/notifications/list",
-        description: "All your notifications in one place",
-        auth: ["STUDENT", "LECTURER", "ADMIN"]
-      },
-      drawerLayouts: [
-        {
+  import * as connectivity from "tns-core-modules/connectivity";
+  export default {
+    name: "App",
+    data() {
+      return {
+        msg: "What???",
+        loggedIn: false,
+        connectionType: null,
+        notificationsRoute: {
           text: "My profile",
-          icon: "account",
-          link: "/student/profile/view",
-          description: "View and edit personal information",
+          icon: "bell",
+          link: "/notifications/list",
+          description: "All your notifications in one place",
           auth: ["STUDENT", "LECTURER", "ADMIN"]
         },
-        {
-          text: "Students",
-          icon: "account-multiple",
-          link: "/student/list",
-          description: "Students registered to the system",
-          auth: ["LECTURER", "ADMIN"]
-        },
-        {
-          text: "Lecturers",
-          icon: "account-supervisor-circle",
-          link: "/lecturer/list",
-          description: "Lecturers registered to the system",
-          auth: ["ADMIN"]
-        },
-        {
-          text: "Modules",
-          icon: "book-open-page-variant",
-          link: "/module/list",
-          description: "Modules you are registered for",
-          auth: ["ADMIN", "LECTURER", "STUDENT"]
-        },
-        {
-          text: "Marks",
-          icon: "checkbox-multiple-marked-circle-outline",
-          link: "/marks/all",
-          description: "Test results and marksheets",
-          auth: ["STUDENT"]
-        },
-        {
-          text: "Assessment results",
-          icon: "checkbox-multiple-marked-circle-outline",
-          link: "/marks/sheet",
-          description: "Test results and marksheets",
-          auth: ["LECTURER", "ADMIN"]
-        },
-         {
-          text: "Timetable",
-          icon: "table",
-          link: "/timetable/view",
-          description: "View Your Table",
-          auth: ["STUDENT"]
-        },
-        {
-          text: "Report a student",
-          icon: "account-alert-outline",
-          link: "/Student/Report",
-          description: "Report a student",
-          auth: ["LECTURER", "ADMIN"]
-        },
-        {
-          text: "Settings",
-          icon: "settings",
-          link: "/Student/Report",
-          description: "Customize your portal",
-          auth: ["STUDENT", "LECTURER", "ADMIN"]
-        },
-        {
-          text: "Log out",
-          icon: "exit-run",
-          link: "/logout",
-          description: "Leave the system",
-          auth: ["STUDENT", "LECTURER", "ADMIN"]
-        }
-      ]
-    };
-  },
-  mounted() {
-    this.$store.commit("refreshCache", {
-      db: this.$db,
-      appSettings: this.appSettings,
-      api: this.$api
-    });
-
-    connectivity.startMonitoring(conn => {
-      if (this.connectionType == 0 && conn > 0) {
-        this.$feedback.success({
-          title: "Back online",
-          message: "You are now online"
-        });
-      } else if (this.connectionType > 0 && conn == 0) {
-        this.$feedback.warning({
-          title: "You are offline",
-          message: "Some features are not accessible offline"
-        });
-      }
-      this.connectionType = conn;
-    });
-       
-      if(this.$store.state.cache.cachedUser)
- this.navigate("/student/profile/view", null, {
-                  clearHistory: true
-                });
-  },
-  methods: {
-    goTo(item) {
-      this.$refs.drawer.nativeView.closeDrawer();
-      if (item.link == "/logout") {
-        confirm({
-          title: "Log out",
-          message: "Are you sure you want to log out?",
-          okButtonText: "Yes",
-          cancelButtonText: "No"
-        }).then(result => {
-          if (result) {
-            this.$store.commit("clearCache", {
-              db: this.$db,
-              appSettings: this.appSettings,
-              api: this.$api
-            });
-            this.navigate("/login", null, {
-              clearHistory: true
-            });
+        drawerLayouts: [{
+            text: "My profile",
+            icon: "account",
+            link: "/student/profile/view",
+            description: "View and edit personal information",
+            auth: ["STUDENT", "LECTURER", "ADMIN"]
+          },
+          {
+            text: "Students",
+            icon: "account-multiple",
+            link: "/student/list",
+            description: "Students registered to the system",
+            auth: ["LECTURER", "ADMIN"]
+          },
+          {
+            text: "Lecturers",
+            icon: "account-supervisor-circle",
+            link: "/lecturer/list",
+            description: "Lecturers registered to the system",
+            auth: ["ADMIN"]
+          },
+          {
+            text: "Modules",
+            icon: "book-open-page-variant",
+            link: "/module/list",
+            description: "Modules you are registered for",
+            auth: ["ADMIN", "LECTURER", "STUDENT"]
+          },
+          {
+            text: "Marks",
+            icon: "checkbox-multiple-marked-circle-outline",
+            link: "/marks/all",
+            description: "Test results and marksheets",
+            auth: ["STUDENT"]
+          },
+          {
+            text: "Assessment results",
+            icon: "checkbox-multiple-marked-circle-outline",
+            link: "/marks/sheet",
+            description: "Test results and marksheets",
+            auth: ["LECTURER", "ADMIN"]
+          },
+          {
+            text: "Timetable",
+            icon: "table",
+            link: "/timetable/view",
+            description: "View Your Table",
+            auth: ["STUDENT"]
+          },
+          {
+            text: "Report a student",
+            icon: "account-alert-outline",
+            link: "/Student/Report",
+            description: "Report a student",
+            auth: ["LECTURER", "ADMIN"]
+          },
+          {
+            text: "Settings",
+            icon: "settings",
+            link: "/Student/Report",
+            description: "Customize your portal",
+            auth: ["STUDENT", "LECTURER", "ADMIN"]
+          },
+          {
+            text: "Log out",
+            icon: "exit-run",
+            link: "/logout",
+            description: "Leave the system",
+            auth: ["STUDENT", "LECTURER", "ADMIN"]
           }
-        });
-      } else {
-        this.navigate(item.link);
+        ]
+      };
+    },
+    mounted() {
+      this.$store.commit("refreshCache", {
+        db: this.$db,
+        appSettings: this.appSettings,
+        api: this.$api
+      });
+  
+      console.log("Cached", this.$store.state.cache.cachedUser);
+      connectivity.startMonitoring(conn => {
+        if (this.connectionType == 0 && conn > 0) {
+          this.$feedback.success({
+            title: "Back online",
+            message: "You are now online"
+          });
+        } else if (this.connectionType > 0 && conn == 0) {
+          this.$feedback.warning({
+            title: "You are offline",
+            message: "Some features are not accessible offline"
+          });
+        }
+      }
+    },
+    methods: {
+      goTo(item) {
+        this.$refs.drawer.nativeView.closeDrawer();
+        if (item.link == "/logout") {
+          confirm({
+            title: "Log out",
+            message: "Are you sure you want to log out?",
+            okButtonText: "Yes",
+            cancelButtonText: "No"
+          }).then(result => {
+            if (result) {
+              this.$store.commit("clearCache", {
+                db: this.$db,
+                appSettings: this.appSettings,
+                api: this.$api
+              });
+              this.navigate("/login", null, {
+                clearHistory: true
+              });
+            }
+          });
+        } else {
+          this.navigate(item.link);
+        }
       }
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
-.ribbon {
-  transform: rotate(45deg);
-  margin-top: 30;
-  margin-right: -20;
-  z-index: 10;
-  overflow: hidden;
-}
+  .ribbon {
+    transform: rotate(45deg);
+    margin-top: 30;
+    margin-right: -20;
+    z-index: 10;
+    overflow: hidden;
+  }
 </style>

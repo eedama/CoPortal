@@ -7,14 +7,15 @@
           <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="30%" text="Modules"></label>
         </GridLayout>
       </StackLayout>
-      <ScrollView row="1">
+      <ActivityIndicator verticalAlignment="center" textAlignment="center" row="1" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
+      <ScrollView v-if="!isLoading" row="1">
         <WrapLayout>
-          <StackLayout v-for="module in modules" :key="module._id" width="50%" >
+          <StackLayout v-for="(_module,i) in modules" :key="i" width="50%">
             <CardView height="100" textAlignment="center" elevation="5" margin="10">
-              <Ripple class="p-y-20" @tap="goToModule(module)">
+              <Ripple class="p-y-20" @tap="goToModule(_module)">
                 <GridLayout rows="auto,auto" columns="*" class="p-10" verticalAlignment="center" textAlignment="center">
-                  <label row="0" :textWrap="true" class="font-weight-bold" fontSize="16%" verticalAlignment="center" textAlignment="center" :text="module.name"></label>
-                  <label row="1" :textWrap="true" class="text-dark-black" verticalAlignment="center" fontSize="14%" textAlignment="center" :text="module.code"></label>
+                  <label row="0" :textWrap="true" class="font-weight-bold" fontSize="16%" verticalAlignment="center" textAlignment="center" :text="_module.name"></label>
+                  <label row="1" :textWrap="true" class="text-dark-black" verticalAlignment="center" fontSize="14%" textAlignment="center" :text="_module.code"></label>
                 </GridLayout>
               </Ripple>
             </CardView>
@@ -39,36 +40,35 @@ export default {
   },
   mounted() {
     this.pageLoaded();
-      if (!this.$store.state.cache.cachedUser) {
+    if (!this.$store.state.cache.cachedUser) {
       this.navigate("/login", null, {
         clearHistory: true
       });
     }
-
-    this.$api.getModuleInformation(this.$store.state.cache.cachedUser.user._id)
-    .then(module=>
-    {
-this.modules = module;
+    this.isLoading = true;
+    this.$api
+      .getModuleInformation(this.$store.state.cache.cachedUser.user._id)
+      .then(_modules => {
+        this.modules = _modules;
 
         if (this.modules.length == 0) {
           this.$feedback.warning({
             title: "Modules",
             message: "Not Currently registered with any module",
-            duration: 3000
+            duration: 10000
           });
           return;
         }
-
-    })
-    .catch(err=>
-    {
-      this.$feedback.error({
-            title: "Modules",
-            message: "Failed to retrieve modules try again later",
-            duration: 3000
-          });
-    })
-
+        this.isLoading = false;
+      })
+      .catch(err => {
+        this.$feedback.error({
+          title: "Modules",
+          message: "Failed to retrieve modules try again later",
+          duration: 10000
+        });
+        this.isLoading = false;
+      });
   },
   methods: {
     pageLoaded() {
