@@ -92,6 +92,7 @@ export default {
         this.solutions.push(null);
       });
 
+      this.ApplyNavigation(this);
       this.Questionaire = this.dbQuestionaire;
     },
     changePage(isForward) {

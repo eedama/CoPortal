@@ -78,6 +78,7 @@ Vue.use(Navigator, {
 Vue.prototype.$router = router;
 Vue.prototype.$route = null;
 
+var application = require("application");
 Vue.mixin({
   data() {
     return {
@@ -108,6 +109,21 @@ Vue.mixin({
 
         this.$navigator.navigate(to, options);
       }
+    },
+    ApplyNavigation(self) {
+      var AndroidApplication = application.android;
+      var activity = AndroidApplication.foregroundActivity;
+      activity = AndroidApplication.foregroundActivity;
+      activity.onBackPressed = function (e) {
+        if (self.currentPage && self.currentPage > 0) {
+          self.currentPage--;
+        } else {
+          activity.onBackPressed = function () {
+            self.navigate(null);
+          };
+          self.navigate(null);
+        }
+      };
     },
     getMoment(val = new Date()) {
       return moment(val);
