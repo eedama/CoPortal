@@ -140,9 +140,6 @@ export default {
       api: this.$api
     });
 
- 
-
-    console.log("Cached", this.$store.state.cache.cachedUser);
     connectivity.startMonitoring(conn => {
       if (this.connectionType == 0 && conn > 0) {
         this.$feedback.success({
@@ -157,8 +154,7 @@ export default {
       }
       this.connectionType = conn;
     });
-
-         console.log("we are mounted",this.$store.state.cache.cachedUser);
+       
       if(this.$store.state.cache.cachedUser)
  this.navigate("/student/profile/view", null, {
                   clearHistory: true

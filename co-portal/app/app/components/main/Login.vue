@@ -63,8 +63,11 @@
       };
     },mounted()
     {
-    
- 
+    this.$store.commit("refreshCache", {
+      db: this.$db,
+      appSettings: this.appSettings,
+      api: this.$api
+    });
     }, beforeDestroy() {
       this.isLoading = false;
     },
