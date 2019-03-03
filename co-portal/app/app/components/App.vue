@@ -27,7 +27,7 @@
               />
               <Image
                 row="0"
-                rowspan="2"
+                rowSpan="2"
                 col="1"
                 textAlignment="right"
                 verticalAlignment="center"
@@ -106,9 +106,9 @@
             ></label>
           </StackLayout>
           <Navigator
-            colspan="2"
+            colSpan="2"
             row="1"
-            rowspan="2"
+            rowSpan="2"
             :defaultRoute="userLoggedIn() ? '/student/profile/view' : '/login'"
           />
         </GridLayout>

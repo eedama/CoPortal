@@ -31,7 +31,7 @@
                 <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
                   <label
                     row="0"
-                    rowspan="2"
+                    rowSpan="2"
                     col="0"
                     verticalAlignment="center"
                     textAlignment="center"
