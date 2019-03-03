@@ -58,27 +58,37 @@ router.post("/announcements/get/for/:userID", function (req, res) {
 // This is used on the App to get all student notifications
 router.get("/announcements/get/all/for/student/:userID", function (req, res) {
   var userId = req.params.userID;
-  console.log("UserId",userId);
-  Announcement.find({
+
+  Student.findById(userId).then(user =>{
+    if(user == null) return res.status(512).send("User was not found.");
+    if(!user.modules){
+      user.modules = [null];
+    }else{
+      user.modules.push(null);
+    }
+    Announcement.find({
       removed: false,
-      studentId: userId
+      moduleId: user.modules
     }).
     populate({
-      path: 'modules',
+      path: 'moduleId',
       select: '_id code name'
     })
     .then(announcements => {
       if (announcements == null) return res.status(512).send("No announcements where found");
-  console.log('Announcements',announcements);
-      announcements = announcements.filter(a => a.deletedBy.filter(deleted => deleted == userId).length == 0)
+    console.log('Announcements',announcements);
+        announcements = announcements.filter(a => a.deletedBy.filter(deleted => deleted == userId).length == 0)
 
-      announcements.forEach(element => {
-        element.seenBy = undefined;
-        element.deletedBy = undefined;
+        announcements.forEach(element => {
+          element.seenBy = undefined;
+          element.deletedBy = undefined;
+        });
+        return res.json(announcements);
+      }).catch(err =>{
+        return res.status(512).send("Unable to retrieve the notifications, Try again later.");
       });
-      return res.json(announcements);
     }).catch(err =>{
-       return res.status(512).send("Unable to retrieve the notifications, Try again later.");
+      return res.status(512).send("Unable to retrieve the user, Try again later.");
     });
 });
 
