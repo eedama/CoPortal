@@ -20,8 +20,7 @@ router.post("/login", function (req, res) {
   var password = req.body.password;
   var username = req.body.username;
 
-  Student.
-    .populate({
+  Student.populate({
       path: 'modules',
       select: '_id code name'
     })
