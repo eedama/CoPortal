@@ -142,7 +142,7 @@ export default {
           timetable.isCurrentPeriod = true;
         }
       }
-      if (!this.orderdDays.some(v => v == nowDay)) {
+      if (!this.orderdDays.some(v => v == timetable.day)) {
         this.orderdDays.push(timetable.day);
       }
     }
