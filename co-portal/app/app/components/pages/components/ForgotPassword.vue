@@ -104,8 +104,19 @@ export default {
   },
   methods: {
     GoToLogin() {
-        this.navigate("/login");
+      this.$api
+        .sendLinkToResetPassword(this.username)
+        .then(results => {
+          this.navigate("/login");
+        })
+        .catch(err => {
+          this.$feedback.error({
+            title: "Your Email Was Not Found",
+            message: err.message
+          });
+        });
     },
+
     isEmpty(obj) {
       for (var key in obj) {
         if (obj.hasOwnProperty(key)) return false;
