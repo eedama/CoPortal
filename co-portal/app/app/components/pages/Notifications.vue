@@ -8,7 +8,9 @@
             <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="30%" text="Notifications"></label>
           </GridLayout>
         </StackLayout>
+ 
         <StackLayout row="2">
+                 <ActivityIndicator verticalAlignment="center" textAlignment="center" row="1" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
           <CardView v-for="notify in notification" :key="notify._id" :row="a-1" elevation="15" margin="5">
             <Ripple @tap="readMessage(notify.title,notify.message)" >
               <GridLayout  class="p-15" rows="auto,auto,auto" columns="auto,*,auto">
@@ -39,20 +41,24 @@ export default {
   },
   mounted() {
     this.pageLoaded();
+    this.isLoading = true;
      this.$api
       .getStudentNotification(this.$store.state.cache.cachedUser.user._id)
       .then(notifications=>
       {
         this.notification = notifications;
+              this.isLoading = false;
       })
       .catch(error=>
       {
+              this.isLoading = false;
  this.$feedback.error({
             title: "Notification",
             message: "Can not retrieve notifications at this time",
             duration: 3000
           });
       })
+
   },
   methods: {
     pageLoaded() {

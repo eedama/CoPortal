@@ -55,7 +55,7 @@ export default {
           this.$feedback.warning({
             title: "Modules",
             message: "Not Currently registered with any module",
-            duration: 10000
+            duration: 5000
           });
         }
         this.isLoading = false;
@@ -64,7 +64,7 @@ export default {
         this.$feedback.error({
           title: "Modules",
           message: "Failed to retrieve modules try again later",
-          duration: 10000
+          duration: 5000
         });
         this.isLoading = false;
       });
