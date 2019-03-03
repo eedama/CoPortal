@@ -20,7 +20,9 @@ router.post("/login", function (req, res) {
   var password = req.body.password;
   var username = req.body.username;
 
-  Student.findOne({
+  Student.
+  populate(["modules.code"])
+  .findOne({
       username: username
     })
     .then(student => {
