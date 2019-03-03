@@ -9,13 +9,13 @@
           </GridLayout>
         </StackLayout>
         <StackLayout row="2">
-          <CardView v-for="a in 10" :key="a" :row="a-1" elevation="15" margin="5">
-            <Ripple @tap="readMessage(notification.sender,notification.message)" >
+          <CardView v-for="notify in notification" :key="notify._id" :row="a-1" elevation="15" margin="5">
+            <Ripple @tap="readMessage(notify.title,notify.message)" >
               <GridLayout  class="p-15" rows="auto,auto,auto" columns="auto,*,auto">
                 <Image row="0" col="0" rowSpan="3" verticalAlignment="center" src="res://ic_logo" width="60" height="60" borderRadius="50%"></Image>
-                <label row="0" col="1" class="font-weight-bold" fontSize="16%" :text="notification.sender"></label>
-                <label row="1" col="2"  class="h4 text-dark-black" :text="notification.time"></label>
-                <label row="1" col="1" class="text-dark-black" :textWrap="true" fontSize="13%" colSpan="2" :text="notification.title"></label> 
+                <label row="0" col="1" class="font-weight-bold" fontSize="16%" :text="handleSender(notify.moduleId)"></label>
+                <label row="1" col="2"  class="h4 text-dark-black" :text="getMoment(notify.date).fromNow()"></label>
+                <label row="1" col="1" class="text-dark-black" :textWrap="true" fontSize="13%" colSpan="2" :text="notify.title"></label> 
               </GridLayout>
             </Ripple>
           </CardView>
@@ -33,17 +33,26 @@ import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
-      notification: {
-        sender: "Admin",
-        time: "3 mins ago",
-        title: "WHO IS THIS?",
-        message: "I think i know you, dont I???"
-      },
+      notification:[] ,
       introTxt: "Digitalize your business and keep track of all your earnings."
     };
   },
   mounted() {
     this.pageLoaded();
+     this.$api
+      .getStudentNotification(this.$store.state.cache.cachedUser.user._id)
+      .then(notifications=>
+      {
+        this.notification = notifications;
+      })
+      .catch(error=>
+      {
+ this.$feedback.error({
+            title: "Notification",
+            message: "Can not retrieve notifications at this time",
+            duration: 3000
+          });
+      })
   },
   methods: {
     pageLoaded() {
@@ -61,6 +70,14 @@ export default {
     title: sender,
     message: Message,
     okButtonText: "close"});
+   },
+   handleSender(send)
+   {
+     if(!send)
+     {
+       return "General"
+     }else
+     return send.name;
    }
   }
 };
