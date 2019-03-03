@@ -257,7 +257,23 @@ export default class API {
       }
     })
   }
-
+   getStudentNotification(userID)
+   {
+    return new Promise((resolve, reject) => {
+      if (!userID) {
+        reject(new Error("User Not Defined"));
+      } else {
+        http
+          .request(this.makeGet("/n/announcements/get/all/for/student/" + userID))
+          .then(async results => {
+            resolve(JSON.parse(JSON.stringify(results.content)));
+          })
+          .catch(err => {
+            reject(err);
+          });
+      }
+    })
+   }
   getInternetStatus() {
     return connectivity.getConnectionType();
   }
