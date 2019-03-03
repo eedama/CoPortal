@@ -36,7 +36,7 @@
           <StackLayout row="0" col="1" class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
             <label class="text-white p-x-15 m-x-10 span" textAlignment="center" fontSize="15" text="Demo"></label>
           </StackLayout>
-          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="$store.state.cache.cachedUser ? '/student/profile/view' : '/login'" />
+          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="userLoggedIn() ? '/student/profile/view' : '/login'" />
         </GridLayout>
       </GridLayout>
     </RadSideDrawer>
@@ -139,8 +139,6 @@
         api: this.$api
       });
   
-
-     
       connectivity.startMonitoring(conn => {
         if (this.connectionType == 0 && conn > 0) {
           this.$feedback.success({
@@ -154,10 +152,19 @@
           });
         }
       })
-
-
     },
     methods: {
+      userLoggedIn(){
+          let loggedInUserId = this.appSettings.getBoolean("isLoggedInUserId");
+
+          let documentID = this.appSettings.getString(this.$store.state.cache.cachedUserString);
+
+          if (loggedInUserId && documentID != null) {
+            return true;
+          } else {
+            return false;
+          }
+      },
       goTo(item) {
         this.$refs.drawer.nativeView.closeDrawer();
         if (item.link == "/logout") {
@@ -173,6 +180,7 @@
                 appSettings: this.appSettings,
                 api: this.$api
               });
+              this.appSettings.remove("isLoggedInUserId");
               this.navigate("/login", null, {
                 clearHistory: true
               });

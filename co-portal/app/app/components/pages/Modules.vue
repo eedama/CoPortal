@@ -57,7 +57,6 @@ export default {
             message: "Not Currently registered with any module",
             duration: 10000
           });
-          return;
         }
         this.isLoading = false;
       })

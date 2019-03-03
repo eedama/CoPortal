@@ -203,8 +203,43 @@ export default {
             title: "An error has occured",
             message: err.message
           });
-          console.log("errorr", err);
-        });
+          return;
+        }
+        this.isLoading = true;
+        this.$api
+          .loginUser(this.username, this.password)
+          .then(results => {
+            this.isLoading = false;
+            var currentUser = JSON.parse(JSON.stringify(results.content));
+            this.$store.commit("cacheUser", {
+              db: this.$db,
+              api: this.$api,
+              appSettings: this.appSettings,
+              user: currentUser
+            });
+            this.appSettings.setBoolean("isLoggedInUserId",true);
+            switch (currentUser.userType) {
+              case "ADMIN":
+                alert("You are an admin and we are not ready for you");
+                return;
+              case "LECTURER":
+                alert("You are an lecturer and we are not ready for you");
+                return;
+              case "STUDENT":
+                this.navigate("/student/profile/view", null, {
+                  clearHistory: true
+                });
+                break;
+            }
+          })
+          .catch(err => {
+            this.isLoading = false;
+            this.$feedback.error({
+              title: "An error has occured",
+              message: err.message
+            });
+          });
+      }
     }
   }
 };

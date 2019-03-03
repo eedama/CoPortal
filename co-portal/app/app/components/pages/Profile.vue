@@ -8,9 +8,9 @@
           width="150"
           height="150"
           borderRadius="100%"
-          :src="$store.state.cache.cachedUser.user.profilePic ? $store.state.cache.cachedUser.user.profilePic : $store.state.settings.defaultProfilePic"></Image>
-        <label row="0" class="labelTitle m-t-5" textAlignment="center">{{this.fullname}}</label>
-        <label row="0" class="labelname" textAlignment="center">{{this.username}}</label>
+          :src="currentUser.profilePic ? currentUser.profilePic : $store.state.settings.defaultProfilePic"></Image>
+        <label row="0" class="labelTitle m-t-5" textAlignment="center">{{currentUser.fullname}}</label>
+        <label row="0" class="labelname" textAlignment="center">{{currentUser.username}}</label>
       </StackLayout>
       <StackLayout row="1">
         <CardView textAlignment="center" margin="10">
@@ -103,8 +103,10 @@ import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
-      fullname: "",
-      username: "",
+      currentUser:{
+        fullname: "",
+        username: "",
+      },
       users: [
         {
           title: "ID Number",
@@ -127,21 +129,22 @@ export default {
   },
   mounted() {
     this.pageLoaded();
+    console.log("cached in",this.$store.state.cache.cachedUser);
     if (!this.$store.state.cache.cachedUser) {
       this.navigate("/login", null, {
         clearHistory: true
       });
     }
 
-    var result = JSON.parse(
+    this.currentUser = JSON.parse(
       JSON.stringify(this.$store.state.cache.cachedUser.user)
     );
 
-    this.fullname = result.firstname + " " + result.lastname;
-    this.username = result.username;
-    this.users[0].body = result.idNumber;
-    this.users[1].body = result.gender;
-    result.parents.forEach(parent => {
+    this.currentUser.fullname = this.currentUser.firstname + " " + this.currentUser.lastname;
+    this.currentUser.username = this.currentUser.username;
+    this.users[0].body = this.currentUser.idNumber;
+    this.users[1].body = this.currentUser.gender;
+    this.currentUser.parents.forEach(parent => {
       this.Parents.push({
         title: parent.name + " " + parent.surname,
         body: parent.email,
@@ -150,7 +153,7 @@ export default {
       });
     });
     var Module = "";
-    result.modules.forEach(element => {
+    this.currentUser.modules.forEach(element => {
       Module += element.code + " ";
     });
     this.users[2].body = Module;
