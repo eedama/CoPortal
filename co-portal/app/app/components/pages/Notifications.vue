@@ -45,7 +45,7 @@ export default {
     this.$api
       .getStudentNotification(this.$store.state.cache.cachedUser.user._id)
       .then(notifications => {
-        this.notification = notifications;
+        this.notification = JSON.parse(JSON.stringify(notifications));
         this.isLoading = false;
       })
       .catch(err => {
