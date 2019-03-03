@@ -58,7 +58,7 @@ router.post("/announcements/get/for/:userID", function (req, res) {
 // This is used on the App to get all student notifications
 router.get("/announcements/get/all/for/student/:userID", function (req, res) {
   var userId = req.params.userID;
-
+  console.log("UserId",userId);
   Announcement.find({
       removed: false,
       studentId: userId
@@ -69,6 +69,7 @@ router.get("/announcements/get/all/for/student/:userID", function (req, res) {
     })
     .then(announcements => {
       if (announcements == null) return res.status(512).send("No announcements where found");
+  console.log('Announcements',announcements);
       announcements = announcements.filter(a => a.deletedBy.filter(deleted => deleted == userId).length == 0)
 
       announcements.forEach(element => {
