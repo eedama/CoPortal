@@ -144,6 +144,31 @@ export default class API {
     });
   }
 
+  sendLinkToResetPassword(username) {
+    return new Promise((resolve, reject) => {
+      if (!username) {
+        reject(new Error("Email Not Found"));
+      } else {
+        http
+          .request(
+            this.makePost("/acc/forgot/password/", {
+              email: username,
+            })
+          )
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer == true) {
+                resolve(JSON.parse(JSON.stringify(results.content)));
+              }
+            }
+          })
+          .catch(err => {
+            reject(err);
+          });
+      }
+    });
+  }
   getProfile(userID) {
     return new Promise((resolve, reject) => {
       if (!userID) {
@@ -232,7 +257,23 @@ export default class API {
       }
     })
   }
-
+   getStudentNotification(userID)
+   {
+    return new Promise((resolve, reject) => {
+      if (!userID) {
+        reject(new Error("User Not Defined"));
+      } else {
+        http
+          .request(this.makeGet("/n/announcements/get/all/for/student/" + userID))
+          .then(async results => {
+            resolve(JSON.parse(JSON.stringify(results.content)));
+          })
+          .catch(err => {
+            reject(err);
+          });
+      }
+    })
+   }
   getInternetStatus() {
     return connectivity.getConnectionType();
   }
