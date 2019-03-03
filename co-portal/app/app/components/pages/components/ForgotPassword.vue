@@ -31,7 +31,7 @@
                 <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
                   <label
                     row="0"
-                    rowSpan="2"
+                    rowspan="2"
                     col="0"
                     verticalAlignment="center"
                     textAlignment="center"
@@ -55,57 +55,16 @@
                     autocapitalizationType="none"
                   ></TextField>
                 </GridLayout>
-
-                <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
-                  <label
-                    row="0"
-                    rowSpan="2"
-                    col="0"
-                    verticalAlignment="center"
-                    textAlignment="center"
-                    class="mdi m-10"
-                    fontSize="25%"
-                    :text="'mdi-lock' | fonticon"
-                  ></label>
-                  <label
-                    row="0"
-                    col="1"
-                    class="h3 font-weight-bold text-mute text-dark-black"
-                    text="Password"
-                  ></label>
-                  <TextField
-                    row="1"
-                    col="1"
-                    ref="password"
-                    secure="true"
-                    returnKeyType="done"
-                    v-model="password"
-                    @returnPress="submit()"
-                    :class="{ light: !isLoading }"
-                  ></TextField>
-                </GridLayout>
-
                 <ActivityIndicator v-show="isLoading" :busy="isLoading"></ActivityIndicator>
 
                 <StackLayout v-show="!isLoading">
                   <Button
-                    text="Login"
+                    text="Reset Password"
                     :isEnabled="!isLoading"
                     class="submit-button bg-dark-black text-white"
-                    @tap="submit()"
+                    @tap="GoToLogin()"
                   ></Button>
                 </StackLayout>
-
-                <GridLayout class="m-10">
-                  <Ripple @tap="GoToRegister()">
-                    <label
-                      textAlignment="center"
-                      class="text-mute text-light-black p-15"
-                      fontSize="13%"
-                      text="Forgot Password?"
-                    ></label>
-                  </Ripple>
-                </GridLayout>
               </FlexboxLayout>
             </GridLayout>
           </CardView>
@@ -144,8 +103,8 @@ export default {
     this.isLoading = false;
   },
   methods: {
-    GoToRegister() {
-      this.navigate("/register");
+    GoToLogin() {
+        this.navigate("/login");
     },
     isEmpty(obj) {
       for (var key in obj) {
@@ -156,8 +115,8 @@ export default {
     submit() {
       if (this.username.length == 0) {
         this.$feedback.error({
-          title: "Incorrect email",
-          message: "Please Enter a valid email",
+          title: "Password Reset",
+          message: "Link to reset password sent to email",
           duration: 3000
         });
         return;
@@ -171,43 +130,29 @@ export default {
         });
         return;
       }
-        this.isLoading = true;
-        this.$api
-          .loginUser(this.username, this.password)
-          .then(results => {
-            this.isLoading = false;
-            var currentUser = JSON.parse(JSON.stringify(results.content));
-            this.$store.commit("cacheUser", {
-              db: this.$db,
-              api: this.$api,
-              appSettings: this.appSettings,
-              user: currentUser
-            });
-            this.appSettings.setBoolean("isLoggedInUserId",true);
-            switch (currentUser.userType) {
-              case "ADMIN":
-                alert("You are an admin and we are not ready for you");
-                return;
-              case "LECTURER":
-                alert("You are an lecturer and we are not ready for you");
-                return;
-              case "STUDENT":
-                this.navigate("/student/profile/view", null, {
-                  clearHistory: true
-                });
-                break;
-            }
-          })
-          .catch(err => {
-            this.isLoading = false;
-            this.$feedback.error({
-              title: "An error has occured",
-              message: err.message
-            });
+      this.isLoading = true;
+      this.$api
+        .loginUser(this.username, this.password)
+        .then(results => {
+          this.isLoading = false;
+          var currentUser = JSON.parse(JSON.stringify(results.content));
+          this.$store.commit("cacheUser", {
+            db: this.$db,
+            api: this.$api,
+            appSettings: this.appSettings,
+            user: currentUser
           });
-      }
+        })
+        .catch(err => {
+          this.isLoading = false;
+          this.$feedback.error({
+            title: "An error has occured",
+            message: err.message
+          });
+        });
     }
   }
+};
 </script>
 
 <style scoped>
