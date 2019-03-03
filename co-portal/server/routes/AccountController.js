@@ -6,7 +6,9 @@ import mongoose from "mongoose";
 import Admin from "../models/Admin";
 import Lecturer from "../models/Lecturer";
 import Student from "../models/Student";
-
+import ForgotPassword from "../models/ForgotPassword"
+import EmailProvider from "../services/EmailProvider"
+const emailProvider = new EmailProvider();
 /*
   TODO : Add admin
          Remove Admin
@@ -74,6 +76,29 @@ router.post("/login", function (req, res) {
     }).catch(err => {
       return res.status(500).send(err.message);
     });
+});
+
+router.post("/forgot/password", async function (req, res) {
+    var email = req.body.email;
+
+    if(!email || email.indexOf('@') < 2 || email.indexOf('.') < 2 || email.length < 5){
+      return res.status(512).send("You have entered an invalid email address");
+    }
+
+    var forgotPassword = new ForgotPassword();
+    forgotPassword.email = email;
+
+    var message =  `Hey, \n Use the link below to reset your password \n \n \n \n ${process.env.BASE_URL}/${forgotPassword._id}`;
+
+    var emailResponse = await emailProvider.sendEmail(email, "Coportal password recovery",message);
+    if (emailResponse) {
+      forgotPassword.save(function(err){
+        if(err) return res.status(512).send("Internal server error. Please try again later");
+        return res.send(`An email with a new link to login was sent to ${email}`);
+      });
+    } else {
+      return res.status(512).send("Unable to send you the email, please try again later");
+    }
 });
 
 module.exports = router;
