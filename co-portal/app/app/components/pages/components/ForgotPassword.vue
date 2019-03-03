@@ -31,7 +31,7 @@
                 <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
                   <label
                     row="0"
-                    rowspan="2"
+                    rowSpan="2"
                     col="0"
                     verticalAlignment="center"
                     textAlignment="center"
@@ -114,7 +114,7 @@ export default {
       this.$api
         .sendLinkToResetPassword(this.username)
         .then(results => {
-            Alert("okay");
+          Alert("okay");
           this.$feedback.error({
             title: "Password Reset",
             message: "Link sent to Email Address",
@@ -125,7 +125,7 @@ export default {
           return;
         })
         .catch(err => {
-            Alert("okay3");
+          Alert("okay3");
           this.$feedback.error({
             title: "Your Email Was Not Found",
             message: err.message
