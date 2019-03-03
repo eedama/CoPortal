@@ -163,13 +163,6 @@ export default {
           auth: ["ADMIN", "LECTURER", "STUDENT"]
         },
         {
-          text: "Marks",
-          icon: "checkbox-multiple-marked-circle-outline",
-          link: "/marks/all",
-          description: "Test results and marksheets",
-          auth: ["STUDENT"]
-        },
-        {
           text: "Assessment results",
           icon: "checkbox-multiple-marked-circle-outline",
           link: "/marks/sheet",
@@ -246,7 +239,6 @@ export default {
       this.$refs.drawer.nativeView.closeDrawer();
       if (item.link == "/logout") {
         confirm({
-          
           title: "Log out",
           message: "Are you sure you want to log out?",
           okButtonText: "Yes",
