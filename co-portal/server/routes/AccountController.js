@@ -21,7 +21,7 @@ router.post("/login", function (req, res) {
   var username = req.body.username;
 
   Student.
-  populate(["modules.code"])
+  populate("modules.code")
   .findOne({
       username: username
     })
