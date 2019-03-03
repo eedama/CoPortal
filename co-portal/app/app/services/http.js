@@ -152,7 +152,7 @@ export default class API {
         http
           .request(
             this.makePost("/acc/forgot/password/", {
-              username: username,
+              email: username,
             })
           )
           .then(async result => {
