@@ -42,22 +42,20 @@ export default {
   mounted() {
     this.pageLoaded();
     this.isLoading = true;
-     this.$api
+    this.$api
       .getStudentNotification(this.$store.state.cache.cachedUser.user._id)
       .then(notifications => {
         this.notification = notifications;
-              this.isLoading = false;
+        this.isLoading = false;
       })
-      .catch(error=>
-      {
-              this.isLoading = false;
- this.$feedback.error({
-            title: "Notification",
-            message: "Can not retrieve notifications at this time",
-            duration: 3000
-          });
-      })
-
+      .catch(err => {
+        this.isLoading = false;
+        this.$feedback.error({
+          title: "Notification",
+          message: err.message,
+          duration: 3000
+        });
+      });
   },
   methods: {
     pageLoaded() {
