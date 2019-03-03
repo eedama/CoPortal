@@ -62,7 +62,7 @@ router.get("/announcements/get/all/for/student/:userID", function (req, res) {
   Announcement.find({
       removed: false,
       studentId: userId
-    })
+    }).
     populate({
       path: 'modules',
       select: '_id code name'
