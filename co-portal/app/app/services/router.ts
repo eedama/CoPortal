@@ -11,6 +11,7 @@ import Module from "../components/pages/components/Module.vue";
 import TakeTest from "../components/pages/components/TakeTest.vue";
 import TestMarks from "../components/pages/components/TestMarks.vue";
 import Timetable from "../components/pages/components/Timetable.vue";
+import ForgotPassword from "../components/pages/components/ForgotPassword.vue";
 
 var appSettings = require("application-settings");
 import {
@@ -55,6 +56,15 @@ var router = {
         authLevel: 0
       }
     },
+    "/reset/Password": {
+      name: "Forgot Password",
+      path: "/reset/Password",
+      component: ForgotPassword,
+      meta: {
+        title: "Reset Password",
+        authLevel: 0
+      }
+    },
     "/timetable/view": {
       name: "timetable",
       path: "/timetable/list",
@@ -82,6 +92,7 @@ var router = {
         authLevel: 0
       }
     },
+
     /**
      * Components
      */
