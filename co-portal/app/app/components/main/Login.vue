@@ -31,7 +31,7 @@
                 <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
                   <label
                     row="0"
-                    rowSpan="2"
+                    rowspan="2"
                     col="0"
                     verticalAlignment="center"
                     textAlignment="center"
@@ -59,7 +59,7 @@
                 <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
                   <label
                     row="0"
-                    rowSpan="2"
+                    rowspan="2"
                     col="0"
                     verticalAlignment="center"
                     textAlignment="center"
@@ -97,11 +97,11 @@
                 </StackLayout>
 
                 <GridLayout class="m-10">
-                  <Ripple @tap="GoToRegister()">
+                  <Ripple @tap="GoToResetPassword()">
                     <label
                       textAlignment="center"
                       class="text-mute text-light-black p-15"
-                      fontSize="13%"
+                      fontSize="14%"
                       text="Forgot Password?"
                     ></label>
                   </Ripple>
@@ -144,9 +144,10 @@ export default {
     this.isLoading = false;
   },
   methods: {
-    GoToRegister() {
-      this.navigate("/register");
+    GoToResetPassword() {
+      this.navigate("/reset/Password");
     },
+
     isEmpty(obj) {
       for (var key in obj) {
         if (obj.hasOwnProperty(key)) return false;
@@ -171,43 +172,43 @@ export default {
         });
         return;
       }
-        this.isLoading = true;
-        this.$api
-          .loginUser(this.username, this.password)
-          .then(results => {
-            this.isLoading = false;
-            var currentUser = JSON.parse(JSON.stringify(results.content));
-            this.$store.commit("cacheUser", {
-              db: this.$db,
-              api: this.$api,
-              appSettings: this.appSettings,
-              user: currentUser
-            });
-            this.appSettings.setBoolean("isLoggedInUserId",true);
-            switch (currentUser.userType) {
-              case "ADMIN":
-                alert("You are an admin and we are not ready for you");
-                return;
-              case "LECTURER":
-                alert("You are an lecturer and we are not ready for you");
-                return;
-              case "STUDENT":
-                this.navigate("/student/profile/view", null, {
-                  clearHistory: true
-                });
-                break;
-            }
-          })
-          .catch(err => {
-            this.isLoading = false;
-            this.$feedback.error({
-              title: "An error has occured",
-              message: err.message
-            });
+      this.isLoading = true;
+      this.$api
+        .loginUser(this.username, this.password)
+        .then(results => {
+          this.isLoading = false;
+          var currentUser = JSON.parse(JSON.stringify(results.content));
+          this.$store.commit("cacheUser", {
+            db: this.$db,
+            api: this.$api,
+            appSettings: this.appSettings,
+            user: currentUser
           });
-      }
+          this.appSettings.setBoolean("isLoggedInUserId", true);
+          switch (currentUser.userType) {
+            case "ADMIN":
+              alert("You are an admin and we are not ready for you");
+              return;
+            case "LECTURER":
+              alert("You are an lecturer and we are not ready for you");
+              return;
+            case "STUDENT":
+              this.navigate("/student/profile/view", null, {
+                clearHistory: true
+              });
+              break;
+          }
+        })
+        .catch(err => {
+          this.isLoading = false;
+          this.$feedback.error({
+            title: "An error has occured",
+            message: err.message
+          });
+        });
     }
   }
+};
 </script>
 
 <style scoped>

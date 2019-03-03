@@ -184,13 +184,6 @@ export default {
           auth: ["STUDENT"]
         },
         {
-          text: "ResetPassword",
-          icon: "email",
-          link: "/reset/Password",
-          description: "View Your Table",
-          auth: ["STUDENT", "LECTURER", "ADMIN"]
-        },
-        {
           text: "Report a student",
           icon: "account-alert-outline",
           link: "/Student/Report",
@@ -253,6 +246,7 @@ export default {
       this.$refs.drawer.nativeView.closeDrawer();
       if (item.link == "/logout") {
         confirm({
+          
           title: "Log out",
           message: "Are you sure you want to log out?",
           okButtonText: "Yes",

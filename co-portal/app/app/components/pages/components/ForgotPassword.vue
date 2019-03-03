@@ -31,7 +31,7 @@
                 <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
                   <label
                     row="0"
-                    rowSpan="2"
+                    rowspan="2"
                     col="0"
                     verticalAlignment="center"
                     textAlignment="center"
@@ -88,10 +88,9 @@ import {
 import { Color } from "tns-core-modules/color";
 
 export default {
-  name: "login",
+  name: "resetPassWord",
   data() {
     return {
-      password: "",
       username: ""
     };
   },
@@ -104,60 +103,31 @@ export default {
   },
   methods: {
     GoToLogin() {
-      this.$api
-        .sendLinkToResetPassword(this.username)
-        .then(results => {
-          this.navigate("/login");
-        })
-        .catch(err => {
-          this.$feedback.error({
-            title: "Your Email Was Not Found",
-            message: err.message
-          });
-        });
-    },
-
-    isEmpty(obj) {
-      for (var key in obj) {
-        if (obj.hasOwnProperty(key)) return false;
-      }
-      return true;
-    },
-    submit() {
       if (this.username.length == 0) {
         this.$feedback.error({
           title: "Password Reset",
-          message: "Link to reset password sent to email",
+          message: "Enter a valid email Address",
           duration: 3000
         });
         return;
       }
-
-      if (this.password.length == 0) {
-        this.$feedback.error({
-          title: "Invalid password",
-          message: "Please Enter a valid password",
-          duration: 3000
-        });
-        return;
-      }
-      this.isLoading = true;
       this.$api
-        .loginUser(this.username, this.password)
+        .sendLinkToResetPassword(this.username)
         .then(results => {
-          this.isLoading = false;
-          var currentUser = JSON.parse(JSON.stringify(results.content));
-          this.$store.commit("cacheUser", {
-            db: this.$db,
-            api: this.$api,
-            appSettings: this.appSettings,
-            user: currentUser
+            Alert("okay");
+          this.$feedback.error({
+            title: "Password Reset",
+            message: "Link sent to Email Address",
+            duration: 3000
           });
+          Alert("okay2");
+          this.navigate("/login");
+          return;
         })
         .catch(err => {
-          this.isLoading = false;
+            Alert("okay3");
           this.$feedback.error({
-            title: "An error has occured",
+            title: "Your Email Was Not Found",
             message: err.message
           });
         });
