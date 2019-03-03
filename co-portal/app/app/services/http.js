@@ -19,9 +19,14 @@ export default class API {
       } catch (err) {
         this.master.feedback.warning({
           title: "Access denied",
-          message: err.message
+          message: "Please contact admin."
         });
         return false;
+      }
+    } else if (result.statusCode == 512) {
+      return {
+        isError: true,
+        message: result.content
       }
     } else {
       return true;
@@ -130,15 +135,17 @@ export default class API {
           .then(async result => {
             var answer = await this.handleResponse(result);
             if (answer) {
-              if (answer == true) {
-                resolve(result);
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
               } else {
-                return this.loginUser(user);
+                return reject(new Error("Authorization error, please contact admin."));
               }
             }
           })
           .catch(err => {
-            reject(err);
+            return reject(new Error("Unable to log you in, try again later"));
           });
       }
     });
@@ -147,7 +154,7 @@ export default class API {
   sendLinkToResetPassword(username) {
     return new Promise((resolve, reject) => {
       if (!username) {
-        reject(new Error("Email Not Found"));
+        return reject(new Error("Email Not Found"));
       } else {
         http
           .request(
@@ -158,30 +165,43 @@ export default class API {
           .then(async result => {
             var answer = await this.handleResponse(result);
             if (answer) {
-              if (answer == true) {
-                resolve(result.content);
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
               }
             }
           })
           .catch(err => {
-            reject(err);
+            return reject(new Error("Can not process your request, try again later"));
           });
       }
     });
   }
+
   getProfile(userID) {
     return new Promise((resolve, reject) => {
       if (!userID) {
-        console.log(userID);
         reject(new Error("User Not Defined"));
       } else {
         http
           .request(this.makeGet("/s/" + userID + "/get"))
-          .then(async results => {
-            resolve(JSON.parse(JSON.stringify(results.content)));
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
+            }
           })
           .catch(err => {
-            reject(err);
+            return reject(new Error("Can not load the requested profile,try again later"));
           });
       }
     });
@@ -194,11 +214,20 @@ export default class API {
       } else {
         http
           .request(this.makeGet("/m/modules/all/for/" + userID + "/student"))
-          .then(async results => {
-            resolve(JSON.parse(JSON.stringify(results.content)));
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
+            }
           })
           .catch(err => {
-            reject(err);
+            return reject(new Error("Failed to retrieve modules try again later"));
           });
       }
     })
@@ -211,11 +240,20 @@ export default class API {
       } else {
         http
           .request(this.makeGet("/m/marksheet/for/" + userID + "/moduleID/" + moduleID))
-          .then(async results => {
-            resolve(JSON.parse(JSON.stringify(results.content)));
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
+            }
           })
           .catch(err => {
-            reject(err);
+            return reject(new Error("Can not retrieve marks at this time"));
           });
       }
     })
@@ -231,11 +269,20 @@ export default class API {
             studentId,
             solution
           }))
-          .then(async results => {
-            resolve(JSON.parse(JSON.stringify(results.content)));
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
+            }
           })
           .catch(err => {
-            reject(err);
+            return reject(new Error("Unable to submit your quiz, Try again later"));
           });
       }
     })
@@ -248,15 +295,25 @@ export default class API {
       } else {
         http
           .request(this.makeGet("/l/get/solutions/" + solutionId))
-          .then(async results => {
-            resolve(JSON.parse(JSON.stringify(results.content)));
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
+            }
           })
           .catch(err => {
-            reject(err);
+            return reject(new Error("Unable to retreive the solution , try again later"));
           });
       }
     })
   }
+
   getStudentNotification(userID) {
     return new Promise((resolve, reject) => {
       if (!userID) {
@@ -264,15 +321,25 @@ export default class API {
       } else {
         http
           .request(this.makeGet("/n/announcements/get/all/for/student/" + userID))
-          .then(async results => {
-            resolve(JSON.parse(JSON.stringify(results.content)));
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
+            }
           })
           .catch(err => {
-            reject(err);
+            return reject(new Error("Can not load your notifications, Try again later"));
           });
       }
     })
   }
+
   getInternetStatus() {
     return connectivity.getConnectionType();
   }

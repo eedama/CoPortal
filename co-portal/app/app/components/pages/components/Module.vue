@@ -75,68 +75,65 @@
 </template>
 
 <script>
-  const dialogs = require("ui/dialogs");
-  var appSettings = require("application-settings");
-  
-  import * as connectivity from "tns-core-modules/connectivity";
-  export default {
-    data() {
-      return {
-        currentModule: null,
-        currentMarks:[]
-      };
-    },
-    mounted() {
-      this.pageLoaded();
-      this.$api.getModuleMarks(this.$store.state.cache.cachedUser.user._id,this.module._id)
-      .then(marks=>
-      {
-this.currentMarks = marks;
- if (marks.length == 0) {
+const dialogs = require("ui/dialogs");
+var appSettings = require("application-settings");
+
+import * as connectivity from "tns-core-modules/connectivity";
+export default {
+  data() {
+    return {
+      currentModule: null,
+      currentMarks: []
+    };
+  },
+  mounted() {
+    this.pageLoaded();
+    this.$api
+      .getModuleMarks(
+        this.$store.state.cache.cachedUser.user._id,
+        this.module._id
+      )
+      .then(marks => {
+        this.currentMarks = JSON.parse(JSON.stringify(marks));
+        if (marks.length == 0) {
           this.$feedback.warning({
             title: "Marks",
             message: "No Marks to display yet",
             duration: 3000
           });
-        
         }
       })
-      .catch(error=>
-      {
-  this.$feedback.error({
-            title: "Marks",
-            message: "Can not retrieve marks at this time",
-            duration: 3000
-          });
-      })
-    
-    },
-    props: ["module"],
-    methods: {
-      pageLoaded() {
-        if(!this.module){
-          this.navigate(null);
-        }
-        this.currentModule = this.module;  
-      },
-      TakeTest(test) {
-        this.navigate("/take/test", {
-          dbQuestionaire: test
+      .catch(err => {
+        this.$feedback.error({
+          title: "Error getting your marks",
+          message: err.message,
+          duration: 3000
         });
-      },colorLoaded(marked)
-      {
-        if(marked < 50)
-        {
-          return "darkred"
-        }else
-        {
-          return "darkgreen"
-        }
+      });
+  },
+  props: ["module"],
+  methods: {
+    pageLoaded() {
+      if (!this.module) {
+        this.navigate(null);
+      }
+      this.currentModule = this.module;
+    },
+    TakeTest(test) {
+      this.navigate("/take/test", {
+        dbQuestionaire: test
+      });
+    },
+    colorLoaded(marked) {
+      if (marked < 50) {
+        return "darkred";
+      } else {
+        return "darkgreen";
       }
     }
-  };
+  }
+};
 </script>
 
 <style lang="scss" scoped>
-  
 </style>

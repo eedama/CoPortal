@@ -152,7 +152,7 @@ export default {
               this.navigate(
                 "/test/marks",
                 {
-                  solutionId: results.content._id
+                  solutionId: results._id
                 },
                 {
                   clearHistory: true

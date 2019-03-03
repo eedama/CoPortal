@@ -49,7 +49,7 @@ export default {
     this.$api
       .getModuleInformation(this.$store.state.cache.cachedUser.user._id)
       .then(_modules => {
-        this.modules = _modules;
+        this.modules = JSON.parse(JSON.stringify(_modules));
 
         if (this.modules.length == 0) {
           this.$feedback.warning({
@@ -62,8 +62,8 @@ export default {
       })
       .catch(err => {
         this.$feedback.error({
-          title: "Modules",
-          message: "Failed to retrieve modules try again later",
+          title: "Error in getting modules",
+          message: err.message,
           duration: 10000
         });
         this.isLoading = false;

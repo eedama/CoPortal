@@ -33,26 +33,24 @@ import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
-      notification:[] ,
+      notification: [],
       introTxt: "Digitalize your business and keep track of all your earnings."
     };
   },
   mounted() {
     this.pageLoaded();
-     this.$api
+    this.$api
       .getStudentNotification(this.$store.state.cache.cachedUser.user._id)
-      .then(notifications=>
-      {
+      .then(notifications => {
         this.notification = notifications;
       })
-      .catch(error=>
-      {
- this.$feedback.error({
-            title: "Notification",
-            message: "Can not retrieve notifications at this time",
-            duration: 3000
-          });
-      })
+      .catch(err => {
+        this.$feedback.error({
+          title: "Notification",
+          message: err.message,
+          duration: 3000
+        });
+      });
   },
   methods: {
     pageLoaded() {
@@ -63,22 +61,18 @@ export default {
         doc: "admin"
       });
     },
-   readMessage(sender,Message)
-   {
-    
-   alert({
-    title: sender,
-    message: Message,
-    okButtonText: "close"});
-   },
-   handleSender(send)
-   {
-     if(!send)
-     {
-       return "General"
-     }else
-     return send.name;
-   }
+    readMessage(sender, Message) {
+      alert({
+        title: sender,
+        message: Message,
+        okButtonText: "close"
+      });
+    },
+    handleSender(send) {
+      if (!send) {
+        return "General";
+      } else return send.name;
+    }
   }
 };
 </script>

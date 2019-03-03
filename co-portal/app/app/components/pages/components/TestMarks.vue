@@ -52,7 +52,7 @@ export default {
           this.navigate("/module/view");
           return;
         }
-        this.Solution = results.content;
+        this.Solution = results;
         if (
           this.Solution == null ||
           this.Solution.answers == null ||

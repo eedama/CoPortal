@@ -101,7 +101,7 @@ export default {
         .loginUser(this.username, this.password)
         .then(results => {
           this.isLoading = false;
-          var currentUser = JSON.parse(JSON.stringify(results.content));
+          var currentUser = JSON.parse(JSON.stringify(results));
           this.$store.commit("cacheUser", {
             db: this.$db,
             api: this.$api,

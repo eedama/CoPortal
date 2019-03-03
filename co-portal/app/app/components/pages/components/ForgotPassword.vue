@@ -114,10 +114,9 @@ export default {
       this.$api
         .sendLinkToResetPassword(this.username)
         .then(results => {
-          alert("okay");
-          this.$feedback.error({
+          this.$feedback.success({
             title: "Password Reset",
-            message: "Link sent to Email Address",
+            message: results,
             duration: 3000
           });
 
@@ -125,9 +124,8 @@ export default {
           return;
         })
         .catch(err => {
-          alert("okay3");
           this.$feedback.error({
-            title: "Your Email Was Not Found",
+            title: "Password reset",
             message: err.message
           });
         });
