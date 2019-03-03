@@ -151,7 +151,7 @@ export default class API {
       } else {
         http
           .request(
-            this.makePost("/acc/forgot/password/", {
+            this.makePost("/acc/forgot/password", {
               email: username,
             })
           )
@@ -159,7 +159,7 @@ export default class API {
             var answer = await this.handleResponse(result);
             if (answer) {
               if (answer == true) {
-                resolve(JSON.parse(JSON.stringify(results.content)));
+                resolve(result.content);
               }
             }
           })
@@ -257,8 +257,7 @@ export default class API {
       }
     })
   }
-   getStudentNotification(userID)
-   {
+  getStudentNotification(userID) {
     return new Promise((resolve, reject) => {
       if (!userID) {
         reject(new Error("User Not Defined"));
@@ -273,7 +272,7 @@ export default class API {
           });
       }
     })
-   }
+  }
   getInternetStatus() {
     return connectivity.getConnectionType();
   }
