@@ -119,6 +119,7 @@
 
 <script lang="ts">
 import * as connectivity from "tns-core-modules/connectivity";
+var dialogs = require("ui/dialogs");
 export default {
   name: "App",
   data() {
@@ -238,24 +239,26 @@ export default {
     goTo(item) {
       this.$refs.drawer.nativeView.closeDrawer();
       if (item.link == "/logout") {
-        confirm({
-          title: "Log out",
-          message: "Are you sure you want to log out?",
-          okButtonText: "Yes",
-          cancelButtonText: "No"
-        }).then(result => {
-          if (result) {
-            this.$store.commit("clearCache", {
-              db: this.$db,
-              appSettings: this.appSettings,
-              api: this.$api
-            });
-            this.appSettings.remove("isLoggedInUserId");
-            this.navigate("/login", null, {
-              clearHistory: true
-            });
-          }
-        });
+        dialogs
+          .confirm({
+            title: "Log out",
+            message: "Are you sure you want to log out?",
+            okButtonText: "Yes",
+            cancelButtonText: "No"
+          })
+          .then(result => {
+            if (result) {
+              this.$store.commit("clearCache", {
+                db: this.$db,
+                appSettings: this.appSettings,
+                api: this.$api
+              });
+              this.appSettings.remove("isLoggedInUserId");
+              this.navigate("/login", null, {
+                clearHistory: true
+              });
+            }
+          });
       } else {
         this.navigate(item.link);
       }
