@@ -8,8 +8,8 @@
             <GridLayout width="100%">
               <FlexboxLayout class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
                 <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
-                  <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-10" fontSize="25%" :text="'mdi-email' | fonticon"></label>
-                  <label row="0" col="1" class="h3 font-weight-bold text-mute text-dark-black" text="Email"></label>
+                  <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-10" fontSize="25%" :text="'mdi-account-circle' | fonticon"></label>
+                  <label row="0" col="1" class="h3 font-weight-bold text-mute text-dark-black" text="Username"></label>
                   <TextField row="1" col="1" keyboardType="email" returnKeyType="next" v-model="username" autocorrect="true" autocapitalizationType="none"></TextField>
                 </GridLayout>
   
@@ -126,8 +126,7 @@ export default {
         .catch(err => {
           this.isLoading = false;
           this.$feedback.error({
-            title: "An error has occured",
-            message: err.message
+            title: err.message
           });
         });
     }
