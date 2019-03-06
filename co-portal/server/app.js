@@ -44,15 +44,14 @@ app.use(function(req, res, next) {
 });
 
 mongoose
-    .connect("mongodb://localhost:27017/CoportalGPDevDB?authSource=admin", {
+    .connect(`mongodb://${process.env.DB_ADDRESS}:${process.env.DB_PORT}/${process.env.DB_NAME}?authSource=admin`, {
         auth: {
-            user: "admin",
-            password: "Mulavhelesi@1"
+            user: process.env.DB_USERNAME,
+            password: process.env.DB_PASSWORD
         },
-        useNewUrlParser: true,
         reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
-        reconnectInterval: 500, // Reconnect every 500ms
-        dbName: "CoportalGPDevDB"
+        reconnectInterval: 600, // Reconnect every 500ms
+        dbName: process.env.DB_NAME
     })
     .then(answer => {
         console.log("Successfully connected to MONGO!");
