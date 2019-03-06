@@ -233,6 +233,32 @@ export default class API {
     })
   }
 
+  getStudentTimetable(userID) {
+    return new Promise((resolve, reject) => {
+      if (!userID) {
+        reject(new Error("User Not Defined"));
+      } else {
+        http
+          .request(this.makeGet("/s/timetable/for/" + userID + "/student"))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
+            }
+          })
+          .catch(err => {
+            return reject(new Error("Failed to retrieve timetable please try again later"));
+          });
+      }
+    })
+  }
+
   getModuleMarks(userID, moduleID) {
     return new Promise((resolve, reject) => {
       if (!userID || !moduleID) {
@@ -242,6 +268,7 @@ export default class API {
           .request(this.makeGet("/m/marksheet/for/" + userID + "/moduleID/" + moduleID))
           .then(async result => {
             var answer = await this.handleResponse(result);
+            console.log(answer);
             if (answer) {
               if (answer.isError) {
                 return reject(new Error(answer.message));

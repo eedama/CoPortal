@@ -124,8 +124,8 @@ export default {
           moduleName: "INFORMATICS 2A",
           venue: "C Les 201",
           type: "TEST",
-          startTime: "1:30",
-          endTime: "2:0 `0",
+          startTime: "1120",
+          endTime: "13:00",
           isCurrentPeriod: false
         }
       ],
@@ -151,6 +151,32 @@ export default {
     this.timetables.forEach(timetable => {
       this.getCurrentPeriod(timetable);
     });
+
+    /** this.isLoading = true;
+    this.$api
+      .getModuleInformation(this.$store.state.cache.cachedUser.user._id)
+      .then(_timetable => {
+        this.timetables = JSON.parse(JSON.stringify(_timetable));
+
+        if (this.modules.length == 0) {
+          this.$feedback.warning({
+            title: "Timetable",
+            message: "unable to display time table, No modules to display",
+            duration: 5000
+          });
+        }
+        this.isLoading = false;
+      })
+      .catch(err => {
+        this.$feedback.error({
+          title: "Error in getting timetable",
+          message: err.message,
+          duration: 10000
+        });
+        this.isLoading = false;
+      }); */
+
+
   }
 };
 </script>
