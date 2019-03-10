@@ -106,16 +106,19 @@ export default {
             db: this.$db,
             api: this.$api,
             appSettings: this.appSettings,
-            user: currentUser
+            user: currentUser,
+            type : currentUser.userType
           });
+          console.log("currenttype",currentUser.userType);
           this.appSettings.setBoolean("isLoggedInUserId", true);
           switch (currentUser.userType) {
             case "ADMIN":
               alert("You are an admin and we are not ready for you");
               return;
             case "LECTURER":
-              alert("You are an lecturer and we are not ready for you");
-              return;
+              this.navigate("/module/list", null, {
+                clearHistory: true
+              });
             case "STUDENT":
               this.navigate("/notifications/list", null, {
                 clearHistory: true

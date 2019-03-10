@@ -109,7 +109,7 @@
             colSpan="2"
             row="1"
             rowSpan="2"
-            :defaultRoute="userLoggedIn() ? '/student/profile/view' : '/login'"
+            :defaultRoute="userLoggedIn()"
           />
         </GridLayout>
       </GridLayout>
@@ -132,7 +132,7 @@ export default {
         icon: "bell",
         link: "/notifications/list",
         description: "All your notifications in one place",
-        auth: ["STUDENT", "LECTURER", "ADMIN"]
+        auth: ["STUDENT"]
       },
       drawerLayouts: [
         {
@@ -231,9 +231,11 @@ export default {
       );
 
       if (loggedInUserId && documentID != null) {
-        return true;
+     
+   return '/notifications/list';
+      
       } else {
-        return false;
+        return   '/login';
       }
     },
     goTo(item) {

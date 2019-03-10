@@ -41,6 +41,14 @@ export default {
   },
   mounted() {
     this.pageLoaded();
+    console.log("findme2",this.$store.state.cache.cachedUser.user.userType)
+       if(this.$store.state.cache.cachedUser.user.userType == "LECTURE")
+        {         
+     this.navigate('/module/list', null, {
+        clearHistory: true
+      });
+      return;
+        }
     this.isLoading = true;
     this.$api
       .getStudentNotification(this.$store.state.cache.cachedUser.user._id)
