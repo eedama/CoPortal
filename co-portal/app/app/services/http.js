@@ -341,6 +341,37 @@ export default class API {
     })
   }
 
+  getLectureNotificationModule(lectureID,type,moduleID)
+  {
+    return new Promise((resolve, reject) => {
+      if (!lectureID) {
+        reject(new Error("User Not Defined"));
+      } else {
+        http
+          .request(this.makePost("/n/announcements/get/for/" + lectureID,
+          {
+            userType :type,
+            moduleID : moduleID   
+          }))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
+            }
+          })
+          .catch(err => {
+            return reject(new Error("Can not load your notifications, Try again later"));
+          });
+      }
+    }) 
+  }
+
   getStudentNotification(userID) {
     return new Promise((resolve, reject) => {
       if (!userID) {

@@ -12,16 +12,16 @@
           <TabViewItem v-if="isLecture()" title="Announcements">
             <ScrollView>
               <StackLayout>
-                <CardView v-for="(test,i) in currentModule.questionaires" :key="i" elevation="15" margin="5">
-                  <Ripple @tap="TakeTest(test)">
-                    <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto" columns="auto,*,auto">
-                      <label row="0" rowSpan="2" verticalAlignment="center" textAlignment="center" class="font-weight-bold mdi p-15" fontSize="25%" :text="'mdi-file-document-box-multiple' | fonticon "></label>
-                      <label row="0" col="1" verticalAlignment="center"  class="font-weight-bold" :textWrap="true" fontSize="17%" :text="test.title"></label>
-                      <label row="1" col="1" verticalAlignment="center" :textWrap="true" fontSize="15%" :text="test.questions.length + ' Questions'"></label>
-                      <label row="1" col="2" verticalAlignment="center" class="h4 text-dark-black" :text="getMoment(test.date).fromNow()"></label>
-                    </GridLayout>
-                  </Ripple>
-                </CardView>
+              <CardView v-for="notify in currentNotifications" :key="notify._id" :row="a-1" elevation="15" margin="5">
+            <Ripple @tap="readMessage(notify.title,notify.message)" >
+              <GridLayout  class="p-15" rows="auto,auto,auto" columns="auto,*,auto">
+                <Image row="0" col="0" rowSpan="3" verticalAlignment="center" src="res://ic_logo" width="60" height="60" borderRadius="50%"></Image>
+                <label row="0" col="1" class="font-weight-bold" fontSize="16%" :text="handleSender(notify.moduleId)"></label>
+                <label row="1" col="2"  class="h4 text-dark-black" :text="getMoment(notify.date).fromNow()"></label>
+                <label row="1" col="1" class="text-dark-black" :textWrap="true" fontSize="13%" colSpan="2" :text="notify.title"></label> 
+              </GridLayout>
+            </Ripple>
+          </CardView>
               </StackLayout>
             </ScrollView>
           </TabViewItem>
@@ -100,10 +100,13 @@ export default {
   data() {
     return {
       currentModule: null,
-      currentMarks: []
+      currentMarks: [],
+      currentNotifications:[]
     };
   },
   mounted() {
+    console.log("idPrinted", this.$store.state.cache.cachedUser.user._id);
+     console.log("typePrinted", this.appSettings.getString("userType"))
     this.pageLoaded();
     this.$api
       .getModuleMarks(
@@ -127,6 +130,34 @@ export default {
           duration: 3000
         });
       });
+
+
+    if(this.isLecture())
+    {
+
+      this.$api
+      . getLectureNotificationModule(
+        this.$store.state.cache.cachedUser.user._id,
+        this.appSettings.getString("userType"),
+       this.module._id)
+        .then(notifications => {
+        this.currentNotifications = JSON.parse(JSON.stringify(notifications));
+        if (notifications.length == 0) {
+          this.$feedback.warning({
+            title: "Notifications",
+            message: "No notifications to display yet",
+            duration: 3000
+          });
+        }
+      })
+      .catch(err => {
+        this.$feedback.error({
+          title: "Notifcations",
+          message: err.message,
+          duration: 3000
+        });
+      });
+    }
   },
   props: ["module"],
   methods: {
@@ -156,7 +187,17 @@ export default {
         }
 
         return false;
-      }
+      },readMessage(sender, Message) {
+      alert({
+        title: sender,
+        message: Message,
+        okButtonText: "close"
+      });
+    },
+     handleSender(send) {
+     return this.$store.state.cache.cachedUser.user.username.toUpperCase();
+    }
+
     
   }
 };
