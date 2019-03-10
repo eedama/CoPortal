@@ -12,6 +12,22 @@
           <TabViewItem v-if="isLecture()" title="Announcements">
             <ScrollView>
               <StackLayout>
+                <FlexboxLayout class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
+                <GridLayout v-if="notificationToSend.viewed" class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
+                 <label row="0" col="1" class="h3 font-weight-bold text-mute text-dark-black" text="Title"></label>
+                  <TextField row="1" col="1" keyboardType="text" returnKeyType="next" v-model="notificationToSend.title" autocorrect="true" autocapitalizationType="none"></TextField>
+                </GridLayout>
+  
+                <GridLayout v-if="notificationToSend.viewed" class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
+                  <label row="0" col="1" class="h3 font-weight-bold text-mute text-dark-black" text="Message"></label>
+                  <TextField row="1" col="1"  returnKeyType="text" v-model="notificationToSend.message"></TextField>
+                </GridLayout>
+                <StackLayout >
+                  <Button text="Add Notification" @tap="sendNotification()"  class="submit-button bg-light-black text-white p-5"></Button>
+                </StackLayout>
+                </FlexboxLayout>
+      
+                <ActivityIndicator v-show="isLoading" :busy="isLoading"></ActivityIndicator>
               <CardView v-for="notify in currentNotifications" :key="notify._id" :row="a-1" elevation="15" margin="5">
             <Ripple @tap="readMessage(notify.title,notify.message)" >
               <GridLayout  class="p-15" rows="auto,auto,auto" columns="auto,*,auto">
@@ -101,7 +117,13 @@ export default {
     return {
       currentModule: null,
       currentMarks: [],
-      currentNotifications:[]
+      currentNotifications:[],
+      notificationToSend : {
+        viewed : false,
+        title : '',
+        message: '',
+         isToAll: false
+      }
     };
   },
   mounted() {
@@ -134,7 +156,7 @@ export default {
 
     if(this.isLecture())
     {
-
+ this.isLoading = true;
       this.$api
       . getLectureNotificationModule(
         this.$store.state.cache.cachedUser.user._id,
@@ -142,6 +164,7 @@ export default {
        this.module._id)
         .then(notifications => {
         this.currentNotifications = JSON.parse(JSON.stringify(notifications));
+         this.isLoading = false;
         if (notifications.length == 0) {
           this.$feedback.warning({
             title: "Notifications",
@@ -166,6 +189,48 @@ export default {
         this.navigate(null);
       }
       this.currentModule = this.module;
+    },
+    sendNotification()
+    {
+      console.log("cliked3",this.notificationToSend.viewed);
+      if(!this.notificationToSend.viewed)
+      {
+        this.notificationToSend.viewed  = true;
+      }else
+      {
+        if(this.notificationToSend.title.length <1 || this.notificationToSend.message.length < 1 )
+        {
+           this.$feedback.warning({
+          title: "Notifcations",
+          message: "Please Provide valid message or title",
+          duration: 3000
+        });
+        }else
+        {
+        this.$api
+        .sendNotification(this.$store.state.cache.cachedUser.user._id,
+        this.appSettings.getString("userType"),
+       this.module._id,
+       this.notificationToSend)
+        .then(notification => {
+  this.$feedback.success({
+          title: "Notifcations",
+          message: "Announcement Added Succesfully",
+          duration: 3000
+        });        
+
+      })
+      .catch(err => {
+        this.$feedback.error({
+          title: "Notifcations",
+          message: err.message,
+          duration: 3000
+        });
+      });
+this.notificationToSend.viewed = false;
+        }
+    
+      }
     },
     TakeTest(test) {
       this.navigate("/take/test", {
