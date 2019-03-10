@@ -154,8 +154,9 @@ export default {
     });
     var Module = "";
     this.currentUser.modules.forEach(element => {
-      Module += element.code + " ";
+      Module += element.code + ",";
     });
+Module = Module.slice(0, -1);
     this.users[2].body = Module;
   },
   props: ["moduleId"],
