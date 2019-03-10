@@ -117,7 +117,7 @@ export default {
               alert("You are an lecturer and we are not ready for you");
               return;
             case "STUDENT":
-              this.navigate("/student/profile/view", null, {
+              this.navigate("/notifications/list", null, {
                 clearHistory: true
               });
               break;
