@@ -109,17 +109,20 @@ export default {
             user: currentUser,
             type : currentUser.userType
           });
-          console.log("currenttype",currentUser.userType);
+          console.log("Type8",currentUser.userType);
           this.appSettings.setBoolean("isLoggedInUserId", true);
+          this.appSettings.setString("userType",currentUser.userType);
           switch (currentUser.userType) {
             case "ADMIN":
               alert("You are an admin and we are not ready for you");
               return;
             case "LECTURER":
-              this.navigate("/module/list", null, {
+            {
+             this.navigate("/module/list", null, {
                 clearHistory: true
               });
-            case "STUDENT":
+              break;
+            }case "STUDENT":
               this.navigate("/notifications/list", null, {
                 clearHistory: true
               });

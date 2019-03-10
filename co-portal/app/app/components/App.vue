@@ -140,7 +140,7 @@ export default {
           icon: "account",
           link: "/student/profile/view",
           description: "View and edit personal information",
-          auth: ["STUDENT", "LECTURER", "ADMIN"]
+          auth: ["STUDENT", "ADMIN"]
         },
         {
           text: "Students",
@@ -225,16 +225,23 @@ export default {
   methods: {
     userLoggedIn() {
       let loggedInUserId = this.appSettings.getBoolean("isLoggedInUserId");
-
+      let loggedInType = this.appSettings.getString("userType");
+  
       let documentID = this.appSettings.getString(
         this.$store.state.cache.cachedUserString
       );
-
-      if (loggedInUserId && documentID != null) {
      
-   return '/notifications/list';
-      
-      } else {
+      if (loggedInUserId && documentID != null) {
+        
+     if(loggedInType === "LECTURER")
+     {
+      return '/module/list'; 
+     }else if(loggedInType === "STUDENT")
+     {
+              console.log("model29",loggedInType)
+return '/notifications/list';
+     }
+     } else {
         return   '/login';
       }
     },
@@ -256,6 +263,8 @@ export default {
                 api: this.$api
               });
               this.appSettings.remove("isLoggedInUserId");
+              this.appSettings.remove("userType");
+            
               this.navigate("/login", null, {
                 clearHistory: true
               });

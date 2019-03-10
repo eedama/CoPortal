@@ -39,8 +39,10 @@ export default {
     };
   },
   mounted() {
+     console.log("443Called")
     this.pageLoaded();
     if (!this.$store.state.cache.cachedUser) {
+     
       this.navigate("/login", null, {
         clearHistory: true
       });
