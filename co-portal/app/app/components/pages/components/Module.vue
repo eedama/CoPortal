@@ -9,6 +9,22 @@
       </StackLayout>
       <StackLayout row="1">
         <TabView tabBackgroundColor="white" selectedTabTextColor="black" androidSelectedTabHighlightColor="black">
+          <TabViewItem v-if="isLecture()" title="Announcements">
+            <ScrollView>
+              <StackLayout>
+                <CardView v-for="(test,i) in currentModule.questionaires" :key="i" elevation="15" margin="5">
+                  <Ripple @tap="TakeTest(test)">
+                    <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto" columns="auto,*,auto">
+                      <label row="0" rowSpan="2" verticalAlignment="center" textAlignment="center" class="font-weight-bold mdi p-15" fontSize="25%" :text="'mdi-file-document-box-multiple' | fonticon "></label>
+                      <label row="0" col="1" verticalAlignment="center"  class="font-weight-bold" :textWrap="true" fontSize="17%" :text="test.title"></label>
+                      <label row="1" col="1" verticalAlignment="center" :textWrap="true" fontSize="15%" :text="test.questions.length + ' Questions'"></label>
+                      <label row="1" col="2" verticalAlignment="center" class="h4 text-dark-black" :text="getMoment(test.date).fromNow()"></label>
+                    </GridLayout>
+                  </Ripple>
+                </CardView>
+              </StackLayout>
+            </ScrollView>
+          </TabViewItem>
           <TabViewItem title="Notes">
             <ScrollView>
               <WrapLayout>
@@ -68,6 +84,7 @@
               </StackLayout>
             </ScrollView>
           </TabViewItem>
+         
         </TabView>
       </StackLayout>
     </GridLayout>
@@ -129,8 +146,18 @@ export default {
         return "darkred";
       } else {
         return "darkgreen";
+      }},
+      isLecture()
+      {
+        let loggedInType = this.appSettings.getString("userType");
+        if(loggedInType === "LECTURER")
+        {
+          return true;
+        }
+
+        return false;
       }
-    }
+    
   }
 };
 </script>
