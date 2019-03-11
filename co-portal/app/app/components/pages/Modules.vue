@@ -27,98 +27,110 @@
 </template>
 
 <script>
-const dialogs = require("ui/dialogs");
-var appSettings = require("application-settings");
-
-import * as connectivity from "tns-core-modules/connectivity";
-export default {
-  data() {
-    return {
-      introTxt: "Digitalize your business and keep track of all your earnings.",
-      modules: []
-    };
-  },
-  mounted() {
-     console.log("443Called")
-    this.pageLoaded();
-    if (!this.$store.state.cache.cachedUser) {
-     
-      this.navigate("/login", null, {
-        clearHistory: true
-      });
-    }
-    this.isLoading = true;
-    this.$api
-      .getModuleInformation(this.$store.state.cache.cachedUser.user._id)
-      .then(_modules => {
-        this.modules = JSON.parse(JSON.stringify(_modules));
-
-        if (this.modules.length == 0) {
-          this.$feedback.warning({
-            title: "Modules",
-            message: "Not Currently registered with any module",
-            duration: 5000
-          });
-        }
-        this.isLoading = false;
-      })
-      .catch(err => {
-        this.$feedback.error({
-          title: "Error in getting modules",
-          message: err.message,
-          duration: 10000
-        });
-        this.isLoading = false;
-      });
-  },
-  methods: {
-    pageLoaded() {
-      this.$store.commit("refreshCache", {
-        db: this.$db,
-        api: this.$api,
-        appSettings: this.appSettings,
-        doc: "admin"
-      });
+  const dialogs = require("ui/dialogs");
+  var appSettings = require("application-settings");
+  
+  import * as connectivity from "tns-core-modules/connectivity";
+  export default {
+    data() {
+      return {
+        introTxt: "Digitalize your business and keep track of all your earnings.",
+        modules: [],
+        adKeywords: ["school", "study", "university", "college", "job", "work"]
+      };
     },
-    goToModule(module) {
-      this.navigate(
-        "/module/view",
-        {
-          module: module
-        },
-        null
-      );
+    mounted() {
+      console.log("443Called")
+      this.pageLoaded();
+      if (!this.$store.state.cache.cachedUser) {
+  
+        this.navigate("/login", null, {
+          clearHistory: true
+        });
+      }
+      this.isLoading = true;
+      this.$api
+        .getModuleInformation(this.$store.state.cache.cachedUser.user._id)
+        .then(_modules => {
+          this.modules = JSON.parse(JSON.stringify(_modules));
+  
+          if (this.modules.length == 0) {
+            this.$feedback.warning({
+              title: "Modules",
+              message: "Not Currently registered with any module",
+              duration: 5000
+            });
+          } else {
+            this.modules.forEach(m => {
+              this.adKeywords.push(m.name);
+            })
+          }
+          this.isLoading = false;
+          const testing = this.TNS_ENV !== "production";
+          this.$firebase.admob
+            .showBanner({
+              size: this.$firebase.admob.AD_SIZE.SMART_BANNER, // see firebase.admob.AD_SIZE for all options
+              margins: {
+                top: 10
+              },
+              androidBannerId: "ca-app-pub-4924835910036108/9510636040",
+              iosBannerId: "ca-app-pub-4924835910036108/9510636040",
+              testing: testing, // when not running in production set this to true, Google doesn't like it any other way
+              iosTestDeviceIds: [],
+              keywords: this.adKeywords // add keywords for ad targeting
+            })
+            .then(() => {})
+            .catch(errorMessage => {});
+        })
+        .catch(err => {
+          this.$feedback.error({
+            title: "Error in getting modules",
+            message: err.message,
+            duration: 10000
+          });
+          this.isLoading = false;
+        });
+    },
+    methods: {
+      pageLoaded() {
+        this.$store.commit("refreshCache", {
+          db: this.$db,
+          api: this.$api,
+          appSettings: this.appSettings,
+          doc: "admin"
+        });
+      },
+      goToModule(module) {
+        this.navigate(
+          "/module/view", {
+            module: module
+          },
+          null
+        );
+      }
     }
-  }
-};
+  };
 </script>
 
 <style lang="scss" scoped>
-.topMainText {
-  color: white;
-  background-color: linear-gradient(
-    top bottom,
-    rgba(255, 0, 0, 0.5),
-    rgba(255, 20, 0, 0.7),
-    rgba(255, 0, 30, 0.5),
-    rgba(255, 20, 30, 0.7)
-  );
-}
-
-.backgroundImage {
-  background: url("~/assets/images/suit77_black_white.jpeg") no-repeat center
-    center;
-  background-size: cover;
-  padding-top: 3%;
-  padding-bottom: 3%;
-}
-
-.backgroundImageOverlay {
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: -1;
-}
-
-.bg-dark-blue-overlay {
-  background-color: rgba(0, 0, 0, 0.4);
-}
+  .topMainText {
+    color: white;
+    background-color: linear-gradient( top bottom, rgba(255, 0, 0, 0.5), rgba(255, 20, 0, 0.7), rgba(255, 0, 30, 0.5), rgba(255, 20, 30, 0.7));
+  }
+  
+  .backgroundImage {
+    background: url("~/assets/images/suit77_black_white.jpeg") no-repeat center center;
+    background-size: cover;
+    padding-top: 3%;
+    padding-bottom: 3%;
+  }
+  
+  .backgroundImageOverlay {
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: -1;
+  }
+  
+  .bg-dark-blue-overlay {
+    background-color: rgba(0, 0, 0, 0.4);
+  }
 </style>
