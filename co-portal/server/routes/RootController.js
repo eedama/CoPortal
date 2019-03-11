@@ -3,12 +3,12 @@ var router = express.Router();
 // const auth = require('../config/auth');
 
 import mongoose from "mongoose";
-// import FCM from "../services/FirebaseManager";
-// import CronJob from "../services/CronManager";
-// const cronJob = new CronJob();
+import FCM from "../services/FirebaseManager";
+import CronJob from "../services/CronManager";
+const cronJob = new CronJob();
 import moment from "moment";
 
-router.get("/", async (req, res, next) => {
+router.get("/", async(req, res, next) => {
     var dbActive = false;
     var fcmID = null;
     var jobs = null;
@@ -50,7 +50,8 @@ router.get("/", async (req, res, next) => {
         db: dbActive,
         fcmId: fcmID,
         dateTime: new Date(),
-        lastBuild: upTime
+        lastBuild: upTime,
+        jobs
     });
 });
 module.exports = router;

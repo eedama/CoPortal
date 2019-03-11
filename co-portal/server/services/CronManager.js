@@ -4,8 +4,6 @@ import FCM from "./FirebaseManager";
 import mongoose from "mongoose";
 
 import Notification from "../models/Notification";
-import Setting from "../models/Setting";
-import Business from "../models/Business";
 
 export default class CronJob {
     constructor() {
