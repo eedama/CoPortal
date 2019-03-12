@@ -1,24 +1,21 @@
-import Home from "../components/main/Home.vue";
-import Login from "../components/main/Login.vue";
+import { Feedback, FeedbackPosition, FeedbackType } from 'nativescript-feedback'
+
+import Home from '../components/main/Home.vue'
+import Login from '../components/main/Login.vue'
+import ForgotPassword from '../components/pages/components/ForgotPassword.vue'
+import Module from '../components/pages/components/Module.vue'
+import StudentList from '../components/pages/components/StudentList.vue'
+import TakeTest from '../components/pages/components/TakeTest.vue'
+import TestMarks from '../components/pages/components/TestMarks.vue'
+import Timetable from '../components/pages/components/Timetable.vue'
+import Modules from '../components/pages/Modules.vue'
+import Notifications from '../components/pages/Notifications.vue'
+import Profile from '../components/pages/Profile.vue'
 
 // Pages
-import Modules from "../components/pages/Modules.vue";
-import Notifications from "../components/pages/Notifications.vue";
-import Profile from "../components/pages/Profile.vue";
 // Components
-import Module from "../components/pages/components/Module.vue";
 // Tests
-import TakeTest from "../components/pages/components/TakeTest.vue";
-import TestMarks from "../components/pages/components/TestMarks.vue";
-import Timetable from "../components/pages/components/Timetable.vue";
-import ForgotPassword from "../components/pages/components/ForgotPassword.vue";
-
 var appSettings = require("application-settings");
-import {
-  Feedback,
-  FeedbackType,
-  FeedbackPosition
-} from "nativescript-feedback";
 var feedback = new Feedback();
 
 var router = {
@@ -89,6 +86,16 @@ var router = {
       component: Profile,
       meta: {
         title: "StudentProfile",
+        authLevel: 0
+      }
+    },
+    "/student/list/": {
+      title: "ListStudents",
+      name: "students",
+      path: "/student/list",
+      component: StudentList,
+      meta: {
+        title: "ListStudents",
         authLevel: 0
       }
     },
