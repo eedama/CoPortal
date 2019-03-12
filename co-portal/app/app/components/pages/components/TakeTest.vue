@@ -3,7 +3,8 @@
         <GridLayout v-if="Questionaire" rows="auto,*,auto" columns="*">
             <StackLayout row="0">
                 <GridLayout rows="auto,auto" columns="*">
-                    <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="20%" :text="currentPage >= Questionaire.questions.length ? `Confirm your submission` : `Question ${currentPage + 1} of ${Questionaire.questions.length}`"></label>
+                    <label row="0" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="20%" :text="currentPage >= Questionaire.questions.length ? `Confirm your submission` : `Question ${currentPage + 1} of ${Questionaire.questions.length}`"></label>
+                    <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="18%" :text="timeRemaining == null ? `No time limit` : `${timeRemainingString}`"></label>
                 </GridLayout>
                 <Progress class="text-dark-black" :value="((currentPage + 1)/(Questionaire.questions.length) * 100)"></Progress>
             </StackLayout>
@@ -70,7 +71,11 @@ export default {
       solutions: [],
       Questionaire: null,
       txtError: "",
-      isLoading: false
+      isLoading: false,
+      timeRemaining:120,
+      timeRemainingString:'',
+      timeUp:false,
+      timer:null
     };
   },
   mounted() {
@@ -94,6 +99,23 @@ export default {
 
       this.ApplyNavigation(this);
       this.Questionaire = this.dbQuestionaire;
+      if(this.timeRemaining != null){
+        this.startTimer();
+      }
+    },
+    startTimer(){
+      this.timer = setInterval(() => {
+        this.timeRemaining -= 1;
+        if(this.timeRemaining > 60){
+           this.timeRemainingString = Math.round(this.timeRemaining/60) + " minutes remaining";
+        }else{
+           this.timeRemainingString = this.timeRemaining + " seconds remaining";  
+        }
+        if(this.timeRemaining <= 0){
+          clearInterval(this.timer);
+          this.timeUp = true;
+        }
+      },1000);
     },
     changePage(isForward) {
       this.txtError = "";
