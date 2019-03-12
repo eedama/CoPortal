@@ -71,7 +71,7 @@
             .showBanner({
               size: this.$firebase.admob.AD_SIZE.SMART_BANNER, // see firebase.admob.AD_SIZE for all options
               margins: {
-                top: 10
+                bottom: 10
               },
               androidBannerId: "ca-app-pub-4924835910036108/9510636040",
               iosBannerId: "ca-app-pub-4924835910036108/9510636040",
