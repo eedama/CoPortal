@@ -41,7 +41,38 @@
               </StackLayout>
             </ScrollView>
           </TabViewItem>
-          <TabViewItem title="Notes">
+            <TabViewItem v-if="isLecture()"  title="Students">
+            <ScrollView>
+              <WrapLayout>
+              </WrapLayout>
+            </ScrollView>
+          </TabViewItem>
+           <TabViewItem  v-if="isLecture()" title="assessments">
+             <ScrollView>
+              <StackLayout>
+                <CardView elevation="15" margin="5">
+                  <Ripple>
+                    <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto,auto,auto" columns="*,*,*">
+                      
+                      <label row="0" col="0" verticalAlignment="center" colSpan="3"  textAlignment="center"   class="font-weight-bold text-light-black  p-b-10" :textWrap="true" fontSize="19%" text="Economics"></label>
+                      
+                      <label row="1" col="0" verticalAlignment="center"  :color="colorLoaded(120)"   textAlignment="center" class="text-light-black font-weight-bold" :textWrap="true" fontSize="22%" text="25"></label>
+                      <label row="1" col="1" verticalAlignment="center"   textAlignment="center" class="font-weight-bold" :color="colorLoaded(60)" :textWrap="true" fontSize="22%" text="15"></label>
+                      <label row="1" col="2" verticalAlignment="center"  textAlignment="center" class="font-weight-bold"   :color="colorLoaded(30)" :textWrap="true" fontSize="22%" text="10"></label>
+                    
+                      <label row="2" col="0" verticalAlignment="center" textAlignment="center" class="text-light-black font-weight-bold"    :textWrap="true" fontSize="16%" text="wrote"></label>
+                      <label row="2" col="1" verticalAlignment="center" textAlignment="center" class="text-light-black font-weight-bold"   :textWrap="true" fontSize="16%" text="passed"></label>
+                      <label row="2" col="2" verticalAlignment="center" textAlignment="center" class="text-light-black font-weight-bold"    :textWrap="true" fontSize="16%" text="failed"></label>
+                      
+                     <label row="3" col="2" verticalAlignment="bottom" textAlignment="right"  fontSize="13%" class="h4 text-light-black p-t-10" text=" 5 days to go"></label>
+                      
+                    </GridLayout>
+                  </Ripple>
+                </CardView>
+              </StackLayout>
+            </ScrollView>
+          </TabViewItem>
+          <TabViewItem  title="Notes">
             <ScrollView>
               <WrapLayout>
                 <StackLayout width="50%" v-for="note in module.notes" :key="note._id">
@@ -62,7 +93,7 @@
               </WrapLayout>
             </ScrollView>
           </TabViewItem>
-          <TabViewItem title="Marks">
+          <TabViewItem  v-if="!isLecture()" title="Marks">
              <ScrollView>
               <StackLayout>
                 <CardView v-for="(marked,i) in currentMarks" :key="i"   elevation="15" margin="5">                  
@@ -84,7 +115,7 @@
               </StackLayout>
             </ScrollView>
           </TabViewItem>
-          <TabViewItem title="Tests">
+          <TabViewItem  v-if="!isLecture()" title="Tests">
             <ScrollView>
               <StackLayout>
                 <CardView v-for="(test,i) in currentModule.questionaires" :key="i" elevation="15" margin="5">
@@ -240,9 +271,13 @@ this.notificationToSend.viewed = false;
     colorLoaded(marked) {
       if (marked < 50) {
         return "darkred";
-      } else {
+      } else if(marked >= 50 && marked<=100) {
         return "darkgreen";
-      }},
+      } else if(marked > 100 && marked<=150) {
+        return "#428bca";
+      }
+      
+      },
       isLecture()
       {
         let loggedInType = this.appSettings.getString("userType");
