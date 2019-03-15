@@ -15,7 +15,6 @@ var options = {
 import Admin from '../models/Admin';
 import Lecturer from '../models/Lecturer';
 import Student from '../models/Student';
-import { getMaxListeners } from 'cluster';
 
 class FCM {
     getInstanceId() {
@@ -27,7 +26,7 @@ class FCM {
     }
 
     sendToUser(adminID, payload) {
-        return new Promise(async(resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
 
                 var user = await Admin.findById(adminID);
@@ -43,9 +42,9 @@ class FCM {
 
                 var tokens = user.deviceTokens.filter(v => !v.removed).map(v => v.token);
                 if (tokens) {
-                    tokens.forEach(async deviceToken => {
-                        await this.sendToDevice(deviceToken, payload);
-                    });
+                    for (let i = 0; i < tokens.length; i++) {
+                        await this.sendToDevice(tokens[i], payload);
+                    }
                     return resolve("Notification will be sent to " + tokens.length + " devices");
                 } else {
                     return reject("User has no device");
@@ -61,14 +60,14 @@ class FCM {
             admin
                 .messaging()
                 .sendToDevice(registrationToken, payload, options)
-                .then(function(response) {
+                .then(function (response) {
                     if (response.successCount > 0 && response.failureCount == 0) {
                         return resolve(response.results);
                     } else {
                         throw response.results;
                     }
                 })
-                .catch(async function(error) {
+                .catch(async function (error) {
                     if (error.filter && error.filter(e => JSON.stringify(e.error).indexOf("The provided registration token is not registered") >= 0)) {
                         var _admin = await Admin.findOne({
                             deviceTokens: {
@@ -102,7 +101,7 @@ class FCM {
                             if (deviceToken.token == registrationToken) {
                                 deviceToken.removed = true;
                                 deviceToken.dateRemoved = new Date();
-                                _admin.save(function(err) {
+                                _admin.save(function (err) {
                                     if (err) return reject(err);
                                     return resolve({
                                         message: "Token has expired , we unlinked it , " + registrationToken
@@ -122,14 +121,14 @@ class FCM {
             admin
                 .messaging()
                 .sendToTopic(topic, payload)
-                .then(function(response) {
+                .then(function (response) {
                     if (response.successCount > 0 && response.failureCount == 0) {
                         return resolve(response.results);
                     } else {
                         throw response.results;
                     }
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     return reject(error);
                 });
         });
@@ -140,14 +139,14 @@ class FCM {
             admin
                 .messaging()
                 .subscribeToTopic(registrationToken, topic)
-                .then(function(response) {
+                .then(function (response) {
                     if (response.successCount > 0 && response.failureCount == 0) {
                         return resolve(response.results);
                     } else {
                         throw response.results;
                     }
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     return reject(error);
                 });
         });
@@ -158,14 +157,14 @@ class FCM {
             admin
                 .messaging()
                 .subscribeToTopic(registrationToken, topic)
-                .then(function(response) {
+                .then(function (response) {
                     if (response.successCount > 0 && response.failureCount == 0) {
                         return resolve(response.results);
                     } else {
                         throw response.results;
                     }
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     return reject(error);
                 });
         });
