@@ -3,6 +3,7 @@ var router = express.Router();
 
 import mongoose from "mongoose";
 // import the models
+import Admin from "../models/Admin";
 import Student from "../models/Student";
 import Lecturer from "../models/Lecturer";
 import Module from "../models/Module";
@@ -16,12 +17,12 @@ import Module from "../models/Module";
                 - 
 */
 
-router.post("/clear/studentmodules", function(req, res) {
+router.post("/clear/studentmodules", function (req, res) {
     Module.find().then(modules => {
         if (!modules) return res.status(512).send("Modules do not exist");
         modules.forEach(m => {
             m.students = [];
-            m.save(function(err) {
+            m.save(function (err) {
                 if (err) console.error('Module removal error', m._id + ' can not be removed');
                 console.log("Removed module " + m._id);
             })
@@ -32,7 +33,7 @@ router.post("/clear/studentmodules", function(req, res) {
         if (!students) return res.status(512).send("Students does not exist");
         students.forEach(s => {
             s.modules = [];
-            s.save(function(err) {
+            s.save(function (err) {
                 if (err) console.error('Student removal error', s._id + ' can not be removed');
                 console.log("Removed student " + s._id);
             })
@@ -42,7 +43,7 @@ router.post("/clear/studentmodules", function(req, res) {
     res.send("Student module removal is in progress");
 });
 
-router.post("/add/lecturer", function(req, res) {
+router.post("/add/lecturer", function (req, res) {
     var lecturer = new Lecturer({
         _id: mongoose.Types.ObjectId(),
         lastname: req.body.lecturer.lastname,
@@ -71,11 +72,11 @@ router.post("/add/lecturer", function(req, res) {
             username: lecturer.username
         }).then(l => {
             if (l != null) return res.status(512).send("Username " + lecturer.username + " is already taken.");
-            lecturer.save(function(err) {
+            lecturer.save(function (err) {
                 if (err) return res.status(512).send("Server error : " + err.message);
                 modules.map(m => {
                     m.lecturers.push(lecturer._id);
-                    m.save(function(err) {
+                    m.save(function (err) {
                         if (err) return res.status(512).send("Server error : " + err.message);
                         Lecturer.find({
                                 "active": true
@@ -96,7 +97,7 @@ router.post("/add/lecturer", function(req, res) {
 
 });
 
-router.post("/update/lecturer/:lecturerID", function(req, res) {
+router.post("/update/lecturer/:lecturerID", function (req, res) {
     var lecturerID = req.params.lecturerID;
     var lecturer = new Lecturer({
         lastname: req.body.lecturer.lastname,
@@ -119,7 +120,7 @@ router.post("/update/lecturer/:lecturerID", function(req, res) {
         l.idNumber = lecturer.idNumber;
         l.isSouthAfrican = lecturer.isSouthAfrican;
 
-        l.save(function(err) {
+        l.save(function (err) {
             if (err) return res.status(512).send("Server error : " + err.message);
             Lecturer.find({
                     "active": true
@@ -136,7 +137,7 @@ router.post("/update/lecturer/:lecturerID", function(req, res) {
 });
 
 
-router.post("/add/student", function(req, res) {
+router.post("/add/student", function (req, res) {
     var student = new Student({
         _id: mongoose.Types.ObjectId(),
         lastname: req.body.student.lastname,
@@ -166,11 +167,11 @@ router.post("/add/student", function(req, res) {
             username: student.username
         }).then(l => {
             if (l != null) return res.status(512).send("Username " + student.username + " is already taken.");
-            student.save(function(err) {
+            student.save(function (err) {
                 if (err) return res.status(512).send("Server error : " + err.message);
                 modules.map(m => {
                     m.students.push(student._id);
-                    m.save(function(err) {
+                    m.save(function (err) {
                         if (err) return res.status(512).send("Server error : " + err.message);
                         Student.find({
                                 "active": true
@@ -191,7 +192,7 @@ router.post("/add/student", function(req, res) {
     });
 });
 
-router.post("/update/student/:studentID", function(req, res) {
+router.post("/update/student/:studentID", function (req, res) {
     var studentID = req.params.studentID;
     var student = new Student({
         lastname: req.body.student.lastname,
@@ -234,13 +235,13 @@ router.post("/update/student/:studentID", function(req, res) {
             modules.forEach(_module => {
                 if (!_module.students) _module.students = [];
                 if (!_module.students.some(v => v == studentID)) _module.students.push(studentID);
-                _module.save(function(err) {
+                _module.save(function (err) {
                     if (err) console.log('Module addition failed', `Unable to add module ${_module._id} to ${studentID}`)
                     console.log('Module added', `Linked module ${_module._id} to ${studentID}`)
                 });
             })
         });
-        s.save(function(err) {
+        s.save(function (err) {
             if (err) return res.status(512).send("Server error : " + err.message);
             Student.find({
                     "active": true
@@ -257,7 +258,7 @@ router.post("/update/student/:studentID", function(req, res) {
 });
 
 
-router.post("/device/token/add", async function(req, res) {
+router.post("/device/token/add", async function (req, res) {
     var adminID = req.body.adminID;
     var deviceToken = req.body.deviceToken;
     var deviceInfo = req.body.deviceInfo;
@@ -285,7 +286,7 @@ router.post("/device/token/add", async function(req, res) {
                 token: deviceToken,
                 deviceInfo: deviceInfo
             });
-            admin.save(function(err) {
+            admin.save(function (err) {
                 if (err) return res.status(512).send(err);
                 return res.send("Successfully added the new token");
             });
