@@ -1,6 +1,7 @@
 const state = {
   lastUpdated: null,
   cachedUser: null,
+  deviceToken: null,
   cachedUserString: "buyfeiowjefruhenijwfoepoobsenllnbsllsae"
 };
 
@@ -15,22 +16,21 @@ const mutations = {
           state.cachedUser &&
           state.cachedUser.user &&
           obj.appSettings.getString("device_token") &&
-          state.cachedUser.device_token !=
-            obj.appSettings.getString("device_token")
+          state.deviceToken != obj.appSettings.getString("device_token")
         ) {
-          state.cachedUser.device_token = obj.appSettings.getString(
-            "device_token"
-          );
+          state.deviceToken = obj.appSettings.getString("device_token");
           obj.api
-            .addUserDeviceToken(
-              state.cachedUser.user._id,
-              state.cachedUser.device_token
-            )
+            .addUserDeviceToken(state.cachedUser.user._id, state.deviceToken)
             .then(response => {
               var statusCode = response.statusCode;
               if (statusCode != 200) {
                 var error = response.content;
                 throw new Error(error);
+              } else {
+                console.log(
+                  "device_token_response",
+                  response.content.toString()
+                );
               }
             })
             .catch(err => {
@@ -55,23 +55,21 @@ const mutations = {
         state.cachedUser &&
         state.cachedUser.user &&
         obj.appSettings.getString("device_token") &&
-        state.cachedUser.device_token !=
-          obj.appSettings.getString("device_token")
+        state.deviceToken != obj.appSettings.getString("device_token")
       ) {
-        state.cachedUser.device_token = obj.appSettings.getString(
-          "device_token"
-        );
-        alert("Inside");
+        state.deviceToken = obj.appSettings.getString("device_token");
         obj.api
-          .addUserDeviceToken(
-            state.cachedUser.user._id,
-            state.cachedUser.device_token
-          )
+          .addUserDeviceToken(state.cachedUser.user._id, state.deviceToken)
           .then(response => {
             var statusCode = response.statusCode;
             if (statusCode != 200) {
               var error = response.content;
               throw new Error(error);
+            } else {
+              console.log(
+                "device_token_response_2",
+                response.content.toString()
+              );
             }
           })
           .catch(err => {
