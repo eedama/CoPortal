@@ -164,11 +164,25 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
     });
     Module.findById(moduleID).then(m => {
       if (m == null && moduleID != null) return res.status(512).send("No modules where found");
-      console.log(m);
       Lecturer.findById(userId).then(l => {
         if (l == null && userId != null) return res.status(512).send("No lecturer was found");
         announcement.save(function (err) {
           if (err) return res.status(512).send("Server error : " + err.message);
+          if (m) {
+            m.students.forEach(_student => {
+              FCM.sendToUser(_student, announcement.title, announcement.message);
+            });
+          } else {
+            Student.find({
+              removed: false
+            }).then(students => {
+              if (students) {
+                students.forEach(_student => {
+                  FCM.sendToUser(_student, announcement.title, announcement.message);
+                });
+              }
+            })
+          }
           res.json(announcement);
         });
       }).catch(err => {

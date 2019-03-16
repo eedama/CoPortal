@@ -25,6 +25,15 @@ class FCM {
         }
     }
 
+    sendToUser(adminID, title, body, link = '/', props = '') {
+
+        const payload = helper.makePayload(title, body, {
+            link: link,
+            props: props
+        });
+        return this.sendToUser(adminID, payload);
+    }
+
     sendToUser(adminID, payload) {
         return new Promise(async (resolve, reject) => {
             try {
