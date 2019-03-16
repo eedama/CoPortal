@@ -56,7 +56,7 @@ router.post("/push/notification/to/:userID", function (req, res) {
     };
   }
 
-  FCM.sendToUser(userID, notification.title, notification.body)
+  FCM.sendToUserSimple(userID, notification.title, notification.body)
     .then(response => {
       return res.json(response);
     })
@@ -164,7 +164,7 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
           if (err) return res.status(512).send("Server error : " + err.message);
           if (m) {
             m.students.forEach(_student => {
-              FCM.sendToUser(_student, announcement.title, announcement.message);
+              FCM.sendToUserSimple(_student, announcement.title, announcement.message);
             });
           } else {
             Student.find({
@@ -172,7 +172,7 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
             }).then(students => {
               if (students) {
                 students.forEach(_student => {
-                  FCM.sendToUser(_student, announcement.title, announcement.message);
+                  FCM.sendToUserSimple(_student, announcement.title, announcement.message);
                 });
               }
             })
