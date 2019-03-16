@@ -314,6 +314,33 @@ export default class API {
     })
   }
 
+  getModuleQuestions(moduleID)
+  {
+    return new Promise((resolve, reject) => {
+      if (!moduleID) {
+        reject(new Error("Module not found"));
+      } else {
+        http
+          .request(this.makeGet("/m/get/questionaire/solutions/for/module/" + moduleID))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
+            }
+          })
+          .catch(err => {
+            return reject(new Error("Can not retrieve marks at this time"));
+          });
+      }
+    })
+  }
+
   submitQuiz(studentId, solution) {
     return new Promise((resolve, reject) => {
       if (!studentId || !solution) {

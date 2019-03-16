@@ -50,21 +50,21 @@
            <TabViewItem  v-if="isLecture()" title="assessments">
              <ScrollView>
               <StackLayout>
-                <CardView elevation="15" margin="5">
+                <CardView elevation="15" v-for="(assesment,i) in currentAssesments" :key="i" margin="5">
                   <Ripple>
                     <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto,auto,auto" columns="*,*,*">
                       
-                      <label row="0" col="0" verticalAlignment="center" colSpan="3"  textAlignment="center"   class="font-weight-bold text-light-black  p-b-10" :textWrap="true" fontSize="19%" text="Economics"></label>
+                      <label row="0" col="0" verticalAlignment="center" colSpan="3"  textAlignment="center"   class="font-weight-bold text-light-black  p-b-10" :textWrap="true" fontSize="19%" :text="assesment.title"></label>
                       
-                      <label row="1" col="0" verticalAlignment="center"  :color="colorLoaded(120)"   textAlignment="center" class="text-light-black font-weight-bold" :textWrap="true" fontSize="22%" text="25"></label>
-                      <label row="1" col="1" verticalAlignment="center"   textAlignment="center" class="font-weight-bold" :color="colorLoaded(60)" :textWrap="true" fontSize="22%" text="15"></label>
-                      <label row="1" col="2" verticalAlignment="center"  textAlignment="center" class="font-weight-bold"   :color="colorLoaded(30)" :textWrap="true" fontSize="22%" text="10"></label>
+                      <label row="1" col="0" verticalAlignment="center"  :color="colorLoaded(120)"   textAlignment="center" class="text-light-black font-weight-bold" :textWrap="true" fontSize="22%" :text="assesment.wrote"></label>
+                      <label row="1" col="1" verticalAlignment="center"   textAlignment="center" class="font-weight-bold" :color="colorLoaded(60)" :textWrap="true" fontSize="22%" :text="assesment.passed"></label>
+                      <label row="1" col="2" verticalAlignment="center"  textAlignment="center" class="font-weight-bold"   :color="colorLoaded(30)" :textWrap="true" fontSize="22%" :text="assesment.failed"></label>
                     
                       <label row="2" col="0" verticalAlignment="center" textAlignment="center" class="text-light-black font-weight-bold"    :textWrap="true" fontSize="16%" text="wrote"></label>
                       <label row="2" col="1" verticalAlignment="center" textAlignment="center" class="text-light-black font-weight-bold"   :textWrap="true" fontSize="16%" text="passed"></label>
                       <label row="2" col="2" verticalAlignment="center" textAlignment="center" class="text-light-black font-weight-bold"    :textWrap="true" fontSize="16%" text="failed"></label>
                       
-                     <label row="3" col="2" verticalAlignment="bottom" textAlignment="right"  fontSize="13%" class="h4 text-light-black p-t-10" text=" 5 days to go"></label>
+                     <label row="3" col="2" verticalAlignment="bottom" textAlignment="right"  fontSize="13%" class="h4 text-light-black p-t-10"  :text="getMoment(assesment.date).fromNow()"></label>
                       
                     </GridLayout>
                   </Ripple>
@@ -149,6 +149,7 @@ export default {
       currentModule: null,
       currentMarks: [],
       currentNotifications:[],
+      currentAssesments :[],
       notificationToSend : {
         viewed : false,
         title : '',
@@ -158,8 +159,7 @@ export default {
     };
   },
   mounted() {
-    console.log("idPrinted", this.$store.state.cache.cachedUser.user._id);
-     console.log("typePrinted", this.appSettings.getString("userType"))
+ 
     this.pageLoaded();
     this.$api
       .getModuleMarks(
@@ -211,6 +211,20 @@ export default {
           duration: 3000
         });
       });
+
+      this.$api
+      .getModuleQuestions(this.module._id)
+      .then(assesments=>
+      {
+      this.currentAssesments = JSON.parse(JSON.stringify(assesments));
+      })
+       .catch(err => {
+        this.$feedback.error({
+          title: "Notifcations",
+          message: err.message,
+          duration: 3000
+        });
+      });
     }
   },
   props: ["module"],
@@ -223,7 +237,7 @@ export default {
     },
     sendNotification()
     {
-      console.log("cliked3",this.notificationToSend.viewed);
+   
       if(!this.notificationToSend.viewed)
       {
         this.notificationToSend.viewed  = true;
