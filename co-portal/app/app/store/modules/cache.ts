@@ -21,16 +21,20 @@ const mutations = {
             obj.appSettings.getString("device_token") ||
             !state.cachedUser.device_token)
         ) {
+
           state.cachedUser.device_token = obj.appSettings.getString(
             "device_token"
           );
+          console.log("printed",state.cachedUser.user._id);
           obj.api
             .addUserDeviceToken(
               state.cachedUser.user._id,
               state.cachedUser.device_token
             )
             .then(response => {
+              console.log("printed2",response.content.toString());
               var statusCode = response.statusCode;
+              console.log(statusCode);
               if (statusCode != 200) {
                 var error = response.content;
                 throw new Error(error);
@@ -67,6 +71,7 @@ const mutations = {
           "device_token"
         );
         alert("Inside");
+        console.log("printed1",state.cachedUser.user._id);
         obj.api
           .addUserDeviceToken(
             state.cachedUser.user._id,
