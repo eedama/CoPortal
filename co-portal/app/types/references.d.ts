@@ -7,5 +7,6 @@ declare module "vue/types/vue" {
     currentPage: number;
     $navigator: any;
     $firebase: any;
+    navigate: any;
   }
 }

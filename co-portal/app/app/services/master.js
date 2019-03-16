@@ -55,11 +55,23 @@ master.ChangeLog = {
     }
 };
 
-master.initFCM = function(self) {
+master.initFCM = function (self) {
     return new Promise((resolve, reject) => {
         firebase
             .init({
-                onMessageReceivedCallback: self.notificationReceived,
+                onMessageReceivedCallback: message => {
+                    console.log('message', message);
+                    master.feedback.success({
+                        title: message.title,
+                        duration: 10000,
+                        message: message.body,
+                        onTap: () => {
+                            if (message.data && message.data.link) {
+                                self.navigate(message.data.link, message.data.props);
+                            }
+                        }
+                    });
+                },
                 onPushTokenReceivedCallback: token => {
                     master.appSettings.setString("device_token", token);
                     master.http.getAuthToken();

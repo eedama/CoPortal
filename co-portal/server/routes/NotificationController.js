@@ -56,7 +56,7 @@ router.post("/push/notification/to/:userID", function (req, res) {
     };
   }
 
-  FCM.sendToUserSimple(userID, notification.title, notification.body)
+  FCM.sendToUserSimple(userID, notification.title, notification.body, link, props)
     .then(response => {
       return res.json(response);
     })
