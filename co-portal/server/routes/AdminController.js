@@ -280,7 +280,7 @@ router.post("/device/token/add", async function (req, res) {
         }
 
         var exist = admin.deviceTokens.some(v => v.token == deviceToken && !v.removed);
-        if (exist) {
+        if (!exist) {
             admin.deviceTokens.push({
                 date: Date.now(),
                 token: deviceToken,
