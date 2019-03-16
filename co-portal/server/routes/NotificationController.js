@@ -56,13 +56,7 @@ router.post("/push/notification/to/:userID", function (req, res) {
     };
   }
 
-  var payload = helper.makePayload(notification.title, notification.body, {
-    link: link,
-    props: props,
-    deactive: 'true'
-  });
-
-  FCM.sendToUser(userID, payload)
+  FCM.sendToUser(userID, notification.title, notification.body)
     .then(response => {
       return res.json(response);
     })
