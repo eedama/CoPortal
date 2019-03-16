@@ -63,6 +63,7 @@ master.initFCM = function(self) {
                 onPushTokenReceivedCallback: token => {
                     master.appSettings.setString("device_token", token);
                     master.http.getAuthToken();
+                    // master.http.getAuthToken();
                     master.device_token = token;
                 }
             })

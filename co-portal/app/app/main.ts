@@ -89,6 +89,20 @@ Vue.mixin({
       previousPage: null
     };
   },
+  beforeCreate() {
+    if (!this.$firebase || !this.$firebase.initialized) {
+      master
+        .initFCM(this)
+        .then(instance => {
+          console.log("firebase instance", this.$firebase);
+          this.$firebase = instance;
+          console.log("firebase instance", this.$firebase);
+        })
+        .catch(err => {
+          console.log("tag", err);
+        });
+    }
+  },
   methods: {
     navigate(to, props = null, options = null) {
       if (to == null) {
@@ -97,7 +111,6 @@ Vue.mixin({
         } else {
           this.$navigator.back();
         }
-
       } else {
         options = options || {};
         options.props = props;
@@ -105,7 +118,7 @@ Vue.mixin({
           console.log("Going to same page", to);
           return;
         }
-        
+
         this.$navigator.navigate(to, options);
       }
     },
@@ -113,11 +126,11 @@ Vue.mixin({
       var AndroidApplication = application.android;
       var activity = AndroidApplication.foregroundActivity;
       activity = AndroidApplication.foregroundActivity;
-      activity.onBackPressed = function (e) {
+      activity.onBackPressed = function(e) {
         if (self.currentPage && self.currentPage > 0) {
           self.currentPage--;
         } else {
-          activity.onBackPressed = function () {
+          activity.onBackPressed = function() {
             self.navigate(null);
           };
           self.navigate(null);

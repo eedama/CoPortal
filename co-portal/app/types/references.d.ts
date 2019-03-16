@@ -6,5 +6,6 @@ declare module "vue/types/vue" {
   interface Vue {
     currentPage: number;
     $navigator: any;
+    $firebase: any;
   }
 }

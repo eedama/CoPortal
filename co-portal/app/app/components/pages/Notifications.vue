@@ -11,7 +11,7 @@
  
         <StackLayout row="2">
                  <ActivityIndicator verticalAlignment="center" textAlignment="center" row="1" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
-          <CardView v-for="notify in notification" :key="notify._id" :row="a-1" elevation="15" margin="5">
+          <CardView v-for="notify in notification" :key="notify._id" elevation="15" margin="5">
             <Ripple @tap="readMessage(notify.title,notify.message)" >
               <GridLayout  class="p-15" rows="auto,auto,auto" columns="auto,*,auto">
                 <Image row="0" col="0" rowSpan="3" verticalAlignment="center" src="res://ic_logo" width="60" height="60" borderRadius="50%"></Image>

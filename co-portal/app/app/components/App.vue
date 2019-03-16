@@ -3,114 +3,40 @@
     <RadSideDrawer ref="drawer">
       <StackLayout ~drawerContent backgroundColor="#ffffff">
         <GridLayout v-if="$store.state.cache.cachedUser" rows="auto,*">
-          <CardView
-            v-if="$store.state.cache.cachedUser.user"
-            row="0"
-            class="bg-dark-black"
-            elevation="15"
-          >
+          <CardView v-if="$store.state.cache.cachedUser.user" row="0" class="bg-dark-black" elevation="15">
             <GridLayout class="p-25" rows="auto,auto" columns="*,auto">
-              <Label
-                row="0"
-                col="0"
-                fontSize="20%"
-                class="font-weight-bold text-white p-t-5"
-                :textWrap="true"
-                :text="`${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`"
-              />
-              <Label
-                row="1"
-                col="0"
-                fontSize="18%"
-                class="h4 text-white p-t-5"
-                :text="$store.state.cache.cachedUser.user.username"
-              />
-              <Image
-                row="0"
-                rowSpan="2"
-                col="1"
-                textAlignment="right"
-                verticalAlignment="center"
-                stretch="aspectFit"
-                width="80"
-                height="80"
-                borderRadius="100%"
-                :src="$store.state.cache.cachedUser.user.profilePic ? $store.state.cache.cachedUser.user.profilePic : $store.state.settings.defaultProfilePic"
-              ></Image>
+              <Label row="0" col="0" fontSize="20%" class="font-weight-bold text-white p-t-5" :textWrap="true" :text="`${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`" />
+              <Label row="1" col="0" fontSize="18%" class="h4 text-white p-t-5" :text="$store.state.cache.cachedUser.user.username" />
+              <Image row="0" rowSpan="2" col="1" textAlignment="right" verticalAlignment="center" stretch="aspectFit" width="80" height="80" borderRadius="100%" :src="$store.state.cache.cachedUser.user.profilePic ? $store.state.cache.cachedUser.user.profilePic : $store.state.settings.defaultProfilePic"></Image>
             </GridLayout>
           </CardView>
           <ScrollView row="1">
             <StackLayout>
-              <Ripple
-                @tap="goTo(layout)"
-                v-for="(layout,i) in drawerLayouts.filter(d => d.auth == null || ($store.state.cache.cachedUser && d.auth.some(auth => auth == $store.state.cache.cachedUser.userType)))"
-                :key="i"
-              >
+              <Ripple @tap="goTo(layout)" v-for="(layout,i) in drawerLayouts.filter(d => d.auth == null || ($store.state.cache.cachedUser && d.auth.some(auth => auth == $store.state.cache.cachedUser.userType)))" :key="i">
                 <GridLayout class="drawer-item p-y-10" rows="auto,auto" columns="auto,*">
-                  <label
-                    row="0"
-                    col="0"
-                    textAlignment="center"
-                    verticalAlignment="center"
-                    class="mdi m-10 text-dark-black"
-                    fontSize="35%"
-                    :text="'mdi-' + layout.icon | fonticon"
-                  ></label>
-                  <label
-                    row="0"
-                    col="1"
-                    verticalAlignment="center"
-                    class="font-weight-bold text-dark-black"
-                    fontSize="18%"
-                    :text="layout.text"
-                  ></label>
+                  <label row="0" col="0" textAlignment="center" verticalAlignment="center" class="mdi m-10 text-dark-black" fontSize="35%" :text="'mdi-' + layout.icon | fonticon"></label>
+                  <label row="0" col="1" verticalAlignment="center" class="font-weight-bold text-dark-black" fontSize="18%" :text="layout.text"></label>
                 </GridLayout>
               </Ripple>
             </StackLayout>
           </ScrollView>
         </GridLayout>
       </StackLayout>
-
+  
       <GridLayout ~mainContent columns="*" rows="*">
         <GridLayout rows="auto,auto,*" columns="*,auto">
           <StackLayout orientation="horizontal" row="0" class="text-dark-black">
-            <Ripple
-              v-if="$store.state.cache.cachedUser"
-              verticalAlignment="center"
-              class="m-5"
-              @tap="$refs.drawer.nativeView.showDrawer()"
-            >
+            <Ripple v-if="$store.state.cache.cachedUser" verticalAlignment="center" class="m-5" @tap="$refs.drawer.nativeView.showDrawer()">
               <label class="mdi p-5" fontSize="35%" :text="'mdi-menu' | fonticon"></label>
             </Ripple>
-            <Ripple
-              v-if="$store.state.cache.cachedUser"
-              verticalAlignment="center"
-              class="m-5"
-              @tap="goTo(notificationsRoute)"
-            >
+            <Ripple v-if="$store.state.cache.cachedUser" verticalAlignment="center" class="m-5" @tap="goTo(notificationsRoute)">
               <label class="mdi p-5" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
             </Ripple>
           </StackLayout>
-          <StackLayout
-            row="0"
-            col="1"
-            class="bg-dark-black p-x-15 ribbon ribbon-top-right"
-            textAlignment="right"
-            v-if="TNS_ENV !== 'production'"
-          >
-            <label
-              class="text-white p-x-15 m-x-10 span"
-              textAlignment="center"
-              fontSize="15"
-              text="Demo"
-            ></label>
+          <StackLayout row="0" col="1" class="bg-dark-black p-x-15 ribbon ribbon-top-right" textAlignment="right" v-if="TNS_ENV !== 'production'">
+            <label class="text-white p-x-15 m-x-10 span" textAlignment="center" fontSize="15" text="Demo"></label>
           </StackLayout>
-          <Navigator
-            colSpan="2"
-            row="1"
-            rowSpan="2"
-            :defaultRoute="userLoggedIn()"
-          />
+          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="userLoggedIn()" />
         </GridLayout>
       </GridLayout>
     </RadSideDrawer>
@@ -226,23 +152,20 @@ export default {
     userLoggedIn() {
       let loggedInUserId = this.appSettings.getBoolean("isLoggedInUserId");
       let loggedInType = this.appSettings.getString("userType");
-  
+
       let documentID = this.appSettings.getString(
         this.$store.state.cache.cachedUserString
       );
-     
+
       if (loggedInUserId && documentID != null) {
-        
-     if(loggedInType === "LECTURER")
-     {
-      return '/module/list'; 
-     }else if(loggedInType === "STUDENT")
-     {
-              console.log("model29",loggedInType)
-return '/notifications/list';
-     }
-     } else {
-        return   '/login';
+        if (loggedInType === "LECTURER") {
+          return "/module/list";
+        } else if (loggedInType === "STUDENT") {
+          console.log("model29", loggedInType);
+          return "/notifications/list";
+        }
+      } else {
+        return "/login";
       }
     },
     goTo(item) {
@@ -264,7 +187,7 @@ return '/notifications/list';
               });
               this.appSettings.remove("isLoggedInUserId");
               this.appSettings.remove("userType");
-            
+
               this.navigate("/login", null, {
                 clearHistory: true
               });

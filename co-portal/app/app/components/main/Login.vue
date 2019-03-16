@@ -109,7 +109,6 @@ export default {
             user: currentUser,
             type : currentUser.userType
           });
-          console.log("Type8",currentUser.userType);
           this.appSettings.setBoolean("isLoggedInUserId", true);
           this.appSettings.setString("userType",currentUser.userType);
           switch (currentUser.userType) {

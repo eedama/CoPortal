@@ -35,56 +35,7 @@ export default class API {
 
   getAuthToken() {
     return new Promise((resolve, reject) => {
-      var isNewUser = true;
-      var random = this.randomString() + "_" + Date.now();
-      var user = appSettings.getString("UserToken");
-      var adminID = appSettings.getString("CurrentUserID");
-      if (!user) {
-        user = {
-          email: random + "@jmrapp.com",
-          password: this.randomString(),
-          adminID: adminID,
-          device_token: appSettings.getString("device_token")
-        };
-        appSettings.setString("UserToken", JSON.stringify(user));
-      } else {
-        isNewUser = false;
-        user = JSON.parse(user);
-        if (!user.adminID && adminID) {
-          isNewUser = true;
-          user = {
-            email: random + "@jmrapp.com",
-            password: this.randomString(),
-            adminID: adminID,
-            device_token: appSettings.getString("device_token")
-          };
-          appSettings.setString("UserToken", JSON.stringify(user));
-        }
-      }
-      console.log("New user", user);
-      http
-        .request(
-          this.makePost(isNewUser ? "/auth/register" : "/auth/login", {
-            user: user
-          })
-        )
-        .then(result => {
-          if (result.statusCode == 200) {
-            var _user = result.content.toJSON();
-            appSettings.setString("auth_token", _user.token);
-            resolve(_user.token);
-          } else if (result.statusCode == 512) {
-            appSettings.remove("auth_token");
-            appSettings.remove("UserToken");
-            throw new Error(result.content.toString());
-          } else {
-            throw new Error("Invalid response from the Auth provider");
-          }
-        })
-        .catch(err => {
-          console.log("error", err);
-          reject(err);
-        });
+      resolve();
     });
   }
 
@@ -120,6 +71,29 @@ export default class API {
   }
 
   // All calls
+
+  addUserDeviceToken(adminID, deviceToken) {
+    return new Promise((resolve, reject) => {
+      http
+        .request(
+          this.makePost("/a/device/token/add", {
+            adminID: adminID,
+            deviceToken: deviceToken,
+            deviceInfo: this.master.deviceInfo
+          })
+        )
+        .then(result => {
+          var answer = this.handleResponse(result);
+          if (answer) {
+            resolve(result);
+          }
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   loginUser(username, password) {
     return new Promise((resolve, reject) => {
       if (!username || !password) {
@@ -371,62 +345,62 @@ export default class API {
   }
   sendNotification(lectureID, type, moduleID, notification) {
     return new Promise((resolve, reject) => {
-        if (!lectureID) {
-            reject(new Error("User Not Defined"));
-        } else {
-            http
-                .request(this.makePost("/n/announcements/add/for/" + moduleID + "/by/" + type + "/of/id/" + lectureID, {
-                    announcement: notification
-                }))
-                .then(async result => {
-                    var answer = await this.handleResponse(result);
-                    if (answer) {
-                        if (answer.isError) {
-                            return reject(new Error(answer.message));
-                        } else if (answer == true) {
-                            return resolve(result.content);
-                        } else {
-                            return reject(new Error("Authorization error, please contact admin."));
-                        }
-                    }
-                })
-                .catch(err => {
-                    return reject(new Error("Can not load your notifications, Try again later"));
-                });
-
-
-        }
-    })
-}
-
-getLectureNotificationModule(lectureID, type, moduleID) {
-  return new Promise((resolve, reject) => {
       if (!lectureID) {
-          reject(new Error("User Not Defined"));
+        reject(new Error("User Not Defined"));
       } else {
-          http
-              .request(this.makePost("/n/announcements/get/for/" + lectureID, {
-                  userType: type,
-                  moduleID: moduleID
-              }))
-              .then(async result => {
-                  var answer = await this.handleResponse(result);
-                  if (answer) {
-                      if (answer.isError) {
-                          return reject(new Error(answer.message));
-                      } else if (answer == true) {
-                          return resolve(result.content);
-                      } else {
-                          return reject(new Error("Authorization error, please contact admin."));
-                      }
-                  }
-              })
-              .catch(err => {
-                  return reject(new Error("Can not load your notifications, Try again later"));
-              });
+        http
+          .request(this.makePost("/n/announcements/add/for/" + moduleID + "/by/" + type + "/of/id/" + lectureID, {
+            announcement: notification
+          }))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
+            }
+          })
+          .catch(err => {
+            return reject(new Error("Can not load your notifications, Try again later"));
+          });
+
+
       }
-  })
-}
+    })
+  }
+
+  getLectureNotificationModule(lectureID, type, moduleID) {
+    return new Promise((resolve, reject) => {
+      if (!lectureID) {
+        reject(new Error("User Not Defined"));
+      } else {
+        http
+          .request(this.makePost("/n/announcements/get/for/" + lectureID, {
+            userType: type,
+            moduleID: moduleID
+          }))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
+            }
+          })
+          .catch(err => {
+            return reject(new Error("Can not load your notifications, Try again later"));
+          });
+      }
+    })
+  }
 
   getSolutions(solutionId) {
     return new Promise((resolve, reject) => {
