@@ -180,13 +180,15 @@ export default {
           })
           .then(result => {
             if (result) {
+              this.appSettings.remove("isLoggedInUserId");
+              this.appSettings.remove("userType");
+              this.appSettings.remove("device_token");
+
               this.$store.commit("clearCache", {
                 db: this.$db,
                 appSettings: this.appSettings,
                 api: this.$api
               });
-              this.appSettings.remove("isLoggedInUserId");
-              this.appSettings.remove("userType");
 
               this.navigate("/login", null, {
                 clearHistory: true
