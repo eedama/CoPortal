@@ -113,41 +113,40 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
 });
 
 
-router.get("/get/questionaire/solutions/for/module/:moduleId",async function (req, res) {
+router.get("/get/questionaire/solutions/for/module/:moduleId", async function (req, res) {
   var moduleId = req.params.moduleId;
   Module.findById(moduleId)
-  .populate(["questionaires"])
+    .populate(["questionaires"])
     .then(async module => {
       if (module == null) return res.status(512).send("Module was not found");
-      if(!module.questionaires) module.questionaires = [];
+      if (!module.questionaires) module.questionaires = [];
       var questionaires = [];
-      for(var i=0;i<module.questionaires.length;i++) {
+      for (var i = 0; i < module.questionaires.length; i++) {
         const questionaireId = module.questionaires[i]._id;
         const questionaireTitle = module.questionaires[i].title;
         const questionaireTotalQuestions = module.questionaires[i].questions.length;
         const questionaireDate = module.questionaires[i].date;
-          var solutions = await Solution.find({
-            questionaireId:questionaireId
-          });
-          var passed =0;
-          var failed =0;
-          solutions.forEach(solution => {
-             console.log(solution.mark + " vs " + questionaireTotalQuestions/2);
-              if(solution.mark >= (questionaireTotalQuestions/2)){
-                passed++;
-              } else {
-                failed++;
-              }
-          });
-          questionaires.push({
-            id: questionaireId,
-            title: questionaireTitle,
-            totalQuestions:questionaireTotalQuestions,
-            date:questionaireDate,
-            passed: passed,
-            failed: failed,
-            wrote:passed+failed
-          });
+        var solutions = await Solution.find({
+          questionaireId: questionaireId
+        });
+        var passed = 0;
+        var failed = 0;
+        solutions.forEach(solution => {
+          if (solution.mark >= (questionaireTotalQuestions / 2)) {
+            passed++;
+          } else {
+            failed++;
+          }
+        });
+        questionaires.push({
+          id: questionaireId,
+          title: questionaireTitle,
+          totalQuestions: questionaireTotalQuestions,
+          date: questionaireDate,
+          passed: passed,
+          failed: failed,
+          wrote: passed + failed
+        });
       }
       res.json(questionaires);
     })
@@ -449,12 +448,12 @@ router.post(
 
 router.get("/download/notes/:notesId", function (req, res) {
   var notesID = req.params.notesId;
-   lecturerNote.findById(notesID).then(note => {
-      if (note == null) return res.status(512).send("Unable to find the specified note");
-      return res.send(note.file);
-    }).catch(err =>{
-      return res.status(512).send(err.message);
-    });
+  lecturerNote.findById(notesID).then(note => {
+    if (note == null) return res.status(512).send("Unable to find the specified note");
+    return res.send(note.file);
+  }).catch(err => {
+    return res.status(512).send(err.message);
+  });
 });
 
 module.exports = router;

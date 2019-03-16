@@ -48,10 +48,16 @@ class FCM {
                     }
                 }
 
-                var tokens = user.deviceTokens.filter(v => !v.removed).map(v => v.token);
+                var tokens = user.deviceTokens.filter(v => !v.removed && v.token).map(v => v.token);
                 if (tokens) {
+                    console.log('pushnotification', 'Will be pushing ' + payload.notification.title + ' to ' + tokens.length + ' people')
                     for (let i = 0; i < tokens.length; i++) {
-                        await this.sendToDevice(tokens[i], payload);
+                        try {
+                            console.log('pushnotification', 'About to push to ' + tokens[i])
+                            await this.sendToDevice(tokens[i], payload);
+                        } catch (ex) {
+                            console.log('pushnotification', ex.message);
+                        }
                     }
                     return resolve("Notification will be sent to " + tokens.length + " devices");
                 } else {
