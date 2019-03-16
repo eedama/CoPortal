@@ -23,7 +23,7 @@
                   <TextField row="1" col="1"  returnKeyType="text" v-model="notificationToSend.message"></TextField>
                 </GridLayout>
                 <StackLayout >
-                  <Button text="Add Notification" @tap="sendNotification()"  class="submit-button bg-light-black text-white p-5"></Button>
+                  <Button text="Send Announcement" @tap="sendNotification()"  class="submit-button bg-light-black text-white p-5"></Button>
                 </StackLayout>
                 </FlexboxLayout>
       
@@ -258,6 +258,9 @@ export default {
        this.module._id,
        this.notificationToSend)
         .then(notification => {
+          this.currentNotifications.unshift(JSON.parse(JSON.stringify(notification)));
+          this.notificationToSend.message ="";
+          this.notificationToSend.title = "";
   this.$feedback.success({
           title: "Notifcations",
           message: "Announcement Added Succesfully",

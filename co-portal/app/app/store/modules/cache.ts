@@ -22,7 +22,9 @@ const mutations = {
           obj.api
             .addUserDeviceToken(state.cachedUser.user._id, state.deviceToken)
             .then(response => {
+              console.log("printed2",response.content.toString());
               var statusCode = response.statusCode;
+              console.log(statusCode);
               if (statusCode != 200) {
                 var error = response.content;
                 throw new Error(error);
