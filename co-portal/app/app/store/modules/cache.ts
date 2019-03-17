@@ -11,7 +11,6 @@ const mutations = {
     if (docId != null) {
       state.cachedUser = obj.db.getDocument(docId);
       try {
-        alert(obj.appSettings.getString("device_token"));
         if (
           state.cachedUser &&
           state.cachedUser.user &&
