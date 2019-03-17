@@ -98,7 +98,8 @@ var router = {
       meta: {
         title: "ListStudents",
         authLevel: 0
-      },
+      }
+    },
       "/questionaire/marks": {
         title: "MarkList",
         name: "questionaire",

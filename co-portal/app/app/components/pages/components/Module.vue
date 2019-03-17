@@ -51,7 +51,7 @@
              <ScrollView>
               <StackLayout>
                 <CardView elevation="15" v-for="(assesment,i) in currentAssesments" :key="i" margin="5">
-                  <Ripple>
+                  <Ripple @tap="ViewMarks()">
                     <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto,auto,auto" columns="*,*,*">
                       
                       <label row="0" col="0" verticalAlignment="center" colSpan="3"  textAlignment="center"   class="font-weight-bold text-light-black  p-b-10" :textWrap="true" fontSize="19%" :text="assesment.title"></label>
@@ -284,6 +284,12 @@ this.notificationToSend.viewed = false;
       this.navigate("/take/test", {
         dbQuestionaire: test
       });
+    },
+    ViewMarks()
+    {
+        this.navigate("/questionaire/marks", null, {
+          clearHistory: true
+        });
     },
     colorLoaded(marked) {
       if (marked < 50) {
