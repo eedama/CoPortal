@@ -28,7 +28,12 @@ export default class API {
         isError: true,
         message: result.content
       }
-    } else {
+    } else if (result.statusCode == 503) {
+       return {
+        isError: true,
+        message: "Server error, please try again later"
+      }
+    }else {
       return true;
     }
   }
