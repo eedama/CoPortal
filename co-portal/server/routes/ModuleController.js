@@ -112,49 +112,6 @@ router.get("/marksheet/for/:userID/moduleID/:moduleID", function (req, res) {
   });
 });
 
-
-router.get("/get/questionaire/solutions/for/module/:moduleId", async function (req, res) {
-  var moduleId = req.params.moduleId;
-  Module.findById(moduleId)
-    .populate(["questionaires"])
-    .then(async module => {
-      if (module == null) return res.status(512).send("Module was not found");
-      if (!module.questionaires) module.questionaires = [];
-      var questionaires = [];
-      for (var i = 0; i < module.questionaires.length; i++) {
-        const questionaireId = module.questionaires[i]._id;
-        const questionaireTitle = module.questionaires[i].title;
-        const questionaireTotalQuestions = module.questionaires[i].questions.length;
-        const questionaireDate = module.questionaires[i].date;
-        var solutions = await Solution.find({
-          questionaireId: questionaireId
-        });
-        var passed = 0;
-        var failed = 0;
-        solutions.forEach(solution => {
-          if (solution.mark >= (questionaireTotalQuestions / 2)) {
-            passed++;
-          } else {
-            failed++;
-          }
-        });
-        questionaires.push({
-          id: questionaireId,
-          title: questionaireTitle,
-          totalQuestions: questionaireTotalQuestions,
-          date: questionaireDate,
-          passed: passed,
-          failed: failed,
-          wrote: passed + failed
-        });
-      }
-      res.json(questionaires);
-    })
-    .catch(err => {
-      return res.status(512).send("Server error : " + err.message);
-    });
-});
-
 router.get("/get/module/:moduleId", function (req, res) {
   var moduleId = req.params.moduleId;
   Module.findById(moduleId)
@@ -406,6 +363,71 @@ router.get(
       });
   }
 );
+
+router.get(
+  "/get/questionaire/solutions/for/all/students/:questionaireID",
+  async function (req, res) {
+
+    var questionaireID = req.params.questionaireID;
+    Solution.find({
+        questionaireId: questionaireID,
+        isMemo: false
+      })
+      .populate("questionaireId", "_id title")
+      .populate("studentId", "_id firstname lastname")
+      .then(solutions => {
+        if (solutions == null) {
+          return res.status(512).send("No solutions for this questionaire");
+        }
+        return res.json(solutions);
+      })
+      .catch(err => {
+        return res.status(512).send("Server error : " + err.message);
+      });
+  }
+);
+
+router.get("/get/questionaire/solutions/for/module/:moduleId", async function (req, res) {
+  var moduleId = req.params.moduleId;
+  Module.findById(moduleId)
+    .populate(["questionaires"])
+    .then(async module => {
+      if (module == null) return res.status(512).send("Module was not found");
+      if (!module.questionaires) module.questionaires = [];
+      var questionaires = [];
+      for (var i = 0; i < module.questionaires.length; i++) {
+        const questionaireId = module.questionaires[i]._id;
+        const questionaireTitle = module.questionaires[i].title;
+        const questionaireTotalQuestions = module.questionaires[i].questions.length;
+        const questionaireDate = module.questionaires[i].date;
+        var solutions = await Solution.find({
+          questionaireId: questionaireId
+        });
+        var passed = 0;
+        var failed = 0;
+        solutions.forEach(solution => {
+          if (solution.mark >= (questionaireTotalQuestions / 2)) {
+            passed++;
+          } else {
+            failed++;
+          }
+        });
+        questionaires.push({
+          id: questionaireId,
+          title: questionaireTitle,
+          totalQuestions: questionaireTotalQuestions,
+          date: questionaireDate,
+          passed: passed,
+          failed: failed,
+          wrote: passed + failed
+        });
+      }
+      res.json(questionaires);
+    })
+    .catch(err => {
+      return res.status(512).send("Server error : " + err.message);
+    });
+});
 
 router.post(
   "/add/notes/title/:title/description/:description",
