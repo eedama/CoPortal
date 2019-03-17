@@ -11,6 +11,7 @@ import Timetable from '../components/pages/components/Timetable.vue'
 import Modules from '../components/pages/Modules.vue'
 import Notifications from '../components/pages/Notifications.vue'
 import Profile from '../components/pages/Profile.vue'
+import Marks from '../components/pages/Marks.vue'
 
 // Pages
 // Components
@@ -97,7 +98,16 @@ var router = {
       meta: {
         title: "ListStudents",
         authLevel: 0
-      }
+      },
+      "/questionaire/marks": {
+        title: "MarkList",
+        name: "questionaire",
+        path: "/questionaire/marks/:markId",
+        component: Marks,
+        meta: {
+          title: "MarkList",
+          authLevel: 0
+        }
     },
 
     /**

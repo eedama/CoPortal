@@ -11,8 +11,7 @@
  
         <StackLayout row="2">
                  <ActivityIndicator verticalAlignment="center" textAlignment="center" row="1" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
-              <StackLayout>
-                <CardView v-for="(marked,i) in marks" :key="i"   elevation="15" margin="5">                  
+             <CardView v-for="(marked,i) in marks" :key="i"   elevation="15" margin="5">                  
                     <GridLayout verticalAlignment="center" class="p-10" rows="auto,auto,auto" columns="auto,auto,*">
                       <label row="0" rowSpan="3"    verticalAlignment="center"  textAlignment="center" class="font-weight-bold mdi p-15" fontSize="54" :text="'mdi-chart-pie' | fonticon "></label>
                       <label row="0" col="1" verticalAlignment="center" class="font-weight-bold"  :textWrap="true" fontSize="17%" :text="marked.studentId.firstname +' '+marked.studentId.lastname "></label>
@@ -28,8 +27,7 @@
                       <label row="2" col="2" verticalAlignment="center"     textAlignment="right"  class="h4 text-dark-black" :text="getMoment(marked.date).fromNow()"></label>
                     </GridLayout>
                 </CardView>
-              </StackLayout>
-        </StackLayout>
+ </StackLayout>
       </GridLayout>
     </ScrollView>
   </page>
