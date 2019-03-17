@@ -381,13 +381,13 @@ router.get(
           return res.status(512).send("No solutions for this questionaire");
         }
         var answer = [];
-        solutions.forEach(solution => {
-          if (!answer.some(s => s.studentId == solution.studentId)) {
+        solutions.filter(s => s.studentId && s.studentId._id).forEach(solution => {
+          if (!answer.some(s => s.studentId._id.toString() == solution.studentId._id.toString())) {
             answer.push(Object.assign({
               attempts: 1
-            }, solution))
+            }, solution.toObject()))
           } else {
-            answer.find(s => s.studentId == solution.studentId).attempts++;
+            answer.find(s => s.studentId._id.toString() == solution.studentId._id.toString()).attempts++;
           }
         })
         return res.json(answer);
