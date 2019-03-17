@@ -373,13 +373,25 @@ router.get(
         questionaireId: questionaireID,
         isMemo: false
       })
+      .sort("-date")
       .populate("questionaireId", "_id title")
       .populate("studentId", "_id firstname lastname")
       .then(solutions => {
         if (solutions == null) {
           return res.status(512).send("No solutions for this questionaire");
         }
-        return res.json(solutions);
+        var answer = [];
+        solutions.forEach(solution => {
+          if (!answer.some(s => s.studentId == solution.studentId)) {
+            answer.push({
+              attempts: 1,
+              ...solution
+            })
+          } else {
+            answer.find(s => s.studentId == solution.studentId).attempts++;
+          }
+        })
+        return res.json(answer);
       })
       .catch(err => {
         return res.status(512).send("Server error : " + err.message);
