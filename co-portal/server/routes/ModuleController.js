@@ -383,10 +383,9 @@ router.get(
         var answer = [];
         solutions.forEach(solution => {
           if (!answer.some(s => s.studentId == solution.studentId)) {
-            answer.push({
-              attempts: 1,
-              ...solution
-            })
+            answer.push(Object.assign({
+              attempts: 1
+            }, solution))
           } else {
             answer.find(s => s.studentId == solution.studentId).attempts++;
           }
