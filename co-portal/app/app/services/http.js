@@ -377,6 +377,32 @@ export default class API {
       }
     })
   }
+  getQuizStudents(quizID)
+  {
+    return new Promise((resolve, reject) => {
+      if (!quizID) {
+        reject(new Error("Question"));
+      } else {
+        http
+        .request(this.makeGet("/m/get/questionaire/solutions/for/all/students/" + quizID))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(new Error("Authorization error, please contact admin."));
+            }
+          }
+        })
+        .catch(err => {
+          return reject(new Error("Unable to retreive the questionaire marks , try again later"));
+        });
+      }
+    })
+  }
 
   getLectureNotificationModule(lectureID, type, moduleID) {
     return new Promise((resolve, reject) => {
