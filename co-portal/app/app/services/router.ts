@@ -103,7 +103,7 @@ var router = {
       "/questionaire/marks": {
         title: "MarkList",
         name: "questionaire",
-        path: "/questionaire/marks/:markId",
+        path: "/questionaire/marks/:questionaire",
         component: Marks,
         meta: {
           title: "MarkList",
