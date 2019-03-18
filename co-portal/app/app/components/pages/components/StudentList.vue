@@ -4,13 +4,13 @@
       <ScrollView>
         <StackLyout v-for="(_student,i) in studentList" :key="i">
           <cardView height="100" textAlignment="center" elevation="5" margin="10">
-            <GridLayout rows="auto,auto,auto,auto,*" cols="*,auto">
+            <GridLayout rows="auto,auto,auto,auto,auto" cols="*,auto">
               <label
                 row="0"
                 col="0"
                 :textWrap="true"
                 verticalAlignment="center"
-                class="text-dark-black p-2"
+                class="text-dark-black p-2 mdi-card-text"
                 :text="_student.firstname"
               ></label>
               <label
@@ -27,7 +27,7 @@
                 :textWrap="true"
                 class="text-dark-black p-2"
                 verticalAlignment="left"
-                :text="_student.gender"
+                :text=" 'human-male-female' | fonticon + _student.gender"
               ></label>
               <label
                 row="3"
@@ -35,7 +35,7 @@
                 :textWrap="true"
                 class="text-dark-black p-2"
                 verticalAlignment="left"
-                :text="_student.idNumber"
+                :text="'account-circle' | fonticon + _student.idNumber + "
               ></label>
               <label
                 row="4"
@@ -43,7 +43,7 @@
                 :textWrap="true"
                 class="text-dark-black p-2"
                 verticalAlignment="left"
-                :text="_student.isSouthAfrican"
+                :text="'flag' | fonticon + _student.isSouthAfrican + "
               ></label>
             </GridLayout>
           </cardView>
