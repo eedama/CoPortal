@@ -29,11 +29,11 @@ export default class API {
         message: result.content
       }
     } else if (result.statusCode == 503) {
-       return {
+      return {
         isError: true,
         message: "Server error, please try again later"
       }
-    }else {
+    } else {
       return true;
     }
   }
@@ -215,34 +215,29 @@ export default class API {
 
   getStudentList() {
     return new Promise((resolve, reject) => {
-      if (!userID) {
-        reject(new Error("User Not Defined"));
-      } else {
-        http
-          .request(this.makeGet("/s/students/all/"))
-          .then(async result => {
-            var answer = await this.handleResponse(result);
-            if (answer) {
-              if (answer.isError) {
-                return reject(new Error(answer.message));
-              } else if (answer == true) {
-                return resolve(result.content);
-              } else {
-                return reject(new Error("Authorization error, please contact admin."));
-              }
+      http
+        .request(this.makeGet("/s/students/all"))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(new Error("Authorization error, please contact admin."));
             }
-          })
-          .catch(err => {
-            return reject(new Error("Failed to retrieve studedents try again later"));
-          });
-      }
+          }
+        })
+        .catch(err => {
+          return reject(new Error("Failed to retrieve studedents try again later"));
+        });
     })
   }
 
   getStudentTimetable(userID) {
     return new Promise((resolve, reject) => {
       if (!userID) {
-        c
         reject(new Error("User Not Defined"));
       } else {
         http
@@ -293,8 +288,7 @@ export default class API {
     })
   }
 
-  getModuleQuestions(moduleID)
-  {
+  getModuleQuestions(moduleID) {
     return new Promise((resolve, reject) => {
       if (!moduleID) {
         reject(new Error("Module not found"));
@@ -377,29 +371,28 @@ export default class API {
       }
     })
   }
-  getQuizStudents(quizID)
-  {
+  getQuizStudents(quizID) {
     return new Promise((resolve, reject) => {
       if (!quizID) {
         reject(new Error("Question"));
       } else {
         http
-        .request(this.makeGet("/m/get/questionaire/solutions/for/all/students/" + quizID))
-        .then(async result => {
-          var answer = await this.handleResponse(result);
-          if (answer) {
-            if (answer.isError) {
-              return reject(new Error(answer.message));
-            } else if (answer == true) {
-              return resolve(result.content);
-            } else {
-              return reject(new Error("Authorization error, please contact admin."));
+          .request(this.makeGet("/m/get/questionaire/solutions/for/all/students/" + quizID))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(new Error("Authorization error, please contact admin."));
+              }
             }
-          }
-        })
-        .catch(err => {
-          return reject(new Error("Unable to retreive the questionaire marks , try again later"));
-        });
+          })
+          .catch(err => {
+            return reject(new Error("Unable to retreive the questionaire marks , try again later"));
+          });
       }
     })
   }

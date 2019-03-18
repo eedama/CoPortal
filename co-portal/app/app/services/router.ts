@@ -1,17 +1,21 @@
-import { Feedback, FeedbackPosition, FeedbackType } from 'nativescript-feedback'
+import {
+  Feedback,
+  FeedbackPosition,
+  FeedbackType
+} from "nativescript-feedback";
 
-import Home from '../components/main/Home.vue'
-import Login from '../components/main/Login.vue'
-import ForgotPassword from '../components/pages/components/ForgotPassword.vue'
-import Module from '../components/pages/components/Module.vue'
-import StudentList from '../components/pages/components/StudentList.vue'
-import TakeTest from '../components/pages/components/TakeTest.vue'
-import TestMarks from '../components/pages/components/TestMarks.vue'
-import Timetable from '../components/pages/components/Timetable.vue'
-import Modules from '../components/pages/Modules.vue'
-import Notifications from '../components/pages/Notifications.vue'
-import Profile from '../components/pages/Profile.vue'
-import Marks from '../components/pages/Marks.vue'
+import Home from "../components/main/Home.vue";
+import Login from "../components/main/Login.vue";
+import ForgotPassword from "../components/pages/components/ForgotPassword.vue";
+import Module from "../components/pages/components/Module.vue";
+import StudentList from "../components/pages/components/StudentList.vue";
+import TakeTest from "../components/pages/components/TakeTest.vue";
+import TestMarks from "../components/pages/components/TestMarks.vue";
+import Timetable from "../components/pages/components/Timetable.vue";
+import Modules from "../components/pages/Modules.vue";
+import Notifications from "../components/pages/Notifications.vue";
+import Profile from "../components/pages/Profile.vue";
+import Marks from "../components/pages/Marks.vue";
 
 // Pages
 // Components
@@ -90,7 +94,7 @@ var router = {
         authLevel: 0
       }
     },
-    "/student/list/": {
+    "/student/list": {
       title: "ListStudents",
       name: "students",
       path: "/student/list",
@@ -100,15 +104,15 @@ var router = {
         authLevel: 0
       }
     },
-      "/questionaire/marks": {
+    "/questionaire/marks": {
+      title: "MarkList",
+      name: "questionaire",
+      path: "/questionaire/marks/:questionaire",
+      component: Marks,
+      meta: {
         title: "MarkList",
-        name: "questionaire",
-        path: "/questionaire/marks/:questionaire",
-        component: Marks,
-        meta: {
-          title: "MarkList",
-          authLevel: 0
-        }
+        authLevel: 0
+      }
     },
 
     /**

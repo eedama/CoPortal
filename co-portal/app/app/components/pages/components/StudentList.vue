@@ -27,7 +27,7 @@
                 :textWrap="true"
                 class="text-dark-black p-2"
                 verticalAlignment="left"
-                :text=" 'human-male-female' | fonticon + _student.gender"
+                :text=" _student.gender"
               ></label>
               <label
                 row="3"
@@ -35,7 +35,7 @@
                 :textWrap="true"
                 class="text-dark-black p-2"
                 verticalAlignment="left"
-                :text="'account-circle' | fonticon + _student.idNumber + "
+                :text="_student.idNumber"
               ></label>
               <label
                 row="4"
@@ -43,7 +43,7 @@
                 :textWrap="true"
                 class="text-dark-black p-2"
                 verticalAlignment="left"
-                :text="'flag' | fonticon + _student.isSouthAfrican + "
+                :text="_student.isSouthAfrican"
               ></label>
             </GridLayout>
           </cardView>
@@ -61,7 +61,7 @@ export default {
   },
 
   mounted() {
-    this.pageLoaded();
+    //this.pageLoaded();
 
     if (!this.$store.state.cache.cachedUser) {
       this.navigate("/login", null, {
@@ -78,7 +78,7 @@ export default {
       .then(_students => {
         this.studentList = JSON.parse(JSON.stringify(_students));
 
-        if (this.modules.length == 0) {
+        if (_students.length == 0) {
           this.$feedback.warning({
             title: "Students",
 
