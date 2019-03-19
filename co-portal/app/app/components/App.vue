@@ -104,13 +104,6 @@ export default {
           auth: ["STUDENT"]
         },
         {
-          text: "StudentList",
-          icon: "account-tie",
-          link: "/student/list/",
-          description: "View List of Students",
-          auth: ["LECTURER"]
-        },
-        {
           text: "Report a student",
           icon: "account-alert-outline",
           link: "/Student/Report",
