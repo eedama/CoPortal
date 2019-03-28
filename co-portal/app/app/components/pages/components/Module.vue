@@ -142,8 +142,8 @@
               <WrapLayout>
                 <ScrollView orientation="vertical" v-for="(_student,i) in studentList" :key="i">
                   <StackLayout v-for="(_module, index) in studentList[i].modules" :key="index">
-                    <cardView height="230" elevation="5" margin="10">
-                      <ScrollView width="100%">
+                    <cardView height="230" elevation="5" margin="10" v-if="module.code == _module.code">
+                      <Ripple >
                         <GridLayout
                           rows="auto,auto,auto,auto,auto,auto,auto,auto,"
                           columns="auto,*"
@@ -263,7 +263,7 @@
                             :text="_module.code[i] + ',' "
                           ></label>
                         </GridLayout>
-                      </ScrollView>
+                      </Ripple>
                     </cardView>
                   </StackLayout>
                 </ScrollView>
