@@ -27,12 +27,12 @@ export default class API {
       return {
         isError: true,
         message: result.content
-      }
+      };
     } else if (result.statusCode == 503) {
       return {
         isError: true,
         message: "Server error, please try again later"
-      }
+      };
     } else {
       return true;
     }
@@ -119,7 +119,9 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
@@ -138,7 +140,7 @@ export default class API {
         http
           .request(
             this.makePost("/acc/forgot/password", {
-              email: username,
+              email: username
             })
           )
           .then(async result => {
@@ -149,12 +151,16 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
           .catch(err => {
-            return reject(new Error("Can not process your request, try again later"));
+            return reject(
+              new Error("Can not process your request, try again later")
+            );
           });
       }
     });
@@ -175,12 +181,16 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
           .catch(err => {
-            return reject(new Error("Can not load the requested profile,try again later"));
+            return reject(
+              new Error("Can not load the requested profile,try again later")
+            );
           });
       }
     });
@@ -201,17 +211,20 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
           .catch(err => {
-            return reject(new Error("Failed to retrieve modules try again later"));
+            return reject(
+              new Error("Failed to retrieve modules try again later")
+            );
           });
       }
-    })
+    });
   }
-
 
   getStudentList() {
     return new Promise((resolve, reject) => {
@@ -225,14 +238,18 @@ export default class API {
             } else if (answer == true) {
               return resolve(result.content);
             } else {
-              return reject(new Error("Authorization error, please contact admin."));
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
             }
           }
         })
         .catch(err => {
-          return reject(new Error("Failed to retrieve studedents try again later"));
+          return reject(
+            new Error("Failed to retrieve studedents try again later")
+          );
         });
-    })
+    });
   }
 
   getStudentTimetable(userID) {
@@ -250,15 +267,19 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
           .catch(err => {
-            return reject(new Error("Failed to retrieve timetable please try again later"));
+            return reject(
+              new Error("Failed to retrieve timetable please try again later")
+            );
           });
       }
-    })
+    });
   }
 
   getModuleMarks(userID, moduleID) {
@@ -267,7 +288,9 @@ export default class API {
         reject(new Error("User Not Defined"));
       } else {
         http
-          .request(this.makeGet("/m/marksheet/for/" + userID + "/moduleID/" + moduleID))
+          .request(
+            this.makeGet("/m/marksheet/for/" + userID + "/moduleID/" + moduleID)
+          )
           .then(async result => {
             var answer = await this.handleResponse(result);
             console.log(answer);
@@ -277,7 +300,9 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
@@ -285,7 +310,7 @@ export default class API {
             return reject(new Error("Can not retrieve marks at this time"));
           });
       }
-    })
+    });
   }
 
   getModuleQuestions(moduleID) {
@@ -294,7 +319,9 @@ export default class API {
         reject(new Error("Module not found"));
       } else {
         http
-          .request(this.makeGet("/m/get/questionaire/solutions/for/module/" + moduleID))
+          .request(
+            this.makeGet("/m/get/questionaire/solutions/for/module/" + moduleID)
+          )
           .then(async result => {
             var answer = await this.handleResponse(result);
             if (answer) {
@@ -303,7 +330,9 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
@@ -311,7 +340,7 @@ export default class API {
             return reject(new Error("Can not retrieve marks at this time"));
           });
       }
-    })
+    });
   }
 
   submitQuiz(studentId, solution) {
@@ -320,10 +349,12 @@ export default class API {
         reject(new Error("Invalid request"));
       } else {
         http
-          .request(this.makePost("/l/submit/questionaire", {
-            studentId,
-            solution
-          }))
+          .request(
+            this.makePost("/l/submit/questionaire", {
+              studentId,
+              solution
+            })
+          )
           .then(async result => {
             var answer = await this.handleResponse(result);
             if (answer) {
@@ -332,15 +363,19 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
           .catch(err => {
-            return reject(new Error("Unable to submit your quiz, Try again later"));
+            return reject(
+              new Error("Unable to submit your quiz, Try again later")
+            );
           });
       }
-    })
+    });
   }
   sendNotification(lectureID, type, moduleID, notification) {
     return new Promise((resolve, reject) => {
@@ -348,9 +383,19 @@ export default class API {
         reject(new Error("User Not Defined"));
       } else {
         http
-          .request(this.makePost("/n/announcements/add/for/" + moduleID + "/by/" + type + "/of/id/" + lectureID, {
-            announcement: notification
-          }))
+          .request(
+            this.makePost(
+              "/n/announcements/add/for/" +
+                moduleID +
+                "/by/" +
+                type +
+                "/of/id/" +
+                lectureID,
+              {
+                announcement: notification
+              }
+            )
+          )
           .then(async result => {
             var answer = await this.handleResponse(result);
             if (answer) {
@@ -359,17 +404,19 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
           .catch(err => {
-            return reject(new Error("Can not load your notifications, Try again later"));
+            return reject(
+              new Error("Can not load your notifications, Try again later")
+            );
           });
-
-
       }
-    })
+    });
   }
   getQuizStudents(quizID) {
     return new Promise((resolve, reject) => {
@@ -377,7 +424,11 @@ export default class API {
         reject(new Error("Question"));
       } else {
         http
-          .request(this.makeGet("/m/get/questionaire/solutions/for/all/students/" + quizID))
+          .request(
+            this.makeGet(
+              "/m/get/questionaire/solutions/for/all/students/" + quizID
+            )
+          )
           .then(async result => {
             var answer = await this.handleResponse(result);
             if (answer) {
@@ -386,15 +437,21 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
           .catch(err => {
-            return reject(new Error("Unable to retreive the questionaire marks , try again later"));
+            return reject(
+              new Error(
+                "Unable to retreive the questionaire marks , try again later"
+              )
+            );
           });
       }
-    })
+    });
   }
 
   getLectureNotificationModule(lectureID, type, moduleID) {
@@ -403,10 +460,12 @@ export default class API {
         reject(new Error("User Not Defined"));
       } else {
         http
-          .request(this.makePost("/n/announcements/get/for/" + lectureID, {
-            userType: type,
-            moduleID: moduleID
-          }))
+          .request(
+            this.makePost("/n/announcements/get/for/" + lectureID, {
+              userType: type,
+              moduleID: moduleID
+            })
+          )
           .then(async result => {
             var answer = await this.handleResponse(result);
             if (answer) {
@@ -415,17 +474,46 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
           .catch(err => {
-            return reject(new Error("Can not load your notifications, Try again later"));
+            return reject(
+              new Error("Can not load your notifications, Try again later")
+            );
           });
       }
-    })
+    });
   }
 
+  getLectureList() {
+    return new Promise((resolve, reject) => {
+      http
+        .request(this.makeGet("/l/lecturers/all"))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
+          }
+        })
+        .catch(err => {
+          return reject(
+            new Error("Failed to retrieve Lectures try again later")
+          );
+        });
+    });
+  }
   getSolutions(solutionId) {
     return new Promise((resolve, reject) => {
       if (!solutionId) {
@@ -441,15 +529,19 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
           .catch(err => {
-            return reject(new Error("Unable to retreive the solution , try again later"));
+            return reject(
+              new Error("Unable to retreive the solution , try again later")
+            );
           });
       }
-    })
+    });
   }
 
   getStudentNotification(userID) {
@@ -458,7 +550,9 @@ export default class API {
         reject(new Error("User Not Defined"));
       } else {
         http
-          .request(this.makeGet("/n/announcements/get/all/for/student/" + userID))
+          .request(
+            this.makeGet("/n/announcements/get/all/for/student/" + userID)
+          )
           .then(async result => {
             var answer = await this.handleResponse(result);
             if (answer) {
@@ -467,15 +561,19 @@ export default class API {
               } else if (answer == true) {
                 return resolve(result.content);
               } else {
-                return reject(new Error("Authorization error, please contact admin."));
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
               }
             }
           })
           .catch(err => {
-            return reject(new Error("Can not load your notifications, Try again later"));
+            return reject(
+              new Error("Can not load your notifications, Try again later")
+            );
           });
       }
-    })
+    });
   }
 
   getInternetStatus() {

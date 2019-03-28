@@ -102,7 +102,7 @@
                       <Image
                         row="0"
                         col="0"
-                        rowSpan="3"
+                        rowspan="3"
                         verticalAlignment="center"
                         src="res://ic_logo"
                         width="60"
@@ -128,7 +128,7 @@
                         class="text-dark-black"
                         :textWrap="true"
                         fontSize="13%"
-                        colSpan="2"
+                        colspan="2"
                         :text="notify.title"
                       ></label>
                     </GridLayout>
@@ -139,7 +139,135 @@
           </TabViewItem>
           <TabViewItem v-if="isLecture()" title="Students">
             <ScrollView>
-              <WrapLayout></WrapLayout>
+              <WrapLayout>
+                <ScrollView orientation="vertical" v-for="(_student,i) in studentList" :key="i">
+                  <StackLayout v-for="(_module, index) in studentList[i].modules" :key="index">
+                    <cardView height="230" elevation="5" margin="10">
+                      <ScrollView width="100%">
+                        <GridLayout
+                          rows="auto,auto,auto,auto,auto,auto,auto,auto,"
+                          columns="auto,*"
+                          class="p-x-20 p-y-15"
+                        >
+                          <StackLayout verticalAlignment="center" row="0">
+                            <label
+                              row="0"
+                              textAlignment="center"
+                              class="labelTitle m-t-2"
+                              :text="_student.firstname + ' ' + _student.lastname"
+                            ></label>
+                          </StackLayout>
+                          <label
+                            row="1"
+                            col="0"
+                            rowspan="2"
+                            class="text-dark-black text-dark-black mdi"
+                            textAlignment="left"
+                            fontSize="20%"
+                            verticalAlignment="center"
+                            :text="'mdi-account' | fonticon "
+                          ></label>
+                          <label
+                            row="1"
+                            col="1"
+                            verticalAlignment="center"
+                            textAlignment="left"
+                            class="font-weight-bold m-t-0 text-dark-black"
+                            text="IDNumber"
+                          ></label>
+                          <label
+                            row="2"
+                            col="2"
+                            fontSize="15"
+                            class="font-weight-bold"
+                            textAlignment="left"
+                            :text="_student.idNumber"
+                          ></label>
+                          <label
+                            row="3"
+                            col="0"
+                            rowspan="2"
+                            fontSize="20%"
+                            class="font-weight-bold m-r-20 p-t-5 text-dark-black mdi"
+                            :text="'mdi-human-male-female' | fonticon"
+                          ></label>
+                          <label
+                            row="3"
+                            col="1"
+                            textAlignment="left"
+                            class="font-weight-bold p-t-5 text-dark-black"
+                            verticalAlignment="center"
+                            fontSize="15"
+                            text="Gender"
+                          ></label>
+                          <label
+                            row="4"
+                            col="1"
+                            fontSize="15"
+                            textAlignment="left"
+                            :text="_student.gender"
+                          ></label>
+                          <label
+                            row="5"
+                            col="0"
+                            rowspan="2"
+                            fontSize="20%"
+                            class="font-weight-bold m-r-20 p-t-5 mdi text-dark-black"
+                            :text="'mdi-flag' | fonticon"
+                          ></label>
+                          <label
+                            row="5"
+                            col="1"
+                            textAlignment="left"
+                            class="font-weight-bold p-t-5 text-dark-black"
+                            verticalAlignment="center"
+                            fontSize="15"
+                            text="Nationality"
+                          ></label>
+                          <label
+                            row="6"
+                            col="1"
+                            class="font-weight-bold"
+                            v-if="_student.isSouthAfrican == true"
+                            text="South African"
+                          ></label>
+                          <label
+                            row="6"
+                            col="1"
+                            class="font-weight-bold"
+                            v-if="_student.isSouthAfrican == false"
+                            text="International Student"
+                          ></label>
+                          <label
+                            row="7"
+                            col="0"
+                            rowspan="2"
+                            class="font-weight-bold m-r-20 p-t-10 mdi text-dark-black"
+                            fontSize="20%"
+                            :text="'mdi-book-open-variant' | fonticon"
+                          ></label>
+                          <label
+                            row="7"
+                            col="1"
+                            verticalAlignment="center"
+                            textAlignment="left"
+                            class="font-weight-bold p-t-5 text-dark-black"
+                            text="Modules"
+                          ></label>
+                          <label
+                            row="8"
+                            col="1"
+                            class="font-weight-bold mdi"
+                            v-for="(_module,i) in studentList.modules"
+                            :key="i"
+                            :text="_module.code[i] + ',' "
+                          ></label>
+                        </GridLayout>
+                      </ScrollView>
+                    </cardView>
+                  </StackLayout>
+                </ScrollView>
+              </WrapLayout>
             </ScrollView>
           </TabViewItem>
           <TabViewItem v-if="isLecture()" title="assessments">
@@ -162,14 +290,14 @@
                         row="0"
                         col="0"
                         verticalAlignment="center"
-                        colSpan="3"
+                        colspan="3"
                         textAlignment="center"
                         class="font-weight-bold text-light-black p-b-10"
                         :textWrap="true"
                         fontSize="19%"
                         :text="assesment.title"
                       ></label>
-                      
+
                       <label
                         row="1"
                         col="0"
@@ -203,7 +331,7 @@
                         fontSize="22%"
                         :text="assesment.failed"
                       ></label>
-                      
+
                       <label
                         row="2"
                         col="0"
@@ -234,7 +362,7 @@
                         fontSize="16%"
                         text="failed"
                       ></label>
-                      
+
                       <label
                         row="3"
                         col="2"
@@ -259,7 +387,7 @@
                       <label
                         row="0"
                         col="0"
-                        colSpan="3"
+                        colspan="3"
                         :textWrap="true"
                         verticalAlignment="center"
                         textAlignment="center"
@@ -270,7 +398,7 @@
                       <label
                         row="1"
                         col="0"
-                        colSpan="3"
+                        colspan="3"
                         verticalAlignment="center"
                         textAlignment="center"
                         class="font-weight-bold mdi p-15"
@@ -318,7 +446,7 @@
                   >
                     <label
                       row="0"
-                      rowSpan="3"
+                      rowspan="3"
                       verticalAlignment="center"
                       textAlignment="center"
                       class="font-weight-bold mdi p-15"
@@ -340,7 +468,7 @@
                       verticalAlignment="center"
                       textAlignment="right"
                       :color="colorLoaded(marked.mark)"
-                      rowSpan="2"
+                      rowspan="2"
                       :textWrap="true"
                       fontSize="45"
                       :text="marked.mark"
@@ -388,7 +516,7 @@
                     >
                       <label
                         row="0"
-                        rowSpan="2"
+                        rowspan="2"
                         verticalAlignment="center"
                         textAlignment="center"
                         class="font-weight-bold mdi p-15"
@@ -440,7 +568,9 @@ export default {
   data() {
     return {
       currentModule: null,
+      studentList: [],
       currentMarks: [],
+      lectures: [],
       currentNotifications: [],
       currentAssesments: [],
       notificationToSend: {
@@ -476,6 +606,68 @@ export default {
         });
       });
 
+    //NEW
+    this.$api
+
+      .getStudentList()
+
+      .then(_students => {
+        this.studentList = JSON.parse(JSON.stringify(_students));
+
+        if (_students.length == 0) {
+          this.$feedback.warning({
+            title: "Students",
+
+            message: "No Students Available",
+
+            duration: 5000
+          });
+        }
+
+        this.isLoading = false;
+      })
+
+      .catch(err => {
+        this.$feedback.error({
+          title: "Error in getting students",
+
+          message: err.message,
+
+          duration: 10000
+        });
+      });
+
+    //NEW
+    this.$api
+
+      .getLectureList()
+
+      .then(_Lectures => {
+        this.lectures = JSON.parse(JSON.stringify(_Lectures));
+
+        if (_Lectures.length == 0) {
+          this.$feedback.warning({
+            title: "Students",
+
+            message: "Lectures might be unavailable",
+
+            duration: 5000
+          });
+        }
+
+        this.isLoading = false;
+      })
+
+      .catch(err => {
+        this.$feedback.error({
+          title: "Error in getting Lecturers",
+
+          message: err.message,
+
+          duration: 10000
+        });
+      });
+    //NEW
     if (this.isLecture()) {
       this.isLoading = true;
       this.$api
@@ -569,6 +761,11 @@ export default {
         }
       }
     },
+    //#endregion
+    viewStudentProfile(studentID) {
+      this.navigate("/student/profile/view");
+    },
+
     TakeTest(test) {
       this.navigate("/take/test", {
         dbQuestionaire: test
