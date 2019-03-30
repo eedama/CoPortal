@@ -72,10 +72,30 @@ export default class API {
   }
 
   makeURL(url) {
+    if(appSettings.getString("CurrentSchoolUrl")){
+      url = appSettings.getString("CurrentSchoolUrl") + url;
+    }
     return this.baseUrl + url;
   }
 
   // All calls
+  getAllSchools() {
+    return new Promise((resolve, reject) => {
+      http
+        .request(
+          this.makeGet("/get/all/Schools")
+        )
+        .then(result => {
+          var answer = this.handleResponse(result);
+          if (answer) {
+            resolve(result);
+          }
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
 
   addUserDeviceToken(adminID, deviceToken) {
     return new Promise((resolve, reject) => {

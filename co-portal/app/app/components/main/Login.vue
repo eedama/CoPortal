@@ -3,10 +3,11 @@
     <GridLayout rows="*">
       <StackLayout verticalAlignment="center" row="0" class="m-y-10">
         <Image src="~/assets/images/coPortalLogo.png" stretch="aspectFit" verticalAlignment="bottom" textAlignment="center" class="m-10 bottomLogo"></Image>
+        <label textAlignment="center" class="text-mute text-light-black p-15" fontSize="18%" :text="currentSchoolName ? currentSchoolName : 'Pick a school'"></label>
         <ScrollView width="100%">
           <CardView verticalAlignment="center" padding="10" margin="25" elevation="10" shadowOffsetHeight="10" shadowOpacity="0.2" shadowRadius="50">
             <GridLayout width="100%">
-              <FlexboxLayout class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
+              <FlexboxLayout v-if="currentSchoolName" class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
                 <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
                   <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-10" fontSize="25%" :text="'mdi-account-circle' | fonticon"></label>
                   <label row="0" col="1" class="h3 font-weight-bold text-mute text-dark-black" text="Username"></label>
@@ -25,11 +26,27 @@
                   <Button text="Login" :isEnabled="!isLoading" class="submit-button bg-dark-black text-white" @tap="submit()"></Button>
                 </StackLayout>
   
-                <GridLayout class="m-10">
+                <GridLayout columns="*,*" class="m-10">
                   <Ripple @tap="GoToResetPassword()">
                     <label textAlignment="center" class="text-mute text-light-black p-15" fontSize="14%" text="Forgot Password?"></label>
                   </Ripple>
+                  <Ripple col="1" @tap="changeSchool(null,null)">
+                    <label textAlignment="center" class="text-mute text-light-black p-15" fontSize="14%" text="Change school"></label>
+                  </Ripple>
                 </GridLayout>
+              </FlexboxLayout>
+              <FlexboxLayout v-if="!currentSchoolName" class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
+                <StackLayout>
+                  <CardView v-for="(school,i) in schools" :key="i">
+                    <Ripple @tap="changeSchool(school.name,school.url)">
+                      <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
+                        <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-10" fontSize="25%" :text="'mdi-school' | fonticon"></label>
+                        <label row="0" col="1" class="h3 font-weight-bold text-mute text-dark-black" :text="school.name"></label>
+                        <label row="1" col="1" class="h4 font-weight-bold text-mute text-dark-black" :text="school.description"></label>
+                      </GridLayout>
+                    </Ripple>
+                  </CardView>
+                </StackLayout>
               </FlexboxLayout>
             </GridLayout>
           </CardView>
@@ -57,10 +74,23 @@ export default {
   data() {
     return {
       password: "",
-      username: ""
+      username: "",
+      currentSchoolName:null,
+      currentSchoolUrl:null,
+      schools:[]
     };
   },
-  mounted() {},
+  mounted() {
+    this.currentSchoolName =  appSettings.getString("CurrentSchoolName");
+    this.currentSchoolUrl = appSettings.getString("CurrentSchoolUrl");
+    this.$api.getAllSchools().then(schools =>{
+      this.schools = schools;
+    }).catch(err =>{
+      this.$feedback.error({
+        title:err.message
+      })
+    });
+  },
   beforeDestroy() {
     this.isLoading = false;
   },
@@ -68,6 +98,27 @@ export default {
     this.isLoading = false;
   },
   methods: {
+    changeSchool(name,url){
+      if(name != null){
+        this.currentSchoolName = name;
+        this.currentSchoolUrl = url;
+        appSettings.setString("CurrentSchoolName",name);
+        appSettings.setString("CurrentSchoolURL",url);
+      }else{
+        this.currentSchoolName = name;
+        this.currentSchoolUrl = url;
+        appSettings.remove("CurrentSchoolName");
+        appSettings.remove("CurrentSchoolURL");     
+        this.$api.getAllSchools().then(schools =>{
+          this.schools = schools;
+        }).catch(err =>{
+          this.$feedback.error({
+            title:err.message
+          })
+        });
+      }
+    },
+
     GoToResetPassword() {
       this.navigate("/reset/Password");
     },
