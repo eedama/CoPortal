@@ -34,6 +34,7 @@ export default class API {
         message: "Server error, please try again later"
       };
     } else {
+      console.log(result.content.toString());
       return true;
     }
   }
@@ -72,9 +73,10 @@ export default class API {
   }
 
   makeURL(url) {
-    if(appSettings.getString("CurrentSchoolUrl")){
-      url = appSettings.getString("CurrentSchoolUrl") + url;
+    if(appSettings.getString("CurrentSchoolURL")){
+      url ="/"+ appSettings.getString("CurrentSchoolURL") + url;
     }
+    console.log("url",this.baseUrl + url)
     return this.baseUrl + url;
   }
 
@@ -85,10 +87,18 @@ export default class API {
         .request(
           this.makeGet("/get/all/Schools")
         )
-        .then(result => {
-          var answer = this.handleResponse(result);
+        .then(async result => {
+          var answer = await this.handleResponse(result);
           if (answer) {
-            resolve(result);
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
           }
         })
         .catch(err => {
@@ -107,10 +117,18 @@ export default class API {
             deviceInfo: this.master.deviceInfo
           })
         )
-        .then(result => {
-          var answer = this.handleResponse(result);
+        .then(async result => {
+          var answer = await this.handleResponse(result);
           if (answer) {
-            resolve(result);
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
           }
         })
         .catch(err => {

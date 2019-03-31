@@ -36,17 +36,23 @@
                 </GridLayout>
               </FlexboxLayout>
               <FlexboxLayout v-if="!currentSchoolName" class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
-                <StackLayout>
-                  <CardView v-for="(school,i) in schools" :key="i">
-                    <Ripple @tap="changeSchool(school.name,school.url)">
-                      <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
-                        <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-10" fontSize="25%" :text="'mdi-school' | fonticon"></label>
-                        <label row="0" col="1" class="h3 font-weight-bold text-mute text-dark-black" :text="school.name"></label>
-                        <label row="1" col="1" class="h4 font-weight-bold text-mute text-dark-black" :text="school.description"></label>
-                      </GridLayout>
-                    </Ripple>
-                  </CardView>
-                </StackLayout>
+                <GridLayout rows="auto,*" columns="*,auto">
+                  <Ripple col="1" @tap="refresh" verticalAlignment="center" textAlignment="right">
+                    <label class="mdi m-10" fontSize="25%" :text="'mdi-refresh' | fonticon"></label>
+                  </Ripple>
+                  <StackLayout  colSpan="2" row="1">
+                    <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
+                    <CardView v-for="(school,i) in schools" :key="i">
+                      <Ripple @tap="changeSchool(school.name,school.url)">
+                        <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
+                          <label row="0" rowSpan="2" col="0" verticalAlignment="center" textAlignment="center" class="mdi m-10" fontSize="25%" :text="'mdi-school' | fonticon"></label>
+                          <label row="0" col="1" class="h3 font-weight-bold text-mute text-dark-black" :text="school.name"></label>
+                          <label row="1" col="1" class="h4 font-weight-bold text-mute text-dark-black" :text="school.description"></label>
+                        </GridLayout>
+                      </Ripple>
+                    </CardView>
+                  </StackLayout>
+                </GridLayout>
               </FlexboxLayout>
             </GridLayout>
           </CardView>
@@ -81,15 +87,8 @@ export default {
     };
   },
   mounted() {
-    this.currentSchoolName =  appSettings.getString("CurrentSchoolName");
-    this.currentSchoolUrl = appSettings.getString("CurrentSchoolUrl");
-    this.$api.getAllSchools().then(schools =>{
-      this.schools = schools;
-    }).catch(err =>{
-      this.$feedback.error({
-        title:err.message
-      })
-    });
+this.refresh(false);
+
   },
   beforeDestroy() {
     this.isLoading = false;
@@ -98,6 +97,28 @@ export default {
     this.isLoading = false;
   },
   methods: {
+    refresh(clean = false){
+      this.currentSchoolName = clean ? null : appSettings.getString("CurrentSchoolName");
+      this.currentSchoolUrl =  clean ? null : appSettings.getString("CurrentSchoolURL");
+      if(clean)
+      {
+        appSettings.remove("CurrentSchoolName");
+        appSettings.remove("CurrentSchoolURL");
+      }
+    if(!this.currentSchoolUrl) 
+    {
+      this.isLoading = true;
+      this.$api.getAllSchools().then(schools =>{
+        this.isLoading = false;
+        this.schools = JSON.parse(JSON.stringify(schools));
+      }).catch(err =>{
+        this.isLoading = false;
+        this.$feedback.error({
+          title:err.message
+        })
+      });
+    }
+    },
     changeSchool(name,url){
       if(name != null){
         this.currentSchoolName = name;
@@ -105,17 +126,8 @@ export default {
         appSettings.setString("CurrentSchoolName",name);
         appSettings.setString("CurrentSchoolURL",url);
       }else{
-        this.currentSchoolName = name;
-        this.currentSchoolUrl = url;
-        appSettings.remove("CurrentSchoolName");
-        appSettings.remove("CurrentSchoolURL");     
-        this.$api.getAllSchools().then(schools =>{
-          this.schools = schools;
-        }).catch(err =>{
-          this.$feedback.error({
-            title:err.message
-          })
-        });
+        
+        this.refresh(true);
       }
     },
 
