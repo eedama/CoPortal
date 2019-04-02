@@ -142,28 +142,35 @@
               <WrapLayout>
                 <ScrollView orientation="vertical" v-for="(_student,i) in studentList" :key="i">
                   <StackLayout v-for="(_module, index) in studentList[i].modules" :key="index">
-                    <cardView height="230" elevation="5" margin="10" v-if="module.code == _module.code">
-                      <Ripple >
+                    <cardView
+                      height="280"
+                      elevation="5"
+                      margin="10"
+                      v-if="module.code == _module.code"
+                    >
+                      <Ripple>
                         <GridLayout
-                          rows="auto,auto,auto,auto,auto,auto,auto,auto,"
+                          rows="auto,auto,auto,auto,auto,auto,auto,auto,auto"
                           columns="auto,*"
                           class="p-x-20 p-y-15"
                         >
-                          <StackLayout verticalAlignment="center" row="0">
-                            <label
-                              row="0"
-                              textAlignment="center"
-                              class="labelTitle m-t-2"
-                              :text="_student.firstname + ' ' + _student.lastname"
-                            ></label>
-                          </StackLayout>
+                          <label
+                            row="0"
+                            verticalAlignment="center"
+                            textAlignment="center"
+                            fontSize="20"
+                            colspan="2"
+                            class="labelTitle text-dark-black"
+                            :text="_student.firstname + ' ' + _student.lastname"
+                          ></label>
+
                           <label
                             row="1"
                             col="0"
                             rowspan="2"
-                            class="text-dark-black text-dark-black mdi"
+                            class="text-dark-black mdi"
                             textAlignment="left"
-                            fontSize="20%"
+                            fontSize="35"
                             verticalAlignment="center"
                             :text="'mdi-account' | fonticon "
                           ></label>
@@ -179,7 +186,7 @@
                             row="2"
                             col="2"
                             fontSize="15"
-                            class="font-weight-bold"
+                            class="text-dark-black"
                             textAlignment="left"
                             :text="_student.idNumber"
                           ></label>
@@ -187,7 +194,7 @@
                             row="3"
                             col="0"
                             rowspan="2"
-                            fontSize="20%"
+                            fontSize="35"
                             class="font-weight-bold m-r-20 p-t-5 text-dark-black mdi"
                             :text="'mdi-human-male-female' | fonticon"
                           ></label>
@@ -195,7 +202,7 @@
                             row="3"
                             col="1"
                             textAlignment="left"
-                            class="font-weight-bold p-t-5 text-dark-black"
+                            class="font-weight-bold text-dark-black"
                             verticalAlignment="center"
                             fontSize="15"
                             text="Gender"
@@ -205,13 +212,14 @@
                             col="1"
                             fontSize="15"
                             textAlignment="left"
+                            class="text-dark-black"
                             :text="_student.gender"
                           ></label>
                           <label
                             row="5"
                             col="0"
                             rowspan="2"
-                            fontSize="20%"
+                            fontSize="35"
                             class="font-weight-bold m-r-20 p-t-5 mdi text-dark-black"
                             :text="'mdi-flag' | fonticon"
                           ></label>
@@ -227,14 +235,14 @@
                           <label
                             row="6"
                             col="1"
-                            class="font-weight-bold"
+                            class="text-dark-black"
                             v-if="_student.isSouthAfrican == true"
                             text="South African"
                           ></label>
                           <label
                             row="6"
                             col="1"
-                            class="font-weight-bold"
+                            class="text-dark-black"
                             v-if="_student.isSouthAfrican == false"
                             text="International Student"
                           ></label>
@@ -243,7 +251,7 @@
                             col="0"
                             rowspan="2"
                             class="font-weight-bold m-r-20 p-t-10 mdi text-dark-black"
-                            fontSize="20%"
+                            fontSize="30"
                             :text="'mdi-book-open-variant' | fonticon"
                           ></label>
                           <label
