@@ -143,7 +143,7 @@
                 <ScrollView orientation="vertical" v-for="(_student,i) in studentList" :key="i">
                   <StackLayout v-for="(_module, index) in studentList[i].modules" :key="index">
                     <cardView
-                      height="280"
+                      height="240"
                       elevation="5"
                       margin="10"
                       v-if="module.code == _module.code"
@@ -159,15 +159,15 @@
                             verticalAlignment="center"
                             textAlignment="center"
                             fontSize="20"
-                            colspan="2"
-                            class="labelTitle text-dark-black"
+                            colSpan="2"
+                            class="labelTitle text-dark-black m-b-4"
                             :text="_student.firstname + ' ' + _student.lastname"
                           ></label>
 
                           <label
                             row="1"
                             col="0"
-                            rowspan="2"
+                            rowSpan="2"
                             class="text-dark-black mdi"
                             textAlignment="left"
                             fontSize="35"
@@ -193,7 +193,7 @@
                           <label
                             row="3"
                             col="0"
-                            rowspan="2"
+                            rowSpan="2"
                             fontSize="35"
                             class="font-weight-bold m-r-20 p-t-5 text-dark-black mdi"
                             :text="'mdi-human-male-female' | fonticon"
@@ -218,7 +218,7 @@
                           <label
                             row="5"
                             col="0"
-                            rowspan="2"
+                            rowSpan="2"
                             fontSize="35"
                             class="font-weight-bold m-r-20 p-t-5 mdi text-dark-black"
                             :text="'mdi-flag' | fonticon"
@@ -249,7 +249,7 @@
                           <label
                             row="7"
                             col="0"
-                            rowspan="2"
+                            rowSpan="2"
                             class="font-weight-bold m-r-20 p-t-10 mdi text-dark-black"
                             fontSize="30"
                             :text="'mdi-book-open-variant' | fonticon"
