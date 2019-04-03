@@ -97,40 +97,13 @@
                   elevation="15"
                   margin="5"
                 >
-                  <Ripple @tap="readMessage(notify.title,notify.message)">
-                    <GridLayout class="p-15" rows="auto,auto,auto" columns="auto,*,auto">
-                      <Image
-                        row="0"
-                        col="0"
-                        rowspan="3"
-                        verticalAlignment="center"
-                        src="res://ic_logo"
-                        width="60"
-                        height="60"
-                        borderRadius="50%"
-                      ></Image>
-                      <label
-                        row="0"
-                        col="1"
-                        class="font-weight-bold"
-                        fontSize="16%"
-                        :text="handleSender(notify.moduleId)"
-                      ></label>
-                      <label
-                        row="1"
-                        col="2"
-                        class="h4 text-dark-black"
-                        :text="getMoment(notify.date).fromNow()"
-                      ></label>
-                      <label
-                        row="1"
-                        col="1"
-                        class="text-dark-black"
-                        :textWrap="true"
-                        fontSize="13%"
-                        colspan="2"
-                        :text="notify.title"
-                      ></label>
+                  <Ripple @tap="readMessage(notify.title,notify.message)" >
+                    <GridLayout  class="p-15" rows="auto,auto" columns="auto,*,auto">
+                      <Image row="0" col="0" rowSpan="2" verticalAlignment="center" src="res://ic_logo" width="60" height="60" borderRadius="50%"></Image>
+                      <label row="0" col="1" class="font-weight-bold p-x-5" fontSize="16%" :text="notify.title"></label>
+                      <label row="0" col="2" class="h4 text-dark-black" :text="getMoment(notify.date).fromNow()"></label>
+                      <label row="1" col="2" class="h4 text-dark-black" v-if="notify.moduleId" :text="notify.moduleId.name"></label>
+                      <label row="1" col="1" class="text-dark-black p-x-5" :text="notify.message"></label> 
                     </GridLayout>
                   </Ripple>
                 </CardView>
