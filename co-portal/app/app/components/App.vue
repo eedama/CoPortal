@@ -113,7 +113,7 @@ export default {
         {
           text: "Settings",
           icon: "settings",
-          link: "/Student/Report",
+          link: "/settings",
           description: "Customize your portal",
           auth: ["STUDENT", "LECTURER", "ADMIN"]
         },

@@ -16,6 +16,7 @@ import Modules from "../components/pages/Modules.vue";
 import Notifications from "../components/pages/Notifications.vue";
 import Profile from "../components/pages/Profile.vue";
 import Marks from "../components/pages/Marks.vue";
+import Settings from "../components/pages/Settings.vue";
 
 // Pages
 // Components
@@ -111,6 +112,16 @@ var router = {
       component: Marks,
       meta: {
         title: "MarkList",
+        authLevel: 0
+      }
+    },
+    "/settings": {
+      title: "Settings",
+      name: "settings",
+      path: "/settings",
+      component: Settings,
+      meta: {
+        title: "Settings",
         authLevel: 0
       }
     },
