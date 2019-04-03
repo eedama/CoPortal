@@ -73,10 +73,10 @@ export default class API {
   }
 
   makeURL(url) {
-    if(appSettings.getString("CurrentSchoolURL")){
-      url ="/"+ appSettings.getString("CurrentSchoolURL") + url;
+    if (appSettings.getString("CurrentSchoolURL")) {
+      url = "/" + appSettings.getString("CurrentSchoolURL") + url;
     }
-    console.log("url",this.baseUrl + url)
+    console.log("url", this.baseUrl + url)
     return this.baseUrl + url;
   }
 
@@ -290,6 +290,33 @@ export default class API {
     });
   }
 
+  //get lecture Notes
+  getLectureNotes(notesID) {
+    return new Promise((resolve, reject) => {
+      http
+        .request(this.makeGet("/get/lecturer/notes/" + notesID))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
+          }
+        })
+        .catch(err => {
+          return reject(
+            new Error("unable to access Notes")
+          );
+        });
+    });
+  }
+
   getStudentTimetable(userID) {
     return new Promise((resolve, reject) => {
       if (!userID) {
@@ -424,12 +451,11 @@ export default class API {
           .request(
             this.makePost(
               "/n/announcements/add/for/" +
-                moduleID +
-                "/by/" +
-                type +
-                "/of/id/" +
-                lectureID,
-              {
+              moduleID +
+              "/by/" +
+              type +
+              "/of/id/" +
+              lectureID, {
                 announcement: notification
               }
             )
