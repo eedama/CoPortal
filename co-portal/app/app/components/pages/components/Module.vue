@@ -1,7 +1,7 @@
 <template>
   <page actionBarHidden="true">
     <GridLayout v-if="currentModule" rows="auto,*" columns="*">
-      <StackLayout row="0">
+      <StackLayout v-if="!isKeyboardShowing" row="0">
         <GridLayout rows="auto,auto" columns="*">
           <label
             row="0"
@@ -17,7 +17,7 @@
             textAlignment="center"
             class="p-15 text-dark-black"
             fontSize="30%"
-            :text="module.name"
+            :text="module.name + ' ' + isKeyboardShowing"
           ></label>
         </GridLayout>
       </StackLayout>
@@ -25,8 +25,7 @@
         <TabView
           tabBackgroundColor="white"
           selectedTabTextColor="black"
-          androidSelectedTabHighlightColor="black"
-        >
+          androidSelectedTabHighlightColor="black">
           <TabViewItem v-if="isLecture()" title="Announcements">
             <ScrollView>
               <StackLayout>
@@ -111,145 +110,55 @@
             </ScrollView>
           </TabViewItem>
           <TabViewItem v-if="isLecture()" title="Students">
+          <GridLayout rows="*,auto">
             <ScrollView>
-              <WrapLayout>
-                <ScrollView orientation="vertical" v-for="(_student,i) in studentList" :key="i">
-                  <StackLayout v-for="(_module, index) in studentList[i].modules" :key="index">
-                    <cardView
-                      height="240"
-                      elevation="5"
-                      margin="10"
-                      v-if="module.code == _module.code"
-                    >
-                      <Ripple>
-                        <GridLayout
-                          rows="auto,auto,auto,auto,auto,auto,auto,auto,auto"
-                          columns="auto,*"
-                          class="p-x-20 p-y-15"
-                        >
-                          <label
-                            row="0"
-                            verticalAlignment="center"
-                            textAlignment="center"
-                            fontSize="20"
-                            colSpan="2"
-                            class="labelTitle text-dark-black m-b-4"
-                            :text="_student.firstname + ' ' + _student.lastname"
-                          ></label>
-
-                          <label
-                            row="1"
-                            col="0"
-                            rowSpan="2"
-                            class="text-dark-black mdi"
-                            textAlignment="left"
-                            fontSize="35"
-                            verticalAlignment="center"
-                            :text="'mdi-account' | fonticon "
-                          ></label>
-                          <label
-                            row="1"
-                            col="1"
-                            verticalAlignment="center"
-                            textAlignment="left"
-                            class="font-weight-bold m-t-0 text-dark-black"
-                            text="IDNumber"
-                          ></label>
-                          <label
-                            row="2"
-                            col="2"
-                            fontSize="15"
-                            class="text-dark-black"
-                            textAlignment="left"
-                            :text="_student.idNumber"
-                          ></label>
-                          <label
-                            row="3"
-                            col="0"
-                            rowSpan="2"
-                            fontSize="35"
-                            class="font-weight-bold m-r-20 p-t-5 text-dark-black mdi"
-                            :text="'mdi-human-male-female' | fonticon"
-                          ></label>
-                          <label
-                            row="3"
-                            col="1"
-                            textAlignment="left"
-                            class="font-weight-bold text-dark-black"
-                            verticalAlignment="center"
-                            fontSize="15"
-                            text="Gender"
-                          ></label>
-                          <label
-                            row="4"
-                            col="1"
-                            fontSize="15"
-                            textAlignment="left"
-                            class="text-dark-black"
-                            :text="_student.gender"
-                          ></label>
-                          <label
-                            row="5"
-                            col="0"
-                            rowSpan="2"
-                            fontSize="35"
-                            class="font-weight-bold m-r-20 p-t-5 mdi text-dark-black"
-                            :text="'mdi-flag' | fonticon"
-                          ></label>
-                          <label
-                            row="5"
-                            col="1"
-                            textAlignment="left"
-                            class="font-weight-bold p-t-5 text-dark-black"
-                            verticalAlignment="center"
-                            fontSize="15"
-                            text="Nationality"
-                          ></label>
-                          <label
-                            row="6"
-                            col="1"
-                            class="text-dark-black"
-                            v-if="_student.isSouthAfrican == true"
-                            text="South African"
-                          ></label>
-                          <label
-                            row="6"
-                            col="1"
-                            class="text-dark-black"
-                            v-if="_student.isSouthAfrican == false"
-                            text="International Student"
-                          ></label>
-                          <label
-                            row="7"
-                            col="0"
-                            rowSpan="2"
-                            class="font-weight-bold m-r-20 p-t-10 mdi text-dark-black"
-                            fontSize="30"
-                            :text="'mdi-book-open-variant' | fonticon"
-                          ></label>
-                          <label
-                            row="7"
-                            col="1"
-                            verticalAlignment="center"
-                            textAlignment="left"
-                            class="font-weight-bold p-t-5 text-dark-black"
-                            text="Modules"
-                          ></label>
-                          <label
-                            row="8"
-                            col="1"
-                            class="font-weight-bold mdi"
-                            v-for="(_module,i) in studentList.modules"
-                            :key="i"
-                            :text="_module.code[i] + ',' "
-                          ></label>
-                        </GridLayout>
-                      </Ripple>
-                    </cardView>
-                  </StackLayout>
-                </ScrollView>
-              </WrapLayout>
+              <StackLayout>
+                <CardView
+                  elevation="5"
+                  margin="5" v-for="(student,i) in studentList" :key="i">
+                <Ripple>
+                  <GridLayout
+                    class="text-dark-black p-15"
+                    rows="auto,auto"
+                    columns="auto,*,auto">
+                  <label
+                    row="0"
+                    col="0"
+                    class="mdi text-dark-black m-r-20"
+                    rowSpan="2"
+                    verticalAlignment="center"
+                    textAlignment="left"
+                    fontSize="35"
+                    :text="'mdi-account-circle' | fonticon"
+                  ></label>
+                  <label
+                    row="0"
+                    col="1"
+                    class="font-weight-bold"
+                    fontSize="15"
+                    textAlignment="left"
+                    :text="student.lastname + ' ' + student.firstname"
+                  ></label>
+                  <label
+                    v-if="student.gender"
+                    row="0"
+                    col="2"
+                    class="font-weight-bold text-dark-black mdi p-x-10 p-b-2"
+                    fontSize="30%"
+                    rowSpan="2"
+                    borderRadius="50"
+                    verticalAlignment="center"
+                    textAlignment="center"
+                    :text="'mdi-human-' + student.gender.toLowerCase() | fonticon"
+                  ></label>
+                  <label row="1" col="1" fontSize="15" textAlignment="left" :text="student.username"></label>
+                  </GridLayout>
+                </Ripple>
+                </CardView>
+              </StackLayout>
             </ScrollView>
+            <MDTextField row="1" class="m-5" fontSize="22" keyboardType="search" hint="Search" returnKeyType="search"></MDTextField>
+          </GridLayout>
           </TabViewItem>
           <TabViewItem v-if="isLecture()" title="assessments">
             <ScrollView>

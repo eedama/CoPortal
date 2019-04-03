@@ -7,6 +7,8 @@ import moment from "moment";
 
 import "./styles.scss";
 import { TNSFontIcon, fonticon } from "nativescript-fonticon"; // require the couchbase module
+import TextFieldPlugin from 'nativescript-material-textfield/vue'; 
+Vue.use(TextFieldPlugin);
 
 TNSFontIcon.debug = true;
 TNSFontIcon.paths = {
@@ -88,6 +90,11 @@ Vue.mixin({
       currentPage: 0,
       previousPage: null
     };
+  },
+  computed:{
+    isKeyboardShowing(){
+      return require('nativescript-keyboardshowing').isShowing()
+    }
   },
   beforeCreate() {
     if (!this.$firebase || !this.$firebase.initialized) {
