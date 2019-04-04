@@ -180,7 +180,7 @@
                         row="0"
                         col="0"
                         verticalAlignment="center"
-                        colspan="3"
+                        colSpan="3"
                         textAlignment="center"
                         class="font-weight-bold text-light-black p-b-10"
                         :textWrap="true"
@@ -277,7 +277,7 @@
                       <label
                         row="0"
                         col="0"
-                        colspan="3"
+                        colSpan="3"
                         :textWrap="true"
                         verticalAlignment="center"
                         textAlignment="center"
@@ -288,7 +288,7 @@
                       <label
                         row="1"
                         col="0"
-                        colspan="3"
+                        colSpan="3"
                         verticalAlignment="center"
                         textAlignment="center"
                         class="font-weight-bold mdi p-15"
@@ -302,19 +302,20 @@
                         class="h4 text-dark-black"
                         :text="getMoment(note.date).fromNow()"
                       ></label>
-                      <Ripple row="2" col="1" verticalAlignment="bottom" textAlignment="right">
+                      <ActivityIndicator row="2" v-show="isDownloading.some(v => v == note._id)" col="1" verticalAlignment="bottom" textAlignment="right" :busy="isDownloading.some(v => v == note._id)"></ActivityIndicator>
+                      <Ripple row="2" v-show="!isDownloading.some(v => v == note._id)" @tap="DownloadNotes(note)" col="1" verticalAlignment="bottom" textAlignment="right">
                         <label
-                          class="font-weight-bold mdi p-x-5"
+                          class="font-weight-bold mdi p-x-10"
                           textAlignment="right"
-                          fontSize="20%"
+                          fontSize="24%"
                           :text="'mdi-download' | fonticon "
                         ></label>
                       </Ripple>
                       <Ripple row="2" col="2" verticalAlignment="bottom" textAlignment="right">
                         <label
-                          class="font-weight-bold mdi p-x-5"
+                          class="font-weight-bold mdi p-x-10"
                           textAlignment="right"
-                          fontSize="20%"
+                          fontSize="24%"
                           :text="'mdi-share-variant' | fonticon "
                         ></label>
                       </Ripple>
@@ -452,11 +453,12 @@
 <script>
 const dialogs = require("ui/dialogs");
 var appSettings = require("application-settings");
-
+var fs = require("tns-core-modules/file-system");
 import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
+      isDownloading:[],
       currentModule: null,
       studentList: [],
       currentMarks: [],
@@ -655,7 +657,29 @@ export default {
     viewStudentProfile(studentID) {
       this.navigate("/student/profile/view");
     },
+    DownloadNotes(note){
+      this.isDownloading.push(note._id);
+      this.$api.downloadNotes(note._id).then(noteFile => {
+        var documents = fs.knownFolders.documents();
+        var path = fs.path.join(documents.path, note.title + ".pdf");
+        var pdfFile = fs.File.fromPath(path);
 
+        alert(note.file);
+        pdfFile.writeText(noteFile).then(()=> { 
+          alert('Saved.')
+          this.isDownloading = this.isDownloading.filter(v => v != note._id);
+        }, (error)=> {
+          alert('Error') 
+          console.log(error);
+          this.isDownloading = this.isDownloading.filter(v => v != note._id);
+        });
+      }).catch(err => {
+        this.isDownloading = this.isDownloading.filter(v => v != note._id);
+        this.$feedback.error({
+          title:err.message
+        });
+      });
+    },
     TakeTest(test) {
       this.navigate("/take/test", {
         dbQuestionaire: test

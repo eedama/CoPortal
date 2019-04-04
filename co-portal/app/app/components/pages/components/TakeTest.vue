@@ -4,9 +4,10 @@
             <StackLayout row="0">
                 <GridLayout rows="auto,auto" columns="*">
                     <label row="0" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="20%" :text="currentPage >= Questionaire.questions.length ? `Confirm your submission` : `Question ${currentPage + 1} of ${Questionaire.questions.length}`"></label>
-                    <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="18%" :text="timeRemaining == null ? `No time limit` : `${timeRemainingString}`"></label>
+                    <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="18%" :text="timeRemaining == null ? `No time limit` : (timeRemaining == 0 ? 'You ran out of time' : `${timeRemainingString}`)"></label>
                 </GridLayout>
-                <Progress class="text-dark-black" :value="((currentPage + 1)/(Questionaire.questions.length) * 100)"></Progress>
+                <Progress v-if="timeRemaining && totalTimeLimit" class="text-dark-black" :value="((timeRemaining)/(totalTimeLimit) * 100)"></Progress>
+                <Progress v-if="!timeRemaining" class="text-dark-black" :value="((currentPage + 1)/(Questionaire.questions.length) * 100)"></Progress>
             </StackLayout>
     
             <ScrollView v-if="currentPage >= 0 && (currentPage) < Questionaire.questions.length" verticalAlignment="center" row="1">
@@ -16,7 +17,7 @@
                             <label row="0" class="text-dark-black m-10 font-weight-bold" :textWrap="true" fontSize="17%" colSpan="2" :text="Questionaire.questions[currentPage].title"></label>
                             <ScrollView class="p-x-15 m-l-25" row="1">
                                 <StackLayout :textWrap="true">
-                                    <CheckBox fillColor="black" class="p-15 text-dark-black" :name="`circleToggle-${currentPage}`" boxType="circle" :text="answer" v-for="(answer,j) in Questionaire.questions[currentPage].answers" :key="j" @tap="selectSolution(currentPage,answer)" :checked="solutions[currentPage] == answer"></CheckBox>
+                                    <CheckBox :isEnabled="!timeUp" fillColor="black" class="p-15 text-dark-black" :name="`circleToggle-${currentPage}`" boxType="circle" :text="answer" v-for="(answer,j) in Questionaire.questions[currentPage].answers" :key="j" @tap="selectSolution(currentPage,answer)" :checked="solutions[currentPage] == answer"></CheckBox>
                                 </StackLayout>
                             </ScrollView>
                         </GridLayout>
@@ -50,8 +51,11 @@
                     </Ripple>
                 </GridLayout>
                 <GridLayout v-if="(currentPage) == Questionaire.questions.length && !isLoading" rows="auto" columns="auto,*">
-                    <Ripple class="p-5" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" @tap="SubmitQuiz()">
+                    <Ripple v-if="!submitted" class="p-5" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" @tap="SubmitQuiz()">
                         <label class="font-weight-bold m-15 p-5" textAlignment="center" fontSize="20%" text="Submit"></label>
+                    </Ripple>
+                    <Ripple v-if="submitted" class="p-5" col="0" colSpan="2" verticalAlignment="center" textAlignment="center" @tap="ViewMarks()">
+                        <label class="font-weight-bold m-15 p-5" textAlignment="center" fontSize="20%" text="View Results"></label>
                     </Ripple>
                 </GridLayout>
                 <ActivityIndicator verticalAlignment="center" textAlignment="center" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
@@ -72,9 +76,11 @@ export default {
       Questionaire: null,
       txtError: "",
       isLoading: false,
-      timeRemaining:120,
+      timeRemaining:null,
+      totalTimeLimit:null,
       timeRemainingString:'',
       timeUp:false,
+      submitted:false,
       timer:null
     };
   },
@@ -97,8 +103,28 @@ export default {
         this.solutions.push(null);
       });
 
+      if(this.dbQuestionaire.timeLimit && this.dbQuestionaire.timeLimit.split(' ').length == 2 && !isNaN(this.dbQuestionaire.timeLimit.split(' ')[0])){
+         const timeLimit = Number(this.dbQuestionaire.timeLimit.split(' ')[0]);
+         switch(this.dbQuestionaire.timeLimit.split(' ')[1]){
+            case 'minute':
+            case 'minutes':
+              this.timeRemaining =timeLimit * 60
+            break;
+            case 'hour':
+            case 'hours':
+              this.timeRemaining = timeLimit * 60 * 60
+            break;
+            default:
+             this.timeRemaining = null;
+            break;
+         }
+      }else{
+        this.timeRemaining = null;
+      }
+
       this.ApplyNavigation(this);
       this.Questionaire = this.dbQuestionaire;
+      this.totalTimeLimit = this.timeRemaining;
       if(this.timeRemaining != null){
         this.startTimer();
       }
@@ -111,21 +137,55 @@ export default {
         }else{
            this.timeRemainingString = this.timeRemaining + " seconds remaining";  
         }
+
+        if(this.timeRemaining == 5*60 || this.timeRemaining == 15*60 || this.timeRemaining == 30*60){
+          this.$feedback.info({
+            title:'You have ' + this.timeRemainingString,
+            message:'Hurry up!',
+            duration:4000
+          });
+        }
+
         if(this.timeRemaining <= 0){
           clearInterval(this.timer);
           this.timeUp = true;
+          this.currentPage = this.Questionaire.questions.length;
+          this.SubmitQuiz();
+          this.$feedback.error({
+            title:'Your time is up',
+            message:'You can only submit your results',
+            duration:10000
+          });
         }
       },1000);
     },
     changePage(isForward) {
       this.txtError = "";
-      isForward ? this.currentPage++ : this.currentPage--;
+      if(this.timeUp){
+        this.$feedback.error({
+          title:'Your time is up',
+          message:'You can only submit your results',
+          duration:10000
+        });
+      }
+        isForward ? this.currentPage++ : this.currentPage--;
     },
     selectSolution(index, value) {
       if (this.solutions[index] != value) {
         this.solutions[index] = value;
       }
       this.$forceUpdate();
+    },
+    ViewMarks(){
+       this.navigate(
+          "/test/marks",
+          {
+            solutionId: this.submitted._id
+          },
+          {
+            clearHistory: true
+          }
+        );
     },
     SubmitQuiz() {
       this.isLoading = true;
@@ -148,7 +208,7 @@ export default {
         okButtonText: "Yes",
         cancelButtonText: "No"
       }).then(result => {
-        if (!result) {
+        if (!result && !this.timeUp) {
           this.isLoading = false;
         } else {
           var solution = {
@@ -171,15 +231,8 @@ export default {
                 title: "Submitted!",
                 message: "You will get your marks shortly."
               });
-              this.navigate(
-                "/test/marks",
-                {
-                  solutionId: results._id
-                },
-                {
-                  clearHistory: true
-                }
-              );
+              this.timeUp = true;
+              this.submitted = results;
             })
             .catch(err => {
               this.isLoading = false;
