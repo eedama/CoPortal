@@ -17,7 +17,7 @@
             textAlignment="center"
             class="p-15 text-dark-black"
             fontSize="30%"
-            :text="module.name + ' ' + isKeyboardShowing"
+            :text="module.name"
           ></label>
         </GridLayout>
       </StackLayout>
@@ -285,6 +285,7 @@
                         fontSize="16%"
                         :text="note.title"
                       ></label>
+                      <PDFView v-if="selectedNotes" :src="selectedNotes" @load="onLoad()"></PDFView>
                       <label
                         row="1"
                         col="0"
@@ -459,6 +460,7 @@ export default {
   data() {
     return {
       isDownloading:[],
+      selectedNotes:null,
       currentModule: null,
       studentList: [],
       currentMarks: [],
@@ -603,6 +605,9 @@ export default {
   },
   props: ["module"],
   methods: {
+    onLoad(){
+
+    },
     pageLoaded() {
       if (!this.module) {
         this.navigate(null);
@@ -660,12 +665,16 @@ export default {
     DownloadNotes(note){
       this.isDownloading.push(note._id);
       this.$api.downloadNotes(note._id).then(noteFile => {
+        if(!noteFile || !noteFile.base64StringFile){
+          throw new Error("File can not be downloaded");
+        }
         var documents = fs.knownFolders.documents();
         var path = fs.path.join(documents.path, note.title + ".pdf");
         var pdfFile = fs.File.fromPath(path);
 
-        alert(note.file);
-        pdfFile.writeText(noteFile).then(()=> { 
+        alert(noteFile.fileName);
+        this.selectedNotes = noteFile.base64StringFile;
+        pdfFile.writeText(noteFile.base64StringFile).then(()=> { 
           alert('Saved.')
           this.isDownloading = this.isDownloading.filter(v => v != note._id);
         }, (error)=> {
