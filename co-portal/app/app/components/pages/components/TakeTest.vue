@@ -45,7 +45,7 @@
                 class="text-dark-black m-10 font-weight-bold"
                 :textWrap="true"
                 fontSize="17%"
-                colspan="2"
+                colSpan="2"
                 :text="Questionaire.questions[currentPage].title"
               ></label>
               <ScrollView class="p-x-15 m-l-25" row="1">
@@ -166,7 +166,7 @@
             v-if="!submitted"
             class="p-5"
             col="0"
-            colspan="2"
+            colSpan="2"
             verticalAlignment="center"
             textAlignment="center"
             @tap="SubmitQuiz()"
@@ -182,7 +182,7 @@
             v-if="submitted"
             class="p-5"
             col="0"
-            colspan="2"
+            colSpan="2"
             verticalAlignment="center"
             textAlignment="center"
             @tap="ViewMarks()"
@@ -327,18 +327,20 @@ export default {
       }
       this.$forceUpdate();
     },
-    ViewMarks() {
-      this.navigate(
-        "/test/marks",
-        {
-          solutionId: this.submitted._id
-        },
-        {
-          clearHistory: true
-        }
-      );
+
+    ViewMarks(){
+       clearInterval(this.timer);
+       this.navigate(
+          "/test/marks",
+          {
+            solutionId: this.submitted._id
+          },
+          {
+            clearHistory: true
+          }
+        );
     },
-    SubmitQuiz() {
+    async SubmitQuiz() {
       this.isLoading = true;
       this.txtError = "";
       var hasError = false;
@@ -353,47 +355,54 @@ export default {
         this.isLoading = false;
         return;
       }
-      confirm({
-        title: "Submit confirmation",
-        message: "Are you sure you want to submit?",
-        okButtonText: "Yes",
-        cancelButtonText: "No"
-      }).then(result => {
-        if (!result && !this.timeUp) {
-          this.isLoading = false;
-        } else {
-          var solution = {
-            id: this.Questionaire._id,
-            isMemo: this.isMemo,
-            answers: []
-          };
-          this.solutions.forEach((v, i) => {
-            solution.answers.push({
-              answer: v,
-              question: this.Questionaire.questions[i]
-            });
-          });
 
-          this.$api
-            .submitQuiz(this.$store.state.cache.cachedUser.user._id, solution)
-            .then(results => {
-              this.isLoading = false;
-              this.$feedback.success({
-                title: "Submitted!",
-                message: "You will get your marks shortly."
-              });
-              this.timeUp = true;
-              this.submitted = JSON.parse(JSON.stringify(results));
-            })
-            .catch(err => {
-              this.isLoading = false;
-              this.$feedback.error({
-                title: "Unable to submit",
-                message: err.message
-              });
-            });
-        }
+   
+      if(!this.timeUp){
+        var result = await confirm({
+          title: "Submit confirmation",
+          message: "Are you sure you want to submit?",
+          okButtonText: "Yes",
+          cancelButtonText: "No"
+        });
+
+        if(!result)
+        {
+          this.isLoading = false;
+          return;
+        } 
+      }
+        
+      var solution = {
+        id: this.Questionaire._id,
+        isMemo: this.isMemo,
+        answers: []
+      };
+      this.solutions.forEach((v, i) => {
+        solution.answers.push({
+          answer: v,
+          question: this.Questionaire.questions[i]
+        });
+
       });
+
+      this.$api
+        .submitQuiz(this.$store.state.cache.cachedUser.user._id, solution)
+        .then(results => {
+          this.isLoading = false;
+          this.$feedback.success({
+            title: "Submitted!",
+            message: "You will get your marks shortly."
+          });
+          this.timeUp = true;
+          this.submitted = JSON.parse(JSON.stringify(results));
+        })
+        .catch(err => {
+          this.isLoading = false;
+          this.$feedback.error({
+            title: "Unable to submit",
+            message: err.message
+          });
+        });
     }
   }
 };

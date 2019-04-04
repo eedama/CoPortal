@@ -61,6 +61,11 @@ registerElement(
   () => require("nativescript-bottom-navigation").BottomNavigationTab
 );
 
+registerElement(
+  "PDFView", 
+  () => require("nativescript-pdf-view").PDFView
+);
+
 Vue.filter("fonticon", fonticon);
 
 import master from "./services/master";
