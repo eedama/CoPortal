@@ -183,11 +183,11 @@ router.post('/add/new/bulk/modules', async function(req, res) {
           description: _module.description,
         });
 
-        var notSaved = await mmodule.save();
-        if(notSaved) {
-          failed.push(notSaved);
+        var saved = await mmodule.save();
+        if(saved) {
+          succeded.push(saved);
         }else{
-          succeded.push(mmodule.name);
+          failed.push(mmodule.name + " failed");
         }
       }
     }catch(ex){
@@ -196,7 +196,7 @@ router.post('/add/new/bulk/modules', async function(req, res) {
   }
   return res.json({
     succeded:succeded,
-    failed:failed + ' failed'
+    failed:failed
   })
 });
 
