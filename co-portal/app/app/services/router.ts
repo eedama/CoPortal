@@ -16,6 +16,7 @@ import Notifications from "../components/pages/Notifications.vue";
 import Profile from "../components/pages/Profile.vue";
 import Marks from "../components/pages/Marks.vue";
 import Settings from "../components/pages/Settings.vue";
+import PDFView from "../components/pages/PDFView.vue";
 
 // Pages
 // Components
@@ -49,6 +50,15 @@ var router = {
     /**
      * Pages
      */
+    "/pdf/view": {
+      name: "pdfview",
+      path: "/module/list",
+      component: PDFView,
+      meta: {
+        title: "PDFView",
+        authLevel: 0
+      }
+    },
     "/module/list": {
       name: "modules",
       path: "/module/list",

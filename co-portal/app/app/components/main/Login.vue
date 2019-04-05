@@ -126,7 +126,6 @@ this.refresh(false);
         appSettings.setString("CurrentSchoolName",name);
         appSettings.setString("CurrentSchoolURL",url);
       }else{
-        
         this.refresh(true);
       }
     },

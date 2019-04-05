@@ -25,7 +25,8 @@
         <TabView
           tabBackgroundColor="white"
           selectedTabTextColor="black"
-          androidSelectedTabHighlightColor="black">
+          androidSelectedTabHighlightColor="black"
+        >
           <TabViewItem v-if="isLecture()" title="Announcements">
             <ScrollView>
               <StackLayout>
@@ -96,13 +97,39 @@
                   elevation="15"
                   margin="5"
                 >
-                  <Ripple @tap="readMessage(notify.title,notify.message)" >
-                    <GridLayout  class="p-15" rows="auto,auto" columns="auto,*,auto">
-                      <Image row="0" col="0" rowSpan="2" verticalAlignment="center" src="res://ic_logo" width="60" height="60" borderRadius="50%"></Image>
-                      <label row="0" col="1" class="font-weight-bold p-x-5" fontSize="16%" :text="notify.title"></label>
-                      <label row="0" col="2" class="h4 text-dark-black" :text="getMoment(notify.date).fromNow()"></label>
-                      <label row="1" col="2" class="h4 text-dark-black" v-if="notify.moduleId" :text="notify.moduleId.name"></label>
-                      <label row="1" col="1" class="text-dark-black p-x-5" :text="notify.message"></label> 
+                  <Ripple @tap="readMessage(notify.title,notify.message)">
+                    <GridLayout class="p-15" rows="auto,auto" columns="auto,*,auto">
+                      <Image
+                        row="0"
+                        col="0"
+                        rowspan="2"
+                        verticalAlignment="center"
+                        src="res://ic_logo"
+                        width="60"
+                        height="60"
+                        borderRadius="50%"
+                      ></Image>
+                      <label
+                        row="0"
+                        col="1"
+                        class="font-weight-bold p-x-5"
+                        fontSize="16%"
+                        :text="notify.title"
+                      ></label>
+                      <label
+                        row="0"
+                        col="2"
+                        class="h4 text-dark-black"
+                        :text="getMoment(notify.date).fromNow()"
+                      ></label>
+                      <label
+                        row="1"
+                        col="2"
+                        class="h4 text-dark-black"
+                        v-if="notify.moduleId"
+                        :text="notify.moduleId.name"
+                      ></label>
+                      <label row="1" col="1" class="text-dark-black p-x-5" :text="notify.message"></label>
                     </GridLayout>
                   </Ripple>
                 </CardView>
@@ -110,55 +137,67 @@
             </ScrollView>
           </TabViewItem>
           <TabViewItem v-if="isLecture()" title="Students">
-          <GridLayout rows="*,auto">
-            <ScrollView>
-              <StackLayout>
-                <CardView
-                  elevation="5"
-                  margin="5" v-for="(student,i) in studentList" :key="i">
-                <Ripple>
-                  <GridLayout
-                    class="text-dark-black p-15"
-                    rows="auto,auto"
-                    columns="auto,*,auto">
-                  <label
-                    row="0"
-                    col="0"
-                    class="mdi text-dark-black m-r-20"
-                    rowSpan="2"
-                    verticalAlignment="center"
-                    textAlignment="left"
-                    fontSize="35"
-                    :text="'mdi-account-circle' | fonticon"
-                  ></label>
-                  <label
-                    row="0"
-                    col="1"
-                    class="font-weight-bold"
-                    fontSize="15"
-                    textAlignment="left"
-                    :text="student.lastname + ' ' + student.firstname"
-                  ></label>
-                  <label
-                    v-if="student.gender"
-                    row="0"
-                    col="2"
-                    class="font-weight-bold text-dark-black mdi p-x-10 p-b-2"
-                    fontSize="30%"
-                    rowSpan="2"
-                    borderRadius="50"
-                    verticalAlignment="center"
-                    textAlignment="center"
-                    :text="'mdi-human-' + student.gender.toLowerCase() | fonticon"
-                  ></label>
-                  <label row="1" col="1" fontSize="15" textAlignment="left" :text="student.username"></label>
-                  </GridLayout>
-                </Ripple>
-                </CardView>
-              </StackLayout>
-            </ScrollView>
-            <MDTextField row="1" class="m-5" fontSize="22" keyboardType="search" hint="Search" returnKeyType="search"></MDTextField>
-          </GridLayout>
+            <GridLayout rows="*,auto">
+              <ScrollView>
+                <StackLayout>
+                  <CardView elevation="5" margin="5" v-for="(student,i) in studentList" :key="i">
+                    <Ripple>
+                      <GridLayout
+                        class="text-dark-black p-15"
+                        rows="auto,auto"
+                        columns="auto,*,auto"
+                      >
+                        <label
+                          row="0"
+                          col="0"
+                          class="mdi text-dark-black m-r-20"
+                          rowspan="2"
+                          verticalAlignment="center"
+                          textAlignment="left"
+                          fontSize="35"
+                          :text="'mdi-account-circle' | fonticon"
+                        ></label>
+                        <label
+                          row="0"
+                          col="1"
+                          class="font-weight-bold"
+                          fontSize="15"
+                          textAlignment="left"
+                          :text="student.lastname + ' ' + student.firstname"
+                        ></label>
+                        <label
+                          v-if="student.gender"
+                          row="0"
+                          col="2"
+                          class="font-weight-bold text-dark-black mdi p-x-10 p-b-2"
+                          fontSize="30%"
+                          rowspan="2"
+                          borderRadius="50"
+                          verticalAlignment="center"
+                          textAlignment="center"
+                          :text="'mdi-human-' + student.gender.toLowerCase() | fonticon"
+                        ></label>
+                        <label
+                          row="1"
+                          col="1"
+                          fontSize="15"
+                          textAlignment="left"
+                          :text="student.username"
+                        ></label>
+                      </GridLayout>
+                    </Ripple>
+                  </CardView>
+                </StackLayout>
+              </ScrollView>
+              <MDTextField
+                row="1"
+                class="m-5"
+                fontSize="22"
+                keyboardType="search"
+                hint="Search"
+                returnKeyType="search"
+              ></MDTextField>
+            </GridLayout>
           </TabViewItem>
           <TabViewItem v-if="isLecture()" title="assessments">
             <ScrollView>
@@ -273,54 +312,38 @@
               <WrapLayout>
                 <StackLayout width="50%" v-for="note in module.notes" :key="note._id">
                   <CardView elevation="15" margin="5">
-                    <GridLayout class="p-10" rows="auto,auto,auto" columns="*,auto,auto">
-                      <label
-                        row="0"
-                        col="0"
-                        colSpan="3"
-                        :textWrap="true"
-                        verticalAlignment="center"
-                        textAlignment="center"
-                        class="font-weight-bold"
-                        fontSize="16%"
-                        :text="note.title"
-                      ></label>
-                      <PDFView v-if="selectedNotes" :src="selectedNotes" @load="onLoad()"></PDFView>
-                      <label
-                        row="1"
-                        col="0"
-                        colSpan="3"
-                        verticalAlignment="center"
-                        textAlignment="center"
-                        class="font-weight-bold mdi p-15"
-                        fontSize="75%"
-                        :text="'mdi-file-pdf' | fonticon "
-                      ></label>
-                      <label
-                        row="2"
-                        col="0"
-                        verticalAlignment="bottom"
-                        class="h4 text-dark-black"
-                        :text="getMoment(note.date).fromNow()"
-                      ></label>
-                      <ActivityIndicator row="2" v-show="isDownloading.some(v => v == note._id)" col="1" verticalAlignment="bottom" textAlignment="right" :busy="isDownloading.some(v => v == note._id)"></ActivityIndicator>
-                      <Ripple row="2" v-show="!isDownloading.some(v => v == note._id)" @tap="DownloadNotes(note)" col="1" verticalAlignment="bottom" textAlignment="right">
+                    <Ripple @tap="DownloadNotes(note)">
+                      <GridLayout class="p-10" rows="auto,auto,auto" columns="*,auto,auto">
                         <label
-                          class="font-weight-bold mdi p-x-10"
-                          textAlignment="right"
-                          fontSize="24%"
-                          :text="'mdi-download' | fonticon "
+                          row="0"
+                          col="0"
+                          colSpan="3"
+                          :textWrap="true"
+                          verticalAlignment="center"
+                          textAlignment="center"
+                          class="font-weight-bold"
+                          fontSize="16%"
+                          :text="note.title"
                         ></label>
-                      </Ripple>
-                      <Ripple row="2" col="2" verticalAlignment="bottom" textAlignment="right">
                         <label
-                          class="font-weight-bold mdi p-x-10"
-                          textAlignment="right"
-                          fontSize="24%"
-                          :text="'mdi-share-variant' | fonticon "
+                          row="1"
+                          col="0"
+                          colSpan="3"
+                          verticalAlignment="center"
+                          textAlignment="center"
+                          class="font-weight-bold mdi p-15"
+                          fontSize="75%"
+                          :text="'mdi-file-pdf' | fonticon "
                         ></label>
-                      </Ripple>
-                    </GridLayout>
+                        <label
+                          row="2"
+                          col="0"
+                          verticalAlignment="bottom"
+                          class="h4 text-dark-black"
+                          :text="getMoment(note.date).fromNow()"
+                        ></label>
+                      </GridLayout>
+                    </Ripple>
                   </CardView>
                 </StackLayout>
               </WrapLayout>
@@ -338,7 +361,7 @@
                   >
                     <label
                       row="0"
-                      rowSpan="3"
+                      rowspan="3"
                       verticalAlignment="center"
                       textAlignment="center"
                       class="font-weight-bold mdi p-15"
@@ -360,7 +383,7 @@
                       verticalAlignment="center"
                       textAlignment="right"
                       :color="colorLoaded(marked.mark)"
-                      rowSpan="2"
+                      rowspan="2"
                       :textWrap="true"
                       fontSize="40"
                       :text="marked.mark+'%'"
@@ -408,7 +431,7 @@
                     >
                       <label
                         row="0"
-                        rowSpan="2"
+                        rowspan="2"
                         verticalAlignment="center"
                         textAlignment="center"
                         class="font-weight-bold mdi p-15"
@@ -454,13 +477,11 @@
 <script>
 const dialogs = require("ui/dialogs");
 var appSettings = require("application-settings");
-var fs = require("tns-core-modules/file-system");
 import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
-      isDownloading:[],
-      selectedNotes:null,
+      selectedNotes: null,
       currentModule: null,
       studentList: [],
       currentMarks: [],
@@ -502,26 +523,26 @@ export default {
     if (this.isLecture()) {
       this.isLoading = true;
 
-    this.$api
-      .getStudentsForModule(this.module._id)
-      .then(_students => {
-        this.studentList = JSON.parse(JSON.stringify(_students));
-        if (_students.length == 0) {
-          this.$feedback.warning({
-            title: "Students",
-            message: "No Students Available",
-            duration: 5000
+      this.$api
+        .getStudentsForModule(this.module._id)
+        .then(_students => {
+          this.studentList = JSON.parse(JSON.stringify(_students));
+          if (_students.length == 0) {
+            this.$feedback.warning({
+              title: "Students",
+              message: "No Students Available",
+              duration: 5000
+            });
+          }
+          this.isLoading = false;
+        })
+        .catch(err => {
+          this.$feedback.error({
+            title: "Error in getting students",
+            message: err.message,
+            duration: 10000
           });
-        }
-        this.isLoading = false;
-      })
-      .catch(err => {
-        this.$feedback.error({
-          title: "Error in getting students",
-          message: err.message,
-          duration: 10000
         });
-      });
 
       this.$api
         .getLectureNotificationModule(
@@ -564,9 +585,7 @@ export default {
   },
   props: ["module"],
   methods: {
-    onLoad(){
-
-    },
+    onLoad() {},
     pageLoaded() {
       if (!this.module) {
         this.navigate(null);
@@ -617,35 +636,12 @@ export default {
         }
       }
     },
-    //#endregion
     viewStudentProfile(studentID) {
       this.navigate("/student/profile/view");
     },
-    DownloadNotes(note){
-      this.isDownloading.push(note._id);
-      this.$api.downloadNotes(note._id).then(noteFile => {
-        if(!noteFile || !noteFile.base64StringFile){
-          throw new Error("File can not be downloaded");
-        }
-        var documents = fs.knownFolders.documents();
-        var path = fs.path.join(documents.path, note.title + ".pdf");
-        var pdfFile = fs.File.fromPath(path);
-
-        alert(noteFile.fileName);
-        this.selectedNotes = noteFile.base64StringFile;
-        pdfFile.writeText(noteFile.base64StringFile).then(()=> { 
-          alert('Saved.')
-          this.isDownloading = this.isDownloading.filter(v => v != note._id);
-        }, (error)=> {
-          alert('Error') 
-          console.log(error);
-          this.isDownloading = this.isDownloading.filter(v => v != note._id);
-        });
-      }).catch(err => {
-        this.isDownloading = this.isDownloading.filter(v => v != note._id);
-        this.$feedback.error({
-          title:err.message
-        });
+    DownloadNotes(note) {
+      this.navigate("/pdf/view", {
+        noteId: note._id
       });
     },
     TakeTest(test) {
