@@ -8,7 +8,6 @@ import Home from "../components/main/Home.vue";
 import Login from "../components/main/Login.vue";
 import ForgotPassword from "../components/pages/components/ForgotPassword.vue";
 import Module from "../components/pages/components/Module.vue";
-import StudentList from "../components/pages/components/StudentList.vue";
 import TakeTest from "../components/pages/components/TakeTest.vue";
 import TestMarks from "../components/pages/components/TestMarks.vue";
 import Timetable from "../components/pages/components/Timetable.vue";
@@ -92,16 +91,6 @@ var router = {
       component: Profile,
       meta: {
         title: "StudentProfile",
-        authLevel: 0
-      }
-    },
-    "/student/list": {
-      title: "ListStudents",
-      name: "students",
-      path: "/student/list",
-      component: StudentList,
-      meta: {
-        title: "ListStudents",
         authLevel: 0
       }
     },

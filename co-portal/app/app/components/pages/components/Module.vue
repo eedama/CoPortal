@@ -338,7 +338,7 @@
                   >
                     <label
                       row="0"
-                      rowspan="3"
+                      rowSpan="3"
                       verticalAlignment="center"
                       textAlignment="center"
                       class="font-weight-bold mdi p-15"
@@ -360,7 +360,7 @@
                       verticalAlignment="center"
                       textAlignment="right"
                       :color="colorLoaded(marked.mark)"
-                      rowspan="2"
+                      rowSpan="2"
                       :textWrap="true"
                       fontSize="40"
                       :text="marked.mark+'%'"
@@ -408,7 +408,7 @@
                     >
                       <label
                         row="0"
-                        rowspan="2"
+                        rowSpan="2"
                         verticalAlignment="center"
                         textAlignment="center"
                         class="font-weight-bold mdi p-15"
@@ -464,7 +464,6 @@ export default {
       currentModule: null,
       studentList: [],
       currentMarks: [],
-      lectures: [],
       currentNotifications: [],
       currentAssesments: [],
       notificationToSend: {
@@ -500,70 +499,30 @@ export default {
         });
       });
 
-    //NEW
+    if (this.isLecture()) {
+      this.isLoading = true;
+
     this.$api
-
-      .getStudentList()
-
+      .getStudentsForModule(this.module._id)
       .then(_students => {
         this.studentList = JSON.parse(JSON.stringify(_students));
-
         if (_students.length == 0) {
           this.$feedback.warning({
             title: "Students",
-
             message: "No Students Available",
-
             duration: 5000
           });
         }
-
         this.isLoading = false;
       })
-
       .catch(err => {
         this.$feedback.error({
           title: "Error in getting students",
-
           message: err.message,
-
           duration: 10000
         });
       });
 
-    //NEW
-    this.$api
-
-      .getLectureList()
-
-      .then(_Lectures => {
-        this.lectures = JSON.parse(JSON.stringify(_Lectures));
-
-        if (_Lectures.length == 0) {
-          this.$feedback.warning({
-            title: "Students",
-
-            message: "Lectures might be unavailable",
-
-            duration: 5000
-          });
-        }
-
-        this.isLoading = false;
-      })
-
-      .catch(err => {
-        this.$feedback.error({
-          title: "Error in getting Lecturers",
-
-          message: err.message,
-
-          duration: 10000
-        });
-      });
-    //NEW
-    if (this.isLecture()) {
-      this.isLoading = true;
       this.$api
         .getLectureNotificationModule(
           this.$store.state.cache.cachedUser.user._id,

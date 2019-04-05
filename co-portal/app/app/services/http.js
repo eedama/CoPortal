@@ -264,10 +264,10 @@ export default class API {
     });
   }
 
-  getStudentList() {
+  getStudentsForModule(moduleID) {
     return new Promise((resolve, reject) => {
       http
-        .request(this.makeGet("/s/students/all"))
+        .request(this.makeGet("/s/students/all/for/module/" + moduleID))
         .then(async result => {
           var answer = await this.handleResponse(result);
           if (answer) {

@@ -407,6 +407,7 @@ export default {
         });
     }
   }
+  }
 };
 </script>
 

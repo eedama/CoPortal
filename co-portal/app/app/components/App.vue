@@ -69,13 +69,6 @@ export default {
           auth: ["STUDENT", "ADMIN","LECTURER"]
         },
         {
-          text: "Students",
-          icon: "account-multiple",
-          link: "/student/list",
-          description: "Students registered to the system",
-          auth: ["LECTURER", "ADMIN"]
-        },
-        {
           text: "Lecturers",
           icon: "account-supervisor-circle",
           link: "/lecturer/list",
