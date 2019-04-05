@@ -189,6 +189,8 @@ router.post('/add/new/bulk/modules', async function(req, res) {
         }else{
           failed.push(mmodule.name + " failed");
         }
+      }else{
+        failed.push(results.name +  " " + results.code + " already exists");
       }
     }catch(ex){
       failed.push(ex.message);
