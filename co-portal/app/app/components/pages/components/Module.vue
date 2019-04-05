@@ -102,7 +102,7 @@
                       <Image
                         row="0"
                         col="0"
-                        rowspan="2"
+                        rowSpan="2"
                         verticalAlignment="center"
                         src="res://ic_logo"
                         width="60"
@@ -151,7 +151,7 @@
                           row="0"
                           col="0"
                           class="mdi text-dark-black m-r-20"
-                          rowspan="2"
+                          rowSpan="2"
                           verticalAlignment="center"
                           textAlignment="left"
                           fontSize="35"
@@ -171,7 +171,7 @@
                           col="2"
                           class="font-weight-bold text-dark-black mdi p-x-10 p-b-2"
                           fontSize="30%"
-                          rowspan="2"
+                          rowSpan="2"
                           borderRadius="50"
                           verticalAlignment="center"
                           textAlignment="center"
@@ -361,7 +361,7 @@
                   >
                     <label
                       row="0"
-                      rowspan="3"
+                      rowSpan="3"
                       verticalAlignment="center"
                       textAlignment="center"
                       class="font-weight-bold mdi p-15"
@@ -383,7 +383,7 @@
                       verticalAlignment="center"
                       textAlignment="right"
                       :color="colorLoaded(marked.mark)"
-                      rowspan="2"
+                      rowSpan="2"
                       :textWrap="true"
                       fontSize="40"
                       :text="marked.mark+'%'"
@@ -431,7 +431,7 @@
                     >
                       <label
                         row="0"
-                        rowspan="2"
+                        rowSpan="2"
                         verticalAlignment="center"
                         textAlignment="center"
                         class="font-weight-bold mdi p-15"

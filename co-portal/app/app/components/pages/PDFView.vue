@@ -1,28 +1,28 @@
 <template>
   <page actionBarHidden="true">
     <GridLayout rows="*,auto" columns="*">
-      <PDFView :src="pdfNoteFile"></PDFView>
+      <PDFView :src="$api.getDownloadNotesURL(noteId)" @onLoad="loadedPDF()"></PDFView>
       <ActivityIndicator
-        v-if="!pdfNoteFile"
+        v-show="isDownloadingFile"
         verticalAlignment="center"
         textAlignment="center"
-        :busy="!pdfNoteFile"
+        :busy="isDownloadingFile"
       ></ActivityIndicator>
       <StackLayout row="1">
         <GridLayout rows="auto" columns="*,*">
-          <Ripple col="0" verticalAlignment="center" textAlignment="center">
+          <Ripple class="p-10" col="0" verticalAlignment="center" textAlignment="center">
             <label
-              class="font-weight-bold mdi p-x-10"
+              class="font-weight-bold mdi p-x-25 p-y-10 text-dark-black"
               textAlignment="center"
-              fontSize="45%"
+              fontSize="30%"
               :text="'mdi-download' | fonticon "
             ></label>
           </Ripple>
-          <Ripple col="1" verticalAlignment="center" textAlignment="center">
+          <Ripple class="p-10" col="1" verticalAlignment="center" textAlignment="center">
             <label
-              class="font-weight-bold mdi p-x-10"
+              class="font-weight-bold mdi p-x-25 p-y-10 text-dark-black"
               textAlignment="center"
-              fontSize="45%"
+              fontSize="30%"
               :text="'mdi-share-variant' | fonticon "
             ></label>
           </Ripple>
@@ -37,19 +37,21 @@ const dialogs = require("ui/dialogs");
 var appSettings = require("application-settings");
 
 import * as connectivity from "tns-core-modules/connectivity";
-var fs = require("tns-core-modules/file-system");
 export default {
   data() {
     return {
-      pdfNoteFile: null
+      pdfNoteFile: null,
+      isDownloadingFile: true
     };
   },
   props: ["noteId"],
   mounted() {
-    this.DownloadNotes();
+   // this.DownloadNotes();
   },
   methods: {
-    onLoad() {},
+    loadedPDF() {
+      this.isDownloadingFile = false;
+    },
     pageLoaded() {
       this.$store.commit("refreshCache", {
         db: this.$db,
@@ -62,24 +64,23 @@ export default {
       if (!this.noteId) {
         this.navigate(null);
       }
+      this.isDownloadingFile = true;
       this.$api
         .downloadNotes(this.noteId)
         .then(noteFile => {
+          this.isDownloadingFile = false;
           noteFile = JSON.parse(JSON.stringify(noteFile));
           if (!noteFile || !noteFile.base64StringFile) {
             throw new Error("File can not be downloaded");
           }
+          this.pdfNoteFile = noteFile.base64StringFile;
+
+          alert(this.pdfNoteFile);
+
+          /*
           var documents = fs.knownFolders.documents();
           var path = fs.path.join(documents.path, noteFile.fileName);
           var pdfFile = fs.File.fromPath(path);
-
-          const base64 = require("base64topdf");
-          this.pdfNoteFile = base64.base64Decode(
-            noteFile.base64StringFile,
-            noteFile.fileName
-          );
-
-          alert(this.pdfNoteFile);
 
           pdfFile.writeText(noteFile.base64StringFile).then(
             () => {
@@ -89,8 +90,10 @@ export default {
               alert(error);
             }
           );
+          */
         })
         .catch(err => {
+          this.isDownloadingFile = false;
           this.$feedback.error({
             title: err.message
           });

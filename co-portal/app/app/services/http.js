@@ -668,6 +668,10 @@ export default class API {
       });
   }
 
+  getDownloadNotesURL(noteID){
+    return this.makeGet("/m/download/pdf/file/" + noteID);
+  }
+
   getInternetStatus() {
     return connectivity.getConnectionType();
   }

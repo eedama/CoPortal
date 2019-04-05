@@ -513,4 +513,26 @@ router.get('/download/notes/:notesId', function(req, res) {
 		});
 });
 
+router.get('/download/pdf/file/:notesId',function(req,res){
+	var notesID = req.params.notesId;
+	LectureNote.findById(notesID)
+		.then(note => {
+			if (note == null || !note.file || !note.file.base64StringFile) return res.status(512).send('Unable to find the specified note');
+				const base64 = note.file.base64StringFile.split('base64,');
+				if(!base64 || base64.length != 2 || base64[1].length < 20){
+						throw new Error("PDF file is corrupted, please contact admin");
+				}
+
+				res.writeHead(200, {
+					'Content-Type': 'application/pdf',
+					'Content-Disposition': `attachment; filename="${note.title ? note.title.replace(/ /g,'-') : note.file.fileName}.pdf"`
+				});
+				const download = Buffer.from(base64[1].toString('utf-8'), 'base64');
+				return res.end(download);
+		})
+		.catch(err => {
+			return res.status(512).send(err.message);
+		});
+});
+
 module.exports = router;
