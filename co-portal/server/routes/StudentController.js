@@ -175,48 +175,20 @@ router.get('/all/past/tests/for/:studentId', function (req, res) {
   });
 });
 
-
 router.get("/:id/get", function (req, res) {
   let id = req.params.id;
   if (id == null) {
-    return res.status(404);
-    res.send("Invalid ID > " + id);
+    return res.status(512).send("Invalid ID");
   } else {
     Student.findById(id)
       .populate(['modules'])
       .then(student => {
         if (student == null) {
-          return res.status(404);
-          res.send("No student with id : " + id);
+          return res.status(512).send("No student with id : " + id);
         } else {
           res.json(student);
         }
       });
   }
 });
-
-/**
- * POST methods
- */
-
-router.post("/:text/search", function (req, res) {
-  let txtSearch = req.params.text;
-  if (txtSearch == null || txtSearch.length < 2) {
-    return res.status(404);
-    res.send("Cannot search for - " + txtSearch);
-  } else {
-    Student.find({
-      $text: {
-        $search: new RegExp('^' + txtSearch + '$', "i")
-      }
-    }).then(answer => {
-      if (answer == null || answer.length <= 0) {
-        return res.status(512).send("No results for : " + txtSearch);
-      } else {
-        res.json(answer);
-      }
-    });
-  }
-});
-
 module.exports = router;

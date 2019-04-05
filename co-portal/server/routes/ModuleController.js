@@ -190,7 +190,7 @@ router.post('/add/new/bulk/modules', async function(req, res) {
           failed.push(mmodule.name + " failed");
         }
       }else{
-        failed.push(results + " " + results.name +  " " + results.code + " already exists");
+        failed.push(results.name +  " " + results.code + " already exists");
       }
     }catch(ex){
       failed.push(ex.message);
@@ -205,7 +205,7 @@ router.post('/add/new/bulk/modules', async function(req, res) {
 router.post('/assign/to/lecturer/:lecturerID', function(req, res) {
 	var lecturerID = req.params.lecturerID;
   if(!req.body.modules) return res.status(512).send('Server error : invalid request');
-  
+
 	var lecturerModules = new Array();
 
 	req.body.modules
