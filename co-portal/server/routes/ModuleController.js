@@ -175,7 +175,7 @@ router.post('/add/new/bulk/modules', async function(req, res) {
         name: _module.name,
         code: _module.code,
       });
-      if (results == null){
+      if (!results){
         var mmodule = new Module({
           _id: mongoose.Types.ObjectId(),
           name: _module.name,
@@ -190,7 +190,7 @@ router.post('/add/new/bulk/modules', async function(req, res) {
           failed.push(mmodule.name + " failed");
         }
       }else{
-        failed.push(results.name +  " " + results.code + " already exists");
+        failed.push(results + " " + results.name +  " " + results.code + " already exists");
       }
     }catch(ex){
       failed.push(ex.message);
