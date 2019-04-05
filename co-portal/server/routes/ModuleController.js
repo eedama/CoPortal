@@ -171,9 +171,6 @@ router.post('/add/new/bulk/modules', async function(req, res) {
   var succeded=[],failed=[];
 	for (var _module of modules.filter(m => m)) {
   try {
-    console.log(_module)
-    
-    console.log(_module.name)
       var results = await Module.findOne({
         name: _module.name,
         code: _module.code,
@@ -207,7 +204,8 @@ router.post('/add/new/bulk/modules', async function(req, res) {
 
 router.post('/assign/to/lecturer/:lecturerID', function(req, res) {
 	var lecturerID = req.params.lecturerID;
-
+  if(!req.body.modules) return res.status(512).send('Server error : invalid request');
+  
 	var lecturerModules = new Array();
 
 	req.body.modules
