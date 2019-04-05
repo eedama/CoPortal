@@ -169,7 +169,7 @@ router.post('/add/new/bulk/modules', async function(req, res) {
 	}
 
   var succeded=[],failed=[];
-	for (var _module in modules.filter(m => m)) {
+	for (var _module of modules.filter(m => m)) {
   try {
     console.log(_module)
     
