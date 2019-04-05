@@ -476,8 +476,8 @@ router.post('/add/notes/title/:title/description/:description', function(req, re
 
 			var lecturerNote = new LectureNote({
 				_id: mongoose.Types.ObjectId(),
-				lecturerId: lecturerId, //ForeignKey
-				moduleId: moduleId, //ForeignKey
+				lecturerId: lecturerId,
+				moduleId: moduleId,
 				title: title,
 				description: description,
 				file: file,
