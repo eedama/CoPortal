@@ -192,19 +192,20 @@ export default {
       this.isLoading = true;
       this.txtError = "";
       var hasError = false;
-      this.solutions.map((s, i) => {
-        if (s == null) {
-          hasError = true;
-          this.txtError = "Please provide an answer to this question";
-          this.currentPage = i;
-        }
-      });
-      if (hasError) {
-        this.isLoading = false;
-        return;
-      }
-
+     
       if(!this.timeUp){
+        this.solutions.map((s, i) => {
+          if (s == null) {
+            hasError = true;
+            this.txtError = "Please provide an answer to this question";
+            this.currentPage = i;
+          }
+        });
+        if (hasError) {
+          this.isLoading = false;
+          return;
+        }
+
         var result = await confirm({
           title: "Submit confirmation",
           message: "Are you sure you want to submit?",
