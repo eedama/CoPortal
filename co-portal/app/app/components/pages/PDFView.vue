@@ -1,7 +1,7 @@
 <template>
   <page actionBarHidden="true">
     <GridLayout rows="*,auto" columns="*">
-      <PDFView :src="$api.getDownloadNotesURL(noteId)" @onLoad="loadedPDF()"></PDFView>
+      <PDFView :src="$api.getDownloadNotesURL(noteId)" @load="loadedPDF()"></PDFView>
       <ActivityIndicator
         v-show="isDownloadingFile"
         verticalAlignment="center"
@@ -10,15 +10,7 @@
       ></ActivityIndicator>
       <StackLayout row="1">
         <GridLayout rows="auto" columns="*,*">
-          <Ripple class="p-10" col="0" verticalAlignment="center" textAlignment="center">
-            <label
-              class="font-weight-bold mdi p-x-25 p-y-10 text-dark-black"
-              textAlignment="center"
-              fontSize="30%"
-              :text="'mdi-download' | fonticon "
-            ></label>
-          </Ripple>
-          <Ripple class="p-10" col="1" verticalAlignment="center" textAlignment="center">
+          <Ripple @tap="ShareFile" class="p-10" col="1" verticalAlignment="center" textAlignment="center">
             <label
               class="font-weight-bold mdi p-x-25 p-y-10 text-dark-black"
               textAlignment="center"
@@ -37,6 +29,9 @@ const dialogs = require("ui/dialogs");
 var appSettings = require("application-settings");
 
 import * as connectivity from "tns-core-modules/connectivity";
+import { HandleFile } from 'nativescript-handle-file';
+import * as SocialShare from "nativescript-social-share";
+
 export default {
   data() {
     return {
@@ -44,9 +39,8 @@ export default {
       isDownloadingFile: true
     };
   },
-  props: ["noteId"],
+  props: ["noteId","fileName"],
   mounted() {
-   // this.DownloadNotes();
   },
   methods: {
     loadedPDF() {
@@ -59,6 +53,20 @@ export default {
         appSettings: this.appSettings,
         doc: "admin"
       });
+    },
+    ShareFile(){
+      SocialShare.shareUrl(this.$api.getDownloadNotesURL(this.noteId), this.fileName, "How would you like to share the notes?")
+    },
+    DownloadFile(){
+        let handleFile = new HandleFile();
+        handleFile.open({
+          name :this.fileName,
+          url: this.$api.getDownloadNotesURL(this.noteId),
+          directory: "downloads", // only in android [downloads, pictures, movies, music]
+          tittle: this.fileName // only in android
+        }).then(result => {
+          console.log(result);
+        });
     },
     DownloadNotes() {
       if (!this.noteId) {
@@ -74,23 +82,6 @@ export default {
             throw new Error("File can not be downloaded");
           }
           this.pdfNoteFile = noteFile.base64StringFile;
-
-          alert(this.pdfNoteFile);
-
-          /*
-          var documents = fs.knownFolders.documents();
-          var path = fs.path.join(documents.path, noteFile.fileName);
-          var pdfFile = fs.File.fromPath(path);
-
-          pdfFile.writeText(noteFile.base64StringFile).then(
-            () => {
-              alert("Saved at " + path);
-            },
-            error => {
-              alert(error);
-            }
-          );
-          */
         })
         .catch(err => {
           this.isDownloadingFile = false;

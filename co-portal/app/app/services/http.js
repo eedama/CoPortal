@@ -669,7 +669,7 @@ export default class API {
   }
 
   getDownloadNotesURL(noteID){
-    return this.makeGet("/m/download/pdf/file/" + noteID);
+    return this.makeURL("/m/download/pdf/file/" + noteID);
   }
 
   getInternetStatus() {

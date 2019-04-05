@@ -336,9 +336,12 @@
                           :text="'mdi-file-pdf' | fonticon "
                         ></label>
                         <label
-                          row="2"
                           col="0"
-                          verticalAlignment="bottom"
+                          row="2"
+                          colSpan="3"
+                          :textWrap="true"
+                          verticalAlignment="center"
+                          textAlignment="center"
                           class="h4 text-dark-black"
                           :text="getMoment(note.date).fromNow()"
                         ></label>
@@ -641,7 +644,8 @@ export default {
     },
     DownloadNotes(note) {
       this.navigate("/pdf/view", {
-        noteId: note._id
+        noteId: note._id,
+        fileName: note.title ? note.title.replace(/ /g,'-') + '.pdf' : 'untitled.pdf'
       });
     },
     TakeTest(test) {

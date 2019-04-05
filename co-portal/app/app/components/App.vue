@@ -81,7 +81,7 @@
                 :textWrap="true"
                 class="font-weight-bold text-dark-black"
                 fontSize="18%"
-                :text="$store.state.cache.cachedUser.userType.toLowerCase() + ' at ' + currentSchool"
+                :text="$store.state.cache.cachedUser.userType.toLowerCase() + ' at ' + currentUserSchool"
               ></label>
             </GridLayout>
           </StackLayout>
@@ -140,7 +140,6 @@ export default {
     return {
       msg: "What???",
       loggedIn: false,
-      currentSchool: "",
       connectionType: null,
       notificationsRoute: {
         text: "My profile",
@@ -209,8 +208,12 @@ export default {
       ]
     };
   },
+  computed:{
+    currentUserSchool(){
+      this. appSettings.getString("CurrentSchoolName");
+    }
+  },
   mounted() {
-    this.currentSchool = appSettings.getString("CurrentSchoolName");
     this.$store.commit("refreshCache", {
       db: this.$db,
       appSettings: this.appSettings,
