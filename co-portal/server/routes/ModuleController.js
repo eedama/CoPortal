@@ -472,7 +472,7 @@ router.post('/add/notes/title/:title/description/:description', function(req, re
 		.then(module => {
 			if (module == null) new Error('Module does not exist');
 			if (module.lecturers.indexOf(lecturerId) < 0 && lecturerId != null)
-				new Error('Lecturer does not exist / Is not incharge of this module');
+				new Error('Lecturer does not exist or he/she is not incharge of this module');
 
 			var lecturerNote = new LectureNote({
 				_id: mongoose.Types.ObjectId(),
