@@ -171,6 +171,9 @@ router.post('/add/new/bulk/modules', async function(req, res) {
   var succeded=[],failed=[];
 	for (var _module in modules.filter(m => m)) {
   try {
+    console.log(_module)
+    
+    console.log(_module.name)
       var results = await Module.findOne({
         name: _module.name,
         code: _module.code,
