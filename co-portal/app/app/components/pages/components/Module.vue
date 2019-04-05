@@ -362,8 +362,8 @@
                       :color="colorLoaded(marked.mark)"
                       rowspan="2"
                       :textWrap="true"
-                      fontSize="45"
-                      :text="marked.mark"
+                      fontSize="40"
+                      :text="marked.mark+'%'"
                     ></label>
                     <label
                       row="2"
