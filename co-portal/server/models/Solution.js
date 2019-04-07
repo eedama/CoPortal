@@ -52,6 +52,7 @@ SolutionSchema.pre("save", function (next) {
                     if (answer.answer == solution.answer) {
                         mark++;
                     }
+                    answer.correctAnswer = solution.answer;
                 });
                 this.mark = mark;
 
