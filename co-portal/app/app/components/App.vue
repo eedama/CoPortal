@@ -210,7 +210,7 @@ export default {
   },
   computed:{
     currentUserSchool(){
-      this. appSettings.getString("CurrentSchoolName");
+     return  this.appSettings.getString("CurrentSchoolName");
     }
   },
   mounted() {
