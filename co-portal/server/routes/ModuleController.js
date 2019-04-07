@@ -64,9 +64,22 @@ router.get('/modules/all/for/:userID/:userType', function(req, res) {
 			path: 'notes',
 			select: 'title description type date',
 		})
-		.then(modules => {
+		.then(async modules => {
 			if (modules == null) return res.status(512).send('No modules where found');
 			// TODO: to speed up ,,, add this on the find
+			
+			for(var _module of modules){
+					if(_module.questionaires){
+						for(var questionaire of _module.questionaires){		
+							var solutions = await Solution.find({
+								studentId: userID,
+								questionaireId: questionaire._id,
+							});
+							questionaire.totalAttempts = solutions ?  solutions.length : attempts;
+						}
+					}
+			}
+
 			modules = modules.filter(
 				m =>
 					userType == 'ADMIN' ||
@@ -94,7 +107,7 @@ router.get('/marksheet/for/:userID/moduleID/:moduleID', function(req, res) {
 		}
 		return highest;
 	}
-	
+
 	MarkSheet.find({
 		moduleID,
 		removed: false,

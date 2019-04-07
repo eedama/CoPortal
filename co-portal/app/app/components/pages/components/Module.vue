@@ -456,7 +456,7 @@
                         verticalAlignment="center"
                         :textWrap="true"
                         fontSize="15%"
-                        :text="test.questions.length + ' Questions'"
+                        :text="test.totalAttempts + '/' + test.attemptLimit + ' attempts'"
                       ></label>
                       <label
                         row="1"
@@ -658,6 +658,7 @@ export default {
       });
     },
     TakeTest(test) {
+
       this.navigate("/take/test", {
         dbQuestionaire: test
       });

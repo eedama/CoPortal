@@ -22,7 +22,11 @@ const QuestionaireSchema = new mongoose.Schema({
     },
     attemptLimit: {
         type: Number,
-        default: 1
+        default:1
+    },
+    totalAttempts:{ //This variable is never saved to the database
+        default:0,
+        type:Number
     },
     date: {
         type: Date,
