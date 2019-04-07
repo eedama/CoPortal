@@ -87,16 +87,9 @@ export default {
         results = JSON.parse(JSON.stringify(results));
         this.total  = results.mark +"/"+results.answers.length;
         results.answers.forEach(solution => {
-          var isAnswer = false;
-          solution.question.answers.forEach(answer =>
-          {
-            if(answer === solution.answer)
-            {
-              isAnswer = true;
-            }
-          })
-          var Mark = {question : solution.question.title,
-          correct : isAnswer}
+  var Mark = {question : solution.question.title,
+          correct : (solution.correctAnswer === solution.answer)
+          }
           this.Solution.push(Mark)
         });
 
