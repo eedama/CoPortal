@@ -507,6 +507,15 @@ export default {
       )
       .then(marks => {
         this.currentMarks = JSON.parse(JSON.stringify(marks));
+        if(this.currentMarks)
+        {
+          this.currentMarks.forEach(mark =>
+          {
+            mark.mark = Math.floor((mark.mark/mark.total)*100);
+          })
+        }
+        console.log("tag",this.currentMarks)
+        
         if (marks.length == 0) {
           this.$feedback.warning({
             title: "Marks",
