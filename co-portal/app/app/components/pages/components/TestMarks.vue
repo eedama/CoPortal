@@ -7,15 +7,49 @@
             row="0"
             verticalAlignment="center"
             textAlignment="center"
-            class="p-15 text-dark-black"
+            class="p-15 text-dark-black font-weight-bold"
+            fontSize="30%"
+            text="Results"
+          ></label>
+            <label
+            row="1"
+            verticalAlignment="center"
+            textAlignment="center"
+            class="text-primary font-weight-bold"
             fontSize="20%"
-            text="Davis Mudau"
+            :text="total"
           ></label>
         </GridLayout>
       </StackLayout>
+       <ScrollView v-if="!isLoading" row="1">
+        <WrapLayout>
       <StackLayout row="1">
-        <Label text="Davis Mulaudzi"></Label>
+          <CardView v-for="(solution,i) in Solution" :key="i" elevation="5" margin="10">
+             
+                <GridLayout class="p-5" rows="auto,auto" columns="auto,*">
+                  <label
+                    row="0"
+                    class="text-dark-black m-10 font-weight-bold"
+                    :textWrap="true"
+                    fontSize="17%"
+                    colSpan="2"
+                    :text="solution.question"
+                  ></label>
+                   <label
+                  row="1"
+                  col="1"
+                  class="mdi text-dark-black font-weight-bold"
+                  verticalAlignment="center"
+                  :color="colorLoaded(solution.correct)"
+                  textAlignment="right"
+                  fontSize="35"
+                  :text="iconLoaded(solution.correct) | fonticon"
+                ></label>
+                </GridLayout>
+            </CardView>
       </StackLayout>
+        </WrapLayout>
+       </ScrollView>
     </GridLayout>
   </page>
 </template>
@@ -30,12 +64,13 @@ export default {
     return {
       txtFeedback: "",
       currentPage: 0,
-      Solution: null,
+      Solution:[],
       feedbacks: [],
       addingFeedBack: false,
       autoRefreshChats: false,
       refreshTimer: "",
-      isLoading: false
+      isLoading: false,
+      total : ""
     };
   },
   mounted() {
@@ -49,15 +84,23 @@ export default {
         if (results == null) {
           return;
         }
-        this.Solution = JSON.parse(JSON.stringify(results));
-        alert(JSON.stringify(results));
-        if (
-          this.Solution == null ||
-          this.Solution.answers == null ||
-          this.Solution.answers.length < 1
-        ) {
-          throw new Error("Unable to retreive the solution , try again later");
-        }
+        results = JSON.parse(JSON.stringify(results));
+        this.total  = results.mark +"/"+results.answers.length;
+        results.answers.forEach(solution => {
+          var isAnswer = false;
+          solution.question.answers.forEach(answer =>
+          {
+            if(answer === solution.answer)
+            {
+              isAnswer = true;
+            }
+          })
+          var Mark = {question : solution.question.title,
+          correct : isAnswer}
+          this.Solution.push(Mark)
+        });
+
+       
       })
       .catch(err => {
          this.isLoading = false;
@@ -69,7 +112,23 @@ export default {
       });
   },
   props: ["solutionId"],
-  methods: {}
+  methods: {
+   colorLoaded(marked) {
+      if (!marked) {
+        return "darkred";
+      } else if (marked) {
+        return "darkgreen";
+      }
+    },
+    iconLoaded(marked)
+    {
+       if (marked) {
+        return "mdi-check";
+      } else if (!marked) {
+        return "mdi-window-close";
+      }
+    }
+  }
 };
 </script>
 
