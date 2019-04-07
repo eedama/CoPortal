@@ -83,7 +83,18 @@ router.get('/modules/all/for/:userID/:userType', function(req, res) {
 router.get('/marksheet/for/:userID/moduleID/:moduleID', function(req, res) {
 	var userID = req.params.userID;
 	var moduleID = req.params.moduleID;
-
+	function getHighest(studentMarks){
+		var highest = 0;
+		if(studentMarks){
+			studentMarks.forEach(mark =>{
+				if(mark > highest){
+					highest = mark;
+				}
+			});
+		}
+		return highest;
+	}
+	
 	MarkSheet.find({
 		moduleID,
 		removed: false,
@@ -101,7 +112,7 @@ router.get('/marksheet/for/:userID/moduleID/:moduleID', function(req, res) {
 					id: m.id,
 					title: m.title,
 					date: m.date,
-					mark: m.studentMarks.filter(sm => sm.studentID == userID)[0].mark,
+					mark: getHighest(m.studentMarks.filter(sm => sm.studentID == userID).map(m => m.mark)),
 					total: m.total,
 					studentID: userID,
 					lecturerID: m.lecturerID,
