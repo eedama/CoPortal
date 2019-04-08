@@ -171,13 +171,6 @@ export default {
           auth: ["ADMIN", "LECTURER", "STUDENT"]
         },
         {
-          text: "Assessment results",
-          icon: "checkbox-multiple-marked-circle-outline",
-          link: "/marks/sheet",
-          description: "Test results and marksheets",
-          auth: ["LECTURER", "ADMIN"]
-        },
-        {
           text: "Timetable",
           icon: "table",
           link: "/timetable/view",
