@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="row">
-      <div v-show="!printing" class="col s2 m3 row">
+      <div v-show="!printing" class="col s12 m3 row">
         <div class="col s12 center">
           <md-subheader><label class="markValue">Modules</label></md-subheader>
         </div>
@@ -26,7 +26,7 @@
           </div>
         </div>
       </div>
-      <div :class="{'s12 m12':printing}" class="col s10 m9 row center-align">
+      <div :class="{'s12 m12':printing}" class="col s12 m9 row center-align">
         <md-card class="white col s12 m10 offset-m1 center">
           <md-card-header>
             <md-card-header-text>
@@ -107,9 +107,6 @@
                       </md-table-cell>
                     </md-table-row>
                   </md-table>
-                  <md-card-actions v-show="!printing">
-                    <md-button class="btn-flat">Save changes</md-button>
-                  </md-card-actions>
                 </div>
               </div>
               <div v-if="selectedMarkSheetAction == 1" class="row" style="border:3px solid #eeeeee">
@@ -126,6 +123,13 @@
                       <md-icon>title</md-icon>
                       <label>Title</label>
                       <md-input v-model="markSheet.title"></md-input>
+                    </md-field>
+                  </md-list-item>
+                  <md-list-item>
+                    <md-field>
+                      <md-icon>sort</md-icon>
+                      <label>Total</label>
+                      <md-input v-model="markSheet.total"></md-input>
                     </md-field>
                   </md-list-item>
                   <md-list-item>
@@ -229,6 +233,7 @@ export default {
       markSheet: {
         id: "",
         title: "",
+        total: 100,
         type: "PracticalTest",
         moduleID: "",
         lecturerID: "",
@@ -238,30 +243,6 @@ export default {
       //End
       search: null,
       searched: [],
-      addingRecord: false,
-      markSheetIds: [
-        214,
-        2121,
-        312,
-        521,
-        432,
-        4543,
-        643,
-        6435,
-        15,
-        2134,
-        235,
-        346,
-        4575,
-        46,
-        235,
-        32532,
-        634654,
-        865,
-        7634,
-        4523,
-        56236
-      ],
       users: [],
       // end
       txtSearch: "",
@@ -422,9 +403,11 @@ export default {
           }
         )
         .then(results => {
-          this.sheets.filter(s => s["_id"] == results.data["_id"]).map(v => {
-            return results.data;
-          });
+          this.sheets
+            .filter(s => s["_id"] == results.data["_id"])
+            .map(v => {
+              return results.data;
+            });
           this.SelectMarkSheetById(results.data);
           this.searchOnTable();
         })

@@ -12,8 +12,10 @@ import LecturerList from '@/components/Lecturer/LecturerList'
 import ModuleView from '@/components/Module/ModuleView'
 import AllMarks from '@/components/Marks/AllMarks'
 import MarkSheet from '@/components/Marks/MarkSheet'
-
+import Survey from '@/components/Survey/Survey'
+import Report from '@/components/Report/Report'
 import AddStudentTemp from '@/components/admin/AddStudentTemp'
+import EditStudent from '@/components/Student/EditStudent'
 
 Vue.use(Router)
 
@@ -85,6 +87,16 @@ const router = new Router({
       },
       props: true,
       component: StudentList
+    },
+    {
+      path: '/student/update',
+      name: 'UpdateStudent',
+      meta: {
+        authLevel: ['ADMIN', 'LECTURER', 'STUDENT'],
+        showNav: true
+      },
+      props: true,
+      component: EditStudent
     },
     /**
      * Student routes END
@@ -168,6 +180,24 @@ const router = new Router({
       },
       props: true,
       component: MarkSheet
+    }, {
+      path: '/survey',
+      name: 'Survey',
+      meta: {
+        authLevel: null,
+        showNav: false
+      },
+      props: true,
+      component: Survey
+    }, {
+      path: '/Student/Report',
+      name: 'Report',
+      meta: {
+        authLevel: ['LECTURER', 'ADMIN'],
+        showNav: false
+      },
+      props: true,
+      component: Report
     }
     /**
      * Marks routes END

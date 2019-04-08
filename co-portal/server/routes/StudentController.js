@@ -19,11 +19,47 @@ import Questionaire from "../models/Questionaire";
 router.post("/delete/:studentID", function (req, res) {
   var studentID = req.params.studentID;
   Student.findById(studentID).then(student => {
+    if (!student) return res.status(512).send("Student does not exist");
     student.active = false;
     student.removed = true;
     student.save(function (err) {
       if (err) return res.status(512).send("Server error : " + err.message);
       res.send(studentID);
+    })
+  }).catch(err => {
+    return res.status(512).send("Server error : " + err.message);
+  });
+
+});
+
+router.post("/add/parent/for/:studentID", function (req, res) {
+  var studentID = req.params.studentID;
+  var _parent = req.body.parent;
+
+  Student.findById(studentID).then(student => {
+    if (!student) return res.status(512).send("Student does not exist");
+    if (!_parent) return res.status(512).send("Invalid parent details provided");
+    var parent = {
+      surname: _parent.surname,
+      name: _parent.name,
+      contactNumbers: _parent.numbers,
+      email: _parent.email,
+      relationship: _parent.relationship && _parent.relationship.toUpperCase()
+    };
+
+    if (!student.parents) {
+      student.parents = [];
+    }
+
+    if (student.parents.find(p => p.surname == parent.surname && p.name == parent.name && p.relationship == parent.relationship)) {
+      return res.status(512).send(`${parent.surname} ${parent.name} is already a ${parent.relationship} of ${student.username}.`);
+    } else {
+      student.parents.push(parent);
+    }
+
+    student.save(function (err) {
+      if (err) return res.status(512).send("Server error : " + err.message);
+      return res.send(`Added ${parent.surname} ${parent.name} as a ${parent.relationship} of ${student.username}.`);
     })
   }).catch(err => {
     return res.status(512).send("Server error : " + err.message);
@@ -139,48 +175,20 @@ router.get('/all/past/tests/for/:studentId', function (req, res) {
   });
 });
 
-
 router.get("/:id/get", function (req, res) {
   let id = req.params.id;
   if (id == null) {
-    return res.status(404);
-    res.send("Invalid ID > " + id);
+    return res.status(512).send("Invalid ID");
   } else {
     Student.findById(id)
       .populate(['modules'])
       .then(student => {
         if (student == null) {
-          return res.status(404);
-          res.send("No student with id : " + id);
+          return res.status(512).send("No student with id : " + id);
         } else {
           res.json(student);
         }
       });
   }
 });
-
-/**
- * POST methods
- */
-
-router.post("/:text/search", function (req, res) {
-  let txtSearch = req.params.text;
-  if (txtSearch == null || txtSearch.length < 2) {
-    return res.status(404);
-    res.send("Cannot search for - " + txtSearch);
-  } else {
-    Student.find({
-      $text: {
-        $search: new RegExp('^' + txtSearch + '$', "i")
-      }
-    }).then(answer => {
-      if (answer == null || answer.length <= 0) {
-        return res.status(512).send("No results for : " + txtSearch);
-      } else {
-        res.json(answer);
-      }
-    });
-  }
-});
-
 module.exports = router;

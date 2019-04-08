@@ -61,3 +61,5 @@ typings/
 .next
 
 co-portal/server/dist/
+
+/co-portal/server/firebase_service_account.json

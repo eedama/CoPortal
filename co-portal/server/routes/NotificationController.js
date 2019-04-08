@@ -8,6 +8,8 @@ import Lecturer from "../models/Lecturer";
 import Student from "../models/Student";
 import Announcement from "../models/Announcement";
 import Module from "../models/Module";
+import FCM from '../services/FirebaseManager';
+import helper from '../services/Helper';
 
 /*
   TODO : Add admin
@@ -17,7 +19,53 @@ import Module from "../models/Module";
                 - Notifications sent
                 - 
 */
+router.post("/test/push/notification", function (req, res) {
+  var deviceToken = req.body.token;
+  var payload = {
+    notification: {
+      title: "Testing push!!",
+      body: "This is the body of the push"
+    },
+    data: {
+      link: "/home",
+      props: JSON.stringify({
+        device_token: deviceToken
+      })
+    }
+  };
+  FCM.sendToDevice(deviceToken, payload)
+    .then(response => {
+      return res.json(response);
+    })
+    .catch(err => {
+      return res.status(512).send(err);
+    });
+});
 
+router.post("/push/notification/to/:userID", function (req, res) {
+  var userID = req.params.userID;
+  var notification = req.body.notification;
+  var data = req.body.data;
+  var link = req.body.link;
+  var props = req.body.props;
+
+  if (!notification) {
+    notification = {
+      title: "Testing push!!",
+      body: "This is the body of the push"
+    };
+  }
+
+  FCM.sendToUserSimple(userID, notification.title, notification.body, link, props)
+    .then(response => {
+      return res.json(response);
+    })
+    .catch(err => {
+      return res.status(512).send(err);
+    });
+});
+
+// This is used on the Website and it is overloaded soo null ModuleId returns all the global notifications
 router.post("/announcements/get/for/:userID", function (req, res) {
   var userID = req.params.userID;
   var userType = req.body.userType;
@@ -54,6 +102,43 @@ router.post("/announcements/get/for/:userID", function (req, res) {
     });
 });
 
+// This is used on the App to get all student notifications
+router.get("/announcements/get/all/for/student/:userID", function (req, res) {
+  var userId = req.params.userID;
+
+  Student.findById(userId).then(user => {
+    if (user == null) return res.status(512).send("User was not found.");
+    if (!user.modules) {
+      user.modules = [null];
+    } else {
+      user.modules.push(null);
+    }
+    Announcement.find({
+      removed: false,
+      moduleId: user.modules
+    }).
+    populate({
+        path: 'moduleId',
+        select: '_id code name'
+      })
+      .then(announcements => {
+        if (announcements == null) return res.status(512).send("No announcements where found");
+        announcements = announcements.filter(a => a.deletedBy.filter(deleted => deleted == userId).length == 0)
+
+        announcements.forEach(element => {
+          element.seenBy = undefined;
+          element.deletedBy = undefined;
+        });
+        announcements.reverse();
+        return res.json(announcements);
+      }).catch(err => {
+        return res.status(512).send("Unable to retrieve the notifications, Try again later.");
+      });
+  }).catch(err => {
+    return res.status(512).send("Unable to retrieve the user, Try again later.");
+  });
+});
+
 router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", function (req, res) {
   var moduleID = req.params.moduleID;
   var userType = req.params.userType;
@@ -73,11 +158,25 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
     });
     Module.findById(moduleID).then(m => {
       if (m == null && moduleID != null) return res.status(512).send("No modules where found");
-      console.log(m);
       Lecturer.findById(userId).then(l => {
         if (l == null && userId != null) return res.status(512).send("No lecturer was found");
         announcement.save(function (err) {
           if (err) return res.status(512).send("Server error : " + err.message);
+          if (m) {
+            m.students.forEach(_student => {
+              FCM.sendToUserSimple(_student, announcement.title, announcement.message);
+            });
+          } else {
+            Student.find({
+              removed: false
+            }).then(students => {
+              if (students) {
+                students.forEach(_student => {
+                  FCM.sendToUserSimple(_student, announcement.title, announcement.message);
+                });
+              }
+            })
+          }
           res.json(announcement);
         });
       }).catch(err => {
