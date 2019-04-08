@@ -8,6 +8,11 @@ import Student from "../models/Student";
 import Lecturer from "../models/Lecturer";
 import Module from "../models/Module";
 import MarkSheet from "../models/MarkSheet";
+import Report from "../models/Report";
+import SMSProvider from "../services/SMSProvider"
+import EmailProvider from "../services/EmailProvider"
+const smsProvider = new SMSProvider();
+const emailProvider = new EmailProvider();
 
 /*
   TODO: Get one lecturer - DONE
@@ -319,12 +324,13 @@ router.post("/sheet/add", function (req, res) {
     req.body.markSheet.type = 'UNKNOWN';
   }
   if (!req.body.markSheet.date) {
-    req.body.markSheet.date = Date.now;
+    req.body.markSheet.date = Date.now();
   }
   var markSheet = new MarkSheet({
     _id: mongoose.Types.ObjectId(),
     id: req.body.markSheet.id,
     title: req.body.markSheet.title,
+    total: req.body.markSheet.total,
     type: req.body.markSheet.type.toUpperCase(),
     date: req.body.markSheet.date
   });
@@ -366,19 +372,15 @@ router.post("/sheet/update/mark/by/:lecturerID", function (req, res) {
   var sheetID = req.body.markSheetID;
   var studentID = req.body.studentID;
   var mark = req.body.mark;
-  MarkSheet.findOne({
-    lecturerID: lecturerID,
-    '_id': sheetID
-  }).then(sheet => {
-    if (sheet == null) return res.status(512).send("Marksheet does not exist");
-    var marks = sheet.studentMarks.filter(s => s.studentID == studentID);
-    if (!marks || marks.length == 0) {
+  MarkSheet.findById(sheetID).then(sheet => {
+    if (sheet == null || sheet.lecturerID != lecturerID) return res.status(512).send("Marksheet does not exist");
+    if (sheet.studentMarks.filter(s => s.studentID == studentID).length == 0) {
       sheet.studentMarks.push({
-        studentID: studentID,
-        mark: mark
+        studentID,
+        mark
       })
     } else {
-      sheet.studentMarks.filter(s => s.studentID == studentID)[0].marks = marks;
+      sheet.studentMarks.filter(s => s.studentID == studentID)[0].mark = mark;
     }
     sheet.save(function (err) {
       if (err)
@@ -388,5 +390,81 @@ router.post("/sheet/update/mark/by/:lecturerID", function (req, res) {
   }).catch(err => {
     return res.status(512).send("Server error: " + err.message);
   });
+});
+
+router.post("/report/student", function (req, res) {
+  var lecturerID = req.params.lecturerID;
+  var subject = req.body.subject;
+  var studentID = req.body.studentID;
+  var message = req.body.message;
+  var html = req.body.html;
+  var method = req.body.method && req.body.method.toUpperCase();
+  if (method != 'EMAIL') {
+    method = "SMS";
+  }
+
+  var report = new Report({
+    _id: mongoose.Types.ObjectId(),
+    studentId: studentID,
+    lecturerId: lecturerID,
+    method: method,
+    subject: subject,
+    message: message,
+    html: html,
+    parents: new Array()
+  })
+
+  Student.findById(report.studentId).then(student => {
+    if (!student) return res.status(512).send("Student does not exist");
+    if (!student.parents) return res.status(512).send("Student does not have any parent registered to the system.");
+    student.parents.filter(p => p.email).forEach(async parent => {
+      var status = 'NOTSENT';
+      if (report.method == 'SMS' && parent.contactNumbers) {
+        var msg = `Hello, ${parent.surname} ${parent.name} this is a message from coportal, in relation to your child ${student.surname} ${student.firstname}.
+        ${ report.message }
+        kind regards
+        ${ report.subject } Lecturer.
+        `;
+        var smsResponse = await smsProvider.sendSMS(parent.contactNumbers, msg);
+        if (smsResponse) status = 'SMSSENT';
+      }
+      var emailResponse = await emailProvider.sendEmail(parent.email, report.subject, report.html);
+      if (emailResponse && status == 'SMSSENT') {
+        status = 'SMSANDEMAILSENT';
+      } else if (emailResponse) {
+        status = 'EMAILSENT';
+      }
+      report.parents.push({
+        _id: parent._id,
+        status: status
+      });
+      report.markModified("parents");
+      if (report.parents.length > 0) {
+        report.status = `Report was sent to ${report.parents.length} parents , ${report.parents.filter(p => p.status == 'SMSSENT').length} via sms and ${report.parents.filter(p => p.status == 'EMAILSENT').length} via email`;
+      } else {
+        report.status = "Report was not sent to any parent";
+      }
+      report.save(function (err) {
+        if (err) return res.status(512).send(err);
+        return res.send("Report successfully saved");
+      });
+    });
+
+    report.save(function (err) {
+      if (err) return res.status(512).send(err);
+      return res.send("Report successfully saved");
+    });
+  }).catch(err => {
+    return res.status(512).send(err);
+  });
+
+});
+
+router.get("/get/all/reports", function (req, res) {
+  Report.find({}).then(reports => {
+    return res.json(reports);
+  }).catch(err => {
+    return res.status(512).send(err);
+  })
 });
 module.exports = router;

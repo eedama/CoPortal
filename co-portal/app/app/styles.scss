@@ -1,0 +1,40 @@
+// NativeScript core theme
+// @see https://docs.nativescript.org/ui/theme
+@import '~nativescript-theme-core/scss/dark';
+
+// Override variables here
+
+@import '~nativescript-theme-core/scss/index';
+
+// Global SCSS styling
+// @see https://docs.nativescript.org/ui/styling
+@import 'assets/variables';
+
+.mdi {
+    font-family: "Material Design Icons",
+        "materialdesignicons";
+}
+
+.bg-dark-black {
+    background-color: $darkBlackColor;
+}
+
+.bg-light-black {
+    background-color: $lightBlackColor;
+}
+
+.bg-white {
+    background-color: $whiteColor;
+}
+
+.text-dark-black {
+    color: $darkBlackColor;
+}
+
+.text-light-black {
+    color: $lightBlackColor;
+}
+
+.text-white {
+    color: $whiteColor;
+}

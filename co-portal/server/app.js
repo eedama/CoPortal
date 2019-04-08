@@ -6,6 +6,7 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 
 var app = express();
+require('dotenv').config();
 
 import mongoose, {
     mongo
@@ -17,6 +18,7 @@ import moduleController from "./routes/ModuleController";
 import accountController from "./routes/AccountController";
 import notificationController from "./routes/NotificationController";
 import surveyController from "./routes/SurveyController";
+import rootController from "./routes/RootController";
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -42,15 +44,14 @@ app.use(function(req, res, next) {
 });
 
 mongoose
-    .connect("mongodb://localhost:27017/CoportalGPLiveDB?authSource=admin", {
+    .connect(`mongodb://${process.env.DB_ADDRESS}:${process.env.DB_PORT}/${process.env.DB_NAME}?authSource=admin`, {
         auth: {
-            user: "admin",
-            password: "Mulavhelesi@1"
+            user: process.env.DB_USERNAME,
+            password: process.env.DB_PASSWORD
         },
-        useNewUrlParser: true,
         reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
-        reconnectInterval: 500, // Reconnect every 500ms
-        dbName: "CoportalGPLiveDB"
+        reconnectInterval: 600, // Reconnect every 500ms
+        dbName: process.env.DB_NAME
     })
     .then(answer => {
         console.log("Successfully connected to MONGO!");
@@ -63,6 +64,7 @@ app.use("/m", moduleController);
 app.use("/acc", accountController);
 app.use("/n", notificationController);
 app.use("/survey", surveyController);
+app.use("/", rootController);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {

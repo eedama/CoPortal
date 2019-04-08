@@ -73,13 +73,12 @@
               <th>Description</th>
               <th>Lecturers</th>
               <th>Total students</th>
-              <th>Total tests</th>
-              <th>More details</th>
+              <th>Total online tests</th>
             </tr>
           </thead>
   
-          <tbody>
-            <tr v-for="(module,i) in filteredModules" :key="i">
+          <tbody class="row">
+            <tr  v-on:click="goToModule(module._id)" class="pointer col-xs-12" v-for="(module,i) in filteredModules" :key="i">
               <td>{{ module.name }}</td>
               <td>{{ module.code }}</td>
               <td>{{ module.description }}</td>
@@ -88,9 +87,8 @@
                   <p>{{ lecturer.lastname }} {{ lecturer.firstname }}</p>
                 </a>
               </td>
-              <td><a class="pointer">{{ module.students.length }}</a></td>
-              <td><a class="pointer">{{ module.questionaires.length }}</a></td>
-              <td><a class="pointer btn black" v-on:click="goToModule(module._id)">View</a></td>
+              <td><a class="pointer">{{ module.students.length }} students</a></td>
+              <td><a class="pointer">{{ module.questionaires.length }} online tests</a></td>
             </tr>
           </tbody>
         </table>

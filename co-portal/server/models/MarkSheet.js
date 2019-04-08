@@ -23,6 +23,7 @@ const MarkSheetSchema = new mongoose.Schema({
         },
         mark: Number
     }],
+    total: Number,
     type: {
         type: String,
         enum: ['PRACTICALTEST', 'THEORYTEST', 'HOMECLASSTEST', 'EXAM', 'ONLINETEST', 'UNKNOWN'],
