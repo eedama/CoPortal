@@ -75,7 +75,7 @@ router.get('/modules/all/for/:userID/:userType', function(req, res) {
 								studentId: userID,
 								questionaireId: questionaire._id,
 							});
-							questionaire.totalAttempts = solutions ?  solutions.length : attempts;
+							questionaire.totalAttempts = solutions ?  solutions.length : 0;
 						}
 					}
 			}
