@@ -658,10 +658,15 @@ export default {
       });
     },
     TakeTest(test) {
-
-      this.navigate("/take/test", {
-        dbQuestionaire: test
-      });
+      if(test.totalAttempts < test.attemptLimit){
+        this.navigate("/take/test", {
+          dbQuestionaire: test
+        });
+      }else{
+        this.$feedback.warning({
+          title:'You have exceed your ' + test.attemptLimit + ' attempts'
+        });
+      }
     },
     ViewMarks(questionaireId, questionaireName) {
       console.log("g50", questionaireId);
