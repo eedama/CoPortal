@@ -1,7 +1,7 @@
 <template>
   <page actionBarHidden="true">
     <GridLayout v-if="currentModule" rows="auto,*" columns="*">
-      <StackLayout v-if="!isKeyboardShowing" row="0">
+      <StackLayout row="0">
         <GridLayout rows="auto,auto" columns="*">
           <label
             row="0"
@@ -511,8 +511,12 @@ export default {
         {
           this.currentMarks.forEach(mark =>
           {
-            mark.mark = Math.floor((mark.mark/mark.total)*100);
-          })
+            try{
+              mark.mark = Math.floor((mark.mark/mark.total)*100);
+            }catch(ex){
+              mark.mark = '-';
+            }
+          });
         }
         console.log("tag",this.currentMarks)
         
@@ -669,7 +673,6 @@ export default {
       }
     },
     ViewMarks(questionaireId, questionaireName) {
-      console.log("g50", questionaireId);
       let questionaire = {
         title: questionaireName,
         _id: questionaireId

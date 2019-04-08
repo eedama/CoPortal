@@ -15,7 +15,11 @@ const SolutionSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'Student'
     },
-    answers: Array,
+    answers: [{
+        question : Object,
+        answer:String,
+        correctAnswer : String
+    }],
     mark: Number,
     feedbacks: Array,
     isMemo: {
@@ -46,13 +50,14 @@ SolutionSchema.pre("save", function (next) {
             .then(s => {
                 if (s == null) throw new Error("Test does not have a memorandum");
 
-                this.answers.forEach((answer, i) => {
+                this.answers = this.answers.filter(a => a.answer).map(answer => {
                     let solution = s.answers.find(v => v.question.id == answer.question.id);
                     if (solution == null) throw new Error("Test does not have a memorandum");
                     if (answer.answer == solution.answer) {
                         mark++;
                     }
                     answer.correctAnswer = solution.answer;
+                    return answer;
                 });
                 this.mark = mark;
 

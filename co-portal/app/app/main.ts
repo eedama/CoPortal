@@ -96,11 +96,6 @@ Vue.mixin({
       previousPage: null
     };
   },
-  computed:{
-    isKeyboardShowing(){
-      return require('nativescript-keyboardshowing').isShowing()
-    }
-  },
   beforeCreate() {
     if (!this.$firebase || !this.$firebase.initialized) {
       master

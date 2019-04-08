@@ -36,7 +36,7 @@
       return {
         introTxt: "Digitalize your business and keep track of all your earnings.",
         modules: [],
-        adKeywords: ["school", "study", "university", "college", "job", "work"]
+        adKeywords: ["school", "study", "university", "college", "job", "work","money","free"]
       };
     },
     mounted() {
@@ -53,7 +53,6 @@
         .getModuleInformation(this.$store.state.cache.cachedUser.user._id)
         .then(_modules => {
           _modules = JSON.parse(JSON.stringify(_modules));
-            /*
           if (_modules.length == 0) {
             this.$feedback.warning({
               title: "Modules",
@@ -62,7 +61,7 @@
             });
           } else {
             _modules.forEach(m => {
-              this.adKeywords.push(m.name);
+              this.adKeywords.unshift(m.name);
             })
           }
           const testing = this.TNS_ENV !== "production";
@@ -94,9 +93,6 @@
               this.isLoading = false;
               this.modules = _modules;
           }
-          */
-            this.isLoading = false;
-            this.modules = _modules;
         })
         .catch(err => {
           this.$feedback.error({
@@ -116,10 +112,10 @@
           doc: "admin"
         });
       },
-      goToModule(module) {
+      goToModule(_module) {
         this.navigate(
           "/module/view", {
-            module: module
+            module: _module
           },
           null
         );
