@@ -210,7 +210,7 @@ export default {
   },
   computed:{
     currentUserSchool(){
-     return  this.appSettings.getString("CurrentSchoolName");
+     return appSettings.getString("CurrentSchoolName");
     }
   },
   mounted() {
@@ -219,8 +219,17 @@ export default {
       appSettings: this.appSettings,
       api: this.$api
     });
-
-    connectivity.startMonitoring(conn => {
+    try{
+    this.$firebase.admob.hideBanner().then(() =>{
+      console.log('Banner_hidden',true);
+    }).catch(err =>{
+      console.log('Banner_hidden',err);
+    });
+    }catch(ex){
+      console.log('Banner_hidden',ex);
+    }
+   
+   connectivity.startMonitoring(conn => {
       if (this.connectionType == 0 && conn > 0) {
         this.$feedback.success({
           title: "Back online",

@@ -52,21 +52,21 @@
       this.$api
         .getModuleInformation(this.$store.state.cache.cachedUser.user._id)
         .then(_modules => {
-          this.modules = JSON.parse(JSON.stringify(_modules));
-  
-          if (this.modules.length == 0) {
+          _modules = JSON.parse(JSON.stringify(_modules));
+          if (_modules.length == 0) {
             this.$feedback.warning({
               title: "Modules",
               message: "Not Currently registered with any module",
               duration: 5000
             });
           } else {
-            this.modules.forEach(m => {
+            _modules.forEach(m => {
               this.adKeywords.push(m.name);
             })
           }
-          this.isLoading = false;
           const testing = this.TNS_ENV !== "production";
+          try{
+            /*
           this.$firebase.admob
             .showBanner({
               size: this.$firebase.admob.AD_SIZE.SMART_BANNER, // see firebase.admob.AD_SIZE for all options
@@ -79,8 +79,22 @@
               iosTestDeviceIds: [],
               keywords: this.adKeywords // add keywords for ad targeting
             })
-            .then(() => {})
-            .catch(errorMessage => {});
+            .then(() => {
+              this.isLoading = false;
+              this.modules = _modules;
+            })
+            .catch(errorMessage => {
+              this.isLoading = false;
+              this.modules = _modules;
+            });
+*/
+              this.isLoading = false;
+              this.modules = _modules;
+          }catch(ex){
+              console.log('Banner_hidden',ex);
+              this.isLoading = false;
+              this.modules = _modules;
+          }
         })
         .catch(err => {
           this.$feedback.error({

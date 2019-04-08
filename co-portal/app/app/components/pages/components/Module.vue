@@ -660,7 +660,7 @@ export default {
     TakeTest(test) {
       if(test.totalAttempts < test.attemptLimit){
         this.navigate("/take/test", {
-          dbQuestionaire: test
+          dbQuestionaire: JSON.parse(JSON.stringify(test))
         });
       }else{
         this.$feedback.warning({
