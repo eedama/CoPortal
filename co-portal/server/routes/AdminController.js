@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-
+var bcrypt = require('bcrypt');
 import mongoose from "mongoose";
 // import the models
 import Admin from "../models/Admin";
@@ -48,7 +48,7 @@ router.post("/add/lecturer", function (req, res) {
         _id: mongoose.Types.ObjectId(),
         lastname: req.body.lecturer.lastname,
         firstname: req.body.lecturer.firstname,
-        password: req.body.lecturer.password,
+        password:GeneratePassword(req.body.lecturer.password),
         username: req.body.lecturer.username,
         gender: req.body.lecturer.gender,
         dob: req.body.lecturer.dob,
@@ -135,14 +135,21 @@ router.post("/update/lecturer/:lecturerID", function (req, res) {
         return res.status(512).send("Server error : " + err.message);
     });
 });
+function GeneratePassword(password)
+{
 
+var saltRounds = 13;
+var salt = bcrypt.genSaltSync(saltRounds);
+var hash =   bcrypt.hashSync(password, salt);
+return hash;
+}
 
 router.post("/add/student", function (req, res) {
     var student = new Student({
         _id: mongoose.Types.ObjectId(),
         lastname: req.body.student.lastname,
         firstname: req.body.student.firstname,
-        password: req.body.student.password,
+        password: GeneratePassword(req.body.student.password),
         username: req.body.student.username,
         gender: req.body.student.gender,
         dob: req.body.student.dob,

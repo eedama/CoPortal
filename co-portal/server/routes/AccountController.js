@@ -1,4 +1,5 @@
 var express = require("express");
+var bcrypt = require('bcrypt');
 var router = express.Router();
 
 import mongoose from "mongoose";
@@ -6,8 +7,8 @@ import mongoose from "mongoose";
 import Admin from "../models/Admin";
 import Lecturer from "../models/Lecturer";
 import Student from "../models/Student";
-import ForgotPassword from "../models/ForgotPassword"
-import EmailProvider from "../services/EmailProvider"
+import ForgotPassword from "../models/ForgotPassword";
+import EmailProvider from "../services/EmailProvider";
 const emailProvider = new EmailProvider();
 /*
   TODO : Add admin
@@ -36,14 +37,13 @@ router.post("/login", function (req, res) {
         }).then(lecturer => {
           if (lecturer == null) {
             Admin.findOne({
-              username: username,
-              password: password
+              username: username
             }).then(admin => {
               if (admin == null) {
                 return res.status(512).send("Incorrect login details");
               } else {
                 // admin != null
-                if (admin.password != password) {
+                if (!ComparePassword(password,admin.password) ) {
                   return res.status(512).send("Incorrect password for " + username);
                 }
                 res.json({
@@ -54,7 +54,7 @@ router.post("/login", function (req, res) {
             });
           } else {
             // lecturer != null
-            if (lecturer.password != password) {
+            if (!ComparePassword(password,lecturer.password)) {
               return res.status(512).send("Incorrect password for " + username);
             }
             res.json({
@@ -65,7 +65,7 @@ router.post("/login", function (req, res) {
         });
       } else {
         // student != null
-        if (student.password != password) {
+        if (!ComparePassword(password,student.password)) {
           return res.status(512).send("Incorrect password for " + username);
         }
         res.json({
@@ -101,7 +101,7 @@ router.post("/forgot/password", async function (req, res) {
   } else if (lecturer) {
     username = lecturer.username;
   } else if (admin) {
-    username = admin.username
+    username = admin.username;
   }
   if (!username) {
     return res.status(512).send("You have entered an incorrect email address");
@@ -123,6 +123,11 @@ router.post("/forgot/password", async function (req, res) {
   }
 });
 
+function ComparePassword(passwordNew,passwordSaved)
+{
+var compare = bcrypt.compareSync(passwordNew,passwordSaved);
+return compare;
+}
 function GenerateEmail(username, link) {
   return "<div class=\"Email-header\" style=\"font-size:20px;font-family:sans-serif;letter-spacing:1px; box-sizing:border-box; margin-top:60px;margin-bottom:98px;\">" +
     "<img class=\"corportal\" align=\"left\" style=\"width:160px;height:auto;margin-top:-40px;\" src=\"https://coportal.net/static/img/logo.1328452.png\">" +
@@ -130,7 +135,7 @@ function GenerateEmail(username, link) {
     "</h4><p style=\"margin-bottom:40px\">you recently requested to reset your Coportal account password.please click the button below to reset.</p>" +
     "<a href=\"" + link + "\" style=\"text-decoration:none;background-color:black;color:white;padding:10px;border-radius:10px;\" >Reset your Password</a>" +
     "<p style=\"margin-top:40px; margin-bottom:34px\"> if you did not make this request. please ignore this email</p>   Best Regards,<br> <br><span>Coportal Communication</span>" +
-    "<br><img class=\"corportal\" align=\"left\" style=\"width:160px;height:auto;opacity:0.1\" src=\"https://coportal.net/static/img/coPortalLogo.jpg\"></div>"
+    "<br><img class=\"corportal\" align=\"left\" style=\"width:160px;height:auto;opacity:0.1\" src=\"https://coportal.net/static/img/coPortalLogo.jpg\"></div>";
 }
 
 module.exports = router;
