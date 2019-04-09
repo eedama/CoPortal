@@ -377,7 +377,7 @@
           </TabViewItem>
           <TabViewItem v-if="!isLecture()" title="Marks">
             <GridLayout rows="*">
-              <StackLayout row="0" verticalAlignment="center" textAlignment="center" v-if="!isLoading && (!currentMarks || currentMarks.length == 0)">
+              <StackLayout row="0" verticalAlignment="center" textAlignment="center" v-show="!isLoading && (!currentMarks || currentMarks.length == 0)">
                 <label verticalAlignment="center" textAlignment="center" class="mdi m-x-10" fontSize="50%" :text="'mdi-alert' | fonticon"></label>
                 <label verticalAlignment="center" textAlignment="center" class="m-x-10 font-weight-bold" fontSize="30%" text="No Marks"></label>
                 <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="20%" :textWrap="true" text="Get engaged and write online tests, or remind your lecturer to fill in the marksheet"></label>
