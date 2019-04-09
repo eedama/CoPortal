@@ -93,11 +93,11 @@
                     </StackLayout>
                   </FlexboxLayout>
 
-                  <ActivityIndicator row="1" v-if="isLoading" :busy="isLoading"></ActivityIndicator>
+                  <ActivityIndicator class="m-35" row="1" v-if="isLoading" :busy="isLoading"></ActivityIndicator>
                   <StackLayout row="1" verticalAlignment="center" textAlignment="center" v-if="!isLoading && (!currentNotifications || currentNotifications.length == 0)">
                     <label verticalAlignment="center" textAlignment="center" class="mdi m-x-10" fontSize="50%" :text="'mdi-alert' | fonticon"></label>
-                    <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="30%" text="No Announcements"></label>
-                    <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="25%" :textWrap="true" text="Get engaged and start sending announcements"></label>
+                    <label verticalAlignment="center" textAlignment="center" class="m-x-10 font-weight-bold" fontSize="30%" text="No Announcements"></label>
+                    <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="20%" :textWrap="true" text="Get engaged and start sending announcements"></label>
                   </StackLayout>
                   <ScrollView row="1">
                     <StackLayout>
@@ -149,8 +149,13 @@
              </GridLayout>
           </TabViewItem>
           <TabViewItem v-if="isLecture()" title="Students">
-            <GridLayout rows="*,auto">
-              <ScrollView>
+            <GridLayout rows="*">
+              <StackLayout row="0" verticalAlignment="center" textAlignment="center" v-if="!isLoading && (!studentList || studentList.length == 0)">
+                <label verticalAlignment="center" textAlignment="center" class="mdi m-x-10" fontSize="50%" :text="'mdi-alert' | fonticon"></label>
+                <label verticalAlignment="center" textAlignment="center" class="m-x-10 font-weight-bold" fontSize="30%" text="No Students"></label>
+                <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="20%" :textWrap="true" :text="`Start adding students who study ${module.name} today!`"></label>
+              </StackLayout>
+              <ScrollView row="0">
                 <StackLayout>
                   <CardView elevation="5" margin="5" v-for="(student,i) in studentList" :key="i">
                     <Ripple>
@@ -201,171 +206,183 @@
                   </CardView>
                 </StackLayout>
               </ScrollView>
-              <MDTextField
-                row="1"
-                class="m-5"
-                fontSize="22"
-                keyboardType="search"
-                hint="Search"
-                returnKeyType="search"
-              ></MDTextField>
             </GridLayout>
           </TabViewItem>
           <TabViewItem v-if="isLecture()" title="assessments">
-            <ScrollView>
-              <StackLayout>
-                <CardView
-                  elevation="15"
-                  v-for="(assesment,i) in currentAssesments"
-                  :key="i"
-                  margin="5"
-                >
-                  <Ripple @tap="ViewMarks(assesment.id,assesment.title)">
-                    <GridLayout
-                      verticalAlignment="center"
-                      class="p-10"
-                      rows="auto,auto,auto,auto"
-                      columns="*,*,*"
-                    >
-                      <label
-                        row="0"
-                        col="0"
-                        verticalAlignment="center"
-                        colSpan="3"
-                        textAlignment="center"
-                        class="font-weight-bold text-light-black p-b-10"
-                        :textWrap="true"
-                        fontSize="19%"
-                        :text="assesment.title"
-                      ></label>
-
-                      <label
-                        row="1"
-                        col="0"
-                        verticalAlignment="center"
-                        :color="colorLoaded(120)"
-                        textAlignment="center"
-                        class="text-light-black font-weight-bold"
-                        :textWrap="true"
-                        fontSize="22%"
-                        :text="assesment.wrote"
-                      ></label>
-                      <label
-                        row="1"
-                        col="1"
-                        verticalAlignment="center"
-                        textAlignment="center"
-                        class="font-weight-bold"
-                        :color="colorLoaded(60)"
-                        :textWrap="true"
-                        fontSize="22%"
-                        :text="assesment.passed"
-                      ></label>
-                      <label
-                        row="1"
-                        col="2"
-                        verticalAlignment="center"
-                        textAlignment="center"
-                        class="font-weight-bold"
-                        :color="colorLoaded(30)"
-                        :textWrap="true"
-                        fontSize="22%"
-                        :text="assesment.failed"
-                      ></label>
-
-                      <label
-                        row="2"
-                        col="0"
-                        verticalAlignment="center"
-                        textAlignment="center"
-                        class="text-light-black font-weight-bold"
-                        :textWrap="true"
-                        fontSize="16%"
-                        text="wrote"
-                      ></label>
-                      <label
-                        row="2"
-                        col="1"
-                        verticalAlignment="center"
-                        textAlignment="center"
-                        class="text-light-black font-weight-bold"
-                        :textWrap="true"
-                        fontSize="16%"
-                        text="passed"
-                      ></label>
-                      <label
-                        row="2"
-                        col="2"
-                        verticalAlignment="center"
-                        textAlignment="center"
-                        class="text-light-black font-weight-bold"
-                        :textWrap="true"
-                        fontSize="16%"
-                        text="failed"
-                      ></label>
-
-                      <label
-                        row="3"
-                        col="2"
-                        verticalAlignment="bottom"
-                        textAlignment="right"
-                        fontSize="13%"
-                        class="h4 text-light-black p-t-10"
-                        :text="getMoment(assesment.date).fromNow()"
-                      ></label>
-                    </GridLayout>
-                  </Ripple>
-                </CardView>
+            <GridLayout rows="*">
+              <StackLayout row="0" verticalAlignment="center" textAlignment="center" v-if="!isLoading && (!currentAssesments || currentAssesments.length == 0)">
+                <label verticalAlignment="center" textAlignment="center" class="mdi m-x-10" fontSize="50%" :text="'mdi-alert' | fonticon"></label>
+                <label verticalAlignment="center" textAlignment="center" class="m-x-10 font-weight-bold" fontSize="30%" text="No Assessments"></label>
+                <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="20%" :textWrap="true" text="Fill in the mark sheet to see student's performances here"></label>
               </StackLayout>
-            </ScrollView>
-          </TabViewItem>
-          <TabViewItem title="Notes">
-            <ScrollView>
-              <WrapLayout>
-                <StackLayout width="50%" v-for="note in module.notes" :key="note._id">
-                  <CardView elevation="15" margin="5">
-                    <Ripple @tap="DownloadNotes(note)">
-                      <GridLayout class="p-10" rows="auto,auto,auto" columns="*,auto,auto">
+              <ScrollView row="0">
+                <StackLayout>
+                  <CardView
+                    elevation="15"
+                    v-for="(assesment,i) in currentAssesments"
+                    :key="i"
+                    margin="5"
+                  >
+                    <Ripple @tap="ViewMarks(assesment.id,assesment.title)">
+                      <GridLayout
+                        verticalAlignment="center"
+                        class="p-10"
+                        rows="auto,auto,auto,auto"
+                        columns="*,*,*"
+                      >
                         <label
                           row="0"
                           col="0"
-                          colSpan="3"
-                          :textWrap="true"
                           verticalAlignment="center"
+                          colSpan="3"
                           textAlignment="center"
-                          class="font-weight-bold"
-                          fontSize="16%"
-                          :text="note.title"
+                          class="font-weight-bold text-light-black p-b-10"
+                          :textWrap="true"
+                          fontSize="19%"
+                          :text="assesment.title"
                         ></label>
+
                         <label
                           row="1"
                           col="0"
-                          colSpan="3"
                           verticalAlignment="center"
+                          :color="colorLoaded(120)"
                           textAlignment="center"
-                          class="font-weight-bold mdi p-15"
-                          fontSize="75%"
-                          :text="'mdi-file-pdf' | fonticon "
+                          class="text-light-black font-weight-bold"
+                          :textWrap="true"
+                          fontSize="22%"
+                          :text="assesment.wrote"
                         ></label>
                         <label
-                          col="0"
-                          row="2"
-                          colSpan="3"
-                          :textWrap="true"
+                          row="1"
+                          col="1"
                           verticalAlignment="center"
                           textAlignment="center"
-                          class="h4 text-dark-black"
-                          :text="getMoment(note.date).fromNow()"
+                          class="font-weight-bold"
+                          :color="colorLoaded(60)"
+                          :textWrap="true"
+                          fontSize="22%"
+                          :text="assesment.passed"
+                        ></label>
+                        <label
+                          row="1"
+                          col="2"
+                          verticalAlignment="center"
+                          textAlignment="center"
+                          class="font-weight-bold"
+                          :color="colorLoaded(30)"
+                          :textWrap="true"
+                          fontSize="22%"
+                          :text="assesment.failed"
+                        ></label>
+
+                        <label
+                          row="2"
+                          col="0"
+                          verticalAlignment="center"
+                          textAlignment="center"
+                          class="text-light-black font-weight-bold"
+                          :textWrap="true"
+                          fontSize="16%"
+                          text="wrote"
+                        ></label>
+                        <label
+                          row="2"
+                          col="1"
+                          verticalAlignment="center"
+                          textAlignment="center"
+                          class="text-light-black font-weight-bold"
+                          :textWrap="true"
+                          fontSize="16%"
+                          text="passed"
+                        ></label>
+                        <label
+                          row="2"
+                          col="2"
+                          verticalAlignment="center"
+                          textAlignment="center"
+                          class="text-light-black font-weight-bold"
+                          :textWrap="true"
+                          fontSize="16%"
+                          text="failed"
+                        ></label>
+
+                        <label
+                          row="3"
+                          col="2"
+                          verticalAlignment="bottom"
+                          textAlignment="right"
+                          fontSize="13%"
+                          class="h4 text-light-black p-t-10"
+                          :text="getMoment(assesment.date).fromNow()"
                         ></label>
                       </GridLayout>
                     </Ripple>
                   </CardView>
                 </StackLayout>
-              </WrapLayout>
-            </ScrollView>
+              </ScrollView>
+            </GridLayout> 
+          </TabViewItem>
+          <TabViewItem title="Notes">
+            <GridLayout rows="*">
+              <StackLayout row="0" verticalAlignment="center" textAlignment="center" v-if="!isLoading && (!module.notes || module.notes.length == 0)">
+                <label verticalAlignment="center" textAlignment="center" class="mdi m-x-10" fontSize="50%" :text="'mdi-alert' | fonticon"></label>
+                <label verticalAlignment="center" textAlignment="center" class="m-x-10 font-weight-bold" fontSize="30%" text="No Notes"></label>
+                <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="20%" :textWrap="true" :text="`${module.name} (${module.code}) has no uploaded notes, just yet!`"></label>
+              </StackLayout>
+              <ScrollView row="0">
+                <WrapLayout>
+                  <StackLayout width="50%" v-for="note in module.notes" :key="note._id">
+                    <CardView elevation="15" margin="5">
+                      <Ripple @tap="DownloadNotes(note)">
+                        <GridLayout class="p-10" rows="auto,auto,auto" columns="*,auto,auto">
+                          <label
+                            row="0"
+                            col="0"
+                            colSpan="3"
+                            :textWrap="true"
+                            verticalAlignment="center"
+                            textAlignment="center"
+                            class="font-weight-bold"
+                            fontSize="16%"
+                            :text="note.title"
+                          ></label>
+                          <label
+                            row="1"
+                            col="0"
+                            colSpan="3"
+                            verticalAlignment="center"
+                            textAlignment="center"
+                            class="font-weight-bold mdi p-15"
+                            fontSize="75%"
+                            :text="'mdi-file-pdf' | fonticon "
+                          ></label>
+                          <label
+                            col="0"
+                            row="2"
+                            colSpan="3"
+                            :textWrap="true"
+                            verticalAlignment="center"
+                            textAlignment="center"
+                            class="h4 text-dark-black"
+                            :text="getMoment(note.date).fromNow()"
+                          ></label>
+                        </GridLayout>
+                      </Ripple>
+                    </CardView>
+                  </StackLayout>
+                </WrapLayout>
+              </ScrollView>
+            </GridLayout>
           </TabViewItem>
           <TabViewItem v-if="!isLecture()" title="Marks">
-            <ScrollView>
+            <GridLayout rows="*">
+              <StackLayout row="0" verticalAlignment="center" textAlignment="center" v-if="!isLoading && (!currentMarks || currentMarks.length == 0)">
+                <label verticalAlignment="center" textAlignment="center" class="mdi m-x-10" fontSize="50%" :text="'mdi-alert' | fonticon"></label>
+                <label verticalAlignment="center" textAlignment="center" class="m-x-10 font-weight-bold" fontSize="30%" text="No Marks"></label>
+                <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="20%" :textWrap="true" text="Get engaged and write online tests, or remind your lecturer to fill in the marksheet"></label>
+              </StackLayout>
+              <ScrollView row="0">
               <StackLayout>
                 <CardView v-for="(marked,i) in currentMarks" :key="i" elevation="15" margin="5">
                   <GridLayout
@@ -427,9 +444,16 @@
                 </CardView>
               </StackLayout>
             </ScrollView>
+            </GridLayout>
           </TabViewItem>
           <TabViewItem v-if="!isLecture()" title="Tests">
-            <ScrollView>
+            <GridLayout rows="*">
+              <StackLayout row="0" verticalAlignment="center" textAlignment="center" v-if="!isLoading && (!currentModule.questionaires || currentModule.questionaires.length == 0)">
+                <label verticalAlignment="center" textAlignment="center" class="mdi m-x-10" fontSize="50%" :text="'mdi-alert' | fonticon"></label>
+                <label verticalAlignment="center" textAlignment="center" class="m-x-10 font-weight-bold" fontSize="30%" text="No Tests"></label>
+                <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="20%" :textWrap="true" :text="`Remind your lecturer to set online tests frequently to boost your ${module.name} (${module.code}) skills`"></label>
+              </StackLayout>
+            <ScrollView row="0">
               <StackLayout>
                 <CardView
                   v-for="(test,i) in currentModule.questionaires"
@@ -482,6 +506,7 @@
                 </CardView>
               </StackLayout>
             </ScrollView>
+            </GridLayout>
           </TabViewItem>
         </TabView>
       </StackLayout>
