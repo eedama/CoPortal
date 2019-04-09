@@ -8,6 +8,11 @@
         </GridLayout>
       </StackLayout>
       <ActivityIndicator verticalAlignment="center" textAlignment="center" row="1" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
+      <StackLayout row="0" rowSpan="2" verticalAlignment="center" textAlignment="center" v-if="!isLoading && (!modules || modules.length == 0)">
+        <label verticalAlignment="center" textAlignment="center" class="mdi m-x-10" fontSize="50%" :text="'mdi-alert' | fonticon"></label>
+        <label verticalAlignment="center" textAlignment="center" class="m-10 font-weight-bold" fontSize="30%" text="No Modules"></label>
+        <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="20%" :textWrap="true" text="You currently do not have any modules linked to you"></label>
+      </StackLayout>
       <ScrollView v-if="!isLoading" row="1">
         <WrapLayout>
           <StackLayout v-for="(_module,i) in modules" :key="i" width="50%">
