@@ -28,113 +28,125 @@
           androidSelectedTabHighlightColor="black"
         >
           <TabViewItem v-if="isLecture()" title="Announcements">
-            <ScrollView>
-              <StackLayout>
-                <FlexboxLayout
-                  class="m-10"
-                  justifyContent="space-between"
-                  width="100%"
-                  alignSelf="center"
-                  height="100%"
-                  flexDirection="column"
-                >
-                  <GridLayout
-                    v-if="notificationToSend.viewed"
-                    class="m-10 text-dark-black"
-                    rows="auto,auto"
-                    columns="auto,*"
+              <GridLayout rows="auto,*">
+                  <FlexboxLayout
+                    row="0"
+                    class="m-10"
+                    justifyContent="space-between"
+                    width="100%"
+                    alignSelf="center"
+                    flexDirection="column"
                   >
-                    <label
-                      row="0"
-                      col="1"
-                      class="h3 font-weight-bold text-mute text-dark-black"
-                      text="Title"
-                    ></label>
-                    <TextField
-                      row="1"
-                      col="1"
-                      keyboardType="text"
-                      returnKeyType="next"
-                      v-model="notificationToSend.title"
-                      autocorrect="true"
-                      autocapitalizationType="none"
-                    ></TextField>
-                  </GridLayout>
+                    <GridLayout
+                      v-if="notificationToSend.viewed"
+                      class="m-10 text-dark-black"
+                      rows="auto,auto,auto"
+                      columns="auto,*,auto"
+                    >
+                    <Ripple col="2" row="0" @tap="notificationToSend.viewed = false">
+                      <label class="mdi p-10" fontSize="25%" :text="'mdi-close' | fonticon"></label>
+                    </Ripple>
+                      <label
+                        row="1"
+                        col="1"
+                        colSpan="2"
+                        class="h3 font-weight-bold text-mute text-dark-black"
+                        text="Title"
+                      ></label>
+                      <TextField
+                        row="2"
+                        col="1"
+                        colSpan="2"
+                        keyboardType="text"
+                        returnKeyType="next"
+                        v-model="notificationToSend.title"
+                        autocorrect="true"
+                        autocapitalizationType="none"
+                      ></TextField>
+                    </GridLayout>
 
-                  <GridLayout
-                    v-if="notificationToSend.viewed"
-                    class="m-10 text-dark-black"
-                    rows="auto,auto"
-                    columns="auto,*"
-                  >
-                    <label
-                      row="0"
-                      col="1"
-                      class="h3 font-weight-bold text-mute text-dark-black"
-                      text="Message"
-                    ></label>
-                    <TextField
-                      row="1"
-                      col="1"
-                      returnKeyType="text"
-                      v-model="notificationToSend.message"
-                    ></TextField>
-                  </GridLayout>
-                  <StackLayout>
-                    <Button
-                      text="Send Announcement"
-                      @tap="sendNotification()"
-                      class="submit-button bg-light-black text-white p-5"
-                    ></Button>
-                  </StackLayout>
-                </FlexboxLayout>
-
-                <ActivityIndicator v-show="isLoading" :busy="isLoading"></ActivityIndicator>
-                <CardView
-                  v-for="notify in currentNotifications"
-                  :key="notify._id"
-                  :row="a-1"
-                  elevation="15"
-                  margin="5"
-                >
-                  <Ripple @tap="readMessage(notify.title,notify.message)">
-                    <GridLayout class="p-15" rows="auto,auto" columns="auto,*,auto">
-                      <Image
-                        row="0"
-                        col="0"
-                        rowSpan="2"
-                        verticalAlignment="center"
-                        src="res://ic_logo"
-                        width="60"
-                        height="60"
-                        borderRadius="50%"
-                      ></Image>
+                    <GridLayout
+                      v-if="notificationToSend.viewed"
+                      class="m-10 text-dark-black"
+                      rows="auto,auto"
+                      columns="auto,*"
+                    >
                       <label
                         row="0"
                         col="1"
-                        class="font-weight-bold p-x-5"
-                        fontSize="16%"
-                        :text="notify.title"
+                        class="h3 font-weight-bold text-mute text-dark-black"
+                        text="Message"
                       ></label>
-                      <label
-                        row="0"
-                        col="2"
-                        class="h4 text-dark-black"
-                        :text="getMoment(notify.date).fromNow()"
-                      ></label>
-                      <label
+                      <TextField
                         row="1"
-                        col="2"
-                        class="h4 text-dark-black"
-                        v-if="notify.moduleId"
-                        :text="notify.moduleId.name"
-                      ></label>
-                      <label row="1" col="1" class="text-dark-black p-x-5" :text="notify.message"></label>
+                        col="1"
+                        returnKeyType="text"
+                        v-model="notificationToSend.message"
+                      ></TextField>
                     </GridLayout>
-                  </Ripple>
-                </CardView>
-              </StackLayout>
-            </ScrollView>
+                    <StackLayout>
+                      <Button
+                        text="Send Announcement"
+                        @tap="sendNotification()"
+                        class="submit-button bg-light-black text-white p-5"
+                      ></Button>
+                    </StackLayout>
+                  </FlexboxLayout>
+
+                  <ActivityIndicator row="1" v-if="isLoading" :busy="isLoading"></ActivityIndicator>
+                  <StackLayout row="1" verticalAlignment="center" textAlignment="center" v-if="!isLoading && (!currentNotifications || currentNotifications.length == 0)">
+                    <label verticalAlignment="center" textAlignment="center" class="mdi m-x-10" fontSize="50%" :text="'mdi-alert' | fonticon"></label>
+                    <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="30%" text="No Announcements"></label>
+                    <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="25%" :textWrap="true" text="Get engaged and start sending announcements"></label>
+                  </StackLayout>
+                  <ScrollView row="1">
+                    <StackLayout>
+                      <CardView
+                        v-for="notify in currentNotifications"
+                        :key="notify._id"
+                        :row="a-1"
+                        elevation="15"
+                        margin="5"
+                      >
+                        <Ripple @tap="readMessage(notify.title,notify.message)">
+                          <GridLayout class="p-15" rows="auto,auto" columns="auto,*,auto">
+                            <Image
+                              row="0"
+                              col="0"
+                              rowSpan="2"
+                              verticalAlignment="center"
+                              src="res://ic_logo"
+                              width="60"
+                              height="60"
+                              borderRadius="50%"
+                            ></Image>
+                            <label
+                              row="0"
+                              col="1"
+                              class="font-weight-bold p-x-5"
+                              fontSize="16%"
+                              :text="notify.title"
+                            ></label>
+                            <label
+                              row="0"
+                              col="2"
+                              class="h4 text-dark-black"
+                              :text="getMoment(notify.date).fromNow()"
+                            ></label>
+                            <label
+                              row="1"
+                              col="2"
+                              class="h4 text-dark-black"
+                              v-if="notify.moduleId"
+                              :text="notify.moduleId.name"
+                            ></label>
+                            <label row="1" col="1" class="text-dark-black p-x-5" :text="notify.message"></label>
+                          </GridLayout>
+                        </Ripple>
+                      </CardView>
+                    </StackLayout>
+                </ScrollView>
+             </GridLayout>
           </TabViewItem>
           <TabViewItem v-if="isLecture()" title="Students">
             <GridLayout rows="*,auto">
