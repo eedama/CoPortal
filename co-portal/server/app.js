@@ -83,7 +83,6 @@ const winstonLogger = winston.createLogger({
 
 app.use(function(req, res, next) {
     req.logger = winstonLogger;
-    winstonLogger.warn()
     next();
 });
 
