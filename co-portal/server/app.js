@@ -24,6 +24,8 @@ import notificationController from "./routes/NotificationController";
 import surveyController from "./routes/SurveyController";
 import rootController from "./routes/RootController";
 
+import CronJob from './services/CronManager';
+
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
@@ -59,6 +61,8 @@ mongoose
     })
     .then(answer => {
         console.log("Successfully connected to MONGO!");
+        const cronJob = new CronJob();
+        cronJob.fireJobs();
     });
 
 const logDirectory = '/tmp/' + process.env.API_NAME + '-log/';
