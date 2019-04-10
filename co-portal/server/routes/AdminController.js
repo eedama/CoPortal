@@ -42,30 +42,79 @@ router.post("/clear/studentmodules", function (req, res) {
 
     res.send("Student module removal is in progress");
 });
+
+
 router.get("/passwords/student/update", function (req, res) 
 {
   Student.find({
     "active": true
   })
-.then(Students =>
+.then(students =>
   {
  if (students == null) res.send("Error : 9032rtu834g9erbo");
-  Students.forEach(student=>
+  students.forEach(student=>
     {
     student.password =GeneratePassword(student.password) ;
     student.save(function (err)
-  {
-      if(err){
-        console.error(erro)
-    }else
-    {
-        console.log("saved");
-    }
-})
+        {
+            if(err){
+                console.error(erro)
+            }else
+            {
+                console.log("saved Student");
+            }
+        })
     })  
   });
 });
 
+router.get("/passwords/admin/update", function (req, res) 
+{
+  Admin.find({
+    "active": true
+  })
+.then(admins =>
+  {
+ if (admins == null) res.send("Error : 9032rtu834g9erbo");
+  admins.forEach(admin=>
+    {
+    admin.password =GeneratePassword(admin.password) ;
+    admin.save(function (err)
+        {
+            if(err){
+                console.error(erro)
+            }else
+            {
+                console.log("saved Admin");
+            }
+        })
+    })  
+  });
+});
+
+router.get("/passwords/lecturer/update", function (req, res) 
+{
+  Lecturer.find({
+    "active": true
+  })
+.then(lecturers =>
+  {
+ if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
+  lecturers.forEach(lecturer=>
+    {
+    lecturer.password =GeneratePassword(lecturer.password) ;
+    lecturer.save(function (err)
+        {
+            if(err){
+                console.error(erro)
+            }else
+            {
+                console.log("saved Lecturer");
+            }
+        })
+    })  
+  });
+});
 
 
 
