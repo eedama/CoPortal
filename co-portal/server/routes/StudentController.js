@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import Student from "../models/Student";
 import Module from "../models/Module";
 import Questionaire from "../models/Questionaire";
+import consoling from '../services/Logger';
 
 /*
   TODO: Get one student - DONE

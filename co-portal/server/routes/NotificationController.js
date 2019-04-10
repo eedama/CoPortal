@@ -10,6 +10,7 @@ import Announcement from "../models/Announcement";
 import Module from "../models/Module";
 import FCM from '../services/FirebaseManager';
 import helper from '../services/Helper';
+import consoling from "../services/Logger";
 
 /*
   TODO : Add admin
@@ -165,9 +166,9 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
           if (m) {
             m.students.forEach(_student => {
               FCM.sendToUserSimple(_student, announcement.title, announcement.message).then(results =>{
-                req.logger.info({key:'h54gf33gh4wjjhg5vrfe54',success:true,input:_student,message:results});
+                consoling.info({key:'h54gf33gh4wjjhg5vrfe54',success:true,input:_student,message:results});
               }).catch(ex =>{
-                req.logger.info({key:'h54gf33gh4wjjhg5vrfe54',success:false,input:_student,message:ex});
+                consoling.info({key:'h54gf33gh4wjjhg5vrfe54',success:false,input:_student,message:ex});
               });
             });
           } else {
@@ -177,9 +178,9 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
               if (students) {
                 students.forEach(_student => {
                   FCM.sendToUserSimple(_student, announcement.title, announcement.message).then(results =>{
-                    req.logger.info({key:'h54gf33gh4wjjhg5vweew54',success:true,input:_student,message:results});
+                    consoling.info({key:'h54gf33gh4wjjhg5vweew54',success:true,input:_student,message:results});
                   }).catch(ex =>{
-                    req.logger.info({key:'h54gf33gh4wjjhg5vweew54',success:false,input:_student,message:ex});
+                    consoling.info({key:'h54gf33gh4wjjhg5vweew54',success:false,input:_student,message:ex});
                   });
                 });
               }

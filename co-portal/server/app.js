@@ -66,26 +66,6 @@ if (!fs.existsSync(logDirectory)) {
     fs.mkdirSync(logDirectory);
 }
 
-const winstonLogger = winston.createLogger({
-    transports: [
-        new winston.transports.DailyRotateFile({
-            dirname: logDirectory,
-            filename: 'console-log-%DATE%.log',
-            datePattern: 'YYYY-MM-DD',
-            zippedArchive: false,
-            maxSize: '20m',
-            maxFiles: '14d'
-        })],
-    format: winston.format.combine(
-        winston.format.json()
-    )}
-);
-
-app.use(function(req, res, next) {
-    req.logger = winstonLogger;
-    next();
-});
-
 app.use(expressWinston.logger({
     transports: [
         new winston.transports.File({

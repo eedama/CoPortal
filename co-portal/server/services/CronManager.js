@@ -4,6 +4,7 @@ import FCM from "./FirebaseManager";
 import mongoose from "mongoose";
 
 import Notification from "../models/Notification";
+import consoling from '../services/Logger';
 
 export default class CronJob {
     constructor() {
@@ -21,6 +22,7 @@ export default class CronJob {
             "cron",
             `Scheduled a job (${interval}) to ${registrationToken}`
         );
+        consoling.info({key:'h523h4wrehrgewwfjjhg5vrfe54',input:payload,message:`Scheduled a job (${interval}) to ${registrationToken}`});
         let task = cron.schedule(interval, () => {
             console.log("cron", "Performing the cron job....");
             if (toTopic) {
@@ -83,7 +85,7 @@ export default class CronJob {
 
     // This is called on app.js (everytime the server starts)
     fireJobs() {
-        //this.clearTargets();
+        // this.clearTargets();
     }
 
 }
