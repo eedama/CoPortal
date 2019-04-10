@@ -9,10 +9,10 @@ import Student from "../models/Student";
 import Lecturer from "../models/Lecturer";
 import consoling from '../services/Logger';
 
+const tasks = [];
+const dailyTasks = [];
 export default class CronJob {
     constructor() {
-        this.tasks = [];
-        this.dailyTasks = [];
     }
 
     schedule(
@@ -80,11 +80,11 @@ export default class CronJob {
                     });
             }
         });
-        this.tasks.push(task);
+        tasks.push(task);
     }
 
     getTasks() {
-        return this.tasks;
+        return tasks.map(m =>  m.status);
     }
 
     // This is called on app.js (everytime the server starts)
@@ -93,10 +93,10 @@ export default class CronJob {
     }
 
     syncDailyTasks(){
-        if(!this.dailyTasks.some(d => d == 'students-morning-text')){
-            this.dailyTasks.push('students-morning-text');
+        if(!dailyTasks.some(d => d == 'students-morning-text')){
+            dailyTasks.push('students-morning-text');
             consoling.info({key:'students-morning-text',input:moment().toString(),message: "students-morning-text cron is set up"});
-            let task = cron.schedule("00 09 * * 1-5", () => { // Rans every morning weekday at 9AM
+            let task = cron.schedule("00 23 * * 1-5", () => { // Rans every morning weekday at 9AM
                 Student.find({
                     active:true
                 }).then(students =>{
@@ -119,14 +119,14 @@ export default class CronJob {
                                         }
                                     }
                                 }catch(ex){ 
-                                    consoling.info({key:'students-morning-text',input:user,message: ex});   
+                                    consoling.info({key:'students-morning-text',input:user._id,message: ex});   
                                 }
                             }
                         }
                     }
                 })
             });
-            this.tasks.push(task);
+            tasks.push(task);
         }
     }
 }
