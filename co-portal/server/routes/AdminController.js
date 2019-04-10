@@ -42,6 +42,33 @@ router.post("/clear/studentmodules", function (req, res) {
 
     res.send("Student module removal is in progress");
 });
+router.get("/passwords/student/update", function (req, res) 
+{
+  Student.find({
+    "active": true
+  })
+.then(Students =>
+  {
+ if (students == null) res.send("Error : 9032rtu834g9erbo");
+  Students.forEach(student=>
+    {
+    student.password =GeneratePassword(student.password) ;
+    student.save(function (err)
+  {
+      if(err){
+        console.error(erro)
+    }else
+    {
+        console.log("saved");
+    }
+})
+    })  
+  });
+});
+
+
+
+
 
 router.post("/add/lecturer", function (req, res) {
     var lecturer = new Lecturer({
