@@ -1,5 +1,15 @@
 <template>
   <page actionBarHidden="true">
+    <ScrollView>
+      <GridLayout rows="*,auto,auto" columns="*">
+        <StackLayout row="1">
+          <GridLayout rows="auto,auto" columns="*">
+            <label row="0" verticalAlignment="center" textAlignment="center" class="mdi p-15 text-dark-black" fontSize="50%" :text="'mdi-bell' | fonticon"></label>
+            <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="30%" text="Notifications"></label>
+          </GridLayout>
+        </StackLayout>
+ 
+        <StackLayout row="2">
     <GridLayout rows="auto,*" columns="*">
       <StackLayout row="0">
         <GridLayout rows="auto,auto" columns="*">
@@ -14,21 +24,56 @@
       </StackLayout>
       <ScrollView row="1">
         <StackLayout>
+    <ScrollView>
+      <GridLayout rows="*,auto,auto,auto" columns="*">
+        <StackLayout row="1">
+          <GridLayout rows="auto,auto" columns="*">
+            <label row="0" verticalAlignment="center" textAlignment="center" class="mdi p-15 text-dark-black" fontSize="50%" :text="'mdi-bell' | fonticon"></label>
+            <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="30%" text="General Notifications"></label>
+          </GridLayout>
+        </StackLayout>
+ 
+        <StackLayout row="2">
           <ActivityIndicator verticalAlignment="center" textAlignment="center" row="1" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
           <CardView v-for="notify in notification" :key="notify._id" elevation="15" margin="5">
-            <Ripple @tap="readMessage(notify.title,notify.message)" >
+            <Ripple v-if="notify.moduleId == null" @tap="readMessage(notify.title,notify.message)" >
               <GridLayout  class="p-15" rows="auto,auto" columns="auto,*,auto">
                 <Image row="0" col="0" rowSpan="2" verticalAlignment="center" src="res://ic_logo" width="60" height="60" borderRadius="50%"></Image>
                 <label row="0" col="1" class="font-weight-bold p-x-5" fontSize="16%" :text="notify.title"></label>
                 <label row="0" col="2" class="h4 text-dark-black" :text="getMoment(notify.date).fromNow()"></label>
                 <label row="1" col="2" class="h4 text-dark-black" v-if="notify.moduleId" :text="notify.moduleId.name"></label>
                 <label row="1" col="1" class="text-dark-black p-x-5" :text="notify.message"></label> 
+                <label row="0" class="font-weight-bold p-x-5" fontSize="20%" v-if="notify.moduleId != null" text="No Notifications"></label>
               </GridLayout>
             </Ripple>
           </CardView>
         </StackLayout>
+      </GridLayout>
+    </ScrollView>
       </ScrollView>
     </GridLayout>
+		<StackLayout row="3">
+          <GridLayout rows="auto" columns="*">
+            <label row="1" verticalAlignment="center" textAlignment="center" class="p-15 text-dark-black" fontSize="30%" text="Module Notifications"></label>
+          </GridLayout>
+        </StackLayout>
+		<StackLayout row="4">
+          <ActivityIndicator verticalAlignment="center" textAlignment="center" row="1" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
+          <CardView v-for="notify in notification" :key="notify._id" elevation="15" margin="5">
+            <Ripple v-if="notify.moduleId != null" @tap="readMessage(notify.title,notify.message)" >
+              <GridLayout  class="p-15" rows="auto,auto,auto" columns="auto,*,auto">
+                <Image row="0" col="0" rowSpan="2" verticalAlignment="center" src="res://ic_logo" width="60" height="60" borderRadius="50%"></Image>
+                <label row="0" col="1" class="font-weight-bold p-x-5" fontSize="16%" :text="notify.title"></label>
+                <label row="0" col="2" class="h4 text-dark-black" :text="getMoment(notify.date).fromNow()"></label>
+                <label row="1" col="2" class="h4 text-dark-black" v-if="notify.moduleId" :text="notify.moduleId.name"></label>
+                <label row="1" col="1" class="text-dark-black p-x-5" :text="notify.message"></label> 
+                <label row="2" class="font-weight-bold p-x-5" fontSize="20%" v-if="notify.moduleId == null" text="No Notifications"></label>
+              </GridLayout>  
+            </Ripple>
+          </CardView>
+        </StackLayout>
+      </GridLayout>
+    </ScrollView>
   </page>
 </template>
 
@@ -41,7 +86,8 @@ export default {
   data() {
     return {
       notification: [],
-      introTxt: "Digitalize your business and keep track of all your earnings."
+      introTxt: "Digitalize your business and keep track of all your earnings.",
+      notificationType: ["General Notification","Module Notification"]
     };
   },
   mounted() {
