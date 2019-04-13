@@ -186,7 +186,7 @@ router.post('/add/new/module', function(req, res) {
 	});
 });
 
-router.post('/add/new/bulk/modules', async function(req, res) {
+router.post('/add/bulk/modules', async function(req, res) {
 	const modules = req.body.modules;
 	if (!modules) {
 		return res.status(512).send('Server error : Invalid request');
