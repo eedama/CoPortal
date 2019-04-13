@@ -55,6 +55,7 @@ mongoose
             user: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD
         },
+        useNewUrlParser: true,
         reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
         reconnectInterval: 600, // Reconnect every 500ms
         dbName: process.env.DB_NAME
