@@ -45,15 +45,36 @@
       };
     },
     mounted() {
-      console.log("443Called")
       this.pageLoaded();
       if (!this.$store.state.cache.cachedUser) {
-  
         this.navigate("/login", null, {
           clearHistory: true
         });
       }
+      const testing = this.TNS_ENV !== "production";
+
       this.isLoading = true;
+      try{
+          this.$store.state.cache.cachedUser.user.modules.forEach(m => {
+              this.adKeywords.unshift(m.name);
+          });
+          this.$nextTick(() =>{
+            this.$firebase.admob
+                .showBanner({
+                  size: this.$firebase.admob.AD_SIZE.SMART_BANNER, // see firebase.admob.AD_SIZE for all options
+                  margins: {
+                    bottom: 10
+                  },
+                  androidBannerId: "ca-app-pub-4924835910036108/9510636040",
+                  iosBannerId: "ca-app-pub-4924835910036108/9510636040",
+                  testing: testing, // when not running in production set this to true, Google doesn't like it any other way
+                  iosTestDeviceIds: [],
+                  keywords: this.adKeywords // add keywords for ad targeting
+                });
+          });
+      }catch(err){
+        console.error(err)
+      }
       this.$api
         .getModuleInformation(this.$store.state.cache.cachedUser.user._id)
         .then(_modules => {
@@ -64,40 +85,9 @@
               message: "Not Currently registered with any module",
               duration: 5000
             });
-          } else {
-            _modules.forEach(m => {
-              this.adKeywords.unshift(m.name);
-            })
           }
-          const testing = this.TNS_ENV !== "production";
-          try{
-          
-          this.$firebase.admob
-            .showBanner({
-              size: this.$firebase.admob.AD_SIZE.SMART_BANNER, // see firebase.admob.AD_SIZE for all options
-              margins: {
-                bottom: 10
-              },
-              androidBannerId: "ca-app-pub-4924835910036108/9510636040",
-              iosBannerId: "ca-app-pub-4924835910036108/9510636040",
-              testing: testing, // when not running in production set this to true, Google doesn't like it any other way
-              iosTestDeviceIds: [],
-              keywords: this.adKeywords // add keywords for ad targeting
-            })
-            .then(() => {
-              this.isLoading = false;
-              this.modules = _modules;
-            })
-            .catch(errorMessage => {
-              this.isLoading = false;
-              this.modules = _modules;
-            });
-
-          }catch(ex){
-              console.log('Banner_hidden',ex);
-              this.isLoading = false;
-              this.modules = _modules;
-          }
+          this.modules = _modules;
+          this.isLoading = false;
         })
         .catch(err => {
           this.$feedback.error({
