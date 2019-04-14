@@ -275,7 +275,7 @@ router.post("/add/student", function (req, res) {
     });
 });
 
-router.post("/update/student/:studentID", function (req, res) {
+router.post("/update/student/:studentID",async function (req, res) {
     var studentID = req.params.studentID;
     var student = new Student({
         lastname: req.body.student.lastname,
@@ -283,10 +283,18 @@ router.post("/update/student/:studentID", function (req, res) {
         username: req.body.student.username,
         gender: req.body.student.gender,
         dob: req.body.student.dob,
+        contactNumbers: req.body.student.contactNumbers,
+        email: req.body.student.email,
         idNumber: req.body.student.idNumber,
         isSouthAfrican: req.body.student.isSouthAfrican
     });
 
+    var taken = await Student.findOne({
+        username:student.username
+    });
+
+    if(taken && taken._id != studentID) return res.status(512).send("Username " + student.username + " is already taken");
+    if(student.contactNumbers && (isNaN(student.contactNumbers) || student.contactNumbers.length != 10)) return res.status(512).send("Contact numbers must be 10 numeric values, " + student.contactNumbers + " is invalid");
     var studentModules = [];
 
     req.body.student.modules.filter(m => m != null).map(m => {
