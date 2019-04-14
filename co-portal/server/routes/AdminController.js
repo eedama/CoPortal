@@ -326,14 +326,7 @@ router.post("/update/student/:studentID", function (req, res) {
         });
         s.save(function (err) {
             if (err) return res.status(512).send("Server error : " + err.message);
-            Student.find({
-                    "active": true
-                })
-                .populate(['modules'])
-                .then(students => {
-                    if (students == null) res.send("Error : 9032rtu8fg34g9erbo");
-                    res.json(students);
-                });
+            res.json(s);
         });
     }).catch(err => {
         return res.status(512).send("Server error : " + err.message);
