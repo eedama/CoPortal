@@ -107,32 +107,32 @@
                 <GridLayout class="text-dark-black p-x-20 p-y-15" rows="auto,auto" columns="auto,*">
                   <label row="0" col="0" class="mdi text-dark-black m-r-20" rowSpan="2" verticalAlignment="center" textAlignment="left" fontSize="35" :text="'mdi-account' | fonticon"></label>
                   <label row="0" col="1" class="font-weight-bold" fontSize="15" verticalAlignment="center" textAlignment="left" text="Last name"></label>
-                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" :text="currentStudent.lastname"></TextView>
+                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" v-model="currentStudent.lastname"></TextView>
                 </GridLayout> 
                 <GridLayout class="text-dark-black p-x-20 p-y-15" rows="auto,auto" columns="auto,*">
                   <label row="0" col="0" class="mdi text-dark-black m-r-20" rowSpan="2" verticalAlignment="center" textAlignment="left" fontSize="35" :text="'mdi-account' | fonticon"></label>
                   <label row="0" col="1" class="font-weight-bold" fontSize="15" verticalAlignment="center" textAlignment="left" text="First name"></label>
-                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" :text="currentStudent.firstname"></TextView>
+                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" v-model="currentStudent.firstname"></TextView>
                 </GridLayout> 
                 <GridLayout class="text-dark-black p-x-20 p-y-15" rows="auto,auto" columns="auto,*">
                   <label row="0" col="0" class="mdi text-dark-black m-r-20" rowSpan="2" verticalAlignment="center" textAlignment="left" fontSize="35" :text="'mdi-account-outline' | fonticon"></label>
                   <label row="0" col="1" class="font-weight-bold" fontSize="15" verticalAlignment="center" textAlignment="left" text="ID Number"></label>
-                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" :text="currentStudent.idNumber"></TextView>
+                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" v-model="currentStudent.idNumber"></TextView>
                 </GridLayout>  
                 <GridLayout class="text-dark-black p-x-20 p-y-15" rows="auto,auto" columns="auto,*">
                   <label row="0" col="0" class="mdi text-dark-black m-r-20" rowSpan="2" verticalAlignment="center" textAlignment="left" fontSize="35" :text="'mdi-account-outline' | fonticon"></label>
                   <label row="0" col="1" class="font-weight-bold" fontSize="15" verticalAlignment="center" textAlignment="left" text="Username"></label>
-                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" :text="currentStudent.username"></TextView>
+                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" v-model="currentStudent.username"></TextView>
                 </GridLayout>  
                 <GridLayout class="text-dark-black p-x-20 p-y-15" rows="auto,auto" columns="auto,*">
                   <label row="0" col="0" class="mdi text-dark-black m-r-20" rowSpan="2" verticalAlignment="center" textAlignment="left" fontSize="35" :text="'mdi-phone' | fonticon"></label>
                   <label row="0" col="1" class="font-weight-bold" fontSize="15" verticalAlignment="center" textAlignment="left" text="Contact numbers"></label>
-                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" :text="currentStudent.contactNumbers"></TextView>
+                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" v-model="currentStudent.contactNumbers"></TextView>
                 </GridLayout>  
                 <GridLayout class="text-dark-black p-x-20 p-y-15" rows="auto,auto" columns="auto,*">
                   <label row="0" col="0" class="mdi text-dark-black m-r-20" rowSpan="2" verticalAlignment="center" textAlignment="left" fontSize="35" :text="'mdi-email' | fonticon"></label>
                   <label row="0" col="1" class="font-weight-bold" fontSize="15" verticalAlignment="center" textAlignment="left" text="Email"></label>
-                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" :text="currentStudent.email"></TextView>
+                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" v-model="currentStudent.email"></TextView>
                 </GridLayout>  
               </StackLayout>
             </ScrollView>
@@ -237,6 +237,7 @@ export default {
     },
     SaveChanges(){
       this.isSavingChanges = true;
+      alert(this.currentStudent.lastname)
       this.$api.updateStudent(this.currentStudent._id,this.currentStudent).then(result => {
         this.$feedback.success({
           title:'Changes successfully applied'
