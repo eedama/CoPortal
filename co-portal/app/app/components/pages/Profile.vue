@@ -12,7 +12,7 @@
         <label row="0" class="labelTitle m-t-5" textAlignment="center">{{currentUser.fullname}}</label>
         <label row="0" class="labelname" textAlignment="center">{{currentUser.username}}</label>
       </StackLayout>
-      <StackLayout row="1">
+      <StackLayout v-if="!isEditting" row="1">
         <CardView textAlignment="center" margin="10">
           <ScrollView width="100%">
             <StackLayout width="100%">
@@ -94,6 +94,9 @@
           </ScrollView>
         </CardView>
       </StackLayout>
+      <StackLayout v-if="isEditting">
+
+      </StackLayout>
     </GridLayout>
   </page>
 </template>
@@ -103,6 +106,7 @@ import * as connectivity from "tns-core-modules/connectivity";
 export default {
   data() {
     return {
+      isEditting:false,
       currentUser:{
         fullname: "",
         username: "",
@@ -154,7 +158,7 @@ export default {
     });
     var Module = "";
     this.currentUser.modules.forEach(element => {
-      Module += element.code + ",";
+      Module += element.name + ",";
     });
 Module = Module.slice(0, -1);
     this.users[2].body = Module;
@@ -167,6 +171,18 @@ Module = Module.slice(0, -1);
         api: this.$api,
         appSettings: this.appSettings,
         doc: "admin"
+      });
+    },
+    SubmitStudent(studentID,student){
+      this.$api.updateStudent(studentID,student).then(result => {
+        this.$feedback.success({
+          title:'Changes successfully applied'
+        });
+      }).catch(err =>{
+        this.$feedback.error({
+          title:'Failed to apply changes',
+          message:err.message
+        });
       });
     }
   }

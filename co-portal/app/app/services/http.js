@@ -234,6 +234,32 @@ export default class API {
     });
   }
 
+  getAllModules(){
+    return new Promise((resolve, reject) => {
+        http
+          .request(this.makeGet("/m/modules/all"))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
+              }
+            }
+          })
+          .catch(err => {
+            return reject(
+              new Error("Failed to retrieve modules try again later")
+            );
+          });
+    });    
+  }
+
   getModuleInformation(userID) {
     return new Promise((resolve, reject) => {
       if (!userID) {
@@ -666,6 +692,39 @@ export default class API {
             );
           });
       });
+  }
+
+  updateStudent(studentID,student){
+    return new Promise((resolve,reject)=>{
+      http
+      .request(
+        this.makePost(
+          "/a/update/student/" + studentID,
+          {
+            student
+          }
+        )
+      )
+      .then(async result => {
+        var answer = await this.handleResponse(result);
+        if (answer) {
+          if (answer.isError) {
+            return reject(new Error(answer.message));
+          } else if (answer == true) {
+            return resolve(result.content);
+          } else {
+            return reject(
+              new Error("Authorization error, please contact admin.")
+            );
+          }
+        }
+      })
+      .catch(err => {
+        return reject(
+          new Error("Can not load your notifications, Try again later")
+        );
+      });
+    });
   }
 
   getDownloadNotesURL(noteID){
