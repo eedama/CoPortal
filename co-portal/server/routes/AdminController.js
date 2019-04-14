@@ -303,7 +303,7 @@ router.post("/update/student/:studentID", function (req, res) {
         s.dob = student.dob;
         s.idNumber = student.idNumber;
         s.isSouthAfrican = student.isSouthAfrican;
-        if (!s.modules) s.modules = [];
+        if (!s.modules || req.body.overrideModules) s.modules = [];
 
         studentModules.filter(v => !s.modules.some(sm => v == sm)).forEach(smm => {
             s.modules.push(smm);

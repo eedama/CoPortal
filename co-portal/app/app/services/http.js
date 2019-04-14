@@ -701,7 +701,8 @@ export default class API {
         this.makePost(
           "/a/update/student/" + studentID,
           {
-            student
+            student,
+            overrideModules:true
           }
         )
       )
