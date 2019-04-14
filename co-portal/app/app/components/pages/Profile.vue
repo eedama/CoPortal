@@ -237,7 +237,6 @@ export default {
     },
     SaveChanges(){
       this.isSavingChanges = true;
-      alert(this.currentStudent.lastname)
       this.$api.updateStudent(this.currentStudent._id,this.currentStudent).then(result => {
         this.$feedback.success({
           title:'Changes successfully applied'
