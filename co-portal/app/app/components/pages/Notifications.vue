@@ -17,7 +17,7 @@
 
         <StackLayout
           row="0"
-          rowspan="2"
+          rowSpan="2"
           verticalAlignment="center"
           textAlignment="center"
           v-if="!isLoading && generalNotification.length == 0"
@@ -74,7 +74,7 @@
                 <Image
                   row="0"
                   col="0"
-                  rowspan="2"
+                  rowSpan="2"
                   verticalAlignment="center"
                   src="res://ic_logo"
                   width="60"
@@ -146,7 +146,7 @@
                 <Image
                   row="0"
                   col="0"
-                  rowspan="2"
+                  rowSpan="2"
                   verticalAlignment="center"
                   src="res://ic_logo"
                   width="60"
