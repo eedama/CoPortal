@@ -326,8 +326,13 @@ router.post('/assign/to/student/:studentID', function(req, res) {
 						.filter(m => student.modules.filter(sm => sm == m._id).length == 0)
 						.map(m => m._id);
 					student.modules.push(studentModules);
-					student.save(function(err) {
+					student.save(async function(err) {
 						if (err) return res.status(512).send('Server error : ' + err.message);
+						for(var _module  of modules){
+								if (!_module.students) _module.students = [];
+								if (!_module.students.some(v => v == studentID)) _module.students.push(studentID);
+								await _module.save();
+						}
 						res.json(true);
 					});
 				})
