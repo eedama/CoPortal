@@ -89,7 +89,7 @@
         this.isSavingChanges = true;
         var student = JSON.parse(JSON.stringify(this.$store.state.cache.cachedUser.user));
         student.modules = this.selectedModules;
-        this.$api.updateStudent(this.$store.state.cache.cachedUser.user._id,student).then(result => {
+        this.$api.updateStudent(student._id,student).then(result => {
           this.$store.commit("cacheUser", {
             db: this.$db,
             api: this.$api,
