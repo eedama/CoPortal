@@ -694,7 +694,11 @@ export default class API {
       });
   }
 
-  updateStudent(studentID,student){
+  updateStudent(studentID,obj){
+    var student = JSON.parse(JSON.stringify(obj));
+    if(student.modules){
+      student.modules = student.modules.map(m => m._id);
+    }
     return new Promise((resolve,reject)=>{
       http
       .request(
@@ -703,6 +707,40 @@ export default class API {
           {
             student,
             overrideModules:true
+          }
+        )
+      )
+      .then(async result => {
+        var answer = await this.handleResponse(result);
+        if (answer) {
+          if (answer.isError) {
+            return reject(new Error(answer.message));
+          } else if (answer == true) {
+            return resolve(result.content);
+          } else {
+            return reject(
+              new Error("Authorization error, please contact admin.")
+            );
+          }
+        }
+      })
+      .catch(err => {
+        return reject(
+          new Error("Can not load your notifications, Try again later")
+        );
+      });
+    });
+  }
+
+  changePassword(userID,userType,oldPassword,newPassword){
+    return new Promise((resolve,reject)=>{
+      http
+      .request(
+        this.makePost(
+          `/acc/${userType.toLowerCase()}/change/password/${userID}`,
+          {
+            oldPassword : oldPassword,
+            newPassword : newPassword
           }
         )
       )
