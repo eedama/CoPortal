@@ -26,7 +26,7 @@
                 <Image
                   row="0"
                   col="0"
-                  rowspan="2"
+                  rowSpan="2"
                   verticalAlignment="center"
                   src="res://ic_logo"
                   width="60"
@@ -89,7 +89,7 @@
                 <Image
                   row="0"
                   col="0"
-                  rowspan="2"
+                  rowSpan="2"
                   verticalAlignment="center"
                   src="res://ic_logo"
                   width="60"
