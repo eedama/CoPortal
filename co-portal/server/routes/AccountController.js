@@ -78,6 +78,35 @@ router.post("/login", function (req, res) {
     });
 });
 
+router.post("/:userType/change/password/:userID",async function(req,res){
+    var userType = req.params.userType;
+    var userID = req.params.userID;
+
+    switch(userType){
+      case 'student':
+        var student = await Student.findById(userID);
+        if(student){
+          if (!ComparePassword(req.body.oldPassword,student.password)) {
+            return res.status(512).send("Incorrect old password");
+          }else{
+            if(!req.body.newPassword || req.body.newPassword.length < 4){
+              return res.status(512).send("New password too short, atleast 4 charactors are required");
+            }
+            student.password = GeneratePassword(req.body.newPassword);
+            student.save(function(err){
+              if(err) return res.status(512).send("Unable to save your password,try again later");
+              return res.send("Password successfully changed");
+            });
+          }
+        }else{
+          res.status(512).send("Unable to find a user with id " + userID);
+        }
+      break;
+      default:
+        return res.status(512).send("Invalid request");
+    }
+});
+
 router.post("/forgot/password", async function (req, res) {
   var email = req.body.email;
 
@@ -123,11 +152,18 @@ router.post("/forgot/password", async function (req, res) {
   }
 });
 
-function ComparePassword(passwordNew,passwordSaved)
-{
-var compare = bcrypt.compareSync(passwordNew,passwordSaved);
-return compare;
+function ComparePassword(passwordNew,passwordSaved){
+    var compare = bcrypt.compareSync(passwordNew,passwordSaved);
+    return compare;
 }
+
+function GeneratePassword(password){
+    var saltRounds = 13;
+    var salt = bcrypt.genSaltSync(saltRounds);
+    var hash =   bcrypt.hashSync(password, salt);
+    return hash;
+}
+
 function GenerateEmail(username, link) {
   return "<div class=\"Email-header\" style=\"font-size:20px;font-family:sans-serif;letter-spacing:1px; box-sizing:border-box; margin-top:60px;margin-bottom:98px;\">" +
     "<img class=\"corportal\" align=\"left\" style=\"width:160px;height:auto;margin-top:-40px;\" src=\"https://coportal.net/static/img/logo.1328452.png\">" +
