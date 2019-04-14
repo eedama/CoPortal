@@ -127,12 +127,12 @@
                 <GridLayout class="text-dark-black p-x-20 p-y-15" rows="auto,auto" columns="auto,*">
                   <label row="0" col="0" class="mdi text-dark-black m-r-20" rowSpan="2" verticalAlignment="center" textAlignment="left" fontSize="35" :text="'mdi-phone' | fonticon"></label>
                   <label row="0" col="1" class="font-weight-bold" fontSize="15" verticalAlignment="center" textAlignment="left" text="Contact numbers"></label>
-                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" v-model="currentStudent.contactNumbers"></TextView>
+                  <TextView row="1" col="1" fontSize="15" :textWrap="true" keyboardType="number" textAlignment="left" v-model="currentStudent.contactNumbers"></TextView>
                 </GridLayout>  
                 <GridLayout class="text-dark-black p-x-20 p-y-15" rows="auto,auto" columns="auto,*">
                   <label row="0" col="0" class="mdi text-dark-black m-r-20" rowSpan="2" verticalAlignment="center" textAlignment="left" fontSize="35" :text="'mdi-email' | fonticon"></label>
                   <label row="0" col="1" class="font-weight-bold" fontSize="15" verticalAlignment="center" textAlignment="left" text="Email"></label>
-                  <TextView row="1" col="1" fontSize="15" :textWrap="true" textAlignment="left" v-model="currentStudent.email"></TextView>
+                  <TextView row="1" col="1" fontSize="15" :textWrap="true" keyboardType="email" textAlignment="left" v-model="currentStudent.email"></TextView>
                 </GridLayout>  
               </StackLayout>
             </ScrollView>
