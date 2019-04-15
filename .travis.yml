@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+  - stable
+addons:
+  apt:
+    packages:
+      - sshpass
+  ssh_known_hosts:
+    - $ADDRESS:$PORT
+cache:
+  apt: true
+  directories:
+    - node_modules
+install:
+  - cd ./co-portal/server
+  - npm install
+script:
+  - npm run build
+  - cd ../../
+  - echo "Running the script that ruplicates servers"
+deploy:
+  - provider: script
+    script: bash ./deploy.sh "$PASSWORD" "$PORT" "$USERNAME" "$ADDRESS" "$PROJECT_FOLDER" "$PROJECT_PORT" "CoportalDev"
+    on:
+      branch: develop
+  - provider: script
+    script: bash ./deploy.sh "$PASSWORD" "$PORT" "$USERNAME" "$ADDRESS" "$PROJECT_LIVE_FOLDER" "$PROJECT_LIVE_PORT" "CoportalLive"
+    on:
+      branch: master
