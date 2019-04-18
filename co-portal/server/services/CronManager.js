@@ -115,7 +115,7 @@ export default class CronJob {
                                             props: null
                                         });
                                         for (let i = 0; i < tokens.length; i++) {
-                                            this.schedule(when,token[i],payload)
+                                            this.schedule(when,tokens[i],payload)
                                         }
                                     }
                                 }catch(ex){ 
