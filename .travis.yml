@@ -14,10 +14,15 @@ cache:
 install:
   - cd ./co-portal/server
   - npm install
+  - cd ../client
+  - npm install
+  - npm run build
+  - cd ../server
 script:
+  - npm rebuild
   - npm run build
   - cd ../../
-  - echo "Running the script that ruplicates servers"
+  - echo "Running the script that builds the server"
 deploy:
   - provider: script
     script: bash ./deploy.sh "$PASSWORD" "$PORT" "$USERNAME" "$ADDRESS" "$PROJECT_FOLDER" "$PROJECT_PORT" "CoportalDev"
