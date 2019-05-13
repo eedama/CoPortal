@@ -13,8 +13,8 @@
           <div class="col s6"></div>
         </div>
         <ul class="right">
-          <li @click="changeSchool()" v-if="$store.state.settings.school">
-            <a class="center-align pointer waves-effect black-text">
+          <li>
+            <a @click="changeSchool()" class="center-align pointer waves-effect black-text">
               <span>{{ $store.state.settings.school}}</span>
             </a>
           </li>

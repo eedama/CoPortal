@@ -57,6 +57,12 @@
           <vue-typer v-if="!$store.state.user.isLoggedIn" class="center-align" :text='titleText' erase-style='backspace'></vue-typer>
           <span v-if="$store.state.user.isLoggedIn">Welcome back <a class="pointer waves-effect">{{ $store.state.user.username }}</a></span>
         </h5>
+        <div @click="changeSchool()" class="row pointer waves-effect">
+          <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+            <span>{{ $store.state.settings.school }}</span>
+            <label class="text-center">School</label>
+          </div>
+        </div>
       </div>
       <div class="col s10 offset-s1 m8 offset-m2 center-align">
         <img src="../assets/logo.png" class="responsive-img">
@@ -69,7 +75,7 @@
           <h5 class="center-align"><i style="font-size:100%" class="material-icons left">lock</i> <span>Login</span></h5>
         </div>
       </div>
-      </div>
+    </div>
     <div v-if="!$store.state.user.isLoggedIn" class="row bottomPin">
       <div class="col s12 center-align">
         <h5 class="center-align">Meet some of our cool friends that might help boost your career life</h5>
