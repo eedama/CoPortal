@@ -12,12 +12,11 @@ cache:
   directories:
     - node_modules
 install:
-  - cd ./co-portal/server
-  - npm install
-  - cd ../client
+  - cd ./co-portal/client
   - npm install
   - npm run build
   - cd ../server
+  - npm install
 script:
   - npm rebuild
   - npm run build
