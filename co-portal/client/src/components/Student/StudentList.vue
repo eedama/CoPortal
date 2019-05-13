@@ -8,7 +8,7 @@
         </md-button>
       </div>
     </div>
-  
+
     <div v-show="!addingStudents" class="row">
       <div class="col s8 offset-s2 center-align">
         <a v-on:click="addingStudents = !addingStudents" class="btn waves-effect">Add new student</a>
@@ -20,10 +20,10 @@
       </div>
     </div>
     <div v-show="!addingStudents" class="row">
-  
+
       <md-dialog class="card" style="position:absolute" :md-active.sync="studentModule._id != null">
         <md-dialog-title>Adding modules for {{ studentModule.username }}</md-dialog-title>
-  
+
         <md-dialog-content>
           <div class="row" :key="i" v-for="(m,i) in studentModule.modules.length">
             <div class="col s10">
@@ -77,7 +77,7 @@
                 <label class="text-center" for="Username">Username</label>
               </div>
             </div>
-  
+
             <div class="row">
               <div class="col s10 offset-s1 m8 offset-m2">
                 <md-field>
@@ -86,7 +86,7 @@
                 </md-field>
               </div>
             </div>
-  
+
             <div class="row" v-show="student.idNumber.length > 6">
               <div class="col s10 offset-s1 m8 offset-m2">
                 <label>
@@ -109,7 +109,7 @@
                 </md-datepicker>
               </div>
             </div>
-  
+
             <div class="row" v-show="txtError.length > 0">
               <div class="col s8 offset-s2 m6 offset-m3 text-center">
                 <label class="text-center red-text">{{ txtError }}</label>
@@ -153,14 +153,14 @@
               <div class="md-title">{{ student.lastname }} {{ student.firstname}}</div>
               <div class="md-subhead">Takes {{ student.modules.length }} {{ student.modules.length == 1 ? 'module' : 'modules' }}</div>
             </md-card-header-text>
-  
+
             <md-menu md-size="big" md-direction="bottom-end">
               <md-button v-on:click=" isFullscreen == student._id ? isFullscreen = null : isFullscreen = student._id" class="md-icon-button waves-effect">
                 <md-icon>{{ isFullscreen == student._id ? 'close' : 'fullscreen'}}</md-icon>
               </md-button>
             </md-menu>
           </md-card-header>
-  
+
           <md-card-content>
             <md-list class="md-double-line">
               <md-subheader>Details</md-subheader>
@@ -187,8 +187,8 @@
               </md-list-item>
             </md-list>
           </md-card-content>
-  
-  
+
+
           <md-card-expand>
             <md-card-actions md-alignment="space-between">
               <div>
@@ -196,7 +196,7 @@
                   <md-icon>account_circle</md-icon> {{ student.username }}
                 </md-button>
               </div>
-  
+
               <div>
               </div>
               <md-card-expand-trigger>
@@ -205,14 +205,14 @@
                 </md-button>
               </md-card-expand-trigger>
             </md-card-actions>
-  
+
             <md-card-expand-content>
               <md-card-content>
-  
+
                 <md-list class="md-double-line">
-  
+
                   <md-subheader>Modules</md-subheader>
-  
+
                   <md-list-item v-for="modul in student.modules" :key="modul._id" :class="{'waves-effect':!modul.removed}">
                     <md-icon class="md-primary">book</md-icon>
                     <div v-on:click="!modul.removed ? goToModule(modul._id) : null" class="md-list-item-text">
@@ -242,7 +242,7 @@
                     </div>
                   </md-list-item>
                   <md-subheader>Past tests</md-subheader>
-  
+
                   <md-list-item v-on:click="goToSolution(pastTest.solutionId)" v-for="(pastTest,v) in student.pastTests" :key="v" href="#" class="waves-effect">
                     <md-icon class="md-primary">account_circle</md-icon>
                     <div class="md-list-item-text">
@@ -251,13 +251,13 @@
                     </div>
                   </md-list-item>
                   <md-subheader>Student settings</md-subheader>
-  
+
                   <md-list-item v-on:click="student.removed = !student.removed" class="waves-effect">
                     <md-icon class="md-primary">delete</md-icon>
                     <div class="md-list-item-text">
                       <span>{{ student.removed ? 'Are you sure?':'Delete' }}</span>
                     </div>
-  
+
                     <md-button v-if="!isLoading" v-show="student.removed" v-on:click="DeleteStudent(student._id)" class="md-icon-button md-list-action">
                       <md-icon>done</md-icon>
                     </md-button>
@@ -275,9 +275,9 @@
             </md-card-expand-content>
           </md-card-expand>
         </md-card>
-  
+
       </div>
-  
+
     </div>
   </div>
 </template>
@@ -667,7 +667,12 @@ export default {
         )
         .then(results => {
           this.isLoading = false;
-          this.students = results.data;
+          this.students = this.students.map(s => {
+            if(s._id == results.data._id){
+              s = results.data;
+            }
+            return s;
+          });
           this.student = {
             firstname: "",
             lastname: "",
