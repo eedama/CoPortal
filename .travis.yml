@@ -15,8 +15,9 @@ install:
   - cd ./co-portal/client
   - npm install
   - npm run build
-  - bash ./deploy.sh "$PASSWORD" "$PORT" "$USERNAME" "$ADDRESS" "$PROJECT_FOLDER" "$PROJECT_PORT" "CoportalDev"
-  - cd ../server
+  - cd ../../
+  - bash /deploy.sh "$PASSWORD" "$PORT" "$USERNAME" "$ADDRESS" "$PROJECT_FOLDER" "$PROJECT_PORT" "CoportalDev"
+  - cd ./co-portal/server
   - npm install
 script:
   - npm rebuild
