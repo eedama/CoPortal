@@ -17,8 +17,7 @@ ADD package*.json /app/
 
 ADD . /app
 
-RUN cd /app/ && npm install node-gyp
-RUN cd /app/ && npm install bcrypt
+RUN cd /app/ && npm install bcrypt@3.0.5
 RUN cd /app/ && npm install
 
 WORKDIR /app
