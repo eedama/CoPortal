@@ -13,11 +13,12 @@ ENV DB_PASSWORD $DB_PASSWORD
 ENV ENABLE_SEND_SMS $ENABLE_SEND_SMS
 
 RUN mkdir /app
-ADD package.json /app/
+ADD package*.json /app/
 
 ADD . /app
 
 RUN cd /app/ && npm install node-gyp
+RUN cd /app/ && npm install bcrypt
 RUN cd /app/ && npm install
 
 WORKDIR /app
