@@ -17,9 +17,11 @@ ADD package.json /app/
 
 ADD . /app
 
+RUN cd /app/ && npm install -g node-gyp
 RUN cd /app/ && npm install
 
 WORKDIR /app
 
 RUN npm run build
+
 CMD ["npm", "start"]
