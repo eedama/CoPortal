@@ -27,6 +27,12 @@
                 <label class="text-center" for="Password">Password</label>
               </div>
             </div>
+            <div @click="changeSchool()" class="row pointer waves-effect">
+              <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+                <span>{{ $store.state.settings.school }}</span>
+                <label class="text-center">School (Click if this is not your school)</label>
+              </div>
+            </div>
             <div class="row" v-show="txtError.length > 0">
               <div class="col s8 offset-s2 m6 offset-m3 text-center">
                 <label class="text-center red-text">{{ txtError }}</label>

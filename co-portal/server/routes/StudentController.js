@@ -1,10 +1,12 @@
 var express = require("express");
 var router = express.Router();
+var bcrypt = require('bcrypt');
 import mongoose from "mongoose";
 
 import Student from "../models/Student";
 import Module from "../models/Module";
 import Questionaire from "../models/Questionaire";
+import consoling from '../services/Logger';
 
 /*
   TODO: Get one student - DONE
@@ -15,6 +17,14 @@ import Questionaire from "../models/Questionaire";
         Edit student details
         Login student
 */
+function GeneratePassword(password)
+{
+var saltRounds = 13;
+var salt = bcrypt.genSaltSync(saltRounds);
+var hash =   bcrypt.hashSync(password, salt);
+return hash;
+}
+
 
 router.post("/delete/:studentID", function (req, res) {
   var studentID = req.params.studentID;
@@ -190,5 +200,65 @@ router.get("/:id/get", function (req, res) {
         }
       });
   }
+});
+
+router.post("/add/bulk/students", async function (req, res) {
+
+  const students = req.body.students; var succeded=[],failed=[];
+     
+  for(var _student of students){
+    try {
+      console.log("Adding " + _student.firstname)
+     
+    _student.gender = (_student.gender == "M" || _student.gender == "m") ? "Male" : "Female";
+
+    if(_student.idNumber && _student.idNumber.length == 12){
+       _student.dob = new Date(
+        _student.idNumber.substring(0, 2),
+        _student.idNumber.substring(2, 4) - 1,
+        _student.idNumber.substring(4, 6)
+        );
+    }
+
+    _student.username = _student.firstname.toLowerCase().replace(/ /g,'')+'-'+_student.lastname.toLowerCase().replace(/ /g,'')
+    _student.password = _student.lastname.toLowerCase().replace(/ /g,'');
+
+    var student = new Student({
+        _id: mongoose.Types.ObjectId(),
+        lastname: _student.lastname[0].toUpperCase() + _student.lastname.slice(1).toLowerCase(),
+        firstname: _student.firstname[0].toUpperCase() + _student.firstname.slice(1).toLowerCase(),
+        password: GeneratePassword(_student.password),
+        username: _student.username,
+        gender: _student.gender,
+        dob: _student.dob,
+        idNumber: _student.idNumber,
+        isSouthAfrican: true
+    });
+
+        var results = await Student.findOne({
+          username: student.username
+        });
+        if (!results){
+          var saved = await student.save();
+          if(saved) {
+            console.log("Done with " + _student.firstname)
+            succeded.push(saved);
+          }else{
+            failed.push(student.name + " failed");
+          }
+        }else{
+          failed.push(results.lastname +  " " + results.firstname + " already exists");
+        }
+      }catch(ex){
+        
+      console.log("Exception ")
+      console.log(ex.message);
+        failed.push(ex.message);
+      }
+    }
+    return res.json({
+      succeded:succeded,
+      failed:failed
+    });
 });
 module.exports = router;

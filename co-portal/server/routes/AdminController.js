@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-
+var bcrypt = require('bcrypt');
 import mongoose from "mongoose";
 // import the models
 import Admin from "../models/Admin";
@@ -43,12 +43,88 @@ router.post("/clear/studentmodules", function (req, res) {
     res.send("Student module removal is in progress");
 });
 
+
+router.get("/passwords/student/update", function (req, res) 
+{
+  Student.find({
+    "active": true
+  })
+.then(students =>
+  {
+ if (students == null) res.send("Error : 9032rtu834g9erbo");
+  students.forEach(student=>
+    {
+    student.password =GeneratePassword(student.password) ;
+    student.save(function (err)
+        {
+            if(err){
+                console.error(erro)
+            }else
+            {
+                console.log("saved Student");
+            }
+        })
+    })  
+  });
+});
+
+router.get("/passwords/admin/update", function (req, res) 
+{
+  Admin.find({
+    "active": true
+  })
+.then(admins =>
+  {
+ if (admins == null) res.send("Error : 9032rtu834g9erbo");
+  admins.forEach(admin=>
+    {
+    admin.password =GeneratePassword(admin.password) ;
+    admin.save(function (err)
+        {
+            if(err){
+                console.error(erro)
+            }else
+            {
+                console.log("saved Admin");
+            }
+        })
+    })  
+  });
+});
+
+router.get("/passwords/lecturer/update", function (req, res) 
+{
+  Lecturer.find({
+    "active": true
+  })
+.then(lecturers =>
+  {
+ if (lecturers == null) res.send("Error : 9032rtu834g9erbo");
+  lecturers.forEach(lecturer=>
+    {
+    lecturer.password =GeneratePassword(lecturer.password) ;
+    lecturer.save(function (err)
+        {
+            if(err){
+                console.error(erro)
+            }else
+            {
+                console.log("saved Lecturer");
+            }
+        })
+    })  
+  });
+});
+
+
+
+
 router.post("/add/lecturer", function (req, res) {
     var lecturer = new Lecturer({
         _id: mongoose.Types.ObjectId(),
         lastname: req.body.lecturer.lastname,
         firstname: req.body.lecturer.firstname,
-        password: req.body.lecturer.password,
+        password:GeneratePassword(req.body.lecturer.password),
         username: req.body.lecturer.username,
         gender: req.body.lecturer.gender,
         dob: req.body.lecturer.dob,
@@ -135,14 +211,21 @@ router.post("/update/lecturer/:lecturerID", function (req, res) {
         return res.status(512).send("Server error : " + err.message);
     });
 });
+function GeneratePassword(password)
+{
 
+var saltRounds = 13;
+var salt = bcrypt.genSaltSync(saltRounds);
+var hash =   bcrypt.hashSync(password, salt);
+return hash;
+}
 
 router.post("/add/student", function (req, res) {
     var student = new Student({
         _id: mongoose.Types.ObjectId(),
         lastname: req.body.student.lastname,
         firstname: req.body.student.firstname,
-        password: req.body.student.password,
+        password: GeneratePassword(req.body.student.password),
         username: req.body.student.username,
         gender: req.body.student.gender,
         dob: req.body.student.dob,
@@ -192,7 +275,7 @@ router.post("/add/student", function (req, res) {
     });
 });
 
-router.post("/update/student/:studentID", function (req, res) {
+router.post("/update/student/:studentID",async function (req, res) {
     var studentID = req.params.studentID;
     var student = new Student({
         lastname: req.body.student.lastname,
@@ -200,10 +283,18 @@ router.post("/update/student/:studentID", function (req, res) {
         username: req.body.student.username,
         gender: req.body.student.gender,
         dob: req.body.student.dob,
+        contactNumbers: req.body.student.contactNumbers,
+        email: req.body.student.email,
         idNumber: req.body.student.idNumber,
         isSouthAfrican: req.body.student.isSouthAfrican
     });
 
+    var taken = await Student.findOne({
+        username:student.username
+    });
+
+    if(taken && taken._id != studentID) return res.status(512).send("Username " + student.username + " is already taken");
+    if(student.contactNumbers && (isNaN(student.contactNumbers) || student.contactNumbers.length != 10)) return res.status(512).send("Contact numbers must be 10 numeric values, " + student.contactNumbers + " is invalid");
     var studentModules = [];
 
     req.body.student.modules.filter(m => m != null).map(m => {
@@ -220,7 +311,7 @@ router.post("/update/student/:studentID", function (req, res) {
         s.dob = student.dob;
         s.idNumber = student.idNumber;
         s.isSouthAfrican = student.isSouthAfrican;
-        if (!s.modules) s.modules = [];
+        if (!s.modules || req.body.overrideModules) s.modules = [];
 
         studentModules.filter(v => !s.modules.some(sm => v == sm)).forEach(smm => {
             s.modules.push(smm);
@@ -243,14 +334,7 @@ router.post("/update/student/:studentID", function (req, res) {
         });
         s.save(function (err) {
             if (err) return res.status(512).send("Server error : " + err.message);
-            Student.find({
-                    "active": true
-                })
-                .populate(['modules'])
-                .then(students => {
-                    if (students == null) res.send("Error : 9032rtu8fg34g9erbo");
-                    res.json(students);
-                });
+            res.json(s);
         });
     }).catch(err => {
         return res.status(512).send("Server error : " + err.message);

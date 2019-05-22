@@ -186,7 +186,7 @@ router.post('/add/new/module', function(req, res) {
 	});
 });
 
-router.post('/add/new/bulk/modules', async function(req, res) {
+router.post('/add/bulk/modules', async function(req, res) {
 	const modules = req.body.modules;
 	if (!modules) {
 		return res.status(512).send('Server error : Invalid request');
@@ -220,6 +220,51 @@ router.post('/add/new/bulk/modules', async function(req, res) {
       failed.push(ex.message);
     }
   }
+  return res.json({
+    succeded:succeded,
+    failed:failed
+  })
+});
+
+
+router.post('/link/bulk/modules/to/bulk/students', async function(req, res) {
+	const studentAndModules = req.body.studentAndModules;
+	if(!studentAndModules || studentAndModules.length <= 0){
+		return res.status(512).send('Server error : Invalid request');
+	}
+
+  var succeded=[],failed=[];
+
+	for(let _student of studentAndModules){
+		_student.username = _student.firstname.toLowerCase().replace(/ /g,'')+'-'+_student.lastname.toLowerCase().replace(/ /g,'')
+		try {
+			const _ss = await Student.findOne({
+				username:_student.username
+			});
+			for(let _module of _student.modules){
+				const _mm = await Module.findOne({
+					name: _module.split("-")[0],
+					code: _module.split("-")[1],
+				});
+				if(!_mm.students.some(sm => sm.toString() == _ss._id.toString())){
+					_mm.students.push(_ss._id);
+				}
+				await _mm.save();
+				if(!_ss.modules.some(ms => ms.toString() == _mm._id.toString())){	
+					_ss.modules.push(_mm._id);
+				}
+				var saved = await _ss.save();
+				if(saved) {
+          succeded.push(saved);
+        }else{
+          failed.push(_mm.name + " failed");
+        }
+				console.log('Linked ' + _ss.username + " to " + _mm.name + " ( " + _mm.code + " )");
+			}
+		}catch(ex){
+      failed.push(ex.message);
+    }
+	}
   return res.json({
     succeded:succeded,
     failed:failed
@@ -326,8 +371,13 @@ router.post('/assign/to/student/:studentID', function(req, res) {
 						.filter(m => student.modules.filter(sm => sm == m._id).length == 0)
 						.map(m => m._id);
 					student.modules.push(studentModules);
-					student.save(function(err) {
+					student.save(async function(err) {
 						if (err) return res.status(512).send('Server error : ' + err.message);
+						for(var _module  of modules){
+								if (!_module.students) _module.students = [];
+								if (!_module.students.some(v => v == studentID)) _module.students.push(studentID);
+								await _module.save();
+						}
 						res.json(true);
 					});
 				})

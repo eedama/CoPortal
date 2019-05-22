@@ -8,6 +8,11 @@
         </GridLayout>
       </StackLayout>
       <ActivityIndicator verticalAlignment="center" textAlignment="center" row="1" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
+      <StackLayout row="0" rowSpan="2" verticalAlignment="center" textAlignment="center" v-if="!isLoading && (!modules || modules.length == 0)">
+        <label verticalAlignment="center" textAlignment="center" class="mdi m-x-10" fontSize="50%" :text="'mdi-alert' | fonticon"></label>
+        <label verticalAlignment="center" textAlignment="center" class="m-10 font-weight-bold" fontSize="30%" text="No Modules"></label>
+        <label verticalAlignment="center" textAlignment="center" class="m-x-10" fontSize="20%" :textWrap="true" text="You currently do not have any modules linked to you"></label>
+      </StackLayout>
       <ScrollView v-if="!isLoading" row="1">
         <WrapLayout>
           <StackLayout v-for="(_module,i) in modules" :key="i" width="50%">
@@ -40,15 +45,36 @@
       };
     },
     mounted() {
-      console.log("443Called")
       this.pageLoaded();
       if (!this.$store.state.cache.cachedUser) {
-  
         this.navigate("/login", null, {
           clearHistory: true
         });
       }
+      const testing = this.TNS_ENV !== "production";
+
       this.isLoading = true;
+      try{
+          this.$store.state.cache.cachedUser.user.modules.forEach(m => {
+              this.adKeywords.unshift(m.name);
+          });
+          this.$nextTick(() =>{
+            this.$firebase.admob
+                .showBanner({
+                  size: this.$firebase.admob.AD_SIZE.SMART_BANNER, // see firebase.admob.AD_SIZE for all options
+                  margins: {
+                    bottom: 10
+                  },
+                  androidBannerId: "ca-app-pub-4924835910036108/9510636040",
+                  iosBannerId: "ca-app-pub-4924835910036108/9510636040",
+                  testing: testing, // when not running in production set this to true, Google doesn't like it any other way
+                  iosTestDeviceIds: [],
+                  keywords: this.adKeywords // add keywords for ad targeting
+                });
+          });
+      }catch(err){
+        console.error(err)
+      }
       this.$api
         .getModuleInformation(this.$store.state.cache.cachedUser.user._id)
         .then(_modules => {
@@ -59,40 +85,9 @@
               message: "Not Currently registered with any module",
               duration: 5000
             });
-          } else {
-            _modules.forEach(m => {
-              this.adKeywords.unshift(m.name);
-            })
           }
-          const testing = this.TNS_ENV !== "production";
-          try{
-          
-          this.$firebase.admob
-            .showBanner({
-              size: this.$firebase.admob.AD_SIZE.SMART_BANNER, // see firebase.admob.AD_SIZE for all options
-              margins: {
-                bottom: 10
-              },
-              androidBannerId: "ca-app-pub-4924835910036108/9510636040",
-              iosBannerId: "ca-app-pub-4924835910036108/9510636040",
-              testing: testing, // when not running in production set this to true, Google doesn't like it any other way
-              iosTestDeviceIds: [],
-              keywords: this.adKeywords // add keywords for ad targeting
-            })
-            .then(() => {
-              this.isLoading = false;
-              this.modules = _modules;
-            })
-            .catch(errorMessage => {
-              this.isLoading = false;
-              this.modules = _modules;
-            });
-
-          }catch(ex){
-              console.log('Banner_hidden',ex);
-              this.isLoading = false;
-              this.modules = _modules;
-          }
+          this.modules = _modules;
+          this.isLoading = false;
         })
         .catch(err => {
           this.$feedback.error({

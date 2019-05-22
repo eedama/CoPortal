@@ -25,7 +25,6 @@
         <WrapLayout>
       <StackLayout row="1">
           <CardView v-for="(solution,i) in Solution" :key="i" elevation="5" margin="10">
-             
                 <GridLayout class="p-5" rows="auto,auto" columns="auto,*">
                   <label
                     row="0"
