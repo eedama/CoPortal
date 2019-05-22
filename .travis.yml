@@ -11,23 +11,26 @@ cache:
 services:
   - docker
 install:
-  - cd ./server
+  - 
 script:
-  - docker build -t lavhe/co-portal:api-latest .
+  - echo "Build the web image and tag it as latest"
+  - docker build -t lavhe/co-portal:web-latest ./client/
+  - echo "Build the api image and tag it as latest"
+  - docker build -t lavhe/co-portal:api-latest ./server/
   - echo "Deploying image to dockerhub $TRAVIS_BRANCH"
 before_deploy:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 deploy: 
   - provider: script 
-    script: bash ./push-to-docker.sh "api-latest"
+    script: bash ./push-to-docker.sh "web-latest" && bash ./push-to-docker.sh "api-latest" 
     on:
       all_branches: true
   - provider: script 
-    script: bash ./push-to-docker.sh "api-develop"
+    script: bash ./push-to-docker.sh "web-develop" && bash ./push-to-docker.sh "api-develop"
     on: 
       branch: develop 
   - provider: script 
-    script: bash ./push-to-docker.sh "api-live"  
+    script: bash ./push-to-docker.sh "web-live" && bash ./push-to-docker.sh "api-live"  
     on: 
       branch: master
 after_deploy:
