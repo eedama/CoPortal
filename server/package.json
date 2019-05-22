@@ -9,7 +9,8 @@
         "play": "npm run build && node ./dist/bin/www",
         "fire": "node ./dist/bin/www",
         "windowsStart": "nodemon --exec npm run windowsPlay --watch ./ --ignore ./dist",
-        "start": "nodemon --exec npm run play --watch ./ --ignore ./dist"
+        "dev": "nodemon --exec npm run play --watch ./ --ignore ./dist",
+        "start": "npm run build && node ./dist/bin/www"
     },
     "env": {},
     "dependencies": {

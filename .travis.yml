@@ -1,6 +1,3 @@
-language: node_js
-node_js:
-  - stable
 addons:
   apt:
     packages:
@@ -11,25 +8,28 @@ cache:
   apt: true
   directories:
     - node_modules
+services:
+  - docker
 install:
-  - cd ./co-portal/client
-  - npm install
-  - npm run build
-  - cd ../../
-  - bash ./deploy.sh "$PASSWORD" "$PORT" "$USERNAME" "$ADDRESS" "$PROJECT_FOLDER" "$PROJECT_PORT" "CoportalDev"
-  - cd ./co-portal/server
-  - npm install
+  - cd ./server
 script:
-  - npm rebuild
-  - npm run build
-  - cd ../../
-  - echo "Running the script that builds the server"
-deploy:
-  - provider: script
-    script: bash ./deploy.sh "$PASSWORD" "$PORT" "$USERNAME" "$ADDRESS" "$PROJECT_FOLDER" "$PROJECT_PORT" "CoportalDev"
+  - docker build -t lavhe/co-portal:api-latest .
+  - echo "Deploying image to dockerhub $TRAVIS_BRANCH"
+before_deploy:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+deploy: 
+  - provider: script 
+    script: bash ./push-to-docker.sh "api-latest"
     on:
-      branch: develop
-  - provider: script
-    script: bash ./deploy.sh "$PASSWORD" "$PORT" "$USERNAME" "$ADDRESS" "$PROJECT_LIVE_FOLDER" "$PROJECT_LIVE_PORT" "CoportalLive"
-    on:
+      all_branches: true
+  - provider: script 
+    script: bash ./push-to-docker.sh "api-develop"
+    on: 
+      branch: develop 
+  - provider: script 
+    script: bash ./push-to-docker.sh "api-live"  
+    on: 
       branch: master
+after_deploy:
+  - if [ "$TRAVIS_BRANCH" == "develop" ]; then 
+      sshpass -p "$PASSWORD" ssh -t -oStrictHostKeyChecking=no "$USERNAME@$ADDRESS" "$DOCKER_PULL_SH" ; fi
