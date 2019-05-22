@@ -13,7 +13,7 @@ ENV DB_PASSWORD $DB_PASSWORD
 ENV ENABLE_SEND_SMS $ENABLE_SEND_SMS
 
 RUN mkdir /app
-ADD package*.json /app/
+ADD package.json /app/
 
 ADD . /app
 
