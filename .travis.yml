@@ -11,7 +11,7 @@ cache:
 services:
   - docker
 install:
-  - 
+  - echo "It is about to go down :smile:"
 script:
   - echo "Build the web image and tag it as latest"
   - docker build -t lavhe/co-portal:web-latest ./client/
