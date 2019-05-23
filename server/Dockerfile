@@ -17,11 +17,16 @@ ADD package*.json /app/
 
 ADD . /app
 
-RUN cd /app/ && npm install bcrypt@3.0.5
-RUN cd /app/ && npm install
+RUN apk --no-cache add --virtual builds-deps build-base python
+RUN npm config set python /usr/bin/python
 
 WORKDIR /app
 
+RUN npm install
+
+RUN npm rebuild bcrypt --build-from-source
 RUN npm run build
+
+RUN apk del builds-deps
 
 CMD ["npm", "start"]
