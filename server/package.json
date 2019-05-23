@@ -9,11 +9,12 @@
         "play": "npm run build && node ./dist/bin/www",
         "fire": "node ./dist/bin/www",
         "windowsStart": "nodemon --exec npm run windowsPlay --watch ./ --ignore ./dist",
-        "start": "nodemon --exec npm run play --watch ./ --ignore ./dist"
+        "dev": "nodemon --exec npm run play --watch ./ --ignore ./dist",
+        "start": "npm run build && node ./dist/bin/www"
     },
     "env": {},
     "dependencies": {
-        "bcrypt": "^3.0.5",
+        "bcrypt": "^3.0.0",
         "body-parser": "~1.0.0",
         "cookie-parser": "~1.0.1",
         "debug": "~0.7.4",
