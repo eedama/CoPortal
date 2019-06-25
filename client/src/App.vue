@@ -10,7 +10,7 @@
               </md-avatar>
             </a>
           </div>
-          <div class="col hide-on-small-only m10">
+          <div class="col s12 m8 hide-on-small-only">
             <ul class="left">
               <li>
                 <a @click="changeSchool()" class="center-align pointer waves-effect black-text">
