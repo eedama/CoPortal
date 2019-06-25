@@ -57,12 +57,6 @@
           <vue-typer v-if="!$store.state.user.isLoggedIn" class="center-align" :text='titleText' erase-style='backspace'></vue-typer>
           <span v-if="$store.state.user.isLoggedIn">Welcome back <a class="pointer waves-effect">{{ $store.state.user.username }}</a></span>
         </h5>
-        <div @click="changeSchool()" class="row pointer waves-effect">
-          <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-            <span>{{ $store.state.settings.school }}</span>
-            <label class="text-center">School</label>
-          </div>
-        </div>
       </div>
       <div class="col s10 offset-s1 m8 offset-m2 center-align">
         <img src="../assets/logo.png" class="responsive-img">
@@ -120,8 +114,8 @@
         </md-list>
       </div>
       <div class="col s12 m6 xl4 push-xl2 row" style="margin-top:-6px;">
-        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-          <md-card-header class="left">Portal</md-card-header>
+        <div @click="changeSchool()" class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+          <md-card-header class="left">{{ $store.state.settings.school }} Portal</md-card-header>
         </div>
         <div v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)" :key="i" v-on:click="$router.push(option.link)" class="col s12 pointer bigButton waves-effect">
           <div class="card-panel hoverable">
