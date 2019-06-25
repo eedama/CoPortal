@@ -3,21 +3,24 @@
     <nav class="navFixed z-depth-2" v-if="$route.meta.showNav">
       <div class="nav-wrapper">
         <div class="row brand-logo">
-          <div class="col s6">
+          <div class="col s12 m2">
             <a v-on:click="$router.push('/')" class="pointer waves-effect">
               <md-avatar>
                 <img class="img-responsive" src="static/img/co-portalIcon.png">
               </md-avatar>
             </a>
           </div>
-          <div class="col s6"></div>
+          <div class="col hide-on-small-only m10">
+            <ul class="left">
+              <li>
+                <a @click="changeSchool()" class="center-align pointer waves-effect black-text">
+                  <span>{{ $store.state.settings.school }}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
         <ul class="right">
-          <li>
-            <a @click="changeSchool()" class="center-align pointer waves-effect black-text">
-              <span>{{ $store.state.settings.school}}</span>
-            </a>
-          </li>
           <li v-if="$store.state.user.isLoggedIn">
             <a class="center-align pointer waves-effect black-text">
               <span>{{ $store.state.user.username }}</span>
@@ -82,32 +85,36 @@ export default {
       this.changeSchool();
     }
   },
-  methods:{
-    changeSchool(){
-    var webLink = document.location.host;
-    webLink = webLink.split(".");
-    var school = webLink[0];
-    axios
-      .get(this.$store.state.settings.baseLink + "/get/all/Schools")
-      .then(results => {
-        var found = false;
-        results.data.forEach(schoolUrl => {
-          if (schoolUrl.url === school) {
-            this.$store.commit("changeSchool", school);
-            found = true;
+  methods: {
+    changeSchool() {
+      var webLink = document.location.host;
+      webLink = webLink.split(".");
+      var school = webLink[0];
+      axios
+        .get(this.$store.state.settings.baseLink + "/get/all/Schools")
+        .then(results => {
+          var found = false;
+          results.data.forEach(schoolUrl => {
+            if (schoolUrl.url === school) {
+              this.$store.commit("changeSchool", school);
+              found = true;
+            }
+          });
+          if (!found) {
+            ///code to be added if school is not found from url
+            swal(
+              `The school ${school} is not on our server`,
+              "Please contact the admin if this is an unexpected error",
+              "error"
+            );
+          }
+          console.log("I was called", this.$store.state.settings.baseLink);
+        })
+        .catch(err => {
+          if (err.response != null && err.response.status == 512) {
+            this.txtError = err.response.data;
           }
         });
-        if (!found) {
-          ///code to be added if school is not found from url
-          swal(`The school ${school} is not on our server`, "Please contact the admin if this is an unexpected error", "error");
-        }
-        console.log("I was called", this.$store.state.settings.baseLink);
-      })
-      .catch(err => {
-        if (err.response != null && err.response.status == 512) {
-          this.txtError = err.response.data;
-        }
-      });
     }
   }
 };
