@@ -11,7 +11,7 @@ const StudentSchema = new mongoose.Schema({
         ref: 'Admin'
     },
     idNumber: {
-        type: Number,
+        type: String,
         unique: true
     },
     username: {

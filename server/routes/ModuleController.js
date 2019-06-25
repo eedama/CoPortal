@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var bcrypt = require('bcrypt');
 import mongoose from 'mongoose';
 
 // import the models
@@ -187,12 +188,14 @@ router.post('/add/new/module', function(req, res) {
 });
 
 router.post('/add/bulk/modules', async function(req, res) {
-	const modules = req.body.modules;
+	let modules = req.body.modules;
 	if (!modules) {
 		return res.status(512).send('Server error : Invalid request');
 	}
 
-  var succeded=[],failed=[];
+	modules = modules.filter((value, index, self) =>  self.findIndex(v => v.name == value.name && v.code == value.code) == index);
+	var succeded=[],failed=[];
+	let count = 0;
 	for (var _module of modules.filter(m => m)) {
   try {
       var results = await Module.findOne({
@@ -219,6 +222,10 @@ router.post('/add/bulk/modules', async function(req, res) {
     }catch(ex){
       failed.push(ex.message);
     }
+		console.log(count++,{
+			failed:failed.length > 0 ? failed[failed.length-1] : 0,
+			succeded:succeded.length > 0 ? succeded[succeded.length-1] : 0
+		})
   }
   return res.json({
     succeded:succeded,
@@ -226,6 +233,37 @@ router.post('/add/bulk/modules', async function(req, res) {
   })
 });
 
+function GeneratePassword(password)
+{
+var saltRounds = 13;
+var salt = bcrypt.genSaltSync(saltRounds);
+var hash =   bcrypt.hashSync(password, salt);
+return hash;
+}
+
+router.post('/fix/dublicates', async function(req, res) {
+	Student.find({
+
+	}).then(modules =>{
+		modules.forEach(m =>{
+			if(m.modules){
+				try{
+				let total = m.modules.length;
+				m.modules = m.modules.filter((value, index, self) =>  self.findIndex(v => v.name.trim() == value.name.trim() && v.code.trim() == value.code.trim()) === index);
+				if(total != m.modules.length){
+					console.log("from " + total + " to " + m.modules.length);
+				//	m.save();
+				}else{
+					console.log("Synced at " + total);
+				}
+			}catch(err){
+				console.log(err.message);
+			}
+			}
+		})
+	});
+	res.send("Working.....")
+})
 
 router.post('/link/bulk/modules/to/bulk/students', async function(req, res) {
 	const studentAndModules = req.body.studentAndModules;
@@ -235,36 +273,78 @@ router.post('/link/bulk/modules/to/bulk/students', async function(req, res) {
 
   var succeded=[],failed=[];
 
-	for(let _student of studentAndModules){
-		_student.username = _student.firstname.toLowerCase().replace(/ /g,'')+'-'+_student.lastname.toLowerCase().replace(/ /g,'')
-		try {
-			const _ss = await Student.findOne({
-				username:_student.username
-			});
-			for(let _module of _student.modules){
-				const _mm = await Module.findOne({
-					name: _module.split("-")[0],
-					code: _module.split("-")[1],
-				});
-				if(!_mm.students.some(sm => sm.toString() == _ss._id.toString())){
-					_mm.students.push(_ss._id);
-				}
-				await _mm.save();
-				if(!_ss.modules.some(ms => ms.toString() == _mm._id.toString())){	
-					_ss.modules.push(_mm._id);
-				}
-				var saved = await _ss.save();
-				if(saved) {
-          succeded.push(saved);
-        }else{
-          failed.push(_mm.name + " failed");
-        }
-				console.log('Linked ' + _ss.username + " to " + _mm.name + " ( " + _mm.code + " )");
+	const allModules = await Module.find({
+
+	},"_id name code students");
+	let count = 0;
+	for(let currentModule of allModules.filter(m => m && m.name && m.code)){		
+		const moduleNameCode = `${currentModule.name.trim()}-${currentModule.code.trim()}`;
+		console.log("Trying to link",moduleNameCode);
+		if(!studentAndModules.some(s => s[moduleNameCode])){
+			console.log("No student does " + moduleNameCode);
+			continue;
+		}
+		for(let _student of studentAndModules.filter(s => s[moduleNameCode])){
+			if(!_student[moduleNameCode]){
+				continue;
 			}
-		}catch(ex){
-      failed.push(ex.message);
-    }
+			let firstname = _student.name.toLowerCase().split(',')[0].trim();
+			let lastname = _student.name.toLowerCase().split(',')[1].trim();
+			let username = firstname.toLowerCase().replace(/ /g,'')+'-'+lastname.toLowerCase().replace(/ /g,'').split(' ')[0];
+			try {
+				let _ss = await Student.findOne({
+					username:username
+				},"_id firstname lastname username modules");
+				if(_student[moduleNameCode]){
+						if(!_ss){
+							_ss = new Student({
+								_id:mongoose.Types.ObjectId(),
+								username:username,
+								firstname:firstname,
+								lastname:lastname,
+								password:GeneratePassword(lastname),
+								idNumber:'0000000000000' + (Math.random()*100000) + count++
+							});
+						 //	console.error("????????????? " + username + " is not in the DB - " + moduleNameCode);
+						}
+						var saved = false;
+						if(!currentModule.students.some(sm => sm.toString() == _ss._id.toString())){
+							currentModule.students.push(_ss._id);
+							currentModule.save(function(err){
+								if(err){
+									console.error("<<<<<<<<<Failed to link module " + _ss.username + " to " + moduleNameCode);
+									console.log(err.message);
+									failed.push(currentModule.name + " failed");
+								}else{
+									console.log('Linked module ' + _ss.username + " to " + moduleNameCode);
+									succeded.push(saved);
+								}
+							});
+						}
+						if(!_ss.modules.some(ms => ms.toString() == currentModule._id.toString())){	
+							_ss.modules.push(currentModule._id.toString());
+							_ss.save(function(err){
+								if(err){
+									console.error("<<<<<<<<<Failed to link " + _ss.username + " to " + moduleNameCode);
+									console.log(err.message);
+									failed.push(currentModule.name + " failed");
+								}else{
+									console.log('Linked ' + _ss.username + " to " + moduleNameCode);
+									succeded.push(saved);
+								}
+							});
+						}
+					}else{
+					//	console.log("Couldn't find",_ss);
+					//	console.log("Couldn't find",moduleNameCode + " " + _student[moduleNameCode]);
+					}
+			}catch(ex){
+				console.log(ex.message);
+				failed.push(ex.message);
+			}
+		}
 	}
+	console.log("!!!!! DONE !!!!!");
   return res.json({
     succeded:succeded,
     failed:failed
