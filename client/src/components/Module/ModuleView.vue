@@ -1,12 +1,12 @@
 <template>
   <div class="screen">
-  
-    <md-dialog style="position:absolute;top:25%" class="card" :md-active.sync="addNotes">
+
+    <md-dialog style="position:absolute;top:50%" class="card" :md-active.sync="addNotes">
       <md-card class="col s12 m8 offset-m2">
         <md-card-header>
           <div class="md-title">Adding notes</div>
         </md-card-header>
-  
+
         <md-card-content>
           <md-field>
             <label>Title</label>
@@ -29,7 +29,7 @@
         <md-button class="md-primary" @click="addNotes = false">Close</md-button>
       </md-dialog-actions>
     </md-dialog>
-  
+
     <md-dialog class="card" style="position:absolute" :md-active.sync="addStudent">
       <md-content style="overflow-y:scroll" class="row">
         <add-student v-on:submitted="AddedNewStudent"></add-student>
@@ -73,9 +73,9 @@
                       <md-button class="md-icon-button" md-menu-trigger>
                         <md-icon>more_vert</md-icon>
                       </md-button>
-  
+
                       <md-menu-content class="card">
-                        <md-menu-item v-on:click="addNotes = true" class="waves-effect">
+                        <md-menu-item v-if="$store.state.user.type != 'STUDENT'" v-on:click="addNotes = true" class="waves-effect">
                           <span>Add new</span>
                           <md-icon>add</md-icon>
                         </md-menu-item>
@@ -105,9 +105,9 @@
                       <md-button class="md-icon-button" md-menu-trigger>
                         <md-icon>more_vert</md-icon>
                       </md-button>
-  
+
                       <md-menu-content class="card">
-                        <md-menu-item v-on:click="setATestForModule(module._id)" class="waves-effect">
+                        <md-menu-item v-if="$store.state.user.type != 'STUDENT'" v-on:click="setATestForModule(module._id)" class="waves-effect">
                           <span>Set a test</span>
                           <md-icon>add</md-icon>
                         </md-menu-item>
@@ -143,7 +143,7 @@
                           <span>Reload</span>
                           <md-icon>reload</md-icon>
                         </md-menu-item>
-                        <md-menu-item v-on:click="addStudent = true" class="waves-effect">
+                        <md-menu-item v-if="$store.state.user.type != 'STUDENT'" v-on:click="addStudent = true" class="waves-effect">
                           <span>Add new</span>
                           <md-icon>add</md-icon>
                         </md-menu-item>
@@ -180,8 +180,8 @@
                       <md-button class="md-icon-button" md-menu-trigger>
                         <md-icon>more_vert</md-icon>
                       </md-button>
-  
-                      <md-menu-content class="card">
+
+                      <md-menu-content v-if="$store.state.user.type != 'STUDENT'" class="card">
                         <md-menu-item class="waves-effect">
                           <span>Add new</span>
                           <md-icon>add</md-icon>
@@ -220,7 +220,7 @@
                 <h5 class="center-align center text-center">Send an announcement</h5>
               </div>
             </div>
-  
+
             <md-card v-if="$store.state.user.type != 'STUDENT' && isAddingAnnouncements">
               <md-header>
                 <md-button class="md-icon-button right" v-on:click="isAddingAnnouncements = false">
@@ -278,13 +278,13 @@
                   <md-avatar>
                     <img src="https://placeimg.com/40/40/people/1" alt="People">
                   </md-avatar>
-  
+
                   <div class="md-list-item-text">
                     <span>{{ announcement.lecturerId ?  announcement.lecturerId.lastname + " " + announcement.lecturerId.firstname : "Admin" }} &nbsp;&bull; {{ getMoment(announcement.date).fromNow() }}</span>
                     <span>{{ announcement.title }}</span>
                     <p>{{ announcement.message }}</p>
                   </div>
-  
+
                   <md-button class="md-icon-button md-list-action">
                     <md-icon class="md-primary">thumb_up</md-icon>
                   </md-button>

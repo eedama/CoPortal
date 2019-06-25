@@ -44,7 +44,7 @@
                 <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
               </div>
             </div>
-            <div v-if="pastUsers.length > 0" class="row">
+            <div v-if="pastUsers && pastUsers.length > 0" class="row">
               <div class="col s12 left-align">
                 <label>You can log in as : </label>
               </div>
