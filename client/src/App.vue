@@ -3,21 +3,25 @@
     <nav class="navFixed z-depth-2" v-if="$route.meta.showNav">
       <div class="nav-wrapper">
         <div class="row brand-logo">
-          <div class="col s6">
+          <div class="col s12 m2">
             <a v-on:click="$router.push('/')" class="pointer waves-effect">
               <md-avatar>
                 <img class="img-responsive" src="static/img/co-portalIcon.png">
               </md-avatar>
             </a>
           </div>
-          <div class="col s6"></div>
-        </div>
+          <div class="col hide-on-small-only m10">
+                    <ul class="left">
         <ul class="right">
           <li>
             <a @click="changeSchool()" class="center-align pointer waves-effect black-text">
-              <span>{{ $store.state.settings.school}}</span>
+              <span>{{ $store.state.settings.school }}</span>
             </a>
           </li>
+        </ul>
+        </div>
+        </div>
+        <ul class="right">
           <li v-if="$store.state.user.isLoggedIn">
             <a class="center-align pointer waves-effect black-text">
               <span>{{ $store.state.user.username }}</span>
