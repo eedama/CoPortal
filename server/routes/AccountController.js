@@ -40,7 +40,27 @@ router.post("/login", function (req, res) {
               username: username
             }).then(admin => {
               if (admin == null) {
-                return res.status(512).send("Incorrect login details");
+                Student.find({
+                  'parents.email':username
+                }).then(students =>{
+                  if(students && students.length > 0){
+                    // parent != null
+                    students.filter(s => s && s.parents && s.parents.length > 0).forEach(s => {
+                      s.parents.filter(p => p && p.password && p.email).forEach(parent => {
+                        if (ComparePassword(password,parent.password) ) {
+                          return res.json({
+                            userType: 'PARENT',
+                            user: parent,
+                            students
+                          });
+                        }
+                      })
+                    });
+                    return res.status(512).send("Incorrect password for " + username);
+                  }else{
+                    return res.status(512).send("Incorrect login details");
+                  }
+                });
               } else {
                 // admin != null
                 if (!ComparePassword(password,admin.password) ) {

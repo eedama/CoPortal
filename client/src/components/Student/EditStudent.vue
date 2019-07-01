@@ -219,7 +219,7 @@
                 </md-field>
               </div>
             </div>
-            <div class="row" v-show="txtError.length > 0">
+            <div class="row" v-show="txtError2.length > 0">
               <div class="col s8 offset-s2 m6 offset-m3 text-center">
                 <label class="text-center red-text">{{ txtError2 }}</label>
               </div>

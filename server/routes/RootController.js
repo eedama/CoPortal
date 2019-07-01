@@ -12,6 +12,7 @@ router.get("/", async(req, res, next) => {
     var fcmID = null;
     var jobs = null;
     var serverName = null;
+    var school = null;
     try {
         switch (mongoose.connection.readyState) {
             case 0:
@@ -49,12 +50,19 @@ router.get("/", async(req, res, next) => {
 
     }
 
+    try{
+        school = process.env.SCHOOL;
+    }catch (ex){ 
+
+    }
+
     var upTime = moment().subtract(process.uptime(), 'seconds').fromNow();
 
     res.json({
         api: true,
         serverName:serverName,
         db: dbActive,
+        school:school,
         fcmId: fcmID,
         dateTime: new Date(),
         lastBuild: upTime,
