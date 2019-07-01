@@ -180,7 +180,7 @@
                           <md-icon>reload</md-icon>
                         </md-menu-item>
                         <md-menu-item
-                          v-if="$store.state.user.type != 'STUDENT'"
+                          v-if="$store.state.user.type !== 'STUDENT'"
                           v-on:click="addStudent = true"
                           class="waves-effect"
                         >
@@ -200,7 +200,7 @@
                             id="StudentPassword"
                             name="StudentPassword"
                             type="search"
-                          >
+                          />
                           <label class="text-center" for="StudentPassword">Search</label>
                         </div>
                       </md-list-item>
@@ -233,11 +233,12 @@
                         <md-icon>more_vert</md-icon>
                       </md-button>
 
-                      <md-menu-content
-                        class="card"
-                      >
+                      <md-menu-content class="card">
                         <md-menu-item
-                        v-if="$store.state.user.type == 'ADMIN'" v-on:click="addLecturer = true" class="waves-effect">
+                          v-if="$store.state.user.type == 'ADMIN'"
+                          v-on:click="addLecturer = true"
+                          class="waves-effect"
+                        >
                           <span>Add new</span>
                           <md-icon>add</md-icon>
                         </md-menu-item>
@@ -254,7 +255,7 @@
                             id="LecturerPassword"
                             name="LecturerPassword"
                             type="search"
-                          >
+                          />
                           <label class="text-center" for="LecturerPassword">Search</label>
                         </div>
                       </md-list-item>
@@ -283,7 +284,10 @@
               md-label="No announcements"
               :md-description="`All the announcements about ${module.name} (${module.code}) will be posted here.`"
             >
-              <md-button class="md-primary md-raised">Add an announcement</md-button>
+              <md-button
+                v-if="userType !== 'STUDENT'"
+                class="md-primary md-raised"
+              >Add an announcement</md-button>
             </md-empty-state>
             <div v-if="$store.state.user.type != 'STUDENT' && !isAddingAnnouncements" class="row">
               <div
@@ -313,7 +317,7 @@
                       id="ModuleDescription"
                       name="ModuleDescription"
                       type="text"
-                    >
+                    />
                     <label class="text-center" for="ModuleDescription">Title</label>
                   </div>
                 </div>
@@ -324,7 +328,7 @@
                       id="ModuleDescription"
                       name="ModuleDescription"
                       type="text"
-                    >
+                    />
                     <label class="text-center" for="ModuleDescription">Message</label>
                   </div>
                 </div>
@@ -343,7 +347,7 @@
                             name="group1"
                             type="radio"
                             checked
-                          >
+                          />
                           <span>{{ module.name }} ({{ module.code }}) students</span>
                         </label>
                       </p>
@@ -355,7 +359,7 @@
                             class="with-gap"
                             name="group1"
                             type="radio"
-                          >
+                          />
                           <span>All Students</span>
                         </label>
                       </p>
@@ -381,7 +385,7 @@
               <md-list class="md-triple-line">
                 <md-list-item>
                   <md-avatar>
-                    <img src="https://placeimg.com/40/40/people/1" alt="People">
+                    <img src="https://placeimg.com/40/40/people/1" alt="People" />
                   </md-avatar>
 
                   <div class="md-list-item-text">
@@ -432,6 +436,7 @@ export default {
       txtError: "",
       addStudent: false,
       addLecturer: false,
+      userType: "",
       addNotes: false,
       notes: {
         title: "",
@@ -472,6 +477,7 @@ export default {
     }
   },
   mounted() {
+    this.userType = this.$store.state.user.type;
     if (this.moduleID == null) {
       this.$router.back();
     } else {

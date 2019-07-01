@@ -92,8 +92,10 @@
             erase-style="backspace"
           ></vue-typer>
           <span v-if="$store.state.user.isLoggedIn">
-            Welcome back
-            <a class="pointer waves-effect">{{ $store.state.user.username }}</a>
+            Welcome
+            <span v-if="!isParent">back</span>
+            <a class="pointer">{{ $store.state.user.username }}</a>
+            <span v-if="isParent">{{parentRelationship}}</span>
           </span>
         </h5>
       </div>
@@ -241,6 +243,7 @@ export default {
       isAddingAnnouncements: false,
       showEmoji: false,
       isLoading: false,
+      parentRelationship: "Mother",
       txtSearch: "",
       titleText: [
         "Welcome to Co-Portal.",
