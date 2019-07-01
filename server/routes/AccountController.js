@@ -46,7 +46,7 @@ router.post("/login", function (req, res) {
                   if(students && students.length > 0){
                     // parent != null
                     students.filter(s => s && s.parents && s.parents.length > 0).forEach(s => {
-                      s.parents.forEach(parent => {
+                      s.parents.filter(p => p && p.password && p.email).forEach(parent => {
                         if (ComparePassword(password,parent.password) ) {
                           return res.json({
                             userType: 'PARENT',
@@ -60,7 +60,7 @@ router.post("/login", function (req, res) {
                   }else{
                     return res.status(512).send("Incorrect login details");
                   }
-                })
+                });
               } else {
                 // admin != null
                 if (!ComparePassword(password,admin.password) ) {
