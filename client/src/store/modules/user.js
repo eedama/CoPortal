@@ -7,10 +7,14 @@ const state = {
   type: null,
   profilePic: null,
   isLoggedIn: false,
-  isAdmin: false
+  isAdmin: false,
+  isParent: true,
 };
 
 const mutations = {
+  setParent(state, isParrent) {
+    state.isParent = isParrent;
+  },
   login(state, user) {
     state.id = user.id;
     state.username = user.username;
