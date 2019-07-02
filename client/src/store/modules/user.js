@@ -8,12 +8,20 @@ const state = {
   profilePic: null,
   isLoggedIn: false,
   isAdmin: false,
-  isParent: true
+  isParent: false,
+  parent: {},
+  parentStudents: []
 };
 
 const mutations = {
   setParent(state, isParrent) {
     state.isParent = isParrent;
+  },
+  setStudentParent(state, parent) {
+    state.parent = parent;
+  },
+  setParentStudents(state, students) {
+    state.parentStudents = students;
   },
   login(state, user) {
     state.id = user.id;
@@ -35,6 +43,9 @@ const mutations = {
     state.type = null;
     state.isLoggedIn = false;
     state.isAdmin = false;
+    state.parent = {};
+    state.isParent = false;
+    state.parentStudents = [];
   }
 };
 

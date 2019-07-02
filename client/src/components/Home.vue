@@ -92,8 +92,10 @@
             erase-style="backspace"
           ></vue-typer>
           <span v-if="$store.state.user.isLoggedIn">
-            Welcome back
-            <a class="pointer waves-effect">{{ $store.state.user.username }}</a>
+            Welcome
+            <span v-if="!isParent">back</span>
+            <a class="pointer">{{ $store.state.user.username }}</a>
+            <span v-if="isParent">{{parentRelationship}} ( {{$store.state.user.parent.name}} )</span>
           </span>
         </h5>
       </div>
@@ -241,6 +243,7 @@ export default {
       isAddingAnnouncements: false,
       showEmoji: false,
       isLoading: false,
+      parentRelationship: "Mother",
       txtSearch: "",
       titleText: [
         "Welcome to Co-Portal.",
@@ -300,6 +303,9 @@ export default {
     if (this.$store.state.user.isLoggedIn) {
       this.isLoading = true;
       this.isParent = this.$store.state.user.isParent;
+      this.parentRelationship = this.capitalize(
+        this.$store.state.user.parent.relationship
+      );
       axios
         .post(
           this.$store.state.settings.baseLink +
@@ -356,7 +362,10 @@ export default {
   },
   methods: {
     capitalize(name) {
-      return name.charAt(0).toUpperCase() + name.slice(1);
+      if (!name) {
+        return "";
+      }
+      return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
     },
     GotoExternal(url) {
       window.open(url, "_blank");
