@@ -209,7 +209,22 @@ router.beforeEach((to, from, next) => {
   var userType = store.state.user.type;
   if (userType == null && router.app.$session.has('user')) {
     var user = router.app.$session.get('user');
-    store.commit("login", user);
+    if(user.type === 'PARENT') {
+      const results = user.results;
+      store.commit("setParent", true);
+      store.commit("setStudentParent", results.data.user);
+      store.commit("setParentStudents", results.data.students);
+      const currentUser = results.data.students[0];
+      store.commit("login", {
+        id: currentUser._id,
+        username: currentUser.username,
+        password: currentUser.password,
+        type: "STUDENT",
+        isLoggedIn: true
+      });
+    }else {
+      store.commit("login", user);
+    }
     userType = store.state.user.type;
   }
 

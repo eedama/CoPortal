@@ -165,12 +165,20 @@ Vue.mixin({
         }
       }
       this.$session.start();
-      var newUser = {
-        id: results.data.user._id,
-        username: results.data.user.username,
-        type: results.data.userType,
-        isLoggedIn: true
-      };
+      let newUser = {};
+      if ( results.data.userType === 'PARENT') {
+        newUser = {
+          type: results.data.userType,
+          results: results,
+        }
+      }else {
+        newUser = {
+          id: results.data.user._id,
+          username: results.data.user.username,
+          type: results.data.userType,
+          isLoggedIn: true
+        };
+      }
       this.$session.set("user", newUser);
       var users = this.$session.get("users");
       if (users == null) {

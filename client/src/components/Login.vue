@@ -143,6 +143,9 @@ export default {
         });
     },
     LoginAsUser(user) {
+      if (user.type ===  'PARENT') {
+        user.type = 'STUDENT';
+      }
       this.$store.commit("login", user);
       this.$router.push("/");
     }
