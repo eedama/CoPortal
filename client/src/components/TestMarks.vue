@@ -15,39 +15,84 @@
     </div>
     <div class="col s12 center-align card-panel row">
       <div class="col s12 m8 offset-m2">
-        <h4><a>{{ Solution.isMemo ? 'Memorandum' : Solution.studentId.firstname + " " + Solution.studentId.lastname}}</a></h4>
-        <h5>Your score is <a :class="{'red-text':(Solution.mark*2 < Solution.answers.length)}">{{ Solution.mark }}/{{ Solution.answers.length }}</a></h5>
+        <h4>
+          <a>{{ Solution.isMemo ? 'Memorandum' : Solution.studentId.firstname + " " + Solution.studentId.lastname}}</a>
+        </h4>
+        <h5>
+          Your score is
+          <a
+            :class="{'red-text':(Solution.mark*2 < Solution.answers.length)}"
+          >{{ Solution.mark }}/{{ Solution.answers.length }}</a>
+        </h5>
       </div>
       <div class="col s12 right-align">
-        <a class="btn-floating black waves-effect" title="Download" v-on:click="DownloadMarks"><i class="material-icons">save</i></a>
-        <a class="btn-floating black waves-effect" title="Memorandum" v-on:click="ViewMemorandum"><i class="material-icons">description</i></a>
-        <a class="btn-floating black waves-effect" :class="{'transparent':addingFeedBack}" v-on:click="openCloseFeedbacks" title="Feed back"><i :class="{'black-text':addingFeedBack}" class="material-icons">chat</i></a>
+        <a class="btn-floating black waves-effect" title="Download" v-on:click="DownloadMarks">
+          <i class="material-icons">save</i>
+        </a>
+        <a class="btn-floating black waves-effect" title="Memorandum" v-on:click="ViewMemorandum">
+          <i class="material-icons">description</i>
+        </a>
+        <a
+          class="btn-floating black waves-effect"
+          :class="{'transparent':addingFeedBack}"
+          v-on:click="openCloseFeedbacks"
+          title="Feed back"
+        >
+          <i :class="{'black-text':addingFeedBack}" class="material-icons">chat</i>
+        </a>
       </div>
       <div class="col s12 m8 offset-m2">
-        <span class="blue-text">Scroll down to see {{ addingFeedBack ?'add your feedback' : 'view your test'}}.</span>
+        <span
+          class="blue-text"
+        >Scroll down to see {{ addingFeedBack ?'add your feedback' : 'view your test'}}.</span>
       </div>
     </div>
     <div v-show="addingFeedBack" class="col s12 row card-panel">
       <div class="col s12 right-align">
-        <a class="btn-floating transparent waves-effect right-align" v-on:click="addingFeedBack = !addingFeedBack"><i class="material-icons red-text">close</i></a>
+        <a
+          class="btn-floating transparent waves-effect right-align"
+          v-on:click="addingFeedBack = !addingFeedBack"
+        >
+          <i class="material-icons red-text">close</i>
+        </a>
       </div>
       <div class="row">
-        <div class="col s10 offset-s1 chat" :class="{'right-align':feedback.from.id == $store.state.user.id}" v-for="(feedback,i) in feedbacks" :key="i">
-          <span class="chip message" :class="{'notSent':feedback.status != 'sent','black white-text':feedback.from.type != 'STUDENT'}">
-                     <span class="from" :class="{'white-text':feedback.from.type != 'STUDENT'}">{{ feedback.from.name }}</span> : {{ feedback.message }}
+        <div
+          class="col s10 offset-s1 chat"
+          :class="{'right-align':feedback.from.id == $store.state.user.id}"
+          v-for="(feedback,i) in feedbacks"
+          :key="i"
+        >
+          <span
+            class="chip message"
+            :class="{'notSent':feedback.status != 'sent','black white-text':feedback.from.type != 'STUDENT'}"
+          >
+            <span
+              class="from"
+              :class="{'white-text':feedback.from.type != 'STUDENT'}"
+            >{{ feedback.from.name }}</span>
+            : {{ feedback.message }}
           </span>
-          <p class="time">{{ feedback.status != 'sent' ? feedback.status : getMoment(feedback.date).fromNow() }}</p>
+          <p
+            class="time"
+          >{{ feedback.status != 'sent' ? feedback.status : getMoment(feedback.date).fromNow() }}</p>
         </div>
       </div>
       <div class="col s10 switch">
         <label>
-                      <input v-on:change="toggleAutoRefresh" v-model="autoRefreshChats" type="checkbox">
-                      <span class="lever"></span>
-                      {{ autoRefreshChats ?  'Auto refreshing every 5 seconds' : 'Auto refresh is off, Use the button on the right to get the latest messages' }} 
-                    </label>
+          <input v-on:change="toggleAutoRefresh" v-model="autoRefreshChats" type="checkbox" />
+          <span class="lever"></span>
+          {{ autoRefreshChats ? 'Auto refreshing every 5 seconds' : 'Auto refresh is off, Use the button on the right to get the latest messages' }}
+        </label>
       </div>
       <div class="col s2 right-align">
-        <a v-if="!isLoading" class="btn-floating transparent waves-effect right-align" v-on:click="refreshFeedbacks"><i class="material-icons black-text">refresh</i></a>
+        <a
+          v-if="!isLoading"
+          class="btn-floating transparent waves-effect right-align"
+          v-on:click="refreshFeedbacks"
+        >
+          <i class="material-icons black-text">refresh</i>
+        </a>
         <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
       </div>
       <form class="col s12 center-align">
@@ -58,7 +103,11 @@
             <label for="icon_prefix2">Comment</label>
           </div>
           <div class="col s8 offset-s2 center-align">
-            <a v-if="!isLoading" v-on:click="SubmitFeedback" class="btn green waves-effect-effect">Comment</a>
+            <a
+              v-if="!isLoading"
+              v-on:click="SubmitFeedback"
+              class="btn green waves-effect-effect"
+            >Comment</a>
             <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
           </div>
         </div>
@@ -74,9 +123,16 @@
             <form>
               <h6 class="pointer" v-for="(answer,j) in solution.question.answers" :key="j">
                 <label>
-                              <input :disabled="solution.answer != answer" :checked="solution.answer == answer" :id="answer + '-' + j" class="with-gap" :name="solution._id" type="radio"/>
-                              <span :for="answer + '-' + j">{{ answer }}</span>
-                            </label>
+                  <input
+                    :disabled="solution.answer != answer"
+                    :checked="solution.answer == answer"
+                    :id="answer + '-' + j"
+                    class="with-gap"
+                    :name="solution._id"
+                    type="radio"
+                  />
+                  <span :for="answer + '-' + j">{{ answer }}</span>
+                </label>
               </h6>
             </form>
           </div>
@@ -219,7 +275,11 @@ export default {
         date: new Date(),
         status: "sending...."
       };
-
+      if (this.$store.state.user.isParent) {
+        feedback.from = `${
+          feedback.from
+        }'s (${this.$store.state.user.parent.relationship.toLowerCase()})`;
+      }
       this.feedbacks.push(feedback);
       this.txtFeedback = "";
 
