@@ -443,6 +443,11 @@ export default {
         this.$store.commit("setStudentParent", currentParent);
         this.isChangingStudent = false;
         this.currentStudent = "";
+        swal(
+          "Success",
+          `Successfully changed student to ${user.username}`,
+          "success"
+        );
       }
     },
     goToRoute(option) {
