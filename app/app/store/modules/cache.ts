@@ -21,21 +21,16 @@ const mutations = {
           obj.api
             .addUserDeviceToken(state.cachedUser.user._id, state.deviceToken)
             .then(response => {
-              console.log("printed2", response.content.toString());
-              var statusCode = response.statusCode;
-              console.log(statusCode);
-              if (statusCode != 200) {
-                var error = response.content;
-                throw new Error(error);
-              } else {
-                console.log(
-                  "device_token_response",
-                  response.content.toString()
-                );
+              if(response){
+                var statusCode = response.statusCode;
+                if (statusCode != 200) {
+                  var error = response.content;
+                  throw new Error(error);
+                }
               }
             })
             .catch(err => {
-              console.log("ADDTOKEN-error", err);
+              console.log("ADDTOKEN-error", err.message);
             });
         }
       } catch (errr) {
@@ -62,19 +57,16 @@ const mutations = {
         obj.api
           .addUserDeviceToken(state.cachedUser.user._id, state.deviceToken)
           .then(response => {
-            var statusCode = response.statusCode;
-            if (statusCode != 200) {
-              var error = response.content;
-              throw new Error(error);
-            } else {
-              console.log(
-                "device_token_response_2",
-                response.content.toString()
-              );
+            if(response){
+              var statusCode = response.statusCode;
+              if (statusCode == 512) {
+                var error = response.content;
+                throw new Error(error);
+              }
             }
           })
           .catch(err => {
-            console.log("ADDTOKEN-error", err);
+            console.log("ADDTOKEN-error", err.message);
           });
       }
     } catch (errr) {
