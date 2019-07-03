@@ -1,6 +1,45 @@
 <template>
   <div class="screen">
     <md-dialog
+      v-if="isParent"
+      style="position:absolute;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
+      class="card"
+      :md-active.sync="isChangingStudent"
+    >
+      <md-card class="col s12" style="background-color:#006064;">
+        <md-card-header>
+          <div class="md-title" style="color:ghostwhite">Change Student</div>
+          <md-button v-on:click="isChangingStudent = false" class="right">
+            <md-icon style="color:ghostwhite">close</md-icon>
+          </md-button>
+        </md-card-header>
+      </md-card>
+      <md-card-actions>
+        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+        <div class="row">
+          <md-content class="col s12">
+            <md-field>
+              <label>Select Student</label>
+              <md-select v-model="currentStudent">
+                <md-option
+                  v-for="(student,i) in students"
+                  :key="i"
+                  style="background-color:white"
+                  :value="student._id"
+                >{{ student.username }}</md-option>
+              </md-select>
+            </md-field>
+          </md-content>
+          <md-button
+            v-if="!isLoading"
+            v-on:click="changeStudent()"
+            class="md-primary col s12"
+            style="background-color:#006064;color:ghostwhite"
+          >Change student</md-button>
+        </div>
+      </md-card-actions>
+    </md-dialog>
+    <md-dialog
       v-if="$store.state.user.isLoggedIn && ($store.state.user.type=='LECTUERE' || $store.state.user.type=='ADMIN')"
       style="position:absolute;top:25%;width:100%"
       class="card"
@@ -93,9 +132,13 @@
           ></vue-typer>
           <span v-if="$store.state.user.isLoggedIn">
             Welcome
-            <span v-if="!isParent">back</span>
-            <a class="pointer">{{ $store.state.user.username }}</a>
-            <span v-if="isParent">{{parentRelationship}} ( {{$store.state.user.parent.name}} )</span>
+            <span v-if="isParent">
+              <a class="pointer">{{$store.state.user.parent.name}}</a>
+            </span>
+            <span v-if="!isParent">
+              back
+              <a class="pointer">{{ $store.state.user.username }}</a>
+            </span>
           </span>
         </h5>
       </div>
@@ -189,7 +232,7 @@
         <div
           v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)"
           :key="i"
-          v-on:click="$router.push(option.link)"
+          v-on:click="goToRoute(option)"
           class="col s12 pointer bigButton waves-effect"
         >
           <div class="card-panel hoverable">
@@ -243,7 +286,10 @@ export default {
       isAddingAnnouncements: false,
       showEmoji: false,
       isLoading: false,
+      isChangingStudent: false,
       parentRelationship: "Mother",
+      students: [],
+      currentStudent: "",
       txtSearch: "",
       titleText: [
         "Welcome to Co-Portal.",
@@ -303,9 +349,19 @@ export default {
     if (this.$store.state.user.isLoggedIn) {
       this.isLoading = true;
       this.isParent = this.$store.state.user.isParent;
-      this.parentRelationship = this.capitalize(
-        this.$store.state.user.parent.relationship
-      );
+      if (this.isParent) {
+        this.options.push({
+          text: "Change a student",
+          icon: "people",
+          link: "/",
+          auth: ["STUDENT"],
+          showStudents: true
+        });
+        this.students = this.$store.state.user.parentStudents;
+        this.parentRelationship = this.capitalize(
+          this.$store.state.user.parent.relationship
+        );
+      }
       axios
         .post(
           this.$store.state.settings.baseLink +
@@ -361,6 +417,46 @@ export default {
     }
   },
   methods: {
+    changeStudent() {
+      const currentStudent = this.students.filter(
+        student => student._id === this.currentStudent
+      );
+      if (currentStudent[0]) {
+        const user = currentStudent[0];
+        this.$store.commit("login", {
+          id: user._id,
+          username: user.username,
+          password: user.password,
+          type: "STUDENT",
+          isLoggedIn: true
+        });
+        const currentParent = JSON.parse(
+          JSON.stringify(this.$store.state.user.parent)
+        );
+        const newParent = currentStudent[0].parents.filter(
+          parent => parent.email === currentParent.email
+        );
+
+        if (newParent && newParent.length > 0) {
+          currentParent.relationship = newParent[0].relationship;
+        }
+        this.$store.commit("setStudentParent", currentParent);
+        this.isChangingStudent = false;
+        this.currentStudent = "";
+        swal(
+          "Success",
+          `Successfully changed student to ${user.username}`,
+          "success"
+        );
+      }
+    },
+    goToRoute(option) {
+      if (option.showStudents) {
+        this.isChangingStudent = true;
+      } else {
+        this.$router.push(option.link);
+      }
+    },
     capitalize(name) {
       if (!name) {
         return "";
