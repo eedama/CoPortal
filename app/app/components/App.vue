@@ -203,13 +203,14 @@ export default {
           description: "Customize your portal",
           auth: ["STUDENT", "LECTURER", "ADMIN", "PARENT"]
         },
+        /* 
         {
           text: "Switch student",
           icon: "account-convert",
           link: "/login",
           description: "Switch user",
           auth: ["PARENT"]
-        },
+        }, */
         {
           text: "Log out",
           icon: "exit-run",
@@ -235,10 +236,10 @@ export default {
     this.$firebase.admob.hideBanner().then(() =>{
       console.log('Banner_hidden',true);
     }).catch(err =>{
-      console.log('Banner_hidden',err);
+      console.log('Banner_hidden_dont_stress_1',err);
     });
     }catch(ex){
-      console.log('Banner_hidden',ex);
+      console.log('Banner_hidden_dont_stress',ex);
     }
    
    connectivity.startMonitoring(conn => {

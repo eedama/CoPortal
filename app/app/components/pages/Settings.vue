@@ -8,7 +8,7 @@
         </GridLayout>
       </StackLayout>
       <ActivityIndicator verticalAlignment="center" textAlignment="center" row="1" v-show="isLoading" :busy="isLoading"></ActivityIndicator>
-      <StackLayout v-if="!isLoading" row="1">
+      <StackLayout v-if="!isLoading && $store.state.cache.cachedUser && $store.state.cache.cachedUser.userType != 'PARENT'" row="1">
         <CardView margin="5" :elevation="selectedSetting == 1 ? '10' : '0'">
           <Ripple @tap="LoadModules()">
             <GridLayout class="m-10 p-y-5" rows="auto" columns="auto,*,auto">

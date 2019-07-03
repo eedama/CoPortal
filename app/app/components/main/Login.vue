@@ -242,12 +242,43 @@ export default {
   },
   methods: {
     manageStudent(student){
-      this.navigate("/notifications/list", null, {
-        clearHistory: true
-      });
+      if(this.$store.state.cache.cachedUser && this.$store.state.cache.cachedUser.userType =='PARENT'){
+         let currentUser = JSON.parse(JSON.stringify(this.$store.state.cache.cachedUser));
+         
+         this.appSettings.remove("isLoggedInUserId");
+         this.appSettings.remove("userType");
+         this.appSettings.remove("device_token"); 
+         this.$store.commit("clearCache", {
+           db: this.$db,
+           appSettings: this.appSettings,
+           api: this.$api
+         });
+
+         currentUser.user = student;
+         this.$store.commit("cacheUser", {
+            db: this.$db,
+            api: this.$api,
+            appSettings: this.appSettings,
+            user: currentUser,
+            type: currentUser.userType
+          });
+
+          console.log('currentUser',JSON.stringify(currentUser));
+          console.log('currentUser-session',JSON.stringify(this.$store.state.cache.cachedUser));
+          this.appSettings.setBoolean("isLoggedInUserId", true);
+          this.appSettings.setString("userType", currentUser.userType);
+          this.navigate("/student/profile/view", null, {
+            clearHistory: true
+          });
+      }else{
+         this.$feedback.error({
+              title: 'Current User is ',
+              message: this.$store.state.cache.cachedUser
+          });
+      }
     },
     refresh(clean = false) {
-      if(this.$store.state.cache.cachedUser && this.$store.state.cache.cachedUser.userType =='PARENT'){
+      if(this.$store.state.cache.cachedUser && this.$store.state.cache.cachedUser.userType == 'PARENT'){
         this.isParent = true;
         this.students = this.$store.state.cache.cachedUser.students;
       }
@@ -324,9 +355,8 @@ export default {
           this.isParent = false;
           var currentUser = JSON.parse(JSON.stringify(results));
           if(currentUser && currentUser.user && currentUser.userType == "PARENT"){
-            currentUser.user.lastname = currentUser.user.surname;
-            currentUser.user.firstname = currentUser.user.name;
-            currentUser.user.username = currentUser.user.email;
+            currentUser.parent = currentUser.user;
+            currentUser.user = currentUser.students[0];
           }
           this.$store.commit("cacheUser", {
             db: this.$db,
