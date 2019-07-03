@@ -684,7 +684,11 @@ export default {
         .then(results => {
           this.isLoading = false;
           if (results.data.id == null) {
-            this.goToTakeTest(questionaire);
+            if (this.$store.state.user.isParent) {
+              swal("The student has not taken this test yet", "", "warning");
+            } else {
+              this.goToTakeTest(questionaire);
+            }
           } else {
             this.goToSolution(results.data.id);
           }
