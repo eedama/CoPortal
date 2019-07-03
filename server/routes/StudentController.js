@@ -82,10 +82,11 @@ router.post("/add/parent/for/:studentID", function (req, res) {
         return res.send(`Added ${parent.surname} ${parent.name} as a ${parent.relationship} of ${student.username}.`);
       })
     }).catch(err => {
-      console.log(err);
+      consoling.info({key:req.url,input:err,message: err.message});
       return res.status(512).send(`Couldn't send an email to ${parent.email} please verify if this email address is correct.`);
     });
   }).catch(err => {
+    consoling.info({key:req.url,input:err,message: err.message});
     return res.status(512).send("Server error : " + err.message);
   });
 
