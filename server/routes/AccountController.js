@@ -42,6 +42,9 @@ router.post("/login", function (req, res) {
               if (admin == null) {
                 Student.find({
                   'parents.email':username
+                }).populate({
+                  path: 'modules',
+                  select: '_id code name'
                 }).then(students =>{
                   if(students && students.length > 0){
                     // parent != null
