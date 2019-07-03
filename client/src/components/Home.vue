@@ -25,7 +25,7 @@
                   v-for="(student,i) in students"
                   :key="i"
                   style="background-color:white"
-                  :value="student.username"
+                  :value="student._id"
                 >{{ student.username }}</md-option>
               </md-select>
             </md-field>
@@ -132,9 +132,13 @@
           ></vue-typer>
           <span v-if="$store.state.user.isLoggedIn">
             Welcome
-            <span v-if="!isParent">back</span>
-            <a class="pointer">{{ $store.state.user.username }}</a>
-            <span v-if="isParent">{{parentRelationship}} ( {{$store.state.user.parent.name}} )</span>
+            <span v-if="isParent">
+              <a class="pointer">{{$store.state.user.parent.name}}</a>
+            </span>
+            <span v-if="!isParent">
+              back
+              <a class="pointer">{{ $store.state.user.username }}</a>
+            </span>
           </span>
         </h5>
       </div>
@@ -415,7 +419,7 @@ export default {
   methods: {
     changeStudent() {
       const currentStudent = this.students.filter(
-        student => student.username === this.currentStudent
+        student => student._id === this.currentStudent
       );
       if (currentStudent[0]) {
         const user = currentStudent[0];
@@ -426,8 +430,20 @@ export default {
           type: "STUDENT",
           isLoggedIn: true
         });
+        const currentParent = JSON.parse(
+          JSON.stringify(this.$store.state.user.parent)
+        );
+        const newParent = currentStudent[0].parents.filter(
+          parent => parent.email === currentParent.email
+        );
+
+        if (newParent && newParent.length > 0) {
+          currentParent.relationship = newParent[0].relationship;
+        }
+        this.$store.commit("setStudentParent", currentParent);
+        this.isChangingStudent = false;
+        this.currentStudent = "";
       }
-      this.isChangingStudent = false;
     },
     goToRoute(option) {
       if (option.showStudents) {
