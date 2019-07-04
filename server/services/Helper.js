@@ -28,7 +28,7 @@ export default class helper {
 
     static generatePassword(length){
         let password = ''
-        let alphabets = 'qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM1234567890';
+        let alphabets = 'qwertyuioplkjhgfdsazxcvbnm1234567890';
         for(let i = 0;i<length;i++){
             const index = Math.floor(Math.random() * (alphabets.length-1));
             password += alphabets[index];

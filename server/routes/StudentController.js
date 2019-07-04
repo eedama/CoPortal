@@ -67,7 +67,7 @@ router.post("/add/parent/for/:studentID", function (req, res) {
 
     }
 
-    const password = oldParent ? oldParent.password : GeneratePassword(helper.generatePassword(10));
+    const password = oldParent ? oldParent.password : GeneratePassword(helper.generatePassword(4));
     var parent = {
       surname: _parent.surname,
       name: _parent.name,
