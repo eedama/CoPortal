@@ -304,8 +304,8 @@ function GenerateEmail(parentName,studentName,relationship,username,password) {
   return "<div class=\"Email-header\" style=\"font-size:20px;font-family:sans-serif;letter-spacing:1px; box-sizing:border-box; margin-top:60px;margin-bottom:98px;\">" +
     "<img class=\"corportal\" align=\"right\" style=\"width:160px;height:auto;margin-top:-40px;\" src=\"https://coportal.net/static/img/logo.1328452.png\">" +
     "<span>Coportal Communication</span></div><div style=\"font-family:sans-serif;margin-left:20px;color:dark\"><h4>Hi " + parentName +
-    "</h4><p style=\"margin-bottom:20px\">You have been added as a " + relationship + " of " + studentName + " on the co-portal system" +
-    "Please use the following details to log into the system</p><br /><br />" +
+    "</h4><p style=\"margin-bottom:20px\">You have been added as a " + relationship + " of " + studentName + " on the CoPortal system<br /><br />" +
+    "Please use the following details to log into the system</p><br />" +
     "<h4 style=\"font-family:sans-serif;margin-left:20px;color:dark\">Username : <strong>" + username + "</strong></h4>" +
     "<h4 style=\"font-family:sans-serif;margin-left:20px;color:dark\">Password : <strong>" + password + "</strong></h4>" +
     "<br /><a href='https://" + process.env.SCHOOL + ".coportal.net' style=\"text-decoration:none;background-color:black;color:white;padding:10px;border-radius:10px;\" >Visit the portal</a><br /><br />" +
