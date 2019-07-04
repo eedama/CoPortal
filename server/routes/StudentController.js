@@ -67,7 +67,8 @@ router.post("/add/parent/for/:studentID", function (req, res) {
 
     }
 
-    const password = oldParent ? oldParent.password : GeneratePassword(helper.generatePassword(4));
+    const rawPassword = oldParent ? null : helper.generatePassword(4);
+    const password = oldParent ? oldParent.password : GeneratePassword(rawPassword);
     var parent = {
       surname: _parent.surname,
       name: _parent.name,
@@ -94,11 +95,11 @@ router.post("/add/parent/for/:studentID", function (req, res) {
         return res.send(`Added ${parent.surname} ${parent.name} as a ${parent.relationship} of ${student.username}.`);
       })
     }else{
-      let message = GenerateEmail(parent.name,student.firstname + " " + student.lastname,parent.relationship,parent.email,password);
+      let message = GenerateEmail(parent.name,student.firstname + " " + student.lastname,parent.relationship,parent.email,rawPassword);
       emailProvider.sendEmail(parent.email,"Welcome to Coportal, Your profile is created successfully",message).then(emailSent => {
         student.save(function (err) {
           if (err) return res.status(512).send("Server error : " + err.message);
-          smsProvider.sendSMS(parent.contactNumbers,`Hey ${parent.name} your coportal account was created successfully, please check your ${parent.email} email for login details.`)
+          smsProvider.sendSMS(parent.contactNumbers,`Hey ${parent.name} your coportal account was created successfully.\n\nPlease check your ${parent.email} email for your login details or contact admin.`)
           return res.send(`Added ${parent.surname} ${parent.name} as a ${parent.relationship} of ${student.username}.`);
         })
       }).catch(err => {
