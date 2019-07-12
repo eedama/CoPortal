@@ -47,6 +47,74 @@ router.post("/delete/:studentID", function (req, res) {
 
 });
 
+router.post("/add/bulk/parents", function (req, res) {
+  var studentParents = req.body.studentParents;
+  if(studentParents && studentParents.length > 0){
+    studentParents.forEach(studentParent => {
+      Student.findOne({
+        lastname:studentParent.surname,
+        firstname:studentParent.firstName
+      }).then(async student => {
+        if(student){
+          var father = {
+            surname: studentParent.fatherSurname,
+            name: studentParent.fatherName,
+            contactNumbers: studentParent.fathercellphone,
+            email: student.fatherEmail,
+            relationship: "FATHER",
+            password: GeneratePassword(studentParent.fatherSurname)
+          };
+          var mother = {
+            surname: studentParent.motherSurname,
+            name: studentParent.motherName,
+            contactNumbers: studentParent.mothercellphone,
+            email: student.motherEmail,
+            relationship: "MOTHER",
+            password: GeneratePassword(studentParent.motherSurname)
+          };
+         
+          if (!student.parents) {
+            student.parents = [];
+          }
+            
+          if (student.parents.find(p => p.surname == father.surname && p.name == father.name && p.relationship == father.relationship)) {
+            console.log(`${father.surname} ${father.name} is already a ${father.relationship} of ${student.username}.`);
+          } else if(!father.contactNumbers || !father.name || !father.surname){
+            console.log(`We got an invalid father for ${student.username}`);
+          } else {
+            student.parents.push(father);
+          }
+
+          if (student.parents.find(p => p.surname == mother.surname && p.name == mother.name && p.relationship == mother.relationship)) {
+            console.log(`${mother.surname} ${mother.name} is already a ${mother.relationship} of ${student.username}.`);
+          } else if(!mother.contactNumbers || !mother.name || !mother.surname){
+            console.log(`We got an invalid mother for ${student.username}`);
+          } else {
+            student.parents.push(mother);
+          }
+
+          student.save(function (err) {
+            if (err) console.log(`Could not save parents for ${student.username}, try again later`);
+            if(father.email){
+              let message = GenerateEmail(father.name,student.firstname + " " + student.lastname,father.relationship,father.email,rawPassword);
+              emailProvider.sendEmail(father.email,"Welcome to Coportal, Your profile is created successfully",message);
+            }
+            
+            if(mother.email){
+              let message = GenerateEmail(mother.name,student.firstname + " " + student.lastname,mother.relationship,mother.email,rawPassword);
+              emailProvider.sendEmail(mother.email,"Welcome to Coportal, Your profile is created successfully",message);
+            }
+            console.log(`Added as a ${parent.relationship} of ${student.username}.`);
+          });
+        }else{
+          console.log(`We couldn't find ${studentParent.surname} ${studentParent.firstName}`);
+        }
+      });
+    });
+  }
+});
+
+
 router.post("/add/parent/for/:studentID", function (req, res) {
   var studentID = req.params.studentID;
   var _parent = req.body.parent;
@@ -57,11 +125,11 @@ router.post("/add/parent/for/:studentID", function (req, res) {
   
     let oldParent = null;
     try{
-      const student = await Student.findOne({
+      const _student = await Student.findOne({
         'parents.contactNumbers':_parent.numbers
       });
-      if(student){
-        oldParent = student.parents.find(s => s.contactNumbers == _parent.numbers);
+      if(_student){
+        oldParent = _student.parents.find(s => s.contactNumbers == _parent.numbers);
       }
     }catch(err){
 
