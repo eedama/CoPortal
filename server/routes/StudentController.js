@@ -58,10 +58,10 @@ router.post("/add/parent/for/:studentID", function (req, res) {
     let oldParent = null;
     try{
       const student = await Student.findOne({
-        'parents.email':_parent.email
+        'parents.contactNumbers':_parent.numbers
       });
       if(student){
-        oldParent = student.parents.find(s => s.email == _parent.email);
+        oldParent = student.parents.find(s => s.contactNumbers == _parent.numbers);
       }
     }catch(err){
 
@@ -90,21 +90,17 @@ router.post("/add/parent/for/:studentID", function (req, res) {
 
     if(oldParent){
       student.save(function (err) {
-        if (err) return res.status(512).send("Server error : " + err.message);
-        smsProvider.sendSMS(parent.contactNumbers,`Hey ${parent.name} you have been assigned to be a ${parent.relationship} of ${parent.surname} ${parent.name}.\n\nPlease use your existing login details.\n\nRegards \n\nCoportal`)
+        if (err) return res.status(512).send(`Could not update user ${parent.surname} ${parent.name} try again later`);
         return res.send(`Added ${parent.surname} ${parent.name} as a ${parent.relationship} of ${student.username}.`);
-      })
+      });
     }else{
-      let message = GenerateEmail(parent.name,student.firstname + " " + student.lastname,parent.relationship,parent.email,rawPassword);
-      emailProvider.sendEmail(parent.email,"Welcome to Coportal, Your profile is created successfully",message).then(emailSent => {
-        student.save(function (err) {
-          if (err) return res.status(512).send("Server error : " + err.message);
-          smsProvider.sendSMS(parent.contactNumbers,`Hey ${parent.name} your coportal account was created successfully.\n\nPlease check your ${parent.email} email for your login details or contact admin.`)
-          return res.send(`Added ${parent.surname} ${parent.name} as a ${parent.relationship} of ${student.username}.`);
-        })
-      }).catch(err => {
-        consoling.info({key:req.url,input:err,message: err.message});
-        return res.status(512).send(`Couldn't send an email to ${parent.email} please verify if this email address is correct.`);
+      student.save(function (err) {
+        if (err) return res.status(512).send(`Could not save user ${parent.surname} ${parent.name} try again later`);
+        if(parent.email){
+          let message = GenerateEmail(parent.name,student.firstname + " " + student.lastname,parent.relationship,parent.email,rawPassword);
+          emailProvider.sendEmail(parent.email,"Welcome to Coportal, Your profile is created successfully",message);
+        }
+        return res.send(`Added as a ${parent.relationship} of ${student.username}.`);
       });
     }
 
