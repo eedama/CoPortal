@@ -41,7 +41,7 @@ router.post("/login", function (req, res) {
             }).then(admin => {
               if (admin == null) {
                 Student.find({
-                  'parents.email':username
+                  'parents.contactNumbers':username
                 }).populate({
                   path: 'modules',
                   select: '_id code name'
@@ -49,7 +49,7 @@ router.post("/login", function (req, res) {
                   if(students && students.length > 0){
                     // parent != null
                     students.filter(s => s && s.parents && s.parents.length > 0).forEach(s => {
-                      s.parents.filter(p => p && p.password && p.email).forEach(parent => {
+                      s.parents.filter(p => p && p.password && p.contactNumbers).forEach(parent => {
                         if (ComparePassword(password,parent.password) ) {
                           return res.json({
                             userType: 'PARENT',
