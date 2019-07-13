@@ -41,7 +41,7 @@ const StudentSchema = new mongoose.Schema({
     email: String,
     profilePic: String,
     password: String,
-    contactNumbers: Number,
+    contactNumbers: String,
     isSouthAfrican: {
         type: Boolean,
         default: null

@@ -50,61 +50,75 @@ router.post("/delete/:studentID", function (req, res) {
 router.post("/add/bulk/parents", function (req, res) {
   var studentParents = req.body.studentParents;
   if(studentParents && studentParents.length > 0){
-    studentParents.forEach(studentParent => {
+    studentParents.filter(v => v && v.surname && v.firstName).forEach(studentParent => {
       Student.findOne({
-        lastname:studentParent.surname,
-        firstname:studentParent.firstName
+        $or:[
+          {
+            contactNumbers:studentParent.cellphone ? studentParent.cellphone.trim() : 'Joseph'
+          },
+          {
+            lastname:new RegExp(studentParent.surname,'i'),
+            firstname:new RegExp(studentParent.firstName,'i')
+          }
+        ]
       }).then(async student => {
         if(student){
+          console.log(`We found ${studentParent.surname} ${studentParent.firstName} and about to link parents.`);
           var father = {
-            surname: studentParent.fatherSurname,
-            name: studentParent.fatherName,
+            surname: studentParent.fatherSurname ? studentParent.fatherSurname.toLowerCase(): student.lastname,
+            name: studentParent.fatherName ? studentParent.fatherName.toLowerCase(): `${student.firstname}Father`,
             contactNumbers: studentParent.fathercellphone,
             email: student.fatherEmail,
             relationship: "FATHER",
-            password: GeneratePassword(studentParent.fatherSurname)
+            password: studentParent.fatherSurname ?  GeneratePassword(studentParent.fatherSurname.toLowerCase()) : GeneratePassword(student.lastname)
           };
+        
           var mother = {
-            surname: studentParent.motherSurname,
-            name: studentParent.motherName,
+            surname: studentParent.motherSurname ? studentParent.motherSurname.toLowerCase(): student.lastname,
+            name: studentParent.motherName ? studentParent.motherName.toLowerCase(): `${student.firstname}Mother`,
             contactNumbers: studentParent.mothercellphone,
             email: student.motherEmail,
             relationship: "MOTHER",
-            password: GeneratePassword(studentParent.motherSurname)
+            password: studentParent.motherSurname ?  GeneratePassword(studentParent.motherSurname.toLowerCase()) : GeneratePassword(student.lastname)
           };
          
           if (!student.parents) {
             student.parents = [];
           }
-            
+          let count = student.parents.length;
+
           if (student.parents.find(p => p.surname == father.surname && p.name == father.name && p.relationship == father.relationship)) {
             console.log(`${father.surname} ${father.name} is already a ${father.relationship} of ${student.username}.`);
-          } else if(!father.contactNumbers || !father.name || !father.surname){
+          } else if(!father.contactNumbers){
             console.log(`We got an invalid father for ${student.username}`);
           } else {
+            console.log("Father pushed ?")
             student.parents.push(father);
           }
 
           if (student.parents.find(p => p.surname == mother.surname && p.name == mother.name && p.relationship == mother.relationship)) {
             console.log(`${mother.surname} ${mother.name} is already a ${mother.relationship} of ${student.username}.`);
-          } else if(!mother.contactNumbers || !mother.name || !mother.surname){
+          } else if(!mother.contactNumbers){
             console.log(`We got an invalid mother for ${student.username}`);
           } else {
+            console.log("Mother pushed ?")
             student.parents.push(mother);
           }
 
           student.save(function (err) {
             if (err) console.log(`Could not save parents for ${student.username}, try again later`);
             if(father.email){
-              let message = GenerateEmail(father.name,student.firstname + " " + student.lastname,father.relationship,father.email,rawPassword);
+              let message = GenerateEmail(father.name,student.firstname + " " + student.lastname,father.relationship,father.email,father.surname);
               emailProvider.sendEmail(father.email,"Welcome to Coportal, Your profile is created successfully",message);
             }
             
             if(mother.email){
-              let message = GenerateEmail(mother.name,student.firstname + " " + student.lastname,mother.relationship,mother.email,rawPassword);
+              let message = GenerateEmail(mother.name,student.firstname + " " + student.lastname,mother.relationship,mother.email,mother.surname);
               emailProvider.sendEmail(mother.email,"Welcome to Coportal, Your profile is created successfully",message);
             }
-            console.log(`Added as a ${parent.relationship} of ${student.username}.`);
+            if(count != student.parents.length){
+              console.log("SUCCESS .... " + student.username);
+            }
           });
         }else{
           console.log(`We couldn't find ${studentParent.surname} ${studentParent.firstName}`);

@@ -11,6 +11,10 @@ import Module from "../models/Module";
 import FCM from '../services/FirebaseManager';
 import helper from '../services/Helper';
 import consoling from "../services/Logger";
+import SMSProvider from "../services/SMSProvider"
+import EmailProvider from "../services/EmailProvider"
+const smsProvider = new SMSProvider();
+const emailProvider = new EmailProvider();
 
 /*
   TODO : Add admin
@@ -165,6 +169,9 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
           if (err) return res.status(512).send("Server error : " + err.message);
           if (m) {
             m.students.forEach(_student => {
+              if(notification.isParent){
+                sendSMSToParent(_student,announcement.message);
+              }
               FCM.sendToUserSimple(_student, announcement.title, announcement.message).then(results =>{
                 consoling.info({key:'h54gf33gh4wjjhg5vrfe54',success:true,input:_student,message:results});
               }).catch(ex =>{
@@ -177,6 +184,9 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
             }).then(students => {
               if (students) {
                 students.forEach(_student => {
+                  if(notification.isParent){
+                    sendSMSToParent(_student,announcement.message);
+                  }
                   FCM.sendToUserSimple(_student, announcement.title, announcement.message).then(results =>{
                     consoling.info({key:'h54gf33gh4wjjhg5vweew54',success:true,input:_student,message:results});
                   }).catch(ex =>{
@@ -198,6 +208,21 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
     return res.status(512).send("Invalid request");
   }
 });
+
+async function sendSMSToParent(student,message){
+  if(student && student.parent && student.parent.length > 0){
+    const parent = student.parent.find(v => v.contactNumbers);
+    if(parent){
+      try{
+        await smsProvider.sendSMS(parent.contactNumbers,message);
+      }catch(err){
+        consoling.info({key:"Unable to send SMS SMS to parent",success:false,input:student.lastname + " " + student.firstname,message:err.message});
+      }
+    }else{
+      consoling.info({key:"Invalid SMS to parent",success:false,input:student.lastname + " " + student.firstname,message:"Student does not have a valid parent with contact numbers"});
+    }
+  }
+}
 
 
 module.exports = router;
