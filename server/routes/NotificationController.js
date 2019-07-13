@@ -169,9 +169,12 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
           if (err) return res.status(512).send("Server error : " + err.message);
           if (m) {
             m.students.forEach(_student => {
-              if(notification.isParent){
-                sendSMSToParent(_student,announcement.message);
-              }
+              Student.findById(_student).then(sss => {
+                if(notification.isParent){
+                  console.log("Sending SMS to parents for " + sss.lastname);
+                  sendSMSToParent(sss,announcement.message);
+                }
+              })
               FCM.sendToUserSimple(_student, announcement.title, announcement.message).then(results =>{
                 consoling.info({key:'h54gf33gh4wjjhg5vrfe54',success:true,input:_student,message:results});
               }).catch(ex =>{
@@ -185,6 +188,7 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
               if (students) {
                 students.forEach(_student => {
                   if(notification.isParent){
+                    console.log("Sending SMS to parents for " + _student.lastname);
                     sendSMSToParent(_student,announcement.message);
                   }
                   FCM.sendToUserSimple(_student, announcement.title, announcement.message).then(results =>{
@@ -210,10 +214,11 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
 });
 
 async function sendSMSToParent(student,message){
-  if(student && student.parent && student.parent.length > 0){
-    const parent = student.parent.find(v => v.contactNumbers);
+  if(student && student.parents && student.parents.length > 0){
+    const parent = student.parents.find(v => v.contactNumbers);
     if(parent){
       try{
+        console.log("Added send SMS To Parent " + student.lastname);
         await smsProvider.sendSMS(parent.contactNumbers,message);
       }catch(err){
         consoling.info({key:"Unable to send SMS SMS to parent",success:false,input:student.lastname + " " + student.firstname,message:err.message});
@@ -221,6 +226,8 @@ async function sendSMSToParent(student,message){
     }else{
       consoling.info({key:"Invalid SMS to parent",success:false,input:student.lastname + " " + student.firstname,message:"Student does not have a valid parent with contact numbers"});
     }
+  }else{
+    consoling.info({key:"Invalid SMS to parent",success:false,input:student.lastname + " " + student.firstname,message:"Student does not have a valid parent with contact numbers"});
   }
 }
 
