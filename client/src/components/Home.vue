@@ -74,7 +74,7 @@
               />
               <label class="text-center" for="ModuleDescription">Message</label>
             </div>
-             <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+             <div style="padding:10px" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
                <label>
                   <input
                     v-model="announcement.isParent"
@@ -290,7 +290,7 @@ export default {
         title: "",
         message: "",
         isToAll: true,
-        isParent: true,
+        isParent: false,
         moduleID: null
       },
       announcements: [],
