@@ -31,7 +31,8 @@ const StudentSchema = new mongoose.Schema({
             type: String,
             enum: ['MOTHER', 'FATHER', 'SISTER', 'BROTHER', 'GUARDIAN'],
             default: 'GUARDIAN'
-        }
+        },
+        password:String
     }],
     firstname: String,
     lastname: String,
@@ -40,7 +41,7 @@ const StudentSchema = new mongoose.Schema({
     email: String,
     profilePic: String,
     password: String,
-    contactNumbers: Number,
+    contactNumbers: String,
     isSouthAfrican: {
         type: Boolean,
         default: null

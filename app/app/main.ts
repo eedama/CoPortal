@@ -10,7 +10,7 @@ import { TNSFontIcon, fonticon } from "nativescript-fonticon"; // require the co
 import TextFieldPlugin from 'nativescript-material-textfield/vue'; 
 Vue.use(TextFieldPlugin);
 
-TNSFontIcon.debug = true;
+TNSFontIcon.debug = false;
 TNSFontIcon.paths = {
   mdi: "./assets/materialdesignicons.css"
 };
@@ -121,7 +121,7 @@ Vue.mixin({
       } else {
         options = options || {};
         options.props = props;
-        if (this.$navigator.route.path == to) {
+        if (this.$navigator.route && this.$navigator.route.path == to) {
           console.log("Going to same page", to);
           return;
         }

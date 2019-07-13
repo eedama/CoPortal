@@ -6,14 +6,15 @@
           <CardView
             v-if="$store.state.cache.cachedUser.user"
             row="0"
-            class="bg-dark-black"
+            class="bg-blue-black"
             elevation="15"
           >
-            <GridLayout class="p-25" rows="auto,auto" columns="*,auto">
+            <GridLayout verticalAlignment="center" class="p-5" rows="auto,auto" columns="*,auto">
               <Label
                 row="0"
                 col="0"
-                fontSize="20%"
+                fontSize="18%"
+                verticalAlignment="center" 
                 class="font-weight-bold text-white p-t-5"
                 :textWrap="true"
                 :text="`${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`"
@@ -21,8 +22,10 @@
               <Label
                 row="1"
                 col="0"
-                fontSize="18%"
+                fontSize="16%"
+                verticalAlignment="center" 
                 class="h4 text-white p-t-5"
+                :textWrap="true"
                 :text="$store.state.cache.cachedUser.user.username"
               />
               <Image
@@ -39,6 +42,15 @@
               ></Image>
             </GridLayout>
           </CardView>
+           <Image
+                  row="1"
+                  src="~/assets/images/coPortalLogo.png"
+                  stretch="aspectFit"
+                  verticalAlignment="bottom"
+                  opacity="0.1"
+                  textAlignment="right"
+                  class="m-x-15 bottomLogo"
+              ></Image>
           <ScrollView row="1">
             <StackLayout>
               <Ripple
@@ -52,16 +64,16 @@
                     col="0"
                     textAlignment="center"
                     verticalAlignment="center"
-                    class="mdi m-10 text-dark-black"
-                    fontSize="35%"
+                    class="mdi p-5 text-blue-black"
+                    fontSize="25%"
                     :text="'mdi-' + layout.icon | fonticon"
                   ></label>
                   <label
                     row="0"
                     col="1"
                     verticalAlignment="center"
-                    class="font-weight-bold text-dark-black"
-                    fontSize="18%"
+                    class="text-dark-black p-5"
+                    fontSize="17%"
                     :text="layout.text"
                   ></label>
                 </GridLayout>
@@ -79,9 +91,9 @@
                 textAlignment="center"
                 verticalAlignment="bottom"
                 :textWrap="true"
-                class="font-weight-bold text-dark-black"
+                class="font-weight-bold text-blue-black"
                 fontSize="18%"
-                :text="$store.state.cache.cachedUser.userType.toLowerCase() + ' at ' + currentUserSchool"
+                :text="($store.state.cache.cachedUser.userType =='PARENT' && $store.state.cache.cachedUser.students) ? 'Gaurdian to ' + $store.state.cache.cachedUser.students.map(s => s.username).join() : $store.state.cache.cachedUser.userType.toLowerCase() + ' at ' + currentUserSchool"
               ></label>
             </GridLayout>
           </StackLayout>
@@ -146,7 +158,7 @@ export default {
         icon: "bell",
         link: "/notifications/list",
         description: "All your notifications in one place",
-        auth: ["STUDENT"]
+        auth: ["STUDENT", "PARENT"]
       },
       drawerLayouts: [
         {
@@ -154,7 +166,7 @@ export default {
           icon: "account",
           link: "/student/profile/view",
           description: "View and edit personal information",
-          auth: ["STUDENT", "ADMIN", "LECTURER"]
+          auth: ["STUDENT", "ADMIN", "LECTURER", "PARENT"]
         },
         {
           text: "Lecturers",
@@ -168,14 +180,14 @@ export default {
           icon: "book-open-page-variant",
           link: "/module/list",
           description: "Modules you are registered for",
-          auth: ["ADMIN", "LECTURER", "STUDENT"]
+          auth: ["ADMIN", "LECTURER", "STUDENT", "PARENT"]
         },
         {
           text: "Timetable",
           icon: "table",
           link: "/timetable/view",
           description: "View Your Table",
-          auth: ["STUDENT"]
+          auth: ["STUDENT", "PARENT"]
         },
         {
           text: "Report a student",
@@ -189,14 +201,22 @@ export default {
           icon: "settings",
           link: "/settings",
           description: "Customize your portal",
-          auth: ["STUDENT", "LECTURER", "ADMIN"]
+          auth: ["STUDENT", "LECTURER", "ADMIN", "PARENT"]
         },
+        /* 
+        {
+          text: "Switch student",
+          icon: "account-convert",
+          link: "/login",
+          description: "Switch user",
+          auth: ["PARENT"]
+        }, */
         {
           text: "Log out",
           icon: "exit-run",
           link: "/logout",
           description: "Leave the system",
-          auth: ["STUDENT", "LECTURER", "ADMIN"]
+          auth: ["STUDENT", "LECTURER", "ADMIN", "PARENT"]
         }
       ]
     };
@@ -216,10 +236,10 @@ export default {
     this.$firebase.admob.hideBanner().then(() =>{
       console.log('Banner_hidden',true);
     }).catch(err =>{
-      console.log('Banner_hidden',err);
+      console.log('Banner_hidden_dont_stress_1',err);
     });
     }catch(ex){
-      console.log('Banner_hidden',ex);
+      console.log('Banner_hidden_dont_stress',ex);
     }
    
    connectivity.startMonitoring(conn => {

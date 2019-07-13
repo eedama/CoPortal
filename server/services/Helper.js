@@ -25,4 +25,14 @@ export default class helper {
             data: data
         }
     }
+
+    static generatePassword(length){
+        let password = ''
+        let alphabets = 'qwertyuioplkjhgfdsazxcvbnm1234567890';
+        for(let i = 0;i<length;i++){
+            const index = Math.floor(Math.random() * (alphabets.length-1));
+            password += alphabets[index];
+        }
+        return password
+    }
 }

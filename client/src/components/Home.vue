@@ -1,7 +1,50 @@
 <template>
   <div class="screen">
-
-    <md-dialog v-if="$store.state.user.isLoggedIn && ($store.state.user.type=='LECTUERE' || $store.state.user.type=='ADMIN')" style="position:absolute;top:25%;width:100%" class="card" :md-active.sync="isAddingAnnouncements">
+    <md-dialog
+      v-if="isParent"
+      style="position:absolute;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
+      class="card"
+      :md-active.sync="isChangingStudent"
+    >
+      <md-card class="col s12" style="background-color:#006064;">
+        <md-card-header>
+          <div class="md-title" style="color:ghostwhite">Change Student</div>
+          <md-button v-on:click="isChangingStudent = false" class="right">
+            <md-icon style="color:ghostwhite">close</md-icon>
+          </md-button>
+        </md-card-header>
+      </md-card>
+      <md-card-actions>
+        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+        <div class="row">
+          <md-content class="col s12">
+            <md-field>
+              <label>Select Student</label>
+              <md-select v-model="currentStudent">
+                <md-option
+                  v-for="(student,i) in students"
+                  :key="i"
+                  style="background-color:white"
+                  :value="student._id"
+                >{{ student.username }}</md-option>
+              </md-select>
+            </md-field>
+          </md-content>
+          <md-button
+            v-if="!isLoading"
+            v-on:click="changeStudent()"
+            class="md-primary col s12"
+            style="background-color:#006064;color:ghostwhite"
+          >Change student</md-button>
+        </div>
+      </md-card-actions>
+    </md-dialog>
+    <md-dialog
+      v-if="$store.state.user.isLoggedIn && ($store.state.user.type=='LECTUERE' || $store.state.user.type=='ADMIN')"
+      style="position:absolute;top:25%;width:100%"
+      class="card"
+      :md-active.sync="isAddingAnnouncements"
+    >
       <md-card class="col s12">
         <md-card-header>
           <div class="md-title">Send a announcement</div>
@@ -12,33 +55,67 @@
         <md-content>
           <div class="row">
             <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-              <input v-model="announcement.title" id="ModuleDescription" name="ModuleDescription" type="text" />
+              <input
+                v-model="announcement.title"
+                id="ModuleDescription"
+                name="ModuleDescription"
+                type="text"
+              />
               <label class="text-center" for="ModuleDescription">Title</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-              <input v-model="announcement.message" id="ModuleDescription" name="ModuleDescription" type="text" />
+              <input
+                v-model="announcement.message"
+                id="ModuleDescription"
+                name="ModuleDescription"
+                type="text"
+              />
               <label class="text-center" for="ModuleDescription">Message</label>
             </div>
+             <div style="padding:10px" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+               <label>
+                  <input
+                    v-model="announcement.isParent"
+                    class="with-gap"
+                    name="group1"
+                    type="checkbox"
+                  />
+                  <span>Send announcement to parents</span>
+                </label>
+              </div>
           </div>
           <div class="row">
             <div class="col s8 offset-s2 m6 offset-m3 text-center">
-              <label>Send to : </label>
+              <label>Send to :</label>
             </div>
             <div class="col s8 offset-s2 m6 offset-m3 text-center">
               <form action="#">
                 <p v-for="(module,i) in modules" :key="i">
                   <label>
-                               <input v-model="announcement.module" :value="module._id" class="with-gap" name="group1" type="radio" />
-                               <span>{{ module.name }} ({{ module.code }}) students</span>
-                             </label>
+                    <input
+                      v-model="announcement.module"
+                      :value="module._id"
+                      class="with-gap"
+                      name="group1"
+                      type="radio"
+                    />
+                    <span>{{ module.name }} ({{ module.code }}) students</span>
+                  </label>
                 </p>
                 <p>
                   <label>
-                                 <input v-model="announcement.module" :value="null" class="with-gap" name="group1" type="radio" checked />
-                                 <span>All Students</span>
-                               </label>
+                    <input
+                      v-model="announcement.module"
+                      :value="null"
+                      class="with-gap"
+                      name="group1"
+                      type="radio"
+                      checked
+                    />
+                    <span>All Students</span>
+                  </label>
                 </p>
               </form>
             </div>
@@ -47,36 +124,68 @@
       </md-card>
       <md-card-actions>
         <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-        <md-button v-if="!isLoading" v-on:click="SendAnnouncement()" class="md-primary">Send announcement</md-button>
+        <md-button
+          v-if="!isLoading"
+          v-on:click="SendAnnouncement()"
+          class="md-primary"
+        >Send announcement</md-button>
       </md-card-actions>
     </md-dialog>
 
     <div class="row">
       <div class="col s6 offset-s3 m8 offset-m2 center-align">
         <h5 class="center-align">
-          <vue-typer v-if="!$store.state.user.isLoggedIn" class="center-align" :text='titleText' erase-style='backspace'></vue-typer>
-          <span v-if="$store.state.user.isLoggedIn">Welcome back <a class="pointer waves-effect">{{ $store.state.user.username }}</a></span>
+          <vue-typer
+            v-if="!$store.state.user.isLoggedIn"
+            class="center-align"
+            :text="titleText"
+            erase-style="backspace"
+          ></vue-typer>
+          <span v-if="$store.state.user.isLoggedIn">
+            Welcome
+            <span v-if="isParent">
+              <a class="pointer">{{$store.state.user.parent.name}}</a>
+            </span>
+            <span v-if="!isParent">
+              back
+              <a class="pointer">{{ $store.state.user.username }}</a>
+            </span>
+          </span>
         </h5>
       </div>
       <div class="col s10 offset-s1 m8 offset-m2 center-align">
-        <img src="../assets/logo.png" class="responsive-img">
+        <img src="../assets/logo.png" class="responsive-img" />
       </div>
-
     </div>
     <div v-if="!$store.state.user.isLoggedIn" class="row">
-      <div v-on:click="$router.push('/login')" class="col m6 offset-m3 s12 pointer bigButton center-align waves-effect">
+      <div
+        v-on:click="$router.push('/login')"
+        class="col m6 offset-m3 s12 pointer bigButton center-align waves-effect"
+      >
         <div class="card-panel hoverable">
-          <h5 class="center-align"><i style="font-size:100%" class="material-icons left">lock</i> <span>Login</span></h5>
+          <h5 class="center-align">
+            <i style="font-size:100%" class="material-icons left">lock</i>
+            <span>Login</span>
+          </h5>
         </div>
       </div>
     </div>
     <div v-if="!$store.state.user.isLoggedIn" class="row bottomPin">
       <div class="col s12 center-align">
-        <h5 class="center-align">Meet some of our cool friends that might help boost your career life</h5>
+        <h5
+          class="center-align"
+        >Meet some of our cool friends that might help boost your career life</h5>
       </div>
-      <div v-for="(partner,i) in partners" :key="i" v-on:click="GotoExternal(partner.link)" class="col m3 s6 pointer bigButton center-align waves-effect">
+      <div
+        v-for="(partner,i) in partners"
+        :key="i"
+        v-on:click="GotoExternal(partner.link)"
+        class="col m3 s6 pointer bigButton center-align waves-effect"
+      >
         <div class="card-panel hoverable">
-          <h6 class="center-align"><span>{{ partner.name }}</span></h6>
+          <h6 class="center-align">
+            <span>{{ partner.name }}</span>
+          </h6>
         </div>
       </div>
     </div>
@@ -90,7 +199,12 @@
         </div>
         <md-list class="md-triple-line col s12 center-align">
           <div class="Scroll-first-four">
-            <md-list-item v-if="$store.state.user.type == 'LECTURER' || $store.state.user.type == 'ADMIN'" v-on:click="isAddingAnnouncements = true" style="margin-bottom:15px" class="hoverable col s12 m10 pointer white center-align waves-effect">
+            <md-list-item
+              v-if="$store.state.user.type == 'LECTURER' || $store.state.user.type == 'ADMIN'"
+              v-on:click="isAddingAnnouncements = true"
+              style="margin-bottom:15px"
+              class="hoverable col s12 m10 pointer white center-align waves-effect"
+            >
               <md-avatar>
                 <md-icon>add</md-icon>
               </md-avatar>
@@ -99,13 +213,19 @@
                 <span>Add new Announcement</span>
               </div>
             </md-list-item>
-            <md-list-item v-on:click="AnnouncementClick(announcement)" style="margin-bottom:15px;" v-for="(announcement,i) in announcements" :key="i" class="hoverable col s12 m10 pointer white center-align waves-effect">
+            <md-list-item
+              v-on:click="AnnouncementClick(announcement)"
+              style="margin-bottom:15px;"
+              v-for="(announcement,i) in announcements"
+              :key="i"
+              class="hoverable col s12 m10 pointer white center-align waves-effect"
+            >
               <md-avatar>
-                <img src="https://placeimg.com/40/40/people/1" alt="People">
+                <img src="https://placeimg.com/40/40/people/1" alt="People" />
               </md-avatar>
 
               <div class="md-list-item-text">
-                <span>{{ announcement.lecturerId ?  announcement.lecturerId.lastname + " " + announcement.lecturerId.firstname : "Admin" }} &nbsp;&bull; {{ getMoment(announcement.date).fromNow() }}</span>
+                <span>{{ announcement.lecturerId ? announcement.lecturerId.lastname + " " + announcement.lecturerId.firstname : "Admin" }} &nbsp;&bull; {{ getMoment(announcement.date).fromNow() }}</span>
                 <span>{{ announcement.title }}</span>
                 <p>{{ announcement.message }}</p>
               </div>
@@ -115,13 +235,22 @@
       </div>
       <div class="col s12 m6 xl4 push-xl2 row" style="margin-top:-6px;">
         <div @click="changeSchool()" class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-          <md-card-header class="left">{{ $store.state.settings.school }} Portal</md-card-header>
+          <md-card-header class="left">
+            {{ capitalize($store.state.settings.school) }}
+            <span v-if="isParent">Parent</span> Portal
+          </md-card-header>
         </div>
-        <div v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)" :key="i" v-on:click="$router.push(option.link)" class="col s12 pointer bigButton waves-effect">
+        <div
+          v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)"
+          :key="i"
+          v-on:click="goToRoute(option)"
+          class="col s12 pointer bigButton waves-effect"
+        >
           <div class="card-panel hoverable">
             <h5 class="center-align">
               <i style="font-size:100%" class="material-icons left">{{ option.icon }}</i>
-              <span>{{ option.text }}</span></h5>
+              <span>{{ option.text }}</span>
+            </h5>
           </div>
         </div>
       </div>
@@ -129,7 +258,10 @@
     <div v-if="$store.state.user.isLoggedIn" class="row">
       <div v-on:click="Logout()" class="col m2 offset-m5 s12 pointer center-align waves-effect">
         <div class="card-panel hoverable red">
-          <h5 class="text-xs-center">Log out <i class="material-icons right">exit_to_app</i> </h5>
+          <h5 class="text-xs-center">
+            Log out
+            <i class="material-icons right">exit_to_app</i>
+          </h5>
         </div>
       </div>
     </div>
@@ -143,6 +275,7 @@ export default {
   name: "Home",
   data() {
     return {
+      isParent: false,
       partners: [
         {
           link: "https://www.onlinecareerguidance.co.za",
@@ -157,6 +290,7 @@ export default {
         title: "",
         message: "",
         isToAll: true,
+        isParent: false,
         moduleID: null
       },
       announcements: [],
@@ -164,6 +298,10 @@ export default {
       isAddingAnnouncements: false,
       showEmoji: false,
       isLoading: false,
+      isChangingStudent: false,
+      parentRelationship: "Mother",
+      students: [],
+      currentStudent: "",
       txtSearch: "",
       titleText: [
         "Welcome to Co-Portal.",
@@ -171,12 +309,7 @@ export default {
         "Contact admin for your login info"
       ],
       options: [
-        {
-          text: "My profile",
-          icon: "person",
-          link: "/",
-          auth: ["STUDENT", "LECTURER", "ADMIN"]
-        },
+        ,
         {
           text: "Students",
           icon: "people",
@@ -184,7 +317,9 @@ export default {
           auth: ["LECTURER", "ADMIN"]
         },
         {
-          text: "Edit profile",
+          text: this.$store.state.user.isParent
+            ? "Student Profile"
+            : "Edit profile",
           icon: "account_circle",
           link: "/student/update",
           auth: ["STUDENT"]
@@ -196,13 +331,13 @@ export default {
           auth: ["ADMIN"]
         },
         {
-          text: "Modules",
+          text: this.$store.state.user.isParent ? "Student Modules" : "Modules",
           icon: "books",
           link: "/module/list",
           auth: ["ADMIN", "LECTURER", "STUDENT"]
         },
         {
-          text: "Marks",
+          text: this.$store.state.user.isParent ? "Student Marks" : "Marks",
           icon: "done_all",
           link: "/marks/all",
           auth: ["STUDENT"]
@@ -225,6 +360,20 @@ export default {
   mounted() {
     if (this.$store.state.user.isLoggedIn) {
       this.isLoading = true;
+      this.isParent = this.$store.state.user.isParent;
+      if (this.isParent) {
+        this.options.push({
+          text: "Change a student",
+          icon: "people",
+          link: "/",
+          auth: ["STUDENT"],
+          showStudents: true
+        });
+        this.students = this.$store.state.user.parentStudents;
+        this.parentRelationship = this.capitalize(
+          this.$store.state.user.parent.relationship
+        );
+      }
       axios
         .post(
           this.$store.state.settings.baseLink +
@@ -280,6 +429,52 @@ export default {
     }
   },
   methods: {
+    changeStudent() {
+      const currentStudent = this.students.filter(
+        student => student._id === this.currentStudent
+      );
+      if (currentStudent[0]) {
+        const user = currentStudent[0];
+        this.$store.commit("login", {
+          id: user._id,
+          username: user.username,
+          password: user.password,
+          type: "STUDENT",
+          isLoggedIn: true
+        });
+        const currentParent = JSON.parse(
+          JSON.stringify(this.$store.state.user.parent)
+        );
+        const newParent = currentStudent[0].parents.filter(
+          parent => parent.email === currentParent.email
+        );
+
+        if (newParent && newParent.length > 0) {
+          currentParent.relationship = newParent[0].relationship;
+        }
+        this.$store.commit("setStudentParent", currentParent);
+        this.isChangingStudent = false;
+        this.currentStudent = "";
+        swal(
+          "Success",
+          `Successfully changed student to ${user.username}`,
+          "success"
+        );
+      }
+    },
+    goToRoute(option) {
+      if (option.showStudents) {
+        this.isChangingStudent = true;
+      } else {
+        this.$router.push(option.link);
+      }
+    },
+    capitalize(name) {
+      if (!name) {
+        return "";
+      }
+      return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    },
     GotoExternal(url) {
       window.open(url, "_blank");
     },

@@ -9,9 +9,15 @@
       </div>
     </div>
     <div class="row">
-      <div class="col s10 offset-s1 m8 offset-m3 l6 offset-l3 ">
+      <div class="col s10 offset-s1 m8 offset-m3 l6 offset-l3">
         <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-          <input v-on:keypress.enter="DeepSearch" v-model="txtSearch" id="Password" name="Search" type="search" />
+          <input
+            v-on:keypress.enter="DeepSearch"
+            v-model="txtSearch"
+            id="Password"
+            name="Search"
+            type="search"
+          />
           <label class="text-center" for="Search">Search</label>
         </div>
       </div>
@@ -19,10 +25,14 @@
         <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
       </div>
     </div>
-  
+
     <div class="row">
-      <div class="col s8 offset-s2 center-align">
-        <a v-on:click="addingModules = !addingModules" :class="{'red':addingModules}" class="btn waves-effect">{{ !addingModules ? 'Add Module' : 'Cancel'}}</a>
+      <div v-if="userType !== 'STUDENT'" class="col s8 offset-s2 center-align">
+        <a
+          v-on:click="addingModules = !addingModules"
+          :class="{'red':addingModules}"
+          class="btn waves-effect"
+        >{{ !addingModules ? 'Add Module' : 'Cancel'}}</a>
       </div>
     </div>
     <div v-if="addingModules" class="row valign-wrapper" style="height:80vh">
@@ -44,7 +54,12 @@
             </div>
             <div class="row">
               <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-model="module.description" id="ModuleDescription" name="ModuleDescription" type="text" />
+                <input
+                  v-model="module.description"
+                  id="ModuleDescription"
+                  name="ModuleDescription"
+                  type="text"
+                />
                 <label class="text-center" for="ModuleDescription">Module description</label>
               </div>
             </div>
@@ -55,7 +70,13 @@
             </div>
             <div class="row">
               <div class="col s8 offset-s2 m6 offset-m3 center-align text-center">
-                <input v-if="!isLoading" v-on:click="SubmitModule()" type="submit" value="Submit module" class="btn center-align tg-btn" />
+                <input
+                  v-if="!isLoading"
+                  v-on:click="SubmitModule()"
+                  type="submit"
+                  value="Submit module"
+                  class="btn center-align tg-btn"
+                />
                 <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
               </div>
             </div>
@@ -76,9 +97,14 @@
               <th>Total online tests</th>
             </tr>
           </thead>
-  
+
           <tbody class="row">
-            <tr  v-on:click="goToModule(module._id)" class="pointer col-xs-12" v-for="(module,i) in filteredModules" :key="i">
+            <tr
+              v-on:click="goToModule(module._id)"
+              class="pointer col-xs-12"
+              v-for="(module,i) in filteredModules"
+              :key="i"
+            >
               <td>{{ module.name }}</td>
               <td>{{ module.code }}</td>
               <td>{{ module.description }}</td>
@@ -87,13 +113,16 @@
                   <p>{{ lecturer.lastname }} {{ lecturer.firstname }}</p>
                 </a>
               </td>
-              <td><a class="pointer">{{ module.students.length }} students</a></td>
-              <td><a class="pointer">{{ module.questionaires.length }} online tests</a></td>
+              <td>
+                <a class="pointer">{{ module.students.length }} students</a>
+              </td>
+              <td>
+                <a class="pointer">{{ module.questionaires.length }} online tests</a>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-  
     </div>
   </div>
 </template>
@@ -117,7 +146,8 @@ export default {
       addingModules: false,
       modules: [],
       selectedStudent: null,
-      isLoading: false
+      isLoading: false,
+      userType: ""
     };
   },
   computed: {
@@ -133,6 +163,7 @@ export default {
   },
   mounted() {
     this.isLoading = true;
+    this.userType = this.$store.state.user.type;
     axios
       .get(
         this.$store.state.settings.baseLink +

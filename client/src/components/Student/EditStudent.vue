@@ -2,38 +2,64 @@
   <div class="center-align">
     <div class="row">
       <div class="col s12 center-align card-panel" v-show="done">
-        <md-empty-state md-icon="done" md-label="Student was successfully added." md-description="You can now assign the student to more modules / view the student's progress.">
-        </md-empty-state>
+        <md-empty-state
+          md-icon="done"
+          md-label="Student was successfully added."
+          md-description="You can now assign the student to more modules / view the student's progress."
+        ></md-empty-state>
       </div>
-      <div style="padding-top:30" class="col m8 offset-m2 center-align center">
+      <div style="padding-top:30;margin-top:35px;" class="col m8 offset-m2 center-align center">
         <div class="card row">
           <div v-show="!done" class="card-header center-align z-depth-3 cardBar">
-            <h5 style="padding:20px">Editting a student</h5>
+            <h5 style="padding:20px">Editting student</h5>
           </div>
           <div v-show="!done" class="card-content">
             <div class="row">
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="student.firstname" id="Firstname" name="Firstname" type="text" />
-                <label class="text-center" for="Firstname">Firstname</label>
-              </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="student.lastname" id="Lastname" name="Lastname" type="text" />
-                <label class="text-center" for="Lastname">Lastname</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-model="student.username" id="Username" name="Username" type="text" />
-                <label class="text-center" for="Username">Username</label>
-              </div>
-            </div>
-            <div class="row">
               <div class="input-field active col m4 offset-m1 s12 text-center">
+                <input
+                  :disabled="isParent"
+                  v-model="student.firstname"
+                  id="Firstname"
+                  name="Firstname"
+                  type="text"
+                />
+                <label class="text-center" v-if="!isParent" for="Firstname">Firstname</label>
+              </div>
+              <div class="input-field col m4 offset-m1 s12 text-center active">
+                <input
+                  :disabled="isParent"
+                  v-model="student.lastname"
+                  id="Lastname"
+                  name="Lastname"
+                  type="text"
+                />
+                <label class="text-center" v-if="!isParent" for="Lastname">Lastname</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field active col s8 offset-s2 m6 offset-m3 text-center">
+                <input
+                  :disabled="isParent"
+                  v-model="student.username"
+                  id="Username"
+                  name="Username"
+                  type="text"
+                />
+                <label class="text-center" v-if="!isParent" for="Username">Username</label>
+              </div>
+            </div>
+            <div class="row">
+              <div v-if="!isParent" class="input-field active col m4 offset-m1 s12 text-center">
                 <input v-model="student.password" id="Password" name="Password" type="password" />
                 <label class="text-center" for="Password">Password</label>
               </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="student.confirmPassword" id="ConfirmPassword" name="ConfirmPassword" type="password" />
+              <div v-if="!isParent" class="input-field col m4 offset-m1 s12 text-center active">
+                <input
+                  v-model="student.confirmPassword"
+                  id="ConfirmPassword"
+                  name="ConfirmPassword"
+                  type="password"
+                />
                 <label class="text-center" for="ConfirmPassword">Confirm Password</label>
               </div>
             </div>
@@ -41,36 +67,64 @@
               <div class="col s10">
                 <md-field>
                   <label :for="`modules-${i}`">Module {{ m }}</label>
-                  <md-select style="background-color:white" v-model="student.modules[i]" :name="`modules-${i}`" :id="`modules-${i}`">
-                    <md-option style="background-color:white" :disabled="student.modules.filter(sm => sm == _module._id).length > 0" v-for="_module in modules" :value="_module._id" :key="_module._id">{{ _module.name }} ({{ _module.code }})</md-option>
+                  <md-select
+                    style="background-color:white"
+                    v-model="student.modules[i]"
+                    :name="`modules-${i}`"
+                    :id="`modules-${i}`"
+                    :disabled="userType === 'STUDENT'"
+                  >
+                    <md-option
+                      style="background-color:white"
+                      :disabled="student.modules.filter(sm => sm == _module._id).length > 0"
+                      v-for="_module in modules"
+                      :value="_module._id"
+                      :key="_module._id"
+                    >{{ _module.name }} ({{ _module.code }})</md-option>
                   </md-select>
                 </md-field>
               </div>
-              <div class="col s2 bottom-align">
-                <a v-on:click="student.modules.push(null)" v-if="i == (student.modules.length - 1) && student.modules[i] != null" class="btn btn-floating waves-effect"><i class="material-icons">add</i></a>
-                <a v-on:click="student.modules.splice(i,1)" v-if="i != (student.modules.length - 1)" class="btn btn-floating red waves-effect"><i class="material-icons">close</i></a>
+              <div v-if="userType !== 'STUDENT'" class="col s2 bottom-align">
+                <a
+                  v-on:click="student.modules.push(null)"
+                  v-if="i == (student.modules.length - 1) && student.modules[i] != null"
+                  class="btn btn-floating waves-effect"
+                >
+                  <i class="material-icons">add</i>
+                </a>
+                <a
+                  v-on:click="student.modules.splice(i,1)"
+                  v-if="i != (student.modules.length - 1)"
+                  class="btn btn-floating red waves-effect"
+                >
+                  <i class="material-icons">close</i>
+                </a>
               </div>
             </div>
             <div class="row">
               <div class="col s12">
                 <md-field>
                   <label>ID Number</label>
-                  <md-input v-model="student.idNumber" maxlength="13"></md-input>
+                  <md-input :disabled="isParent" v-model="student.idNumber" maxlength="13"></md-input>
                 </md-field>
               </div>
             </div>
             <div class="row" v-show="student.idNumber.length > 6">
               <div class="row">
                 <div class="col s12">
-                  <label>
-                                            {{ student.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                                      </label>
+                  <label>{{ student.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}</label>
                 </div>
               </div>
               <div class="col s12">
                 <md-field>
                   <label for="Gender">Gender</label>
-                  <md-select style="background-color:white" v-model="student.gender" name="Gender" id="Gender">
+                  <md-select
+                    style="background-color:white"
+                    :disabled="isParent"
+                    v-model="student.gender"
+                    name="Gender"
+                    id="Gender"
+                  >
                     <md-option style="background-color:white" disabled>Pick a gender</md-option>
                     <md-option style="background-color:white" value="Male">Male</md-option>
                     <md-option style="background-color:white" value="Female">Female</md-option>
@@ -78,7 +132,7 @@
                 </md-field>
               </div>
               <div class="col s12">
-                <md-datepicker md-immediately v-model="student.dob">
+                <md-datepicker md-immediately v-if="!isParent" v-model="student.dob">
                   <label>Date of birth</label>
                 </md-datepicker>
               </div>
@@ -90,19 +144,32 @@
             </div>
             <div class="row">
               <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-if="!isLoading" v-on:click="SubmitStudent()" type="submit" value="Submit student" class="btn center-align tg-btn" />
+                <input
+                  v-if="!isLoading && !isParent"
+                  v-on:click="SubmitStudent()"
+                  type="submit"
+                  value="Submit student"
+                  class="btn center-align tg-btn"
+                />
                 <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
               </div>
             </div>
           </div>
           <div class="card-header center-align z-depth-3 cardBar">
-            <h5 style="padding:20px">Add parent</h5>
-              <div v-show="student.parents && student.parents.length > 0" class="row">
+            <h5 style="padding:20px">
+              Add
+              <span v-if="isParent">another</span> parent
+            </h5>
+            <div v-show="student.parents && student.parents.length > 0" class="row">
               <div class="input-field col m4 offset-m1 s12 text-center">
                 <label class="text-center">We already have the following parents in the system</label>
               </div>
               <div class="input-field col m4 offset-m1 s12 text-center">
-                <p class="text-center" v-for="_parent in student.parents">{{ _parent.surname }} {{ _parent.name }} - {{ _parent.relationship }}</p>
+                <p
+                  class="text-center"
+                  v-for="(_parent,a) in student.parents"
+                  :key="a"
+                >{{ _parent.surname }} {{ _parent.name }} - {{ _parent.relationship }}</p>
               </div>
             </div>
           </div>
@@ -123,7 +190,7 @@
                 <label class="text-center" for="Username1">Email</label>
               </div>
             </div>
-             <div class="row">
+            <div class="row">
               <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
                 <input v-model="parent.numbers" id="Username2" name="Username2" type="number" />
                 <label class="text-center" for="Username2">Contact Numbers</label>
@@ -132,9 +199,17 @@
             <div class="row">
               <div class="col s12">
                 <md-field>
-                  <label for="Relationship">{{ parent.firstname }} {{ parent.lastname }} is my </label>
-                  <md-select style="background-color:white" v-model="parent.relationship" name="Relationship" id="Relationship">
-                    <md-option style="background-color:white" disabled>Pick a your relationship with {{ parent.firstname }} {{ parent.lastname }}</md-option>
+                  <label for="Relationship">{{ parent.firstname }} {{ parent.lastname }} is my</label>
+                  <md-select
+                    style="background-color:white"
+                    v-model="parent.relationship"
+                    name="Relationship"
+                    id="Relationship"
+                  >
+                    <md-option
+                      style="background-color:white"
+                      disabled
+                    >Pick a your relationship with {{ parent.firstname }} {{ parent.lastname }}</md-option>
                     <md-option style="background-color:white" value="FATHER">Father</md-option>
                     <md-option style="background-color:white" value="MOTHER">Mother</md-option>
                     <md-option style="background-color:white" value="SISTER">Sister</md-option>
@@ -144,20 +219,26 @@
                 </md-field>
               </div>
             </div>
-            <div class="row" v-show="txtError.length > 0">
+            <div class="row" v-show="txtError2.length > 0">
               <div class="col s8 offset-s2 m6 offset-m3 text-center">
                 <label class="text-center red-text">{{ txtError2 }}</label>
               </div>
             </div>
-             <div class="row">
+            <div class="row">
               <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-if="!isLoading" v-on:click="SubmitParent()" type="submit" value="Save parent" class="btn center-align tg-btn" />
+                <input
+                  v-if="!isLoading"
+                  v-on:click="SubmitParent()"
+                  type="submit"
+                  value="Save parent"
+                  class="btn center-align tg-btn"
+                />
                 <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
               </div>
             </div>
             <div class="row">
               <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <p v-for="result in parentResults">{{ result }}</p>
+                <p v-for="(result,a) in parentResults" :key="a">{{ result }}</p>
               </div>
             </div>
           </div>
@@ -198,10 +279,12 @@ export default {
         numbers: "",
         relationship: "FATHER"
       },
-      parentResults:[],
+      parentResults: [],
       done: false,
       modules: [],
-      isLoading: false
+      isLoading: false,
+      isParent: false,
+      userType: ""
     };
   },
   props: ["studentID"],
@@ -230,6 +313,8 @@ export default {
     this.done = false;
     this.LoadModules();
     this.LoadStudent();
+    this.isParent = this.$store.state.user.isParent;
+    this.userType = this.$store.state.user.type;
   },
   methods: {
     LoadStudent() {
@@ -331,9 +416,7 @@ export default {
           this.parentResults.push(results.data);
           swal(
             "Parent added",
-            `${this.parent.firstname} ${
-              this.parent.lastname
-            } was successfully added as your ${this.parent.relationship}`,
+            `${this.parent.firstname} ${this.parent.lastname} was successfully added as your ${this.parent.relationship}`,
             "success"
           );
         })

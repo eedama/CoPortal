@@ -7,6 +7,11 @@ import Student from "../models/Student";
 import Module from "../models/Module";
 import Questionaire from "../models/Questionaire";
 import consoling from '../services/Logger';
+import helper from '../services/Helper';
+import SMSProvider from "../services/SMSProvider"
+import EmailProvider from "../services/EmailProvider"
+const smsProvider = new SMSProvider();
+const emailProvider = new EmailProvider();
 
 /*
   TODO: Get one student - DONE
@@ -42,19 +47,117 @@ router.post("/delete/:studentID", function (req, res) {
 
 });
 
+router.post("/add/bulk/parents", function (req, res) {
+  var studentParents = req.body.studentParents;
+  if(studentParents && studentParents.length > 0){
+    studentParents.filter(v => v && v.surname && v.firstName).forEach(studentParent => {
+      Student.findOne({
+        $or:[
+          {
+            contactNumbers:studentParent.cellphone ? studentParent.cellphone.trim() : 'Joseph'
+          },
+          {
+            lastname:new RegExp(studentParent.surname,'i'),
+            firstname:new RegExp(studentParent.firstName,'i')
+          }
+        ]
+      }).then(async student => {
+        if(student){
+          console.log(`We found ${studentParent.surname} ${studentParent.firstName} and about to link parents.`);
+          var father = {
+            surname: studentParent.fatherSurname ? studentParent.fatherSurname.toLowerCase(): student.lastname,
+            name: studentParent.fatherName ? studentParent.fatherName.toLowerCase(): `${student.firstname}Father`,
+            contactNumbers: studentParent.fathercellphone,
+            email: student.fatherEmail,
+            relationship: "FATHER",
+            password: studentParent.fatherSurname ?  GeneratePassword(studentParent.fatherSurname.toLowerCase()) : GeneratePassword(student.lastname)
+          };
+        
+          var mother = {
+            surname: studentParent.motherSurname ? studentParent.motherSurname.toLowerCase(): student.lastname,
+            name: studentParent.motherName ? studentParent.motherName.toLowerCase(): `${student.firstname}Mother`,
+            contactNumbers: studentParent.mothercellphone,
+            email: student.motherEmail,
+            relationship: "MOTHER",
+            password: studentParent.motherSurname ?  GeneratePassword(studentParent.motherSurname.toLowerCase()) : GeneratePassword(student.lastname)
+          };
+         
+          if (!student.parents) {
+            student.parents = [];
+          }
+          let count = student.parents.length;
+
+          if (student.parents.find(p => p.surname == father.surname && p.name == father.name && p.relationship == father.relationship)) {
+            console.log(`${father.surname} ${father.name} is already a ${father.relationship} of ${student.username}.`);
+          } else if(!father.contactNumbers){
+            console.log(`We got an invalid father for ${student.username}`);
+          } else {
+            console.log("Father pushed ?")
+            student.parents.push(father);
+          }
+
+          if (student.parents.find(p => p.surname == mother.surname && p.name == mother.name && p.relationship == mother.relationship)) {
+            console.log(`${mother.surname} ${mother.name} is already a ${mother.relationship} of ${student.username}.`);
+          } else if(!mother.contactNumbers){
+            console.log(`We got an invalid mother for ${student.username}`);
+          } else {
+            console.log("Mother pushed ?")
+            student.parents.push(mother);
+          }
+
+          student.save(function (err) {
+            if (err) console.log(`Could not save parents for ${student.username}, try again later`);
+            if(father.email){
+              let message = GenerateEmail(father.name,student.firstname + " " + student.lastname,father.relationship,father.email,father.surname);
+              emailProvider.sendEmail(father.email,"Welcome to Coportal, Your profile is created successfully",message);
+            }
+            
+            if(mother.email){
+              let message = GenerateEmail(mother.name,student.firstname + " " + student.lastname,mother.relationship,mother.email,mother.surname);
+              emailProvider.sendEmail(mother.email,"Welcome to Coportal, Your profile is created successfully",message);
+            }
+            if(count != student.parents.length){
+              console.log("SUCCESS .... " + student.username);
+            }
+          });
+        }else{
+          console.log(`We couldn't find ${studentParent.surname} ${studentParent.firstName}`);
+        }
+      });
+    });
+  }
+});
+
+
 router.post("/add/parent/for/:studentID", function (req, res) {
   var studentID = req.params.studentID;
   var _parent = req.body.parent;
 
-  Student.findById(studentID).then(student => {
+  Student.findById(studentID).then(async student => {
     if (!student) return res.status(512).send("Student does not exist");
     if (!_parent) return res.status(512).send("Invalid parent details provided");
+  
+    let oldParent = null;
+    try{
+      const _student = await Student.findOne({
+        'parents.contactNumbers':_parent.numbers
+      });
+      if(_student){
+        oldParent = _student.parents.find(s => s.contactNumbers == _parent.numbers);
+      }
+    }catch(err){
+
+    }
+
+    const rawPassword = oldParent ? null : helper.generatePassword(4);
+    const password = oldParent ? oldParent.password : GeneratePassword(rawPassword);
     var parent = {
       surname: _parent.surname,
       name: _parent.name,
       contactNumbers: _parent.numbers,
       email: _parent.email,
-      relationship: _parent.relationship && _parent.relationship.toUpperCase()
+      relationship: _parent.relationship && _parent.relationship.toUpperCase(),
+      password: password
     };
 
     if (!student.parents) {
@@ -67,11 +170,24 @@ router.post("/add/parent/for/:studentID", function (req, res) {
       student.parents.push(parent);
     }
 
-    student.save(function (err) {
-      if (err) return res.status(512).send("Server error : " + err.message);
-      return res.send(`Added ${parent.surname} ${parent.name} as a ${parent.relationship} of ${student.username}.`);
-    })
+    if(oldParent){
+      student.save(function (err) {
+        if (err) return res.status(512).send(`Could not update user ${parent.surname} ${parent.name} try again later`);
+        return res.send(`Added ${parent.surname} ${parent.name} as a ${parent.relationship} of ${student.username}.`);
+      });
+    }else{
+      student.save(function (err) {
+        if (err) return res.status(512).send(`Could not save user ${parent.surname} ${parent.name} try again later`);
+        if(parent.email){
+          let message = GenerateEmail(parent.name,student.firstname + " " + student.lastname,parent.relationship,parent.email,rawPassword);
+          emailProvider.sendEmail(parent.email,"Welcome to Coportal, Your profile is created successfully",message);
+        }
+        return res.send(`Added as a ${parent.relationship} of ${student.username}.`);
+      });
+    }
+
   }).catch(err => {
+    consoling.info({key:req.url,input:err,message: err.message});
     return res.status(512).send("Server error : " + err.message);
   });
 
@@ -261,4 +377,18 @@ router.post("/add/bulk/students", async function (req, res) {
       failed:failed
     });
 });
+
+function GenerateEmail(parentName,studentName,relationship,username,password) {
+  return "<div class=\"Email-header\" style=\"font-size:20px;font-family:sans-serif;letter-spacing:1px; box-sizing:border-box; margin-top:60px;margin-bottom:98px;\">" +
+    "<img class=\"corportal\" align=\"right\" style=\"width:160px;height:auto;margin-top:-40px;\" src=\"https://coportal.net/static/img/logo.1328452.png\">" +
+    "<span>Coportal Communication</span></div><div style=\"font-family:sans-serif;margin-left:20px;color:dark\"><h4>Hi " + parentName +
+    "</h4><p style=\"margin-bottom:20px\">You have been added as a " + relationship + " of " + studentName + " on the CoPortal system<br /><br />" +
+    "Please use the following details to log into the system</p><br />" +
+    "<h4 style=\"font-family:sans-serif;margin-left:20px;color:dark\">Username : <strong>" + username + "</strong></h4>" +
+    "<h4 style=\"font-family:sans-serif;margin-left:20px;color:dark\">Password : <strong>" + password + "</strong></h4>" +
+    "<br /><a href='https://" + process.env.SCHOOL + ".coportal.net' style=\"text-decoration:none;background-color:black;color:white;padding:10px;border-radius:10px;\" >Visit the portal</a><br /><br />" +
+    "<br /><a href='https://play.google.com/store/apps/details?id=com.jmrsquared.coportal' style=\"text-decoration:none;background-color:black;color:white;padding:10px;border-radius:10px;\" >Download the APP</a>" +
+    "<br /><br /><br /><br />Best Regards,<br> <br><span>Coportal Communication</span>" +
+    "<br><img class=\"corportal\" align=\"left\" style=\"width:160px;height:auto;opacity:0.1\" src=\"https://coportal.net/static/img/coPortalLogo.jpg\"></div>";
+}
 module.exports = router;

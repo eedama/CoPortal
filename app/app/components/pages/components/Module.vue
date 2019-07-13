@@ -673,7 +673,7 @@ export default {
               this.notificationToSend.message = "";
               this.notificationToSend.title = "";
               this.$feedback.success({
-                title: "Notifcations",
+                title: "Notifications",
                 message: "Announcement Added Succesfully",
                 duration: 3000
               });
@@ -699,6 +699,13 @@ export default {
       });
     },
     TakeTest(test) {
+      if(this.$store.state.cache.cachedUser && this.$store.state.cache.cachedUser.userType =='PARENT'){
+          this.$feedback.warning({
+          title:'Parents can not take tests',
+          message: ''
+        });
+        return;
+      }
       if(test.totalAttempts < test.attemptLimit){
         this.navigate("/take/test", {
           dbQuestionaire: JSON.parse(JSON.stringify(test))

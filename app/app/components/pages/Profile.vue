@@ -192,48 +192,58 @@ export default {
         doc: "admin"
       });
       if (!this.$store.state.cache.cachedUser) {
-      this.navigate("/login", null, {
-        clearHistory: true
+        this.navigate("/login", null, {
+          clearHistory: true
+        });
+      }
+
+      this.currentUser = JSON.parse(
+        JSON.stringify(this.$store.state.cache.cachedUser.user)
+      );
+
+      this.currentUser.fullname = this.currentUser.firstname + " " + this.currentUser.lastname;
+      this.currentUser.username = this.currentUser.username;
+      this.users[0].body = this.currentUser.idNumber;
+      this.users[1].body = this.currentUser.gender;
+
+      this.currentStudent = this.currentUser;
+      /* { 
+          lastname: this.currentUser.lastname,
+          firstname: this.currentUser.firstname,
+          username: this.currentUser.username,
+          gender: this.currentUser.gender,
+          dob: this.currentUser.dob,
+          idNumber: this.currentUser.idNumber,
+          isSouthAfrican: this.currentUser.isSouthAfrican,
+          contactNumbers: this.currentUser.contactNumbers,
+          email: this.currentUser.email,
+      }
+      */
+      if(this.$store.state.cache.cachedUser && this.$store.state.cache.cachedUser.userType =='PARENT'){
+        this.$store.state.cache.cachedUser.students.forEach(parent => {
+          this.Parents.push({
+            title: parent.firstname + " " + parent.lastname,
+            body: parent.username,
+            badge: "Student",
+            icon: "mdi-account-circle"
+          });
+        });
+      }else{
+        this.currentUser.parents.forEach(parent => {
+          this.Parents.push({
+            title: parent.name + " " + parent.surname,
+            body: parent.email,
+            badge: parent.relationship.toLowerCase(),
+            icon: "mdi-account-circle"
+          });
+        });
+      }
+      var Module = "";
+      this.currentUser.modules.forEach(element => {
+        Module += element.name + ",";
       });
-    }
-
-    this.currentUser = JSON.parse(
-      JSON.stringify(this.$store.state.cache.cachedUser.user)
-    );
-
-    this.currentUser.fullname = this.currentUser.firstname + " " + this.currentUser.lastname;
-    this.currentUser.username = this.currentUser.username;
-    this.users[0].body = this.currentUser.idNumber;
-    this.users[1].body = this.currentUser.gender;
-
-    this.currentStudent = this.currentUser;
-    /* { 
-        lastname: this.currentUser.lastname,
-        firstname: this.currentUser.firstname,
-        username: this.currentUser.username,
-        gender: this.currentUser.gender,
-        dob: this.currentUser.dob,
-        idNumber: this.currentUser.idNumber,
-        isSouthAfrican: this.currentUser.isSouthAfrican,
-        contactNumbers: this.currentUser.contactNumbers,
-        email: this.currentUser.email,
-    }
-    */
-
-    this.currentUser.parents.forEach(parent => {
-      this.Parents.push({
-        title: parent.name + " " + parent.surname,
-        body: parent.email,
-        badge: parent.relationship.toLowerCase(),
-        icon: "mdi-account-circle"
-      });
-    });
-    var Module = "";
-    this.currentUser.modules.forEach(element => {
-      Module += element.name + ",";
-    });
-    Module = Module.slice(0, -1);
-    this.users[2].body = Module;
+      Module = Module.slice(0, -1);
+      this.users[2].body = Module;
     },
     SaveChanges(){
       this.isSavingChanges = true;

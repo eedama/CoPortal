@@ -13,7 +13,7 @@
             textAlignment="center"
             class="text-mute text-light-black p-15"
             fontSize="18%"
-            :text="currentSchoolName ? currentSchoolName : 'Pick a school'"
+            :text="isParent ? 'Pick a student' : (currentSchoolName ? currentSchoolName : 'Pick a school')"
           ></label>
           <CardView
             verticalAlignment="center"
@@ -26,15 +26,47 @@
           > 
           <ScrollView width="100%">
             <StackLayout>
-              <FlexboxLayout
-                v-if="currentSchoolName"
-                class="m-10"
-                justifyContent="space-between"
-                width="100%"
-                alignSelf="center"
-                height="100%"
-                flexDirection="column"
-              >
+              <FlexboxLayout v-if="isParent" class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
+                <GridLayout rows="*" columns="*,auto">
+                  <StackLayout colSpan="2">
+                    <ActivityIndicator
+                      verticalAlignment="center"
+                      textAlignment="center"
+                      v-show="isLoading"
+                      :busy="isLoading"
+                    ></ActivityIndicator>
+                    <CardView v-for="(student,i) in students" :key="i">
+                      <Ripple @tap="manageStudent(student)">
+                        <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
+                          <label
+                            row="0"
+                            rowSpan="2"
+                            col="0"
+                            verticalAlignment="center"
+                            textAlignment="center"
+                            class="mdi m-10"
+                            fontSize="25%"
+                            :text="'mdi-account-circle' | fonticon"
+                          ></label>
+                          <label
+                            row="0"
+                            col="1"
+                            class="h3 font-weight-bold text-mute text-dark-black"
+                            :text="`${student.firstname} ${student.lastname}`"
+                          ></label>
+                          <label
+                            row="1"
+                            col="1"
+                            class="h4 font-weight-bold text-mute text-dark-black"
+                            :text="student.username"
+                          ></label>
+                        </GridLayout>
+                      </Ripple>
+                    </CardView>
+                  </StackLayout>
+                </GridLayout>
+              </FlexboxLayout>
+              <FlexboxLayout v-if="currentSchoolName && !isParent" class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
                 <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
                   <label
                     row="0"
@@ -122,15 +154,7 @@
                   </Ripple>
                 </GridLayout>
               </FlexboxLayout>
-              <FlexboxLayout
-                v-if="!currentSchoolName"
-                class="m-10"
-                justifyContent="space-between"
-                width="100%"
-                alignSelf="center"
-                height="100%"
-                flexDirection="column"
-              >
+              <FlexboxLayout v-if="!currentSchoolName && !isParent" class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
                 <GridLayout rows="auto,*" columns="*,auto">
                   <Ripple col="1" @tap="refresh" verticalAlignment="center" textAlignment="right">
                     <label class="mdi m-10" fontSize="25%" :text="'mdi-refresh' | fonticon"></label>
@@ -202,7 +226,9 @@ export default {
       username: "",
       currentSchoolName: null,
       currentSchoolUrl: null,
-      schools: []
+      schools: [],
+      students: [],
+      isParent: false
     };
   },
   mounted() {
@@ -215,7 +241,47 @@ export default {
     this.isLoading = false;
   },
   methods: {
+    manageStudent(student){
+      if(this.$store.state.cache.cachedUser && this.$store.state.cache.cachedUser.userType =='PARENT'){
+         let currentUser = JSON.parse(JSON.stringify(this.$store.state.cache.cachedUser));
+         
+         this.appSettings.remove("isLoggedInUserId");
+         this.appSettings.remove("userType");
+         this.appSettings.remove("device_token"); 
+         this.$store.commit("clearCache", {
+           db: this.$db,
+           appSettings: this.appSettings,
+           api: this.$api
+         });
+
+         currentUser.user = student;
+         this.$store.commit("cacheUser", {
+            db: this.$db,
+            api: this.$api,
+            appSettings: this.appSettings,
+            user: currentUser,
+            type: currentUser.userType
+          });
+
+          console.log('currentUser',JSON.stringify(currentUser));
+          console.log('currentUser-session',JSON.stringify(this.$store.state.cache.cachedUser));
+          this.appSettings.setBoolean("isLoggedInUserId", true);
+          this.appSettings.setString("userType", currentUser.userType);
+          this.navigate("/student/profile/view", null, {
+            clearHistory: true
+          });
+      }else{
+         this.$feedback.error({
+              title: 'Current User is ',
+              message: this.$store.state.cache.cachedUser
+          });
+      }
+    },
     refresh(clean = false) {
+      if(this.$store.state.cache.cachedUser && this.$store.state.cache.cachedUser.userType == 'PARENT'){
+        this.isParent = true;
+        this.students = this.$store.state.cache.cachedUser.students;
+      }
       this.currentSchoolName = clean
         ? null
         : appSettings.getString("CurrentSchoolName");
@@ -286,7 +352,12 @@ export default {
         .loginUser(this.username, this.password)
         .then(results => {
           this.isLoading = false;
+          this.isParent = false;
           var currentUser = JSON.parse(JSON.stringify(results));
+          if(currentUser && currentUser.user && currentUser.userType == "PARENT"){
+            currentUser.parent = currentUser.user;
+            currentUser.user = currentUser.students[0];
+          }
           this.$store.commit("cacheUser", {
             db: this.$db,
             api: this.$api,
@@ -311,10 +382,15 @@ export default {
                 clearHistory: true
               });
               break;
+            case "PARENT":
+              this.isParent = true;
+              this.students = currentUser.students;
+              break;
           }
         })
         .catch(err => {
           this.isLoading = false;
+          this.isParent = false;
           this.$feedback.error({
             title: err.message
           });
