@@ -74,6 +74,17 @@
               />
               <label class="text-center" for="ModuleDescription">Message</label>
             </div>
+             <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+               <label>
+                  <input
+                    v-model="announcement.isParent"
+                    class="with-gap"
+                    name="group1"
+                    type="checkbox"
+                  />
+                  <span>Send announcement to parents</span>
+                </label>
+              </div>
           </div>
           <div class="row">
             <div class="col s8 offset-s2 m6 offset-m3 text-center">
@@ -279,6 +290,7 @@ export default {
         title: "",
         message: "",
         isToAll: true,
+        isParent: true,
         moduleID: null
       },
       announcements: [],
