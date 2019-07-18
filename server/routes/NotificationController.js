@@ -168,18 +168,23 @@ router.post("/announcements/add/for/:moduleID/by/:userType/of/id/:userId", funct
         announcement.save(function (err) {
           if (err) return res.status(512).send("Server error : " + err.message);
           if (m) {
+            consoling.info({key:"About to send SMS to  - " + notification.isParent,success:true,input:"Found " +  m.students.length + " students",message:m.name + " " + m.code});
             m.students.forEach(_student => {
-              Student.findById(_student).then(sss => {
+              try{
                 if(notification.isParent){
+                  Student.findById(_student).then(sss => {
                   console.log("Sending SMS to parents for " + sss.lastname);
-                  sendSMSToParent(sss,announcement.message);
+                    sendSMSToParent(sss,announcement.message);
+                  });
                 }
-              })
-              FCM.sendToUserSimple(_student, announcement.title, announcement.message).then(results =>{
-                consoling.info({key:'h54gf33gh4wjjhg5vrfe54',success:true,input:_student,message:results});
-              }).catch(ex =>{
-                consoling.info({key:'h54gf33gh4wjjhg5vrfe54',success:false,input:_student,message:ex});
-              });
+                FCM.sendToUserSimple(_student, announcement.title, announcement.message).then(results =>{
+                  consoling.info({key:'h54gf33gh4wjjhg5vrfe54',success:true,input:_student,message:results});
+                }).catch(ex =>{
+                  consoling.info({key:'h54gf33gh4wjjhg5vrfe54',success:false,input:_student,message:ex});
+                });
+              }catch(err){
+                consoling.info({key:"About to send SMS to  - " + notification.isParent,success:false,input:_student,message:err.message});
+              }
             });
           } else {
             Student.find({
@@ -217,7 +222,8 @@ async function sendSMSToParent(student,message){
   if(student && student.parents && student.parents.length > 0){
     const parent = student.parents.find(v => v.contactNumbers);
     if(parent){
-      try{
+      try{      
+        consoling.info({key:"About to send SMS to parent",success:true,input:parent.contactNumbers,message:message});
         console.log("Added send SMS To Parent " + student.lastname);
         await smsProvider.sendSMS(parent.contactNumbers,message);
       }catch(err){
