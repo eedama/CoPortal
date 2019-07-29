@@ -1,4 +1,4 @@
-import Vue, { registerElement } from "nativescript-vue";
+import Vue from "nativescript-vue";
 import App from "./components/App.vue";
 // Prints Vue logs when --env.production is *NOT* set while building
 import store from "./store";
@@ -18,50 +18,40 @@ TNSFontIcon.loadCss();
 
 Vue.config.silent = TNS_ENV === "production";
 
-registerElement(
+Vue.registerElement(
   "RadSideDrawer",
   () => require("nativescript-ui-sidedrawer").RadSideDrawer
 );
 
-registerElement("CardView", () => require("nativescript-cardview").CardView);
+Vue.registerElement("CardView", () => require("@nstudio/nativescript-cardview").CardView);
 
-registerElement("Ripple", () => require("nativescript-ripple").Ripple);
+Vue.registerElement("Ripple", () => require("nativescript-ripple").Ripple);
 
-registerElement(
+Vue.registerElement(
   "PullToRefresh",
-  () => require("nativescript-pulltorefresh").PullToRefresh
+  () => require("@nstudio/nativescript-pulltorefresh").PullToRefresh
 );
 
-registerElement("Fab", () => require("nativescript-floatingactionbutton").Fab);
+Vue.registerElement("Fab", () => require("@nstudio/nativescript-floatingactionbutton").Fab);
 
-registerElement(
+Vue.registerElement(
   "DropDown",
   () => require("nativescript-drop-down/drop-down").DropDown
 );
 
-registerElement("CheckBox", () => require("nativescript-checkbox").CheckBox, {
+Vue.registerElement("CheckBox", () => require("@nstudio/nativescript-checkbox").CheckBox, {
   model: {
     prop: "checked",
     event: "checkedChange"
   }
 });
 
-registerElement(
+Vue.registerElement(
   "ImageZoom",
   () => require("nativescript-image-zoom").ImageZoom
 );
 
-registerElement(
-  "BottomNavigation",
-  () => require("nativescript-bottom-navigation").BottomNavigation
-);
-
-registerElement(
-  "BottomNavigationTab",
-  () => require("nativescript-bottom-navigation").BottomNavigationTab
-);
-
-registerElement(
+Vue.registerElement(
   "PDFView", 
   () => require("nativescript-pdf-view").PDFView
 );
