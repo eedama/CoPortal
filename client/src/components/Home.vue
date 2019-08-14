@@ -90,7 +90,7 @@
             <div class="col s8 offset-s2 m6 offset-m3 text-center">
               <label>Send to :</label>
             </div>
-            <div class="col s8 offset-s2 m6 offset-m3 text-center">
+            <div style="max-height:60vh;overflow:scroll" class="col s8 offset-s2 m6 offset-m3 text-center">
               <form action="#">
                 <p v-for="(module,i) in modules" :key="i">
                   <label>
