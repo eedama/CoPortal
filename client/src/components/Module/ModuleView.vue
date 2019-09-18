@@ -415,7 +415,7 @@ const axios = require("axios");
 import AddStudent from "../Student/AddStudent";
 import AddLecturer from "../Lecturer/AddLecturer";
 
-import * as download from "../../assets/lib/js/download.js";
+const download = require("../../assets/lib/js/download.js");
 
 export default {
   name: "ModuleView",
