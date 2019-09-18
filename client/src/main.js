@@ -7,6 +7,7 @@ import store from "./store";
 import VueTyperPlugin from "vue-typer";
 import VueMaterial from "vue-material";
 import * as VueLoaders from "vue-loaders";
+import axios from "axios";
 
 import * as moment from "moment";
 import VueSession from "vue-session";
@@ -40,7 +41,10 @@ Vue.mixin({
       var webLink = document.location.host;
       webLink = webLink.split(".");
       var school = webLink[0];
-      axios
+      if(school && school.indexOf('localhost') >= 0){
+        this.$store.commit("changeSchool", 'test');
+      }else{
+        axios
         .get(this.$store.state.settings.baseLink + "/get/all/Schools")
         .then(results => {
           var found = false;
@@ -65,6 +69,7 @@ Vue.mixin({
             this.txtError = err.response.data;
           }
         });
+      }
     },
     getMoment(value) {
       return moment(value);

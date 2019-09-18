@@ -86,36 +86,7 @@ export default {
     }
   },
   methods: {
-    changeSchool() {
-      var webLink = document.location.host;
-      webLink = webLink.split(".");
-      var school = webLink[0];
-      axios
-        .get(this.$store.state.settings.baseLink + "/get/all/Schools")
-        .then(results => {
-          var found = false;
-          results.data.forEach(schoolUrl => {
-            if (schoolUrl.url === school) {
-              this.$store.commit("changeSchool", school);
-              found = true;
-            }
-          });
-          if (!found) {
-            ///code to be added if school is not found from url
-            swal(
-              `The school ${school} is not on our server`,
-              "Please contact the admin if this is an unexpected error",
-              "error"
-            );
-          }
-          console.log("I was called", this.$store.state.settings.baseLink);
-        })
-        .catch(err => {
-          if (err.response != null && err.response.status == 512) {
-            this.txtError = err.response.data;
-          }
-        });
-    }
+
   }
 };
 </script>
