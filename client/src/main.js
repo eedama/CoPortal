@@ -7,6 +7,7 @@ import store from "./store";
 import VueTyperPlugin from "vue-typer";
 import VueMaterial from "vue-material";
 import * as VueLoaders from "vue-loaders";
+import axios from "axios";
 
 import * as moment from "moment";
 import VueSession from "vue-session";
