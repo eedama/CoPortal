@@ -700,7 +700,7 @@ export default {
     },
     TakeTest(test) {
       if(this.$store.state.cache.cachedUser && this.$store.state.cache.cachedUser.userType =='PARENT'){
-          this.$feedback.warning({
+        this.$feedback.warning({
           title:'Parents can not take tests',
           message: ''
         });
@@ -711,8 +711,30 @@ export default {
           dbQuestionaire: JSON.parse(JSON.stringify(test))
         });
       }else{
-        this.$feedback.warning({
-          title:'You have exceed your ' + test.attemptLimit + ' attempts'
+        console.log('test ....',test);
+        this.$api
+        .getSolutionId(test._id,this.$store.state.cache.cachedUser.userType,this.$store.state.cache.cachedUser.user._id)
+        .then(results => {
+          console.log('results .... ',JSON.parse(JSON.stringify(results)));
+          const solutionId = JSON.parse(JSON.stringify(results)).id;
+          this.isLoading = false;
+          if (solutionId) {
+            this.navigate("/feedback/chat", {
+              solutionId
+            });
+          } else {
+            this.$feedback.warning({
+              title:'Can not find the solution',
+              message: 'The solution of this test is not available'
+            });
+          }
+        })
+        .catch(err => {
+          this.isLoading = false;
+          this.$feedback.error({
+            title:'Can not find the solution',
+            message: err.message
+          });
         });
       }
     },

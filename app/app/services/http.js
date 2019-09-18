@@ -234,30 +234,30 @@ export default class API {
     });
   }
 
-  getAllModules(){
+  getAllModules() {
     return new Promise((resolve, reject) => {
-        http
-          .request(this.makeGet("/m/modules/all"))
-          .then(async result => {
-            var answer = await this.handleResponse(result);
-            if (answer) {
-              if (answer.isError) {
-                return reject(new Error(answer.message));
-              } else if (answer == true) {
-                return resolve(result.content);
-              } else {
-                return reject(
-                  new Error("Authorization error, please contact admin.")
-                );
-              }
+      http
+        .request(this.makeGet("/m/modules/all"))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
             }
-          })
-          .catch(err => {
-            return reject(
-              new Error("Failed to retrieve modules try again later")
-            );
-          });
-    });    
+          }
+        })
+        .catch(err => {
+          return reject(
+            new Error("Failed to retrieve modules try again later")
+          );
+        });
+    });
   }
 
   getModuleInformation(userID) {
@@ -666,107 +666,135 @@ export default class API {
     });
   }
 
-  downloadNotes(noteID){
+  downloadNotes(noteID) {
     return new Promise((resolve, reject) => {
-        http
-          .request(
-            this.makeGet("/m/download/notes/" + noteID)
-          )
-          .then(async result => {
-            var answer = await this.handleResponse(result);
-            if (answer) {
-              if (answer.isError) {
-                return reject(new Error(answer.message));
-              } else if (answer == true) {
-                return resolve(result.content);
-              } else {
-                return reject(
-                  new Error("Authorization error, please contact admin.")
-                );
-              }
+      http
+        .request(
+          this.makeGet("/m/download/notes/" + noteID)
+        )
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
             }
-          })
-          .catch(err => {
-            return reject(
-              new Error("Can not load your notifications, Try again later")
-            );
-          });
-      });
+          }
+        })
+        .catch(err => {
+          return reject(
+            new Error("Can not load your notifications, Try again later")
+          );
+        });
+    });
   }
 
-  updateStudent(studentID,obj){
+  updateStudent(studentID, obj) {
     var student = JSON.parse(JSON.stringify(obj));
-    if(student.modules){
+    if (student.modules) {
       student.modules = student.modules.map(m => m._id);
     }
-    return new Promise((resolve,reject)=>{
+    return new Promise((resolve, reject) => {
       http
-      .request(
-        this.makePost(
-          "/a/update/student/" + studentID,
-          {
-            student,
-            overrideModules:true
-          }
+        .request(
+          this.makePost(
+            "/a/update/student/" + studentID,
+            {
+              student,
+              overrideModules: true
+            }
+          )
         )
-      )
-      .then(async result => {
-        var answer = await this.handleResponse(result);
-        if (answer) {
-          if (answer.isError) {
-            return reject(new Error(answer.message));
-          } else if (answer == true) {
-            return resolve(result.content);
-          } else {
-            return reject(
-              new Error("Authorization error, please contact admin.")
-            );
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
           }
-        }
-      })
-      .catch(err => {
-        return reject(
-          new Error("Can not load your notifications, Try again later")
-        );
-      });
+        })
+        .catch(err => {
+          return reject(
+            new Error("Can not load your notifications, Try again later")
+          );
+        });
     });
   }
 
-  changePassword(userID,userType,oldPassword,newPassword){
-    return new Promise((resolve,reject)=>{
+  changePassword(userID, userType, oldPassword, newPassword) {
+    return new Promise((resolve, reject) => {
       http
-      .request(
-        this.makePost(
-          `/acc/${userType.toLowerCase()}/change/password/${userID}`,
-          {
-            oldPassword : oldPassword,
-            newPassword : newPassword
-          }
+        .request(
+          this.makePost(
+            `/acc/${userType.toLowerCase()}/change/password/${userID}`,
+            {
+              oldPassword: oldPassword,
+              newPassword: newPassword
+            }
+          )
         )
-      )
-      .then(async result => {
-        var answer = await this.handleResponse(result);
-        if (answer) {
-          if (answer.isError) {
-            return reject(new Error(answer.message));
-          } else if (answer == true) {
-            return resolve(result.content);
-          } else {
-            return reject(
-              new Error("Authorization error, please contact admin.")
-            );
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
           }
-        }
-      })
-      .catch(err => {
-        return reject(
-          new Error("Can not load your notifications, Try again later")
-        );
-      });
+        })
+        .catch(err => {
+          return reject(
+            new Error("Can not load your notifications, Try again later")
+          );
+        });
     });
   }
 
-  getDownloadNotesURL(noteID){
+  getSolutionId(questionaireId, userType, userId) {
+    return new Promise((resolve, reject) => {
+      http
+        .request(
+          this.makeGet(`/m/get/solution/id/for/${questionaireId}/by/${userType}/of/id/${userId}`)
+        )
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
+          }
+        })
+        .catch(err => {
+          return reject(
+            new Error("Can not load your notifications, Try again later")
+          );
+        });
+    });
+  }
+
+  getDownloadNotesURL(noteID) {
     return this.makeURL("/m/download/pdf/file/" + noteID);
   }
 

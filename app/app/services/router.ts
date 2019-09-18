@@ -17,6 +17,7 @@ import Profile from "../components/pages/Profile.vue";
 import Marks from "../components/pages/Marks.vue";
 import Settings from "../components/pages/Settings.vue";
 import PDFView from "../components/pages/PDFView.vue";
+import FeedbackChat from "../components/pages/FeedbackChat.vue";
 
 // Pages
 // Components
@@ -50,6 +51,15 @@ var router = {
     /**
      * Pages
      */
+    "/feedback/chat": {
+      name: "FeedbackChat",
+      path: "/feedback/chat",
+      component: FeedbackChat,
+      meta: {
+        title: "FeedbackChat",
+        authLevel: 0
+      }
+    },    
     "/pdf/view": {
       name: "pdfview",
       path: "/module/list",
