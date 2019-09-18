@@ -41,7 +41,10 @@ Vue.mixin({
       var webLink = document.location.host;
       webLink = webLink.split(".");
       var school = webLink[0];
-      axios
+      if(school && school.indexOf('localhost') >= 0){
+        this.$store.commit("changeSchool", 'test');
+      }else{
+        axios
         .get(this.$store.state.settings.baseLink + "/get/all/Schools")
         .then(results => {
           var found = false;
@@ -66,6 +69,7 @@ Vue.mixin({
             this.txtError = err.response.data;
           }
         });
+      }
     },
     getMoment(value) {
       return moment(value);
