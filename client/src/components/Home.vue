@@ -40,17 +40,22 @@
       </md-card-actions>
     </md-dialog>
     <md-dialog
-      v-if="$store.state.user.isLoggedIn && ($store.state.user.type=='LECTUERE' || $store.state.user.type=='ADMIN')"
-      style="position:absolute;top:25%;width:100%"
+      v-if="$store.state.user.isLoggedIn && ($store.state.user.type=='LECTURER' || $store.state.user.type=='ADMIN')"
+      style="position:absolute;max-height:100vh;min-height:20%;width:100%;"
       class="card"
       :md-active.sync="isAddingAnnouncements"
     >
       <md-card class="col s12">
-        <md-card-header>
-          <div class="md-title">Send a announcement</div>
-          <md-button v-on:click="isAddingAnnouncements = false" class="right">
-            <md-icon>close</md-icon>
-          </md-button>
+        <md-card-header style="background-color:#006064;" class="row">
+          <div class="col s12 m10 offset-m1 text-center">
+            <span
+              style="color:ghostwhite"
+              class="md-title"
+            >Send an announcement</span>
+            <md-button class="right" v-on:click="isAddingAnnouncements = false">
+              <md-icon style="color:ghostwhite">close</md-icon>
+            </md-button>
+          </div>
         </md-card-header>
         <md-content>
           <div class="row">
@@ -61,7 +66,7 @@
                 name="ModuleDescription"
                 type="text"
               />
-              <label class="text-center" for="ModuleDescription">Title</label>
+              <label class="text-center" style="color:#006064" for="ModuleDescription">Title</label>
             </div>
           </div>
           <div class="row">
@@ -72,36 +77,39 @@
                 name="ModuleDescription"
                 type="text"
               />
-              <label class="text-center" for="ModuleDescription">Message</label>
+              <label class="text-center" style="color:#006064" for="ModuleDescription">Message</label>
             </div>
-             <div style="padding:10px" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-               <label>
-                  <input
-                    v-model="announcement.isParent"
-                    class="with-gap"
-                    name="group1"
-                    type="checkbox"
-                  />
-                  <span>Send announcement to parents</span>
-                </label>
-              </div>
+            <div style="padding:10px" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+              <label>
+                <input
+                  v-model="announcement.isParent"
+                  class="with-gap"
+                  name="group1"
+                  type="checkbox"
+                />
+                <span :style="{'color:#006064':announcement.isParent}">Send announcement to parents</span>
+              </label>
+            </div>
           </div>
           <div class="row">
-            <div class="col s8 offset-s2 m6 offset-m3 text-center">
-              <label>Send to :</label>
+            <div class="col s8 offset-s2 m6 offset-m3 text-center p-20">
+              <label style="color:#006064">Send to :</label>
             </div>
-            <div style="max-height:60vh;overflow:scroll" class="col s8 offset-s2 m6 offset-m3 text-center">
-              <form action="#">
-                <p v-for="(module,i) in modules" :key="i">
+            <div
+              style="position:relative;top:0%;max-height:40vh;overflow-y:scroll;width:60%"
+              class="col s8 offset-s2 m6 offset-m3 text-center"
+            >
+              <form style="max-height:60vh">
+                <p v-for="(_module,i) in modules" :key="i">
                   <label>
                     <input
                       v-model="announcement.module"
-                      :value="module._id"
+                      :value="_module._id"
                       class="with-gap"
                       name="group1"
                       type="radio"
                     />
-                    <span>{{ module.name }} ({{ module.code }}) students</span>
+                    <span>{{ _module.name }} ({{ _module.code }}) students</span>
                   </label>
                 </p>
                 <p>
@@ -112,24 +120,29 @@
                       class="with-gap"
                       name="group1"
                       type="radio"
-                      checked
+                      :checked="true"
                     />
                     <span>All Students</span>
                   </label>
                 </p>
               </form>
             </div>
+            <div class="col s8 offset-s2 m6 offset-m3 text-center p-20"></div>
           </div>
         </md-content>
+        <md-card-actions style="background-color:#006064;padding:10px">
+          <span v-if="!isLoading"
+            style="float:left;left:0;position:absolute;padding-left:30px;color:ghostwhite;max-width:60%"
+          >The announcement will be sent to {{ modules.some(v => v && v._id == announcement.module) ? `${modules.find(v => v && v._id == announcement.module).name} ${modules.find(v => v && v._id == announcement.module).code}` : 'All' }} students {{ announcement.isParent ? ' and SMSs to thier parents as well' : ''}}</span>
+          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+          <md-button
+            v-if="!isLoading"
+            v-on:click="SendAnnouncement()"
+            style="color:ghostwhite;max-width:40%"
+            class="md-secondary"
+          >Send announcement</md-button>
+        </md-card-actions>
       </md-card>
-      <md-card-actions>
-        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-        <md-button
-          v-if="!isLoading"
-          v-on:click="SendAnnouncement()"
-          class="md-primary"
-        >Send announcement</md-button>
-      </md-card-actions>
     </md-dialog>
 
     <div class="row">
@@ -291,7 +304,8 @@ export default {
         message: "",
         isToAll: true,
         isParent: false,
-        moduleID: null
+        moduleID: null,
+        module: null
       },
       announcements: [],
       modules: [],
