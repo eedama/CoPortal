@@ -11,8 +11,7 @@ const LecturerSchema = new mongoose.Schema({
         ref: 'Admin'
     },
     idNumber: {
-        type: Number,
-        unique: true
+        type: Number
     },
     username: {
         type: String,
