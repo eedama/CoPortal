@@ -11,8 +11,7 @@ const StudentSchema = new mongoose.Schema({
         ref: 'Admin'
     },
     idNumber: {
-        type: String,
-        unique: true
+        type: String
     },
     username: {
         type: String,
@@ -34,8 +33,8 @@ const StudentSchema = new mongoose.Schema({
         },
         password:String
     }],
-    firstname: String,
     lastname: String,
+    firstname: String,
     room: String,
     gender: String,
     email: String,
