@@ -11,6 +11,7 @@ import Module from "../components/pages/components/Module.vue";
 import TakeTest from "../components/pages/components/TakeTest.vue";
 import TestMarks from "../components/pages/components/TestMarks.vue";
 import Timetable from "../components/pages/components/Timetable.vue";
+import StudentAttandance from "../components/pages/components/StudentAttendance.vue";
 import Modules from "../components/pages/Modules.vue";
 import Notifications from "../components/pages/Notifications.vue";
 import Profile from "../components/pages/Profile.vue";
@@ -18,6 +19,7 @@ import Marks from "../components/pages/Marks.vue";
 import Settings from "../components/pages/Settings.vue";
 import PDFView from "../components/pages/PDFView.vue";
 import FeedbackChat from "../components/pages/FeedbackChat.vue";
+
 
 // Pages
 // Components
@@ -165,6 +167,15 @@ var router = {
       component: TestMarks,
       meta: {
         title: "TestMarks",
+        authLevel: 0
+      }
+    },
+    "/student/attendance": {
+      name: "studentattendance",
+      path: "/student/attendance",
+      component: StudentAttandance,
+      meta: {
+        title: "StudentAttendance",
         authLevel: 0
       }
     }

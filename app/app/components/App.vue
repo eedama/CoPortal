@@ -183,6 +183,13 @@ export default {
           auth: ["ADMIN", "LECTURER", "STUDENT", "PARENT"]
         },
         {
+          text: "Attendance",
+          icon: "calendar-check",
+          link: "/student/attendance",
+          description: "Students class Attendance",
+          auth: ["LECTURER", "STUDENT",]
+        },
+        {
           text: "Timetable",
           icon: "table",
           link: "/timetable/view",

@@ -34,7 +34,6 @@ export default class API {
         message: "Server error, please try again later"
       };
     } else {
-      console.log(result.content.toString());
       return true;
     }
   }
@@ -165,6 +164,36 @@ export default class API {
           })
           .catch(err => {
             return reject(new Error("Unable to log you in, try again later"));
+          });
+      }
+    });
+  }
+
+  addStudentToAttendance(student) {
+    return new Promise((resolve, reject) => {
+      if (!student) {
+        reject(new Error("User Unknown"));
+      } else {
+        http
+          .request(
+            this.makePost("/attendance/sign", student)
+          )
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
+              }
+            }
+          })
+          .catch(err => {
+            return reject(new Error("Unable to perform this operation, try again later"));
           });
       }
     });
