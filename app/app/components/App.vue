@@ -187,7 +187,14 @@ export default {
           icon: "calendar-check",
           link: "/student/attendance",
           description: "Students class Attendance",
-          auth: ["LECTURER", "STUDENT",]
+          auth: ["STUDENT",]
+        },
+        {
+          text: "Attendance",
+          icon: "calendar-check",
+          link: "/module/list/attend",
+          description: "Students class Attendance",
+          auth: ["LECTURER"]
         },
         {
           text: "Timetable",
@@ -310,7 +317,10 @@ export default {
               });
             }
           });
-      } else {
+      } else if(item.link == "/module/list/attend"){
+       this.navigate(item.link,{attendance: true });
+      }
+      else {
         this.navigate(item.link);
       }
     }
