@@ -40,7 +40,7 @@ router.get("/get/times/for/:moduleId", function (req, res) {
   return res.json([]);
 });
 
-router.post("/get/for/:moduleId/on/:date", function (req, res) {
+router.get("/get/for/:moduleId/on/:date", function (req, res) {
   var moduleId = req.params.moduleId;
   var date = req.params.date;
 
