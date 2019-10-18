@@ -11,8 +11,11 @@ const AttendanceSchema = new mongoose.Schema({
         ref: 'Lecturer'
     },
     students: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Student'
+        date: Date,
+        studentId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Student'
+        }
     }],
     code: String,
     moduleId: {

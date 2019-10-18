@@ -6,15 +6,47 @@ import mongoose from "mongoose";
 import Attendance from "../models/Attendance";
 import Module from "../models/Module";
 import Lecturer from "../models/Lecturer";
+import Student from "../models/Student";
 import EmailProvider from "../services/EmailProvider";
 import moment from "moment";
+import consoling from "../services/Logger";
 const emailProvider = new EmailProvider();
 
 router.post("/sign", function (req, res) {
   var studentId = req.body.studentId;
   var code = req.body.code;
 
-  return res.send("We got your attendance!");
+  Attendance.findOne({
+    code
+  }).then(async attendance => {
+    if (!attendance) {
+      return res.status(512).send("You have entered a wrong attendance code.");
+    }
+    if (moment().diff(attendance.expireDate) > 0) {
+      return res.status(512).send("The attendance code has expired.");
+    }
+    try {
+      const s = await Student.findById(studentId);
+      if (!s) throw new Error('You are not in our system');
+      if (!s.modules || s.modules.some(v => v == attendance.moduleId)) throw new Error('You have entered an attendance code of a wrong module.');
+    } catch (e) {
+      return res.status(512).send(e.message);
+    }
+    if (!attendance.students) attendance.students = [];
+    if (!attendance.students.some(v => v && v.studentId == studentId)) {
+      attendance.students.push({
+        date: new Date(),
+        studentId
+      });
+    }
+    attendance.save(function (err) {
+      if (err) return res.status(512).send("Your attendance was not logged, please try again before the code expires.");
+      return res.send("Your attendance register is signed successfully!");
+    });
+  }).catch(err => {
+    consoling.info({ key: "Sign attendance", success: false, input: studentId, message: err.message, err });
+    return res.status(512).send(err.message);
+  });
 });
 
 router.post("/create/for/:moduleId", async function (req, res) {
@@ -81,7 +113,7 @@ function generateCode(length) {
   if (!length || length < 0) length = 5;
   let code = '';
   for (let i = 0; i < length; i++) {
-    code += alphabets[(Math.random() * alphabets.length - 1).toFixed()];
+    code += alphabets[(Math.random() * (alphabets.length - 1)).toFixed()];
   }
   return code;
 }
