@@ -178,6 +178,15 @@ var router = {
         title: "StudentAttendance",
         authLevel: 0
       }
+    },
+    "/module/list/attend": {
+      name: "modulesattendlist",
+      path: "/module/list/attend",
+      component: Modules,
+      meta: {
+        title: "Modules",
+        authLevel: 0
+      }
     }
   }
 };
