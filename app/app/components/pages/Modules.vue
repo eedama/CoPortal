@@ -110,12 +110,22 @@
         });
       },
       goToModule(_module) {
-        this.navigate(
-          "/module/view", {
-            module: _module
-          },
-          null
-        );
+        if(this.attendance){
+          this.navigate(
+              "/module/attendance", {
+                module: _module
+              },
+              null
+          );
+        }else{
+          this.navigate(
+              "/module/view", {
+                module: _module
+              },
+              null
+          );
+        }
+       
       }
     }
   };

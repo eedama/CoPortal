@@ -111,7 +111,7 @@ Vue.mixin({
       } else {
         options = options || {};
         options.props = props;
-        if (this.$navigator.route && this.$navigator.route.path == to) {
+        if (this.$navigator.route && this.$navigator.route.path == to && to !== '/module/list/attend') {
           console.log("Going to same page", to);
           return;
         }

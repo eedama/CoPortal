@@ -262,6 +262,33 @@ export default class API {
       }
     });
   }
+  
+
+  getAttendanceHistory(moduleID) {
+    return new Promise((resolve, reject) => {
+      http
+        .request(this.makeGet("/attendance/get/times/for/"+moduleID))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
+          }
+        })
+        .catch(err => {
+          return reject(
+            new Error("Failed to retrieve modules try again later")
+          );
+        });
+    });
+  }
 
   getAllModules() {
     return new Promise((resolve, reject) => {
@@ -313,6 +340,38 @@ export default class API {
           .catch(err => {
             return reject(
               new Error("Failed to retrieve modules try again later")
+            );
+          });
+      }
+    });
+  }
+
+  createAttendance(attendance, moduleID) {
+    return new Promise((resolve, reject) => {
+      if (!attendance) {
+        reject(new Error("Invalid request"));
+      } else {
+        http
+          .request(
+            this.makePost("/attendance/create/for/"+moduleID, attendance)
+          )
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
+              }
+            }
+          })
+          .catch(err => {
+            return reject(
+              new Error("Unable to submit your quiz, Try again later")
             );
           });
       }
