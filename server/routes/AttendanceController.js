@@ -96,16 +96,33 @@ router.post("/create/for/:moduleId", async function (req, res) {
 
 router.get("/get/times/for/:moduleId", function (req, res) {
   var moduleId = req.params.moduleId;
-  var code = req.body.code;
 
-  return res.json([]);
+  Attendance.find({
+    moduleId
+  }, "date").then(attendances => {
+    console.log(attendances)
+    return res.json(attendances);
+  }).catch(err => {
+    consoling.info({ key: "GET Times for module", success: false, input: moduleId, message: err.message, err });
+    return res.status(512).send(err.message);
+  });
 });
 
 router.get("/get/for/:moduleId/on/:date", function (req, res) {
   var moduleId = req.params.moduleId;
   var date = req.params.date;
-
-  return res.json([]);
+  Attendance.findOne({
+    moduleId,
+    date
+  }, "date")
+    .populate("students.studentId")
+    .then(attendance => {
+      if (!attendance) return res.status(512).send("Can not find the specified attendance register.");
+      return res.json(attendance.students);
+    }).catch(err => {
+      consoling.info({ key: "GET FOR module and time", success: false, input: moduleId, message: err.message, err });
+      return res.status(512).send(err.message);
+    });
 });
 
 function generateCode(length) {

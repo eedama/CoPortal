@@ -1,6 +1,70 @@
 <template>
   <div class="screen">
     <md-dialog
+      v-if="$store.state.user.isLoggedIn && $store.state.user.type == 'LECTURER'"
+      style="position:absolute;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
+      class="card"
+      :md-active.sync="isCreatingAttendanceRegister"
+    >
+      <md-card class="col s12" style="background-color:#006064;">
+        <md-card-header>
+          <div class="md-title" style="color:ghostwhite">Creating attendance register</div>
+          <md-button v-on:click="isCreatingAttendanceRegister = false" class="right">
+            <md-icon style="color:ghostwhite">close</md-icon>
+          </md-button>
+        </md-card-header>
+      </md-card>
+      <md-card-actions>
+        <ball-pulse-loader class="text-xs-center" v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+        <div class="row">
+          <md-content v-show="createAttendanceIndex == 0" class="col s12">
+            <md-field>
+              <label>Select a module</label>
+              <md-select v-model="selectedAttendanceModule">
+                <md-option
+                  v-for="(_module,i) in modules"
+                  :key="i"
+                  style="background-color:white"
+                  :value="_module._id"
+                >{{ _module.name }} {{ _module.code }}</md-option>
+              </md-select>
+            </md-field>
+            <md-field>
+              <label>Select a duration</label>
+              <md-select v-model="selectedAttendanceDuration">
+                <md-option
+                  v-for="(duration,i) in ['5 minutes','10 minutes','15 minutes','30 minutes']"
+                  :key="i"
+                  style="background-color:white"
+                  :value="duration"
+                >{{ duration }}</md-option>
+              </md-select>
+            </md-field>
+            <md-field>
+              <p
+                class="red-text text-red text-xs-center"
+                v-if="attendanceError"
+              >{{ attendanceError }}</p>
+            </md-field>
+          </md-content>
+          <md-content v-if="createAttendanceIndex == 1 && attendanceRegister" class="col s12">
+            <div class="row">
+              <h5 class="col s12">The attendance code is</h5>
+              <h2 class="col s12 text-xs-center center">{{ attendanceRegister.code }}</h2>
+              <h5 class="col s12">It will expire</h5>
+              <h3 class="col s12 text-xs-center">{{ getMoment().to(attendanceRegister.date) }}</h3>
+            </div>
+          </md-content>
+          <md-button
+            v-if="createAttendanceIndex == 0 && !isLoading"
+            v-on:click="createAttendance()"
+            class="md-primary col s12"
+            style="background-color:#006064;color:ghostwhite"
+          >Create attendance register</md-button>
+        </div>
+      </md-card-actions>
+    </md-dialog>
+    <md-dialog
       v-if="isParent"
       style="position:absolute;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
       class="card"
@@ -48,10 +112,7 @@
       <md-card class="col s12">
         <md-card-header style="background-color:#006064;" class="row">
           <div class="col s12 m10 offset-m1 text-center">
-            <span
-              style="color:ghostwhite"
-              class="md-title"
-            >Send an announcement</span>
+            <span style="color:ghostwhite" class="md-title">Send an announcement</span>
             <md-button class="right" v-on:click="isAddingAnnouncements = false">
               <md-icon style="color:ghostwhite">close</md-icon>
             </md-button>
@@ -131,7 +192,8 @@
           </div>
         </md-content>
         <md-card-actions style="background-color:#006064;padding:10px">
-          <span v-if="!isLoading"
+          <span
+            v-if="!isLoading"
             style="float:left;left:0;position:absolute;padding-left:30px;color:ghostwhite;max-width:60%"
           >The announcement will be sent to {{ modules.some(v => v && v._id == announcement.module) ? `${modules.find(v => v && v._id == announcement.module).name} ${modules.find(v => v && v._id == announcement.module).code}` : 'All' }} students {{ announcement.isParent ? ' and SMSs to thier parents as well' : ''}}</span>
           <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
@@ -288,6 +350,11 @@ export default {
   name: "Home",
   data() {
     return {
+      createAttendanceIndex: 0,
+      selectedAttendanceModule: null,
+      selectedAttendanceDuration: "5 minutes",
+      attendanceRegister: null,
+      attendanceError: "",
       isParent: false,
       partners: [
         {
@@ -310,6 +377,7 @@ export default {
       announcements: [],
       modules: [],
       isAddingAnnouncements: false,
+      isCreatingAttendanceRegister: false,
       showEmoji: false,
       isLoading: false,
       isChangingStudent: false,
@@ -323,7 +391,13 @@ export default {
         "Contact admin for your login info"
       ],
       options: [
-        ,
+        {
+          text: "Attendance Register",
+          icon: "event_available",
+          link: "/module/list/attend",
+          attendanceRegister: true,
+          auth: ["LECTURER"]
+        },
         {
           text: "Students",
           icon: "people",
@@ -443,6 +517,56 @@ export default {
     }
   },
   methods: {
+    createAttendance() {
+      this.attendanceError = "";
+      if (!this.selectedAttendanceModule) {
+        this.attendanceError = "Please select a module";
+        return;
+      }
+      let duration = 310;
+      switch (this.selectedAttendanceDuration) {
+        case "5 minutes":
+          duration = 310;
+          break;
+        case "10 minutes":
+          duration = 610;
+          break;
+        case "15 minutes":
+          duration = 910;
+          break;
+        case "30 minutes":
+          duration = 1810;
+          break;
+      }
+      this.isLoading = true;
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/attendance/create/for/" +
+            this.selectedAttendanceModule,
+          {
+            duration,
+            lecturerId: this.$store.state.user.id
+          }
+        )
+        .then(results => {
+          this.isLoading = false;
+          this.createAttendanceIndex = 1;
+          this.attendanceRegister = results.data;
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal(
+              "Unable to create attendance register",
+              "Try again later",
+              "error"
+            );
+          }
+        });
+    },
     changeStudent() {
       const currentStudent = this.students.filter(
         student => student._id === this.currentStudent
@@ -479,6 +603,8 @@ export default {
     goToRoute(option) {
       if (option.showStudents) {
         this.isChangingStudent = true;
+      } else if (option.attendanceRegister) {
+        this.isCreatingAttendanceRegister = true;
       } else {
         this.$router.push(option.link);
       }
