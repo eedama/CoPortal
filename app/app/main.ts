@@ -8,8 +8,9 @@ import moment from "moment";
 import "./styles.scss";
 import { TNSFontIcon, fonticon } from "nativescript-fonticon"; // require the couchbase module
 import TextFieldPlugin from 'nativescript-material-textfield/vue'; 
+import RadListView from 'nativescript-ui-listview/vue';
 Vue.use(TextFieldPlugin);
-
+Vue.use(RadListView);
 TNSFontIcon.debug = false;
 TNSFontIcon.paths = {
   mdi: "./assets/materialdesignicons.css"

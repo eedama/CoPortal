@@ -75,7 +75,70 @@
           </TabViewItem>
           <TabViewItem  title="History">
              <GridLayout rows="*">
-
+              <StackLayout v-show="!listView" row="0">
+                 <RadListView ref="listView"
+                   for="item in history"
+                   layout="grid"
+                   >
+        <v-template>
+          <StackLayout @tap="getStudentLayout(item.date)" class="item p-10 m-5" orientation="vertical">
+            <Label  fontSize="20%" :text="item.name" class="text-black"></Label>
+          </StackLayout>
+        </v-template>
+      </RadListView>
+              </StackLayout>
+               <StackLayout v-show="listView" row="0" rows="*,*">
+              <Label  row="0" fontSize="35%" :text="'mdi-keyboard-backspace' | fonticon" @tap="reverseStudentLayout()" class="text-black mdi m-x-10"></Label>
+                <StackLayout row="1">
+                  <CardView elevation="5" margin="5" v-for="(student,i) in students" :key="i">
+                    <Ripple>
+                      <GridLayout
+                        class="text-dark-black p-15"
+                        rows="auto,auto"
+                        columns="auto,*,auto"
+                      >
+                        <label
+                          row="0"
+                          col="0"
+                          class="mdi text-dark-black m-r-20"
+                          rowSpan="2"
+                          verticalAlignment="center"
+                          textAlignment="left"
+                          fontSize="35"
+                          :text="'mdi-account-circle' | fonticon"
+                        ></label>
+                        <label
+                          row="0"
+                          col="1"
+                          class="font-weight-bold"
+                          fontSize="15"
+                          textAlignment="left"
+                          :text="student.lastname + ' ' + student.firstname"
+                        ></label>
+                        <label
+                          v-if="student.gender"
+                          row="0"
+                          col="2"
+                          class="font-weight-bold text-dark-black mdi p-x-10 p-b-2"
+                          fontSize="30%"
+                          rowSpan="2"
+                          borderRadius="50"
+                          verticalAlignment="center"
+                          textAlignment="center"
+                          :text="'mdi-human-' + student.gender.toLowerCase() | fonticon"
+                        ></label>
+                        <label
+                          row="1"
+                          col="1"
+                          fontSize="15"
+                          textAlignment="left"
+                          :text="student.username"
+                        ></label>
+                      </GridLayout>
+                    </Ripple>
+                  </CardView>
+                </StackLayout>
+               </StackLayout>
           </GridLayout>
           </TabViewItem>
         </TabView>
@@ -96,16 +159,21 @@ export default {
      code:'',
      time:null,
      loading:false,
+     listView:false,
+     history:[],
+     students:[],
     };
   },
   mounted(){
    this.lectureId =  this.$store.state.cache.cachedUser.user._id;
-   console.log('lecturer', this.lectureId);
     this.$api
         .getAttendanceHistory(this.module._id)
       .then(attend => {
         const days = JSON.parse(JSON.stringify(attend));
-        console.log(days);
+        this.history = days.map(i => {
+           return {name: date.format(new Date(i.date),"DD MMMM YYYY") , id : i._id, date: i.date};
+       });
+        console.log(this.history);
       })
       .catch(err => {
         this.$feedback.error({
@@ -116,6 +184,29 @@ export default {
   },
   props: ["module"],
   methods: {
+    reverseStudentLayout(){
+      this.students = [];
+      this.listView = false;
+    },
+    getStudentLayout(date){
+      console.log('date', date);
+     this.$api
+        .getAttendanceStudents(this.module._id, date)
+      .then(attend => {
+        const days = JSON.parse(JSON.stringify(attend));
+        days.forEach(n => {
+        const user = {firstname: n.studentId.firstname, lastname: n.studentId.lastname,gender:n.studentId.gender };
+        this.students.push(user);
+        });
+  
+        this.listView = true;
+      })
+      .catch(err => {
+        this.$feedback.error({
+              title: err.message
+            });
+      });
+    },
     getExpiryTime(dated){
      const time = "code expires at " + date.format(dated,"hh:mm");
      const noon = (date.format(dated,'A')).split('.').join('').toUpperCase();
@@ -149,6 +240,11 @@ export default {
   border-radius: 5%;
   height:23%;
 
+}
+.item{
+ background-color: rgba(36,36,36,0.1);
+ border-radius: 5%;
+ 
 }
 .attend{
   border-width: 2 2 2 2;
