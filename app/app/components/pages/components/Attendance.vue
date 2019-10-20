@@ -81,15 +81,18 @@
                    layout="grid"
                    >
         <v-template>
-          <StackLayout @tap="getStudentLayout(item.date)" class="item p-10 m-5" orientation="vertical">
+            <Ripple @tap="getStudentLayout(item.date)">
+          <StackLayout  class="item p-10 m-5" orientation="vertical">
             <Label  fontSize="20%" :text="item.name" class="text-black"></Label>
           </StackLayout>
+            </Ripple>
         </v-template>
       </RadListView>
               </StackLayout>
                <StackLayout v-show="listView" row="0" rows="*,*">
               <Label  row="0" fontSize="35%" :text="'mdi-keyboard-backspace' | fonticon" @tap="reverseStudentLayout()" class="text-black mdi m-x-10"></Label>
-                <StackLayout row="1">
+                 <ScrollView row="1">
+                <StackLayout >
                   <CardView elevation="5" margin="5" v-for="(student,i) in students" :key="i">
                     <Ripple>
                       <GridLayout
@@ -138,6 +141,7 @@
                     </Ripple>
                   </CardView>
                 </StackLayout>
+                 </ScrollView>
                </StackLayout>
           </GridLayout>
           </TabViewItem>
@@ -242,8 +246,8 @@ export default {
 
 }
 .item{
- background-color: rgba(36,36,36,0.1);
- border-radius: 5%;
+ background-color: ghostwhite;
+ border-radius: 2%;
  
 }
 .attend{
