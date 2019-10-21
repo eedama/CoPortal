@@ -2,7 +2,7 @@
   <div class="screen">
     <md-dialog
       v-if="$store.state.user.isLoggedIn && $store.state.user.type == 'LECTURER'"
-      style="position:absolute;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
+      style="position:fixed;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
       class="card"
       :md-active.sync="isCreatingAttendanceRegister"
     >
@@ -14,57 +14,107 @@
           </md-button>
         </md-card-header>
       </md-card>
-      <md-card-actions>
-        <ball-pulse-loader class="text-xs-center" v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-        <div class="row">
-          <md-content v-show="createAttendanceIndex == 0" class="col s12">
-            <md-field>
-              <label>Select a module</label>
-              <md-select v-model="selectedAttendanceModule">
-                <md-option
-                  v-for="(_module,i) in modules"
-                  :key="i"
-                  style="background-color:white"
-                  :value="_module._id"
-                >{{ _module.name }} {{ _module.code }}</md-option>
-              </md-select>
-            </md-field>
-            <md-field>
-              <label>Select a duration</label>
-              <md-select v-model="selectedAttendanceDuration">
-                <md-option
-                  v-for="(duration,i) in ['5 minutes','10 minutes','15 minutes','30 minutes']"
-                  :key="i"
-                  style="background-color:white"
-                  :value="duration"
-                >{{ duration }}</md-option>
-              </md-select>
-            </md-field>
-            <md-field>
-              <p
-                class="red-text text-red text-xs-center"
-                v-if="attendanceError"
-              >{{ attendanceError }}</p>
-            </md-field>
-          </md-content>
-          <md-content v-if="createAttendanceIndex == 1 && attendanceRegister" class="col s12">
+      <md-content class="row">
+        <md-field class="col s8 offset-s2">
+          <label>Select a module</label>
+          <md-select v-model="selectedAttendanceModule">
+            <md-option
+              v-for="(_module,i) in modules"
+              :key="i"
+              style="background-color:white"
+              :value="_module._id"
+            >{{ _module.name }} {{ _module.code }}</md-option>
+          </md-select>
+        </md-field>
+        <md-tabs v-if="selectedAttendanceModule" class="col s12" @md-changed="changeAttendanceTab">
+          <md-tab id="tab-home" md-label="New">
             <div class="row">
-              <h5 class="col s12">The attendance code is</h5>
-              <h2 class="col s12 text-xs-center center">{{ attendanceRegister.code }}</h2>
-              <h4
-                class="col s12 text-xs-center center"
-                v-if="getMoment()"
-              >Expires {{ getMoment(attendanceRegister.expiryDate).fromNow() }}</h4>
+              <md-content v-show="createAttendanceIndex == 0" class="col s12">
+                <md-field>
+                  <label>Select a duration</label>
+                  <md-select v-model="selectedAttendanceDuration">
+                    <md-option
+                      v-for="(duration,i) in ['5 minutes','10 minutes','15 minutes','30 minutes']"
+                      :key="i"
+                      style="background-color:white"
+                      :value="duration"
+                    >{{ duration }}</md-option>
+                  </md-select>
+                </md-field>
+                <md-field>
+                  <p
+                    class="red-text text-red text-xs-center"
+                    v-if="attendanceError"
+                  >{{ attendanceError }}</p>
+                </md-field>
+              </md-content>
+              <md-content v-if="createAttendanceIndex == 1 && attendanceRegister" class="col s12">
+                <div class="row">
+                  <h5 class="col s12">The attendance code is</h5>
+                  <h2 class="col s12 text-xs-center center">{{ attendanceRegister.code }}</h2>
+                  <h4
+                    class="col s12 text-xs-center center"
+                    v-if="getMoment()"
+                  >Expires {{ getMoment(attendanceRegister.expiryDate).fromNow() }}</h4>
+                </div>
+              </md-content>
+              <md-button
+                v-if="createAttendanceIndex == 0 && !isLoading"
+                v-on:click="createAttendance()"
+                class="md-primary col s12"
+                style="background-color:#006064;color:ghostwhite"
+              >Create attendance register</md-button>
             </div>
-          </md-content>
-          <md-button
-            v-if="createAttendanceIndex == 0 && !isLoading"
-            v-on:click="createAttendance()"
-            class="md-primary col s12"
-            style="background-color:#006064;color:ghostwhite"
-          >Create attendance register</md-button>
-        </div>
-      </md-card-actions>
+          </md-tab>
+          <md-tab id="tab-home-history" md-label="History">
+            <div v-if="!selectedAttendanceDate" class="row">
+              <md-button
+                v-for="(time,i) in attendanceRegisterHistoryTimes"
+                :key="i"
+                @click="selectAttendanceDate(time)"
+                class="col s4 offset-s1"
+              >{{ getMoment(time.date).format("Do MMMM") }}</md-button>
+            </div>
+            <div v-if="selectedAttendanceDate" class="row">
+              <md-button v-on:click="selectedAttendanceDate = false">
+                <md-icon>arrow_back</md-icon>
+              </md-button>
+              <md-list class="md-triple-line col s12 center-align">
+                <div class="Scroll-first-four">
+                  <md-list-item
+                    style="margin-bottom:15px;"
+                    v-for="(student,i) in attendanceRegisterHistoryStudents.filter(v => v && v.studentId)"
+                    :key="i"
+                    class="hoverable col s12 m10 pointer white center-align waves-effect"
+                  >
+                    <md-avatar>
+                      <img src="https://placeimg.com/40/40/people/1" alt="People" />
+                    </md-avatar>
+
+                    <div class="md-list-item-text">
+                      <span>{{ student.studentId.lastname + " " + student.studentId.firstname }} &nbsp;&bull; {{ getMoment(student.date).fromNow() }}</span>
+                      <span>{{ student.studentId.username }}</span>
+                    </div>
+                  </md-list-item>
+                </div>
+              </md-list>
+              <ball-pulse-loader
+                class="text-xs-center center col s12"
+                v-if="attendanceRegisterHistoryStudentsLoading"
+                color="#000000"
+                size="20px"
+              ></ball-pulse-loader>
+            </div>
+          </md-tab>
+        </md-tabs>
+
+        <ball-pulse-loader
+          class="text-xs-center center col s12"
+          v-if="isLoading"
+          color="#000000"
+          size="20px"
+        ></ball-pulse-loader>
+      </md-content>
     </md-dialog>
     <md-dialog
       v-if="isParent"
@@ -356,7 +406,11 @@ export default {
       createAttendanceIndex: 0,
       selectedAttendanceModule: null,
       selectedAttendanceDuration: "5 minutes",
+      selectedAttendanceDate: null,
       attendanceRegister: null,
+      attendanceRegisterHistoryTimes: [],
+      attendanceRegisterHistoryStudents: [],
+      attendanceRegisterHistoryStudentsLoading: false,
       attendanceError: "",
       isParent: false,
       partners: [
@@ -520,6 +574,64 @@ export default {
     }
   },
   methods: {
+    selectAttendanceDate(time) {
+      this.selectedAttendanceDate = time;
+      this.attendanceRegisterHistoryStudentsLoading = true;
+      axios
+        .get(
+          this.$store.state.settings.baseLink +
+            "/attendance/get/for/" +
+            this.selectedAttendanceDate._id
+        )
+        .then(results => {
+          this.attendanceRegisterHistoryStudentsLoading = false;
+          this.attendanceRegisterHistoryStudents = results.data;
+          console.log(
+            "attendanceRegisterHistoryStudents",
+            this.attendanceRegisterHistoryStudents
+          );
+        })
+        .catch(err => {
+          this.attendanceRegisterHistoryStudentsLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "error");
+          } else {
+            swal(
+              "Unable to get the attendance list",
+              "Try again later",
+              "error"
+            );
+          }
+        });
+    },
+    changeAttendanceTab(e) {
+      if (e == "tab-home-history") {
+        this.isLoading = true;
+        axios
+          .get(
+            this.$store.state.settings.baseLink +
+              "/attendance/get/times/for/" +
+              this.selectedAttendanceModule
+          )
+          .then(results => {
+            this.isLoading = false;
+            this.attendanceRegisterHistoryTimes = results.data;
+          })
+          .catch(err => {
+            this.isLoading = false;
+            if (err.response != null && err.response.status == 512) {
+              swal(err.response.data, "error");
+            } else {
+              swal(
+                "Unable to get the attendance list",
+                "Try again later",
+                "error"
+              );
+            }
+          });
+      }
+      console.log(e);
+    },
     createAttendance() {
       this.attendanceError = "";
       if (!this.selectedAttendanceModule) {
