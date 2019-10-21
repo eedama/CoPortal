@@ -12,6 +12,7 @@ import TakeTest from "../components/pages/components/TakeTest.vue";
 import TestMarks from "../components/pages/components/TestMarks.vue";
 import Timetable from "../components/pages/components/Timetable.vue";
 import StudentAttandance from "../components/pages/components/StudentAttendance.vue";
+import Attandance from "../components/pages/components/Attendance.vue";
 import Modules from "../components/pages/Modules.vue";
 import Notifications from "../components/pages/Notifications.vue";
 import Profile from "../components/pages/Profile.vue";
@@ -185,6 +186,15 @@ var router = {
       component: Modules,
       meta: {
         title: "Modules",
+        authLevel: 0
+      }
+    },
+    "/module/attendance": {
+      name: "moduleattendance",
+      path: "/module/attendance",
+      component: Attandance,
+      meta: {
+        title: "Attendance",
         authLevel: 0
       }
     }
