@@ -58,7 +58,7 @@
                   fontSize="20%"
                   :textWrap="true"
                   v-if="getMoment &&!loading && code"
-                  :text="'code expires '+ getMoment(time).fromNow()"
+                  :text="expiry"
                 ></label>
                 <Button
                   row="1"
@@ -193,6 +193,11 @@ export default {
       });
   },
   props: ["module"],
+  computed:{
+   expiry(){
+     return 'code expires '+ this.getMoment(this.time).fromNow();
+   }
+  },
   methods: {
     reverseStudentLayout() {
       this.students = [];
