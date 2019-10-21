@@ -46,7 +46,6 @@
     },
     props:["attendance"],
     mounted() {
-      console.log('attended', this.attendance);
       this.pageLoaded();
       if (!this.$store.state.cache.cachedUser) {
         this.navigate("/login", null, {

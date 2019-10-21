@@ -64,7 +64,7 @@
                   row="1"
                   horizontalAlignment="center"
                   verticalAlignment="top"
-                  colspan="2"
+                  colSpan="2"
                   text="generate"
                   :isEnabled="!loading"
                   class="text-white submit-button bg-blue-black"
@@ -107,7 +107,7 @@
                             row="0"
                             col="0"
                             class="mdi text-dark-black m-r-20"
-                            rowspan="2"
+                            rowSpan="2"
                             verticalAlignment="center"
                             textAlignment="left"
                             fontSize="35"
@@ -127,7 +127,7 @@
                             col="2"
                             class="font-weight-bold text-dark-black mdi p-x-10 p-b-2"
                             fontSize="30%"
-                            rowspan="2"
+                            rowSpan="2"
                             borderRadius="50"
                             verticalAlignment="center"
                             textAlignment="center"
@@ -184,7 +184,6 @@ export default {
             date: i.date
           };
         });
-        console.log(this.history);
       })
       .catch(err => {
         this.$feedback.error({
@@ -220,15 +219,6 @@ export default {
           });
         });
     },
-    getExpiryTime(dated) {
-      const time = "code expires at " + date.format(dated, "hh:mm");
-      const noon = date
-        .format(dated, "A")
-        .split(".")
-        .join("")
-        .toUpperCase();
-      this.time = time + " " + noon;
-    },
     generateAttendance() {
       this.loading = true;
       const attendance = { duration: 310, lecturerId: this.lectureId };
@@ -239,7 +229,6 @@ export default {
           this.code = days.code;
           
           this.time = days.expiryDate;
-          console.log(this.time);
           this.loading = false;
         })
         .catch(err => {
