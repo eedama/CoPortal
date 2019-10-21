@@ -57,8 +57,7 @@
                   verticalAlignment="top"
                   fontSize="20%"
                   :textWrap="true"
-                  v-show="!loading && code"
-                  v-if="getMoment"
+                  v-if="getMoment &&!loading && code"
                   :text="'code expires '+ getMoment(time).fromNow()"
                 ></label>
                 <Button
