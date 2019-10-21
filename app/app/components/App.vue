@@ -171,7 +171,7 @@ export default {
           icon: "account",
           link: "/student/profile/view",
           description: "View and edit personal information",
-          auth: ["STUDENT", "ADMIN", "LECTURER", "PARENT"]
+          auth: ["STUDENT", "ADMIN", "PARENT"]
         },
         {
           text: "Lecturers",
