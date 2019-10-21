@@ -1,6 +1,47 @@
 <template>
   <div class="screen">
     <md-dialog
+      v-if="$store.state.user.isLoggedIn && $store.state.user.type == 'STUDENT'"
+      style="position:fixed;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
+      class="card"
+      :md-active.sync="signAttendanceRegister"
+    >
+      <md-card class="col s12" style="background-color:#006064;">
+        <md-card-header>
+          <div class="md-title" style="color:ghostwhite">Attendance register</div>
+          <md-button v-on:click="signAttendanceRegister = false" class="right">
+            <md-icon style="color:ghostwhite">close</md-icon>
+          </md-button>
+        </md-card-header>
+      </md-card>
+      <md-content class="row">
+        <div class="col s12 row">
+          <h5 class="text-xs-center center col s12">{{ getMoment().format("Do MMMM YYYY") }}</h5>
+          <h3 class="text-xs-center center col s12">{{ getMoment().format("hh:mm A") }}</h3>
+          <md-content class="col s12">
+            <md-field style="height:100px">
+              <label class="center"></label>
+              <md-input
+                class="center"
+                placeholder="Attendance code"
+                @keyup.enter="submitAttendanceCode"
+                style="height:100px;font-size:50px;border:2px solid #006064"
+                v-model="currentAttendanceCode"
+              />
+            </md-field>
+          </md-content>
+          <p class="red-text text-red center">{{ currentAttendanceCodeError }}</p>
+          <ball-pulse-loader class="col s12 center" v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+          <md-button
+            v-if="!isLoading"
+            v-on:click="submitAttendanceCode"
+            class="md-primary col s12"
+            style="background-color:#006064;color:ghostwhite"
+          >Submit</md-button>
+        </div>
+      </md-content>
+    </md-dialog>
+    <md-dialog
       v-if="$store.state.user.isLoggedIn && $store.state.user.type == 'LECTURER'"
       style="position:fixed;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
       class="card"
@@ -118,7 +159,7 @@
     </md-dialog>
     <md-dialog
       v-if="isParent"
-      style="position:absolute;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
+      style="position:fixed;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
       class="card"
       :md-active.sync="isChangingStudent"
     >
@@ -157,7 +198,7 @@
     </md-dialog>
     <md-dialog
       v-if="$store.state.user.isLoggedIn && ($store.state.user.type=='LECTURER' || $store.state.user.type=='ADMIN')"
-      style="position:absolute;max-height:100vh;min-height:20%;width:100%;"
+      style="position:fixed;max-height:100vh;min-height:20%;width:100%;"
       class="card"
       :md-active.sync="isAddingAnnouncements"
     >
@@ -402,7 +443,7 @@ export default {
   name: "Home",
   data() {
     return {
-      date: new Date(),
+      /// lecturer attendance
       createAttendanceIndex: 0,
       selectedAttendanceModule: null,
       selectedAttendanceDuration: "5 minutes",
@@ -412,6 +453,11 @@ export default {
       attendanceRegisterHistoryStudents: [],
       attendanceRegisterHistoryStudentsLoading: false,
       attendanceError: "",
+      /// student attendance
+      signAttendanceRegister: true,
+      currentAttendanceCodeError: "",
+      currentAttendanceCode: "",
+      ///
       isParent: false,
       partners: [
         {
@@ -454,6 +500,13 @@ export default {
           link: "/module/list/attend",
           attendanceRegister: true,
           auth: ["LECTURER"]
+        },
+        {
+          text: "Sign Attendance Register",
+          icon: "event_available",
+          link: "/module/list/attend",
+          signAttendanceRegister: true,
+          auth: ["STUDENT"]
         },
         {
           text: "Students",
@@ -574,6 +627,37 @@ export default {
     }
   },
   methods: {
+    submitAttendanceCode() {
+      this.currentAttendanceCodeError = "";
+      if (!this.currentAttendanceCode) {
+        this.currentAttendanceCodeError = "Please enter a valid code";
+        return;
+      }
+      this.isLoading = true;
+      axios
+        .post(this.$store.state.settings.baseLink + "/attendance/sign", {
+          studentId: this.$store.state.user.id,
+          code: this.currentAttendanceCode
+        })
+        .then(results => {
+          this.isLoading = false;
+          swal(results.data, "", "success");
+          this.signAttendanceRegister = false;
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "", "error");
+            this.currentAttendanceCodeError = err.response.data;
+          } else {
+            swal(
+              "Unable to get the attendance list",
+              "Try again later",
+              "error"
+            );
+          }
+        });
+    },
     selectAttendanceDate(time) {
       this.selectedAttendanceDate = time;
       this.attendanceRegisterHistoryStudentsLoading = true;
@@ -720,6 +804,8 @@ export default {
         this.isChangingStudent = true;
       } else if (option.attendanceRegister) {
         this.isCreatingAttendanceRegister = true;
+      } else if (option.signAttendanceRegister) {
+        this.signAttendanceRegister = true;
       } else {
         this.$router.push(option.link);
       }
