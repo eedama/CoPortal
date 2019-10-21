@@ -6,16 +6,21 @@
           <CardView
             v-if="$store.state.cache.cachedUser.user"
             row="0"
-            class="bg-blue-black"
-            elevation="15"
+            class="bg-blue-black p-x-10"
+            :elevation="15"
           >
-            <GridLayout verticalAlignment="center" class="p-5" rows="auto,auto" columns="*,auto">
+            <GridLayout
+              verticalAlignment="center"
+              class="p-y-15 m-x-15 m-t-20"
+              rows="auto,auto"
+              columns="*,auto"
+            >
               <Label
                 row="0"
                 col="0"
                 fontSize="18%"
-                verticalAlignment="center" 
-                class="font-weight-bold text-white p-t-5"
+                verticalAlignment="center"
+                class="font-weight-bold text-white"
                 :textWrap="true"
                 :text="`${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`"
               />
@@ -23,8 +28,8 @@
                 row="1"
                 col="0"
                 fontSize="16%"
-                verticalAlignment="center" 
-                class="h4 text-white p-t-5"
+                verticalAlignment="center"
+                class="h4 text-white p-5"
                 :textWrap="true"
                 :text="$store.state.cache.cachedUser.user.username"
               />
@@ -33,7 +38,7 @@
                 rowSpan="2"
                 col="1"
                 textAlignment="right"
-                verticalAlignment="center"
+                verticalAlignment="bottom"
                 stretch="aspectFit"
                 width="80"
                 height="80"
@@ -42,15 +47,15 @@
               ></Image>
             </GridLayout>
           </CardView>
-           <Image
-                  row="1"
-                  src="~/assets/images/coPortalLogo.png"
-                  stretch="aspectFit"
-                  verticalAlignment="bottom"
-                  opacity="0.1"
-                  textAlignment="right"
-                  class="m-x-15 bottomLogo"
-              ></Image>
+          <Image
+            row="1"
+            src="~/assets/images/coPortalLogo.png"
+            stretch="aspectFit"
+            verticalAlignment="bottom"
+            opacity="0.1"
+            textAlignment="right"
+            class="m-x-15 bottomLogo"
+          ></Image>
           <ScrollView row="1">
             <StackLayout>
               <Ripple
@@ -64,8 +69,8 @@
                     col="0"
                     textAlignment="center"
                     verticalAlignment="center"
-                    class="mdi p-5 text-blue-black"
-                    fontSize="25%"
+                    class="mdi p-5 m-x-10 text-blue-black"
+                    fontSize="35%"
                     :text="'mdi-' + layout.icon | fonticon"
                   ></label>
                   <label
@@ -73,7 +78,7 @@
                     col="1"
                     verticalAlignment="center"
                     class="text-dark-black p-5"
-                    fontSize="17%"
+                    fontSize="20%"
                     :text="layout.text"
                   ></label>
                 </GridLayout>
@@ -134,7 +139,7 @@
               text="Demo"
             ></label>
           </StackLayout>
-          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="userLoggedIn()"/>
+          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="userLoggedIn()" />
         </GridLayout>
       </GridLayout>
     </RadSideDrawer>
@@ -187,7 +192,7 @@ export default {
           icon: "calendar-check",
           link: "/student/attendance",
           description: "Students class Attendance",
-          auth: ["STUDENT",]
+          auth: ["STUDENT"]
         },
         {
           text: "Attendance",
@@ -202,13 +207,6 @@ export default {
           link: "/timetable/view",
           description: "View Your Table",
           auth: ["STUDENT", "PARENT"]
-        },
-        {
-          text: "Report a student",
-          icon: "account-alert-outline",
-          link: "/Student/Report",
-          description: "Report a student",
-          auth: ["LECTURER", "ADMIN"]
         },
         {
           text: "Settings",
@@ -235,9 +233,9 @@ export default {
       ]
     };
   },
-  computed:{
-    currentUserSchool(){
-     return appSettings.getString("CurrentSchoolName");
+  computed: {
+    currentUserSchool() {
+      return appSettings.getString("CurrentSchoolName");
     }
   },
   mounted() {
@@ -246,17 +244,20 @@ export default {
       appSettings: this.appSettings,
       api: this.$api
     });
-    try{
-    this.$firebase.admob.hideBanner().then(() =>{
-      console.log('Banner_hidden',true);
-    }).catch(err =>{
-      console.log('Banner_hidden_dont_stress_1',err);
-    });
-    }catch(ex){
-      console.log('Banner_hidden_dont_stress',ex);
+    try {
+      this.$firebase.admob
+        .hideBanner()
+        .then(() => {
+          console.log("Banner_hidden", true);
+        })
+        .catch(err => {
+          console.log("Banner_hidden_dont_stress_1", err);
+        });
+    } catch (ex) {
+      console.log("Banner_hidden_dont_stress", ex);
     }
-   
-   connectivity.startMonitoring(conn => {
+
+    connectivity.startMonitoring(conn => {
       if (this.connectionType == 0 && conn > 0) {
         this.$feedback.success({
           title: "Back online",
@@ -317,10 +318,9 @@ export default {
               });
             }
           });
-      } else if(item.link == "/module/list/attend"){
-       this.navigate(item.link,{attendance: true });
-      }
-      else {
+      } else if (item.link == "/module/list/attend") {
+        this.navigate(item.link, { attendance: true });
+      } else {
         this.navigate(item.link);
       }
     }
