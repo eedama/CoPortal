@@ -51,8 +51,10 @@
             <div class="row">
               <h5 class="col s12">The attendance code is</h5>
               <h2 class="col s12 text-xs-center center">{{ attendanceRegister.code }}</h2>
-              <h5 class="col s12">It will expire</h5>
-              <h3 class="col s12 text-xs-center">{{ getMoment().to(attendanceRegister.date) }}</h3>
+              <h4
+                class="col s12 text-xs-center center"
+                v-if="getMoment()"
+              >Expires {{ getMoment(attendanceRegister.expiryDate).fromNow() }}</h4>
             </div>
           </md-content>
           <md-button
@@ -350,6 +352,7 @@ export default {
   name: "Home",
   data() {
     return {
+      date: new Date(),
       createAttendanceIndex: 0,
       selectedAttendanceModule: null,
       selectedAttendanceDuration: "5 minutes",
