@@ -2,7 +2,7 @@
   <div class="screen">
     <md-dialog
       v-if="$store.state.user.isLoggedIn && $store.state.user.type == 'STUDENT'"
-      style="position:fixed;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
+      style="position:fixed;max-width:100%;max-height:60%;min-height:20%;min-width:40%;"
       class="card"
       :md-active.sync="signAttendanceRegister"
     >
@@ -43,7 +43,7 @@
     </md-dialog>
     <md-dialog
       v-if="$store.state.user.isLoggedIn && $store.state.user.type == 'LECTURER'"
-      style="position:fixed;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
+      style="position:fixed;max-width:100%;max-height:60%;min-height:20%;min-width:40%;"
       class="card"
       :md-active.sync="isCreatingAttendanceRegister"
     >
@@ -159,7 +159,7 @@
     </md-dialog>
     <md-dialog
       v-if="isParent"
-      style="position:fixed;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
+      style="position:fixed;max-width:100%;max-height:60%;min-height:20%;min-width:40%;"
       class="card"
       :md-active.sync="isChangingStudent"
     >
@@ -287,7 +287,7 @@
         <md-card-actions style="background-color:#006064;padding:10px">
           <span
             v-if="!isLoading"
-            style="float:left;left:0;position:absolute;padding-left:30px;color:ghostwhite;max-width:60%"
+            style="float:left;left:0;position:absolute;padding-left:30px;color:ghostwhite;max-width:100%"
           >The announcement will be sent to {{ modules.some(v => v && v._id == announcement.module) ? `${modules.find(v => v && v._id == announcement.module).name} ${modules.find(v => v && v._id == announcement.module).code}` : 'All' }} students {{ announcement.isParent ? ' and SMSs to thier parents as well' : ''}}</span>
           <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
           <md-button
