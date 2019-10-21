@@ -58,7 +58,8 @@
                   fontSize="20%"
                   :textWrap="true"
                   v-show="!loading && code"
-                  :text="'code expires '+getMoment(time).fromNow()"
+                  v-if="getMoment"
+                  :text="'code expires '+ getMoment(time).fromNow()"
                 ></label>
                 <Button
                   row="1"
@@ -231,13 +232,15 @@ export default {
     },
     generateAttendance() {
       this.loading = true;
-      const attendance = { duration: 3600, lecturerId: this.lectureId };
+      const attendance = { duration: 310, lecturerId: this.lectureId };
       this.$api
         .createAttendance(attendance, this.module._id)
         .then(attend => {
           const days = JSON.parse(JSON.stringify(attend));
           this.code = days.code;
+          
           this.time = days.expiryDate;
+          console.log(this.time);
           this.loading = false;
         })
         .catch(err => {
