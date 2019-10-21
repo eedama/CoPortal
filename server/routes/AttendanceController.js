@@ -51,7 +51,7 @@ router.post("/sign", function (req, res) {
 
 router.post("/create/for/:moduleId", async function (req, res) {
   var moduleId = req.params.moduleId;
-  var duration = req.body.duration;
+  var duration = req.body.duration || 310;
   var lecturerId = req.body.lecturerId
 
   try {
@@ -98,9 +98,9 @@ router.get("/get/times/for/:moduleId", function (req, res) {
   var moduleId = req.params.moduleId;
 
   Attendance.find({
-    moduleId
+    moduleId,
+    "students.0": { $exists: true }
   }, "date").then(attendances => {
-    console.log(attendances)
     return res.json(attendances);
   }).catch(err => {
     consoling.info({ key: "GET Times for module", success: false, input: moduleId, message: err.message, err });
@@ -108,14 +108,10 @@ router.get("/get/times/for/:moduleId", function (req, res) {
   });
 });
 
-router.get("/get/for/:moduleId/on/:date", function (req, res) {
-  var moduleId = req.params.moduleId;
-  var date = req.params.date;
-  Attendance.findOne({
-    moduleId,
-    date
-  }, "date")
-    .populate("students.studentId")
+router.get("/get/for/:attendanceId", function (req, res) {
+  var attendanceId = req.params.attendanceId;
+  Attendance.findById(attendanceId)
+    .populate("students.studentId", "username firstname lastname")
     .then(attendance => {
       if (!attendance) return res.status(512).send("Can not find the specified attendance register.");
       return res.json(attendance.students);
