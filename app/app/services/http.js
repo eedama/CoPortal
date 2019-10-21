@@ -316,13 +316,13 @@ export default class API {
     });
   }
 
-  getAttendanceStudents(moduleID,date) {
+  getAttendanceStudents(attendanceID) {
     return new Promise((resolve, reject) => {
-      if (!moduleID || !date) {
+      if (!attendanceID) {
         reject(new Error("User Not Defined"));
       } else {
         http
-          .request(this.makeGet("/attendance/get/for/"+moduleID+"/on/" + date))
+          .request(this.makeGet("/attendance/get/for/"+attendanceID))
           .then(async result => {
             var answer = await this.handleResponse(result);
             if (answer) {
