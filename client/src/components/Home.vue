@@ -55,7 +55,7 @@
           </md-button>
         </md-card-header>
       </md-card>
-      <md-content class="row">
+      <md-content style="overflow-y:scroll" class="row">
         <md-field class="col s8 offset-s2">
           <label>Select a module</label>
           <md-select @md-selected="setStudentsForModule" v-model="selectedAttendanceModule">
@@ -180,6 +180,17 @@
                   </md-list-item>
                 </div>
               </md-list>
+              <div class="col s12">
+                <ball-pulse-loader class="col s12 center" v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+              </div>
+              <div class="col s12">
+                <md-button
+                  v-if="!isLoading"
+                  v-on:click="submitBulkAttendance"
+                  class="md-primary col s12"
+                  style="background-color:#006064;color:ghostwhite"
+                >Submit</md-button>
+              </div>
             </div>
           </md-tab>
         </md-tabs>
@@ -663,6 +674,55 @@ export default {
     }
   },
   methods: {
+    submitBulkAttendance() {
+      console.log("Here we go!");
+      const students = this.selectedAttendanceModuleStudents
+        ? this.selectedAttendanceModuleStudents
+            .filter(v => v && v.selected)
+            .map(v => v._id)
+        : null;
+      const code = this.attendanceRegister
+        ? this.attendanceRegister.code
+        : null;
+      if (!students || !code) {
+        swal(
+          "Unable to sign register",
+          "make sure you selected students",
+          "error"
+        );
+        return;
+      }
+      console.log("selected students",students);
+      console.log("selected code",code);
+          this.isLoading = true;
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/attendance/sign/bulk/students",
+          {
+            students,
+            code
+          }
+        )
+        .then(results => {
+          this.isLoading = false;
+          swal(results.data, "", "success");
+          this.isCreatingAttendanceRegister = false;
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "", "error");
+          } else {
+            console.log(err);
+            swal(
+              "Unable to get the attendance list",
+              "Try again later",
+              "error"
+            );
+          }
+        });
+    },
     setStudentsForModule(moduleId) {
       this.selectedAttendanceModuleStudents = [];
       if (!moduleId) return;
