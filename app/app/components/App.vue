@@ -199,7 +199,7 @@ export default {
           icon: "calendar-check",
           link: "/module/list/attend",
           description: "Students class Attendance",
-          auth: ["LECTURER"]
+          auth: ["LECTURER","ADMIN"]
         },
         {
           text: "Timetable",
