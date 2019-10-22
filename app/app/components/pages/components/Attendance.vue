@@ -28,8 +28,10 @@
           androidSelectedTabHighlightColor="black"
         >
           <TabViewItem title="New">
+             <ScrollView   height="300" >
+                <StackLayout>
             <GridLayout rows="200,*">
-              <StackLayout class="attend" row="0" rows="*">
+              <StackLayout class="attend m-y-5" height="130" row="0" rows="*">
                 <label
                   row="0"
                   class="p-t-30 text-blue-black"
@@ -48,7 +50,7 @@
                   :busy="loading"
                 ></ActivityIndicator>
               </StackLayout>
-              <StackLayout verticalAlignment="top" row="1" rows="*,*">
+              <StackLayout verticalAlignment="top" row="1" rows="*,*,*,*">
                 <label
                   row="0"
                   class="p-y-20 text-blue-black"
@@ -70,8 +72,43 @@
                   class="text-white submit-button bg-blue-black"
                   @tap="generateAttendance()"
                 ></Button>
+                <Button
+                  row="2"
+                  horizontalAlignment="center"
+                  verticalAlignment="top"
+                  colSpan="2"
+                  text="Enter Manually"
+                  v-if="showManual"
+                  class="text-white submit-button bg-blue-black m-t-5"
+                  @tap="getStudentsList()"
+                ></Button>
+
+                
+                <StackLayout v-if="showStudentList" class="m-t-5" :textWrap="true" width="90%"  horizontalAlignment="center">
+                  <CheckBox
+                    font-size="20"
+                    colSpan="2"
+                    class="checkbox"
+                    fillColor="#006064"
+                    :text="answer.firstname +' '+answer.lastname"
+                    v-for="(answer,j) in manualStudents"
+                    :key="j"
+                    @tap="selectStudent(answer._id)"
+                  ></CheckBox>
+                   <Button
+                  horizontalAlignment="center"
+                  verticalAlignment="top"
+                  colSpan="2"
+                  text="Save"
+                  
+                  class="text-white submit-button bg-blue-black m-t-5"
+                  @tap="submitBulkAttendance()"
+                ></Button>
+                </StackLayout>
               </StackLayout>
             </GridLayout>
+             </StackLayout>
+            </ScrollView>
           </TabViewItem>
           <TabViewItem title="History">
             <GridLayout rows="*">
@@ -168,31 +205,38 @@ export default {
       loading: false,
       listView: false,
       history: [],
-      students: []
+      students: [],
+      showManual:false,
+      manualStudents:[],
+      manualObject:{code:null, students:[]},
+      showStudentList:false,
     };
   },
   mounted() {
     this.lectureId = this.$store.state.cache.cachedUser.user._id;
-    this.$api
-      .getAttendanceHistory(this.module._id)
-      .then(attend => {
-        const days = JSON.parse(JSON.stringify(attend));
-        this.history = days.map(i => {
-          return {
-            name: date.format(new Date(i.date), "DD MMMM YYYY"),
-            _id: i._id,
-            date: i.date
-          };
-        });
-      })
-      .catch(err => {
-        this.$feedback.error({
-          title: err.message
-        });
-      });
+    this.getHistory();
   },
   props: ["module"],
   methods: {
+    getHistory(){
+      this.$api
+        .getAttendanceHistory(this.module._id)
+        .then(attend => {
+          const days = JSON.parse(JSON.stringify(attend));
+          this.history = days.map(i => {
+            return {
+              name: date.format(new Date(i.date), "DD MMMM YYYY"),
+              _id: i._id,
+              date: i.date
+            };
+          });
+        })
+        .catch(err => {
+          this.$feedback.error({
+            title: err.message
+          });
+        });
+    },
     reverseStudentLayout() {
       this.students = [];
       this.listView = false;
@@ -218,21 +262,75 @@ export default {
             title: err.message
           });
         });
+    },getStudentsList(){
+       this.loading = true;
+       this.$api
+        .getStudentsForModule(this.module._id)
+        .then(_students => {
+          this.manualStudents = JSON.parse(JSON.stringify(_students));
+          this.showManual = false;
+          this.showStudentList = true;
+          if (_students.length == 0) {
+            this.$feedback.warning({
+              title: "Students",
+              message: "No Students Available",
+              duration: 5000
+            });
+          }
+          this.loading = false;
+        })
+        .catch(err => {
+           this.loading = false;
+          this.$feedback.error({
+            title: "Error in getting students",
+            message: err.message,
+            duration: 10000
+          });
+        });
+    },
+    selectStudent(id){
+      const contain = this.manualObject.students.findIndex(e => e === id);
+      if(contain > -1){
+         this.manualObject.students = this.manualObject.students.filter(e => e !== id);
+      }else{
+        this.manualObject.students.push(id);
+      }
     },
     generateAttendance() {
       this.loading = true;
+      this.showStudentList = false;
       const attendance = { duration: 310, lecturerId: this.lectureId };
       this.$api
         .createAttendance(attendance, this.module._id)
         .then(attend => {
           const days = JSON.parse(JSON.stringify(attend));
           this.code = days.code;
-          
+          this.manualObject.code = days.code;
+          this.manualObject.students = [];
+          this.manualStudents = [];
+          this.showManual = true;
           this.time = days.expiryDate;
           this.loading = false;
         })
         .catch(err => {
           this.loading = false;
+          this.$feedback.error({
+            title: err.message
+          });
+        });
+    },
+    submitBulkAttendance() {
+      this.$api
+        .submitBulkAttendance(this.manualObject)
+        .then(attend => {
+          this.showStudentList = false;
+          this.showManual = true;
+          this.getHistory();
+           this.$feedback.success({
+              title: attend.toString()
+            });
+        })
+        .catch(err => {
           this.$feedback.error({
             title: err.message
           });
@@ -259,5 +357,10 @@ export default {
   background-color: ghostwhite;
   width: 90%;
   height: 25%;
+}
+.check{
+  font-size: 25px;
+  color:#006064;
+  border-color: #006064;
 }
 </style>

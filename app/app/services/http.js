@@ -376,6 +376,39 @@ export default class API {
     });
   }
 
+  submitBulkAttendance(attendance) {
+    return new Promise((resolve, reject) => {
+      if (!attendance) {
+        reject(new Error("Invalid request"));
+      } else {
+        http
+          .request(
+            this.makePost("/attendance/sign/bulk/students", attendance)
+          )
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
+              }
+            }
+          })
+          .catch(err => {
+            return reject(
+              new Error("Unable to submit your quiz, Try again later")
+            );
+          });
+      }
+    });
+  }
+
+
   createAttendance(attendance, moduleID) {
     return new Promise((resolve, reject) => {
       if (!attendance) {
