@@ -55,10 +55,10 @@
           </md-button>
         </md-card-header>
       </md-card>
-      <md-content class="row">
+      <md-content style="overflow-y:scroll" class="row">
         <md-field class="col s8 offset-s2">
           <label>Select a module</label>
-          <md-select v-model="selectedAttendanceModule">
+          <md-select @md-selected="setStudentsForModule" v-model="selectedAttendanceModule">
             <md-option
               v-for="(_module,i) in modules"
               :key="i"
@@ -145,6 +145,52 @@
                 color="#000000"
                 size="20px"
               ></ball-pulse-loader>
+            </div>
+          </md-tab>
+          <md-tab v-if="attendanceRegister" id="tab-home-manual" md-label="Sign manually">
+            <div class="row">
+              <md-list class="md-triple-line col s12 center-align">
+                <h6>Mark all the present students</h6>
+                <div class="Scroll-first-four">
+                  <md-list-item
+                    style="margin-bottom:15px;"
+                    v-for="(student,i) in selectedAttendanceModuleStudents"
+                    :key="i"
+                    @click="student.selected = !student.selected"
+                    class="col s12 m10 pointer center-align waves-effect"
+                    :class="{'white':student.selected}"
+                  >
+                    <md-avatar>
+                      <md-icon
+                        v-show="!student.selected"
+                        class="black-text"
+                        style="color:ghostwhite;width:100%;height:100%"
+                      >close</md-icon>
+                      <md-icon
+                        v-show="student.selected"
+                        class="black-text"
+                        style="color:ghostwhite;width:100%;height:100%"
+                      >done</md-icon>
+                    </md-avatar>
+
+                    <div class="md-list-item-text">
+                      <span>{{ student.lastname + " " + student.firstname }} &nbsp;&bull;</span>
+                      <span>{{ student.username }}</span>
+                    </div>
+                  </md-list-item>
+                </div>
+              </md-list>
+              <div class="col s12">
+                <ball-pulse-loader class="col s12 center" v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+              </div>
+              <div class="col s12">
+                <md-button
+                  v-if="!isLoading"
+                  v-on:click="submitBulkAttendance"
+                  class="md-primary col s12"
+                  style="background-color:#006064;color:ghostwhite"
+                >Submit</md-button>
+              </div>
             </div>
           </md-tab>
         </md-tabs>
@@ -446,6 +492,7 @@ export default {
       /// lecturer attendance
       createAttendanceIndex: 0,
       selectedAttendanceModule: null,
+      selectedAttendanceModuleStudents: [],
       selectedAttendanceDuration: "5 minutes",
       selectedAttendanceDate: null,
       attendanceRegister: null,
@@ -627,6 +674,91 @@ export default {
     }
   },
   methods: {
+    submitBulkAttendance() {
+      console.log("Here we go!");
+      const students = this.selectedAttendanceModuleStudents
+        ? this.selectedAttendanceModuleStudents
+            .filter(v => v && v.selected)
+            .map(v => v._id)
+        : null;
+      const code = this.attendanceRegister
+        ? this.attendanceRegister.code
+        : null;
+      if (!students || !code) {
+        swal(
+          "Unable to sign register",
+          "make sure you selected students",
+          "error"
+        );
+        return;
+      }
+      console.log("selected students",students);
+      console.log("selected code",code);
+          this.isLoading = true;
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/attendance/sign/bulk/students",
+          {
+            students,
+            code
+          }
+        )
+        .then(results => {
+          this.isLoading = false;
+          swal(results.data, "", "success");
+          this.isCreatingAttendanceRegister = false;
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "", "error");
+          } else {
+            console.log(err);
+            swal(
+              "Unable to get the attendance list",
+              "Try again later",
+              "error"
+            );
+          }
+        });
+    },
+    setStudentsForModule(moduleId) {
+      this.selectedAttendanceModuleStudents = [];
+      if (!moduleId) return;
+      axios
+        .get(
+          this.$store.state.settings.baseLink +
+            "/s/students/all/for/module/" +
+            moduleId
+        )
+        .then(results => {
+          this.isLoading = false;
+          this.selectedAttendanceModuleStudents = results.data.map(v => {
+            return {
+              _id: v._id,
+              username: v.username,
+              lastname: v.lastname,
+              firstname: v.firstname,
+              selected: true
+            };
+          });
+          console.log("results", this.selectedAttendanceModuleStudents);
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal(err.response.data, "", "error");
+          } else {
+            console.log(err);
+            swal(
+              "Unable to get the attendance list",
+              "Try again later",
+              "error"
+            );
+          }
+        });
+    },
     submitAttendanceCode() {
       this.currentAttendanceCodeError = "";
       if (!this.currentAttendanceCode) {

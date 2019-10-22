@@ -49,6 +49,33 @@ router.post("/sign", function (req, res) {
   });
 });
 
+router.post("/sign/bulk/students", function (req, res) {
+  var students = req.body.students;
+  var code = req.body.code;
+
+  Attendance.findOne({
+    code
+  }).then(async attendance => {
+    if (!attendance) {
+      return res.status(512).send("You have entered a wrong attendance code.");
+    }
+    if (!attendance.students) attendance.students = [];
+    attendance.students = attendance.students.concat(students.filter(v => !attendance.students.some(t => t.studentId == v)).map(v => {
+      return {
+        studentId:v,
+        date:new Date()
+      }
+    }));
+    attendance.save(function (err) {
+      if (err) return res.status(512).send("Your attendance was not logged, please try again");
+      return res.send("Your attendance register is signed successfully!");
+    });
+  }).catch(err => {
+    consoling.info({ key: "Sign bulk students attendance", success: false, input: students, message: err.message, err });
+    return res.status(512).send(err.message);
+  });
+});
+
 router.post("/create/for/:moduleId", async function (req, res) {
   var moduleId = req.params.moduleId;
   var duration = req.body.duration || 310;
