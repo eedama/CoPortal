@@ -62,8 +62,8 @@ router.post("/sign/bulk/students", function (req, res) {
     if (!attendance.students) attendance.students = [];
     attendance.students = attendance.students.concat(students.filter(v => !attendance.students.some(t => t.studentId == v)).map(v => {
       return {
-        studentId:v,
-        date:new Date()
+        studentId: v,
+        date: new Date()
       }
     }));
     attendance.save(function (err) {
@@ -128,7 +128,8 @@ router.get("/get/times/for/:moduleId", function (req, res) {
     moduleId,
     "students.0": { $exists: true }
   }, "date").then(attendances => {
-    return res.json(attendances);
+    if (!attendances) attendances = [];
+    return res.json(attendances.reverse());
   }).catch(err => {
     consoling.info({ key: "GET Times for module", success: false, input: moduleId, message: err.message, err });
     return res.status(512).send(err.message);
