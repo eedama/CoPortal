@@ -6,18 +6,33 @@ const SurveySchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         default: mongoose.Types.ObjectId()
     },
-    surveyAnswers: [{
-        QuestionId: {
+    surveyTemplateId: {
+        type: Schema.Types.ObjectId,
+        ref: 'SurveyTemplates'
+    },
+    attendanceId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Attendance'
+    },
+    moduleId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Module'
+    },
+    students: [{
+        studentId: {
             type: Schema.Types.ObjectId,
-            ref: 'SurveyQuestions'
+            ref: 'Student'
         },
-        Answer: String,
-        Answer2: String
+        date: {
+            type: Date,
+            default: Date.now
+        },
+        answers: [{
+            questionId: String,
+            question: String,
+            answer: String
+        }]
     }],
-    name: String,
-    surname: String,
-    email: String,
-    area: String,
     date: {
         type: Date,
         default: Date.now
