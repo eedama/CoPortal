@@ -11,40 +11,37 @@
           >
             <GridLayout
               verticalAlignment="center"
-              class="p-y-15 m-x-15 m-t-20"
+              class="p-y-15 m-x-15"
               rows="auto,auto"
               columns="*,auto"
             >
-              <Label
+              <Image
                 row="0"
                 col="0"
-                fontSize="18%"
-                verticalAlignment="center"
-                class="font-weight-bold text-white"
-                :textWrap="true"
-                :text="`${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`"
-              />
+                textAlignment="left"
+                verticalAlignment="top"
+                horizontalAlignment="left"
+                stretch="aspectFit"
+                width="65"
+                height="65"
+                borderRadius="100%"
+                :src="
+                  $store.state.cache.cachedUser.user.profilePic
+                    ? $store.state.cache.cachedUser.user.profilePic
+                    : $store.state.settings.defaultProfilePic
+                "
+              ></Image>
               <Label
                 row="1"
                 col="0"
-                fontSize="16%"
+                fontSize="15%"
                 verticalAlignment="center"
-                class="h4 text-white p-5"
+                class="font-weight-bold text-white m-t-20"
                 :textWrap="true"
-                :text="$store.state.cache.cachedUser.user.username"
+                :text="
+                  `${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`
+                "
               />
-              <Image
-                row="0"
-                rowSpan="2"
-                col="1"
-                textAlignment="right"
-                verticalAlignment="bottom"
-                stretch="aspectFit"
-                width="80"
-                height="80"
-                borderRadius="100%"
-                :src="$store.state.cache.cachedUser.user.profilePic ? $store.state.cache.cachedUser.user.profilePic : $store.state.settings.defaultProfilePic"
-              ></Image>
             </GridLayout>
           </CardView>
           <Image
@@ -60,48 +57,43 @@
             <StackLayout>
               <Ripple
                 @tap="goTo(layout)"
-                v-for="(layout,i) in drawerLayouts.filter(d => d.auth == null || ($store.state.cache.cachedUser && d.auth.some(auth => auth == $store.state.cache.cachedUser.userType)))"
+                v-for="(layout, i) in drawerLayouts.filter(
+                  d =>
+                    d.auth == null ||
+                    ($store.state.cache.cachedUser &&
+                      d.auth.some(
+                        auth => auth == $store.state.cache.cachedUser.userType
+                      ))
+                )"
                 :key="i"
               >
-                <GridLayout class="drawer-item p-y-10" rows="auto,auto" columns="auto,*">
+                <GridLayout
+                  class="drawer-item p-y-10"
+                  rows="auto,auto"
+                  columns="auto,*"
+                >
                   <label
                     row="0"
                     col="0"
                     textAlignment="center"
                     verticalAlignment="center"
                     class="mdi p-5 m-x-10 text-blue-black"
-                    fontSize="35%"
-                    :text="'mdi-' + layout.icon | fonticon"
+                    fontSize="20%"
+                    :text="('mdi-' + layout.icon) | fonticon"
                   ></label>
                   <label
                     row="0"
                     col="1"
                     verticalAlignment="center"
-                    class="text-dark-black p-5"
-                    fontSize="20%"
+                    class="text-dark-black p-5 m-l-10"
+                    fontSize="16%"
                     :text="layout.text"
                   ></label>
                 </GridLayout>
               </Ripple>
             </StackLayout>
           </ScrollView>
-          <StackLayout textAlignment="center" row="2">
-            <GridLayout
-              v-if="$store.state.cache.cachedUser"
-              class="drawer-item p-y-10"
-              rows="auto"
-              columns="*"
-            >
-              <label
-                textAlignment="center"
-                verticalAlignment="bottom"
-                :textWrap="true"
-                class="font-weight-bold text-blue-black"
-                fontSize="18%"
-                :text="($store.state.cache.cachedUser.userType =='PARENT' && $store.state.cache.cachedUser.students) ? 'Gaurdian to ' + $store.state.cache.cachedUser.students.map(s => s.username).join() : $store.state.cache.cachedUser.userType.toLowerCase() + ' at ' + currentUserSchool"
-              ></label>
-            </GridLayout>
-          </StackLayout>
+          <StackLayout textAlignment="center" row="2"> </StackLayout>
         </GridLayout>
       </StackLayout>
 
@@ -114,7 +106,11 @@
               class="m-5"
               @tap="$refs.drawer.nativeView.showDrawer()"
             >
-              <label class="mdi p-5" fontSize="35%" :text="'mdi-menu' | fonticon"></label>
+              <label
+                class="mdi p-5"
+                fontSize="35%"
+                :text="'mdi-menu' | fonticon"
+              ></label>
             </Ripple>
             <Ripple
               v-if="$store.state.cache.cachedUser"
@@ -122,7 +118,11 @@
               class="m-5"
               @tap="goTo(notificationsRoute)"
             >
-              <label class="mdi p-5" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
+              <label
+                class="mdi p-5"
+                fontSize="25%"
+                :text="'mdi-bell' | fonticon"
+              ></label>
             </Ripple>
           </StackLayout>
           <StackLayout
@@ -139,7 +139,12 @@
               text="Demo"
             ></label>
           </StackLayout>
-          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="userLoggedIn()" />
+          <Navigator
+            colSpan="2"
+            row="1"
+            rowSpan="2"
+            :defaultRoute="userLoggedIn()"
+          />
         </GridLayout>
       </GridLayout>
     </RadSideDrawer>
@@ -199,7 +204,14 @@ export default {
           icon: "calendar-check",
           link: "/module/list/attend",
           description: "Students class Attendance",
-          auth: ["LECTURER","ADMIN"]
+          auth: ["LECTURER", "ADMIN"]
+        },
+        {
+          text: "Survey",
+          icon: "comment-question-outline",
+          link: "/module/list/survey",
+          description: "View Surveys",
+          auth: ["LECTURER", "ADMIN"]
         },
         {
           text: "Timetable",
@@ -284,7 +296,6 @@ export default {
         if (loggedInType === "LECTURER") {
           return "/module/list";
         } else if (loggedInType === "STUDENT") {
-          console.log("model29", loggedInType);
           return "/notifications/list";
         }
       } else {
@@ -320,6 +331,8 @@ export default {
           });
       } else if (item.link == "/module/list/attend") {
         this.navigate(item.link, { attendance: true });
+      } else if (item.link == "/module/list/survey") {
+        this.navigate(item.link, { survey: true });
       } else {
         this.navigate(item.link);
       }

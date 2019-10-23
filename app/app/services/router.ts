@@ -13,6 +13,7 @@ import TestMarks from "../components/pages/components/TestMarks.vue";
 import Timetable from "../components/pages/components/Timetable.vue";
 import StudentAttandance from "../components/pages/components/StudentAttendance.vue";
 import Attandance from "../components/pages/components/Attendance.vue";
+import Survey from "../components/pages/components/Survey.vue";
 import Modules from "../components/pages/Modules.vue";
 import Notifications from "../components/pages/Notifications.vue";
 import Profile from "../components/pages/Profile.vue";
@@ -20,7 +21,6 @@ import Marks from "../components/pages/Marks.vue";
 import Settings from "../components/pages/Settings.vue";
 import PDFView from "../components/pages/PDFView.vue";
 import FeedbackChat from "../components/pages/FeedbackChat.vue";
-
 
 // Pages
 // Components
@@ -62,7 +62,7 @@ var router = {
         title: "FeedbackChat",
         authLevel: 0
       }
-    },    
+    },
     "/pdf/view": {
       name: "pdfview",
       path: "/module/list",
@@ -189,12 +189,30 @@ var router = {
         authLevel: 0
       }
     },
+    "/module/list/survey": {
+      name: "modulesurvry",
+      path: "/module/list/survey",
+      component: Modules,
+      meta: {
+        title: "Modules",
+        authLevel: 0
+      }
+    },
     "/module/attendance": {
       name: "moduleattendance",
       path: "/module/attendance",
       component: Attandance,
       meta: {
         title: "Attendance",
+        authLevel: 0
+      }
+    },
+    "/module/survey": {
+      name: "modulesurvey",
+      path: "/module/survey",
+      component: Survey,
+      meta: {
+        title: "Survey",
         authLevel: 0
       }
     }
