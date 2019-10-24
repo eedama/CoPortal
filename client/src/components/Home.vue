@@ -556,6 +556,12 @@ export default {
           auth: ["STUDENT"]
         },
         {
+          text: "Survey",
+          icon: "question_answer",
+          link: "/survey/list",
+          auth: ["LECTURER","ADMIN"]
+        },
+        {
           text: "Students",
           icon: "people",
           link: "/student/list",

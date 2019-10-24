@@ -80,13 +80,14 @@ router.get("/get/latest/survey/for/:moduleId", async function (req, res) {
         });
 });
 
-router.get("/get/survey/questions/for/:surveyTemplateId", async function (req, res) {
+router.get("/get/survey/questions/for/:surveyId", async function (req, res) {
     const surveyId = req.params.surveyId;
 
     Survey.findById(surveyId)
-        .then(surveys => {
-            if (!surveys) surveys = [];
-            return res.json(surveys.reverse());
+        .populate("surveyTemplateId", "title")
+        .populate("students.studentId", "username lastname firstname")
+        .then(survey => {
+            return res.json(survey);
         });
 });
 
