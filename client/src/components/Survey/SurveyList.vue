@@ -6,17 +6,22 @@
       class="card"
       :md-active.sync="showingSurveyStudentList"
     >
-      <md-card class="col s12 m8 offset-m2">
+      <md-card style="overflow-y:scroll" class="col s12 m8 offset-m2">
         <md-card-header
           v-if="
             selectedSurveyStudentList &&
               selectedSurveyStudentList.surveyTemplateId
           "
         >
-          <div>
-            <h5 class="center">
+          <div class="row">
+            <h5 class="center col s12">
               {{ selectedSurveyStudentList.surveyTemplateId.title }}
             </h5>
+            <img
+              class="col s12 m6 offset-m3 center img-responsive fluid"
+              src="../../assets/km-logo.jpeg"
+              alt="km logo"
+            />
           </div>
         </md-card-header>
 
@@ -85,9 +90,15 @@
     </div>
     <div class="row">
       <div class="col s12">
-        <md-card-header class="center text-xs-center">
-          <h2 class="md-title">Surveys</h2>
-          <div class="md-subhead"></div>
+        <md-card-header class="center row text-xs-center">
+          <div class="row center col s12 m8 offset-m2">
+            <img
+              class="col s12 m4 offset-m4 center"
+              src="../../assets/km-logo.jpeg"
+              alt="km logo"
+            />
+          </div>
+          <h2 class="md-title col s12">Surveys</h2>
         </md-card-header>
       </div>
       <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
