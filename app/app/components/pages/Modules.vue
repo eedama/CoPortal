@@ -136,26 +136,7 @@ export default {
     const testing = this.TNS_ENV !== "production";
 
     this.isLoading = true;
-    try {
-      this.$store.state.cache.cachedUser.user.modules.forEach(m => {
-        this.adKeywords.unshift(m.name);
-      });
-      this.$nextTick(() => {
-        this.$firebase.admob.showBanner({
-          size: this.$firebase.admob.AD_SIZE.SMART_BANNER, // see firebase.admob.AD_SIZE for all options
-          margins: {
-            bottom: 10
-          },
-          androidBannerId: "ca-app-pub-4924835910036108/9510636040",
-          iosBannerId: "ca-app-pub-4924835910036108/9510636040",
-          testing: testing, // when not running in production set this to true, Google doesn't like it any other way
-          iosTestDeviceIds: [],
-          keywords: this.adKeywords // add keywords for ad targeting
-        });
-      });
-    } catch (err) {
-      console.error(err);
-    }
+
     this.$api
       .getModuleInformation(this.$store.state.cache.cachedUser.user._id)
       .then(_modules => {
