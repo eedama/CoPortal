@@ -72,10 +72,10 @@ router.get("/get/latest/survey/for/:moduleId", async function (req, res) {
     }, "-students", { sort: { date: -1 } })
         .populate("surveyTemplateId")
         .then(survey => {
-            if (survey && survey.surveyTemplateId && moment().diff(survey.date, 'hours') < 5) {
+            if (survey && survey.surveyTemplateId && moment().diff(survey.date, 'days') < 1) {
                 return res.json(survey);
             }
-            return res.json(null);
+            return res.status(512).send("This module has no survey for today.");
         });
 });
 
@@ -108,7 +108,7 @@ router.post("/submit/:surveyId", async function (req, res) {
             })
             await attendance.save();
             if (!survey.students) survey.students = [];
-            survey.students = survey.students.filter(v => v && v.studentId);
+            survey.students = survey.students.filter(v => v && v.studentId != studentId);
             survey.students.push({
                 studentId,
                 date: new Date(),
