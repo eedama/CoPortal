@@ -211,7 +211,7 @@ export default {
           icon: "comment-question-outline",
           link: "/module/list/survey",
           description: "View Surveys",
-          auth: ["LECTURER", "ADMIN"]
+          auth: ["LECTURER", "ADMIN", "STUDENT"]
         },
         {
           text: "Timetable",

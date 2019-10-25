@@ -2,23 +2,17 @@
   <page actionBarHidden="true">
     <GridLayout rows="auto,*" columns="*">
       <StackLayout row="0">
-        <GridLayout rows="auto,auto" columns="*">
-          <label
+        <GridLayout rows="auto" columns="*">
+          <Image
             row="0"
-            verticalAlignment="center"
+            src="~/assets/images/company1.jpeg"
+            opacity="1"
+            stretch="aspectFit"
+            verticalAlignment="bottom"
             textAlignment="center"
-            class="text-dark-black mdi"
-            fontSize="45%"
-            :text="'mdi-comment-question-outline' | fonticon"
-          ></label>
-          <label
-            row="1"
-            verticalAlignment="center"
-            textAlignment="center"
-            class="p-15 text-dark-black"
-            fontSize="30%"
-            :text="module.code"
-          ></label>
+            horizontalAlignment="center"
+            class=""
+          ></Image>
         </GridLayout>
       </StackLayout>
       <StackLayout row="1">
@@ -98,7 +92,7 @@
                   v-for="(survey, i) in history"
                   :key="i"
                 >
-                  <Ripple>
+                  <Ripple @tap="viewResults(survey._id)">
                     <GridLayout
                       class="text-dark-black p-15"
                       rows="auto,auto"
@@ -128,6 +122,7 @@
                         row="1"
                         col="1"
                         fontSize="15"
+                        class="m-t-10"
                         textAlignment="left"
                         :text="getDate(survey.date)"
                       ></label>
@@ -166,6 +161,15 @@ export default {
   },
   props: ["module"],
   methods: {
+    viewResults(surveyId) {
+      this.navigate(
+        "/module/survey/results",
+        {
+          surveyId: surveyId
+        },
+        null
+      );
+    },
     getDate(dt) {
       return date.format(new Date(dt), "DD MMMM YYYY");
     },
@@ -182,6 +186,7 @@ export default {
         .submitSurvey(this.selectedTemplate)
         .then(attend => {
           this.loading = false;
+          this.getHistory();
           this.$feedback.success({
             title: attend.toString()
           });
