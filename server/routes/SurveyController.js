@@ -72,11 +72,10 @@ router.get("/get/latest/survey/for/:moduleId", async function (req, res) {
     }, "-students", { sort: { date: -1 } })
         .populate("surveyTemplateId")
         .then(survey => {
-            console.log(moment().diff(survey.date, 'hours'));
             if (survey && survey.surveyTemplateId && moment().diff(survey.date, 'hours') < 5) {
                 return res.json(survey);
             }
-            return res.json([]);
+            return res.json(null);
         });
 });
 
