@@ -14,6 +14,8 @@ import Timetable from "../components/pages/components/Timetable.vue";
 import StudentAttandance from "../components/pages/components/StudentAttendance.vue";
 import Attandance from "../components/pages/components/Attendance.vue";
 import Survey from "../components/pages/components/Survey.vue";
+import SurveyResults from "../components/pages/components/SurveyResults.vue";
+import TakeSurvey from "../components/pages/components/TakeSurvey.vue";
 import Modules from "../components/pages/Modules.vue";
 import Notifications from "../components/pages/Notifications.vue";
 import Profile from "../components/pages/Profile.vue";
@@ -213,6 +215,24 @@ var router = {
       component: Survey,
       meta: {
         title: "Survey",
+        authLevel: 0
+      }
+    },
+    "/module/survey/results": {
+      name: "modulesurveyresults",
+      path: "/module/survey/results",
+      component: SurveyResults,
+      meta: {
+        title: "SurveyResults",
+        authLevel: 0
+      }
+    },
+    "/module/survey/take": {
+      name: "modulesurveytake",
+      path: "/module/survey/take",
+      component: TakeSurvey,
+      meta: {
+        title: "TakeSurvey",
         authLevel: 0
       }
     }

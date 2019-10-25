@@ -287,6 +287,54 @@ export default class API {
     });
   }
 
+  getLatestSurveyQuestions(moduleID) {
+    return new Promise((resolve, reject) => {
+      http
+        .request(this.makeGet("/survey/get/latest/survey/for/" + moduleID))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
+          }
+        })
+        .catch(err => {
+          return reject(new Error("Failed to retrieve survey try again later"));
+        });
+    });
+  }
+
+  getSurveyResults(surveyID) {
+    return new Promise((resolve, reject) => {
+      http
+        .request(this.makeGet("/survey/get/survey/questions/for/" + surveyID))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
+          }
+        })
+        .catch(err => {
+          return reject(new Error("Failed to retrieve survey try again later"));
+        });
+    });
+  }
+
   getSurveyHistory(moduleID) {
     return new Promise((resolve, reject) => {
       http
@@ -418,6 +466,36 @@ export default class API {
           .catch(err => {
             return reject(
               new Error("Failed to retrieve modules try again later")
+            );
+          });
+      }
+    });
+  }
+
+  submitSurveyQuestions(surveyId, response) {
+    return new Promise((resolve, reject) => {
+      if (!surveyId) {
+        reject(new Error("Invalid request"));
+      } else {
+        http
+          .request(this.makePost("/survey/submit/" + surveyId, response))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
+              }
+            }
+          })
+          .catch(err => {
+            return reject(
+              new Error("Unable to submit your survey, Try again later")
             );
           });
       }

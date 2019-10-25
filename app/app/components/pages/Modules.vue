@@ -161,6 +161,14 @@ export default {
       });
   },
   methods: {
+    isStudent() {
+      let loggedInType = this.appSettings.getString("userType");
+      if (loggedInType === "STUDENT") {
+        return true;
+      }
+
+      return false;
+    },
     pageLoaded() {
       this.$store.commit("refreshCache", {
         db: this.$db,
@@ -179,6 +187,16 @@ export default {
           null
         );
       } else if (this.survey) {
+        if (this.isStudent()) {
+          this.navigate(
+            "/module/survey/take",
+            {
+              module: _module
+            },
+            null
+          );
+          return;
+        }
         this.navigate(
           "/module/survey",
           {
