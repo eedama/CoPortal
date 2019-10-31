@@ -112,7 +112,7 @@ var router = {
     },
     "/student/profile/view": {
       name: "profile",
-      path: "/student/profile/view/:userId",
+      path: "/student/profile/view",
       component: Profile,
       meta: {
         title: "StudentProfile",

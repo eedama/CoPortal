@@ -6,24 +6,30 @@
           <CardView
             v-if="$store.state.cache.cachedUser.user"
             row="0"
-            class="bg-blue-black p-x-10"
+            class="p-x-10 "
             :elevation="15"
           >
             <GridLayout
               verticalAlignment="center"
-              class="p-y-15 m-x-15"
               rows="auto,auto"
-              columns="*,auto"
+              columns="auto,*"
             >
+              <Image
+                src="~/assets/images/backgrounds/pexels-photo-509922.jpeg"
+                stretch="aspectFit"
+                rowSpan="2"
+                colSpan="2"
+              />
               <Image
                 row="0"
                 col="0"
+                rowSpan="2"
                 textAlignment="left"
-                verticalAlignment="top"
-                horizontalAlignment="left"
+                verticalAlignment="center"
                 stretch="aspectFit"
                 width="65"
                 height="65"
+                class="p-l-5"
                 borderRadius="100%"
                 :src="
                   $store.state.cache.cachedUser.user.profilePic
@@ -32,11 +38,12 @@
                 "
               ></Image>
               <Label
-                row="1"
-                col="0"
-                fontSize="15%"
+                row="0"
+                colSpan="2"
+                fontSize="17%"
+                textAlignment="center"
                 verticalAlignment="center"
-                class="font-weight-bold text-white m-t-20"
+                class="font-weight-bold text-blue m-y-5 p-10"
                 :textWrap="true"
                 :text="
                   `${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`
@@ -77,8 +84,8 @@
                     col="0"
                     textAlignment="center"
                     verticalAlignment="center"
-                    class="mdi p-5 m-x-10 text-blue-black"
-                    fontSize="20%"
+                    class="mdi p-5 m-x-10 text-blue"
+                    fontSize="25%"
                     :text="('mdi-' + layout.icon) | fonticon"
                   ></label>
                   <label
@@ -107,7 +114,7 @@
               @tap="$refs.drawer.nativeView.showDrawer()"
             >
               <label
-                class="mdi p-5"
+                class="mdi p-5 text-peach"
                 fontSize="35%"
                 :text="'mdi-menu' | fonticon"
               ></label>
@@ -119,7 +126,7 @@
               @tap="goTo(notificationsRoute)"
             >
               <label
-                class="mdi p-5"
+                class="mdi p-5 text-blue"
                 fontSize="25%"
                 :text="'mdi-bell' | fonticon"
               ></label>

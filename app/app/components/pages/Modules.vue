@@ -1,30 +1,25 @@
 <template>
   <page actionBarHidden="true">
-    <GridLayout rows="auto,*" columns="*">
-      <StackLayout row="0">
-        <GridLayout rows="auto,auto" columns="*">
-          <label
-            row="0"
-            verticalAlignment="center"
-            textAlignment="center"
-            class="mdi text-dark-black"
-            fontSize="50%"
-            :text="'mdi-book-open-page-variant' | fonticon"
-          ></label>
-          <label
-            row="1"
-            verticalAlignment="center"
-            textAlignment="center"
-            class="p-15 text-dark-black"
-            fontSize="30%"
-            text="Modules"
-          ></label>
-        </GridLayout>
-      </StackLayout>
+    <GridLayout rows="auto,auto,auto,*" columns="*">
+      <Image
+        src="~/assets/images/backgrounds/education.jpg"
+        stretch="aspectFit"
+        row="1"
+        rowSpan="2"
+      />
+      <label
+        row="0"
+        verticalAlignment="center"
+        textAlignment="center"
+        class="p-t-5 text-blue"
+        fontSize="30%"
+        fontWeight="bold"
+        text="Modules"
+      ></label>
       <ActivityIndicator
         verticalAlignment="center"
         textAlignment="center"
-        row="1"
+        row="3"
         v-show="isLoading"
         :busy="isLoading"
       ></ActivityIndicator>
@@ -58,20 +53,20 @@
           text="You currently do not have any modules linked to you"
         ></label>
       </StackLayout>
-      <ScrollView v-if="!isLoading" row="1">
+      <ScrollView v-if="!isLoading" row="3">
         <WrapLayout>
           <StackLayout v-for="(_module, i) in modules" :key="i" width="50%">
             <CardView
-              height="100"
+              height="80"
               textAlignment="center"
               elevation="5"
               margin="10"
             >
-              <Ripple class="p-y-20" @tap="goToModule(_module)">
+              <Ripple class="border-left-blue" @tap="goToModule(_module)">
                 <GridLayout
                   rows="auto,auto"
                   columns="*"
-                  class="p-10"
+                  class="p-5"
                   verticalAlignment="center"
                   textAlignment="center"
                 >
@@ -79,7 +74,7 @@
                     row="0"
                     :textWrap="true"
                     class="font-weight-bold"
-                    fontSize="16%"
+                    fontSize="14%"
                     verticalAlignment="center"
                     textAlignment="center"
                     :text="_module.name"

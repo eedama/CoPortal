@@ -2,31 +2,45 @@
   <page class="bg-white" actionBarHidden="true">
     <GridLayout rows="*">
       <StackLayout verticalAlignment="center" row="0" class="m-y-10">
-          <Image
-            src="~/assets/images/coPortalLogo.png"
-            stretch="aspectFit"
-            verticalAlignment="bottom"
-            textAlignment="center"
-            class="m-x-5 bottomLogo"
-          ></Image>
-          <label
-            textAlignment="center"
-            class="text-mute text-light-black p-15"
-            fontSize="18%"
-            :text="isParent ? 'Pick a student' : (currentSchoolName ? currentSchoolName : 'Pick a school')"
-          ></label>
-          <CardView
-            verticalAlignment="center"
-            padding="10"
-            margin="20"
-            elevation="1"
-            shadowOffsetHeight="10"
-            shadowOpacity="0.2"
-            shadowRadius="50"
-          > 
+        <Image
+          src="~/assets/images/coPortalLogo.png"
+          stretch="aspectFit"
+          verticalAlignment="bottom"
+          textAlignment="center"
+          class="m-x-5 bottomLogo"
+        ></Image>
+        <label
+          textAlignment="center"
+          class="text-mute  text-blue p-15"
+          fontSize="18%"
+          :text="
+            isParent
+              ? 'Pick a student'
+              : currentSchoolName
+              ? currentSchoolName
+              : 'Pick a school'
+          "
+        ></label>
+        <CardView
+          verticalAlignment="center"
+          padding="10"
+          margin="20"
+          elevation="1"
+          shadowOffsetHeight="10"
+          shadowOpacity="0.2"
+          shadowRadius="50"
+        >
           <ScrollView width="100%">
             <StackLayout>
-              <FlexboxLayout v-if="isParent" class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
+              <FlexboxLayout
+                v-if="isParent"
+                class="m-10"
+                justifyContent="space-between"
+                width="100%"
+                alignSelf="center"
+                height="100%"
+                flexDirection="column"
+              >
                 <GridLayout rows="*" columns="*,auto">
                   <StackLayout colSpan="2">
                     <ActivityIndicator
@@ -35,9 +49,13 @@
                       v-show="isLoading"
                       :busy="isLoading"
                     ></ActivityIndicator>
-                    <CardView v-for="(student,i) in students" :key="i">
+                    <CardView v-for="(student, i) in students" :key="i">
                       <Ripple @tap="manageStudent(student)">
-                        <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
+                        <GridLayout
+                          class="m-10 text-dark-black"
+                          rows="auto,auto"
+                          columns="auto,*"
+                        >
                           <label
                             row="0"
                             rowSpan="2"
@@ -66,22 +84,34 @@
                   </StackLayout>
                 </GridLayout>
               </FlexboxLayout>
-              <FlexboxLayout v-if="currentSchoolName && !isParent" class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
-                <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
+              <FlexboxLayout
+                v-if="currentSchoolName && !isParent"
+                class="m-10"
+                justifyContent="space-between"
+                width="100%"
+                alignSelf="center"
+                height="100%"
+                flexDirection="column"
+              >
+                <GridLayout
+                  class="m-10 text-dark-black"
+                  rows="auto,auto"
+                  columns="auto,*"
+                >
                   <label
                     row="0"
                     rowSpan="2"
                     col="0"
                     verticalAlignment="center"
                     textAlignment="center"
-                    class="mdi m-10"
+                    class="mdi m-10 text-blue"
                     fontSize="25%"
                     :text="'mdi-account-circle' | fonticon"
                   ></label>
                   <label
                     row="0"
                     col="1"
-                    class="h3 font-weight-bold text-mute text-dark-black"
+                    class="h3 font-weight-bold text-mute text-blue"
                     text="Username"
                   ></label>
                   <TextField
@@ -95,21 +125,25 @@
                   ></TextField>
                 </GridLayout>
 
-                <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
+                <GridLayout
+                  class="m-10 text-dark-black"
+                  rows="auto,auto"
+                  columns="auto,*"
+                >
                   <label
                     row="0"
                     rowSpan="2"
                     col="0"
                     verticalAlignment="center"
                     textAlignment="center"
-                    class="mdi m-10"
+                    class="mdi m-10 text-blue"
                     fontSize="25%"
                     :text="'mdi-lock' | fonticon"
                   ></label>
                   <label
                     row="0"
                     col="1"
-                    class="h3 font-weight-bold text-mute text-dark-black"
+                    class="h3 font-weight-bold text-mute text-blue"
                     text="Password"
                   ></label>
                   <TextField
@@ -124,13 +158,16 @@
                   ></TextField>
                 </GridLayout>
 
-                <ActivityIndicator v-show="isLoading" :busy="isLoading"></ActivityIndicator>
+                <ActivityIndicator
+                  v-show="isLoading"
+                  :busy="isLoading"
+                ></ActivityIndicator>
 
                 <StackLayout v-show="!isLoading">
                   <Button
                     text="Login"
                     :isEnabled="!isLoading"
-                    class="submit-button bg-dark-black text-white"
+                    class="submit-button bg-peach text-white"
                     @tap="submit()"
                   ></Button>
                 </StackLayout>
@@ -144,7 +181,7 @@
                       text="Forgot Password?"
                     ></label>
                   </Ripple>
-                  <Ripple col="1" @tap="changeSchool(null,null)">
+                  <Ripple col="1" @tap="changeSchool(null, null)">
                     <label
                       textAlignment="center"
                       class="text-mute text-light-black p-15"
@@ -154,10 +191,27 @@
                   </Ripple>
                 </GridLayout>
               </FlexboxLayout>
-              <FlexboxLayout v-if="!currentSchoolName && !isParent" class="m-10" justifyContent="space-between" width="100%" alignSelf="center" height="100%" flexDirection="column">
+              <FlexboxLayout
+                v-if="!currentSchoolName && !isParent"
+                class="m-10"
+                justifyContent="space-between"
+                width="100%"
+                alignSelf="center"
+                height="100%"
+                flexDirection="column"
+              >
                 <GridLayout rows="auto,*" columns="*,auto">
-                  <Ripple col="1" @tap="refresh" verticalAlignment="center" textAlignment="right">
-                    <label class="mdi m-10" fontSize="25%" :text="'mdi-refresh' | fonticon"></label>
+                  <Ripple
+                    col="1"
+                    @tap="refresh"
+                    verticalAlignment="center"
+                    textAlignment="right"
+                  >
+                    <label
+                      class="mdi m-10 text-peach"
+                      fontSize="25%"
+                      :text="'mdi-refresh' | fonticon"
+                    ></label>
                   </Ripple>
                   <StackLayout colSpan="2" row="1">
                     <ActivityIndicator
@@ -166,29 +220,35 @@
                       v-show="isLoading"
                       :busy="isLoading"
                     ></ActivityIndicator>
-                    <CardView v-for="(school,i) in schools" :key="i">
-                      <Ripple @tap="changeSchool(school.name,school.url)">
-                        <GridLayout class="m-10 text-dark-black" rows="auto,auto" columns="auto,*">
+                    <CardView v-for="(school, i) in schools" :key="i">
+                      <Ripple @tap="changeSchool(school.name, school.url)">
+                        <GridLayout
+                          class="m-10 text-dark-black"
+                          rows="auto,auto"
+                          columns="auto,*"
+                        >
                           <label
                             row="0"
                             rowSpan="2"
                             col="0"
                             verticalAlignment="center"
                             textAlignment="center"
-                            class="mdi m-10"
+                            class="mdi m-10 text-peach"
                             fontSize="25%"
                             :text="'mdi-school' | fonticon"
                           ></label>
                           <label
                             row="0"
                             col="1"
-                            class="h3 font-weight-bold text-mute text-dark-black"
+                            fontSize="16%"
+                            class="font-weight-bold text-mute text-dark-black"
                             :text="school.name"
                           ></label>
                           <label
                             row="1"
                             col="1"
-                            class="h4 font-weight-bold text-mute text-dark-black"
+                            fontSize="14%"
+                            class="text-mute text-blue"
                             :text="school.description"
                           ></label>
                         </GridLayout>
@@ -198,9 +258,9 @@
                 </GridLayout>
               </FlexboxLayout>
             </StackLayout>
-           </ScrollView>
-          </CardView>
-        </StackLayout>
+          </ScrollView>
+        </CardView>
+      </StackLayout>
     </GridLayout>
   </page>
 </template>
@@ -241,44 +301,55 @@ export default {
     this.isLoading = false;
   },
   methods: {
-    manageStudent(student){
-      if(this.$store.state.cache.cachedUser && this.$store.state.cache.cachedUser.userType =='PARENT'){
-         let currentUser = JSON.parse(JSON.stringify(this.$store.state.cache.cachedUser));
-         
-         this.appSettings.remove("isLoggedInUserId");
-         this.appSettings.remove("userType");
-         this.appSettings.remove("device_token"); 
-         this.$store.commit("clearCache", {
-           db: this.$db,
-           appSettings: this.appSettings,
-           api: this.$api
-         });
+    manageStudent(student) {
+      if (
+        this.$store.state.cache.cachedUser &&
+        this.$store.state.cache.cachedUser.userType == "PARENT"
+      ) {
+        let currentUser = JSON.parse(
+          JSON.stringify(this.$store.state.cache.cachedUser)
+        );
 
-         currentUser.user = student;
-         this.$store.commit("cacheUser", {
-            db: this.$db,
-            api: this.$api,
-            appSettings: this.appSettings,
-            user: currentUser,
-            type: currentUser.userType
-          });
+        this.appSettings.remove("isLoggedInUserId");
+        this.appSettings.remove("userType");
+        this.appSettings.remove("device_token");
+        this.$store.commit("clearCache", {
+          db: this.$db,
+          appSettings: this.appSettings,
+          api: this.$api
+        });
 
-          console.log('currentUser',JSON.stringify(currentUser));
-          console.log('currentUser-session',JSON.stringify(this.$store.state.cache.cachedUser));
-          this.appSettings.setBoolean("isLoggedInUserId", true);
-          this.appSettings.setString("userType", currentUser.userType);
-          this.navigate("/student/profile/view", null, {
-            clearHistory: true
-          });
-      }else{
-         this.$feedback.error({
-              title: 'Current User is ',
-              message: this.$store.state.cache.cachedUser
-          });
+        currentUser.user = student;
+        this.$store.commit("cacheUser", {
+          db: this.$db,
+          api: this.$api,
+          appSettings: this.appSettings,
+          user: currentUser,
+          type: currentUser.userType
+        });
+
+        console.log("currentUser", JSON.stringify(currentUser));
+        console.log(
+          "currentUser-session",
+          JSON.stringify(this.$store.state.cache.cachedUser)
+        );
+        this.appSettings.setBoolean("isLoggedInUserId", true);
+        this.appSettings.setString("userType", currentUser.userType);
+        this.navigate("/student/profile/view", null, {
+          clearHistory: true
+        });
+      } else {
+        this.$feedback.error({
+          title: "Current User is ",
+          message: this.$store.state.cache.cachedUser
+        });
       }
     },
     refresh(clean = false) {
-      if(this.$store.state.cache.cachedUser && this.$store.state.cache.cachedUser.userType == 'PARENT'){
+      if (
+        this.$store.state.cache.cachedUser &&
+        this.$store.state.cache.cachedUser.userType == "PARENT"
+      ) {
         this.isParent = true;
         this.students = this.$store.state.cache.cachedUser.students;
       }
@@ -354,7 +425,11 @@ export default {
           this.isLoading = false;
           this.isParent = false;
           var currentUser = JSON.parse(JSON.stringify(results));
-          if(currentUser && currentUser.user && currentUser.userType == "PARENT"){
+          if (
+            currentUser &&
+            currentUser.user &&
+            currentUser.userType == "PARENT"
+          ) {
             currentUser.parent = currentUser.user;
             currentUser.user = currentUser.students[0];
           }
