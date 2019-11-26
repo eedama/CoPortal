@@ -1,4 +1,4 @@
-var express = require("express");
+import express from "express";
 var router = express.Router();
 import mongoose from "mongoose";
 
@@ -9,10 +9,9 @@ import Lecturer from "../models/Lecturer";
 import Module from "../models/Module";
 import MarkSheet from "../models/MarkSheet";
 import Report from "../models/Report";
-import SMSProvider from "../services/SMSProvider"
-import EmailProvider from "../services/EmailProvider"
-const smsProvider = new SMSProvider();
-const emailProvider = new EmailProvider();
+import smsProvider from "../services/SMSProvider"
+import emailProvider from "../services/EmailProvider"
+import { StudentParentType } from "models.types";
 
 /*
   TODO: Get one lecturer - DONE
@@ -24,10 +23,10 @@ const emailProvider = new EmailProvider();
         Login lecturer
 */
 
-router.get("/lecturers/all", function (req, res) {
+router.get("/lecturers/all", function (req: express.Request, res: express.Response) {
   Lecturer.find({
-      "active": true
-    })
+    "active": true
+  })
     .populate(["rents"])
     .populate(['modules'])
     .then(lecturers => {
@@ -36,21 +35,16 @@ router.get("/lecturers/all", function (req, res) {
     });
 });
 
-router.get("/lecturers/of/ids/:lecturerIDs", function (req, res) {
-  var lecturerIDs = req.params.lecturerIDs;
-  if (!Array.isArray(lecturerIDs)) {
-    lecturerIDs = [lecturerIDs];
-  }
-  console.log(lecturerIDs);
+router.get("/lecturers/of/ids/:lecturerIDs", function (req: express.Request, res: express.Response) {
 
-  lecturerIDs = lecturerIDs.map(l => mongoose.Types.ObjectId(l));
+  const lecturerIDs: string[] = Array.isArray(req.params.lecturerIDs) ? req.params.lecturerIDs : [req.params.lecturerIDs];
 
   Lecturer.find({
-      "active": true,
-      '_id': {
-        $in: lecturerIDs
-      }
-    })
+    "active": true,
+    '_id': {
+      $in: lecturerIDs ? lecturerIDs.map((l: string) => mongoose.Types.ObjectId(l)) : []
+    }
+  })
     .populate(["rents"])
     .populate(['modules'])
     .then(lecturers => {
@@ -59,7 +53,7 @@ router.get("/lecturers/of/ids/:lecturerIDs", function (req, res) {
     });
 });
 
-router.post("/delete/:lecturerID", function (req, res) {
+router.post("/delete/:lecturerID", function (req: express.Request, res: express.Response) {
   var lecturerID = req.params.lecturerID;
   Lecturer.findById(lecturerID).then(lecturer => {
     lecturer.active = false;
@@ -74,7 +68,7 @@ router.post("/delete/:lecturerID", function (req, res) {
 
 })
 
-router.post("/add/questionaire", function (req, res) {
+router.post("/add/questionaire", function (req: express.Request, res: express.Response) {
   var questionaire = new Questionaire({
     _id: mongoose.Types.ObjectId(),
     lecturerID: req.body.lecturerId,
@@ -109,7 +103,7 @@ router.post("/add/questionaire", function (req, res) {
   })
 });
 
-router.post("/submit/questionaire", function (req, res) {
+router.post("/submit/questionaire", function (req: express.Request, res: express.Response) {
   var solution = new Solution({
     _id: mongoose.Types.ObjectId(),
     studentId: req.body.solution.isMemo ? null : req.body.studentId,
@@ -142,7 +136,7 @@ router.post("/submit/questionaire", function (req, res) {
   }
 });
 
-router.get("/get/solution/id/for/:questionaireId", function (req, res) {
+router.get("/get/solution/id/for/:questionaireId", function (req: express.Request, res: express.Response) {
   var questionaireId = req.params.questionaireId;
   Solution.findOne({
     questionaireId: questionaireId,
@@ -157,13 +151,13 @@ router.get("/get/solution/id/for/:questionaireId", function (req, res) {
   });
 });
 
-router.post('/feedback/submit/:questionaireId', function (req, res) {
+router.post('/feedback/submit/:questionaireId', function (req: express.Request, res: express.Response) {
   var questionaireId = req.params.questionaireId;
   console.log("Submitting feedback " + questionaireId)
   Solution.findOne({
-      questionaireId: questionaireId,
-      isMemo: true
-    })
+    questionaireId: questionaireId,
+    isMemo: true
+  })
     .then(s => {
       if (s == null) throw "Test does not have a memorandum";
       console.log(s.feedbacks);
@@ -193,12 +187,12 @@ router.post('/feedback/submit/:questionaireId', function (req, res) {
     });
 });
 
-router.get('/feedback/reload/:questionaireId', function (req, res) {
+router.get('/feedback/reload/:questionaireId', function (req: express.Request, res: express.Response) {
   var questionaireId = req.params.questionaireId;
   Solution.findOne({
-      questionaireId: questionaireId,
-      isMemo: true
-    })
+    questionaireId: questionaireId,
+    isMemo: true
+  })
     .then(s => {
       if (s == null) throw "Test does not have a memorandum";
 
@@ -213,7 +207,7 @@ router.get('/feedback/reload/:questionaireId', function (req, res) {
     });
 });
 
-router.get("/all/questionaire", function (req, res) {
+router.get("/all/questionaire", function (req: express.Request, res: express.Response) {
 
   Questionaire.find().then(questionaires => {
     // randomizeQuestions
@@ -232,7 +226,7 @@ router.get("/all/questionaire", function (req, res) {
 
 });
 
-router.get("/get/solutions/:solutionId", function (req, res) {
+router.get("/get/solutions/:solutionId", function (req: express.Request, res: express.Response) {
   var solutionId = req.params.solutionId;
   Solution.findById(solutionId).populate('studentId').then(solution => {
     if (solution == null) res.send("Can not find that solution");
@@ -245,7 +239,7 @@ router.get("/get/solutions/:solutionId", function (req, res) {
   });
 });
 
-function shuffle(array) {
+function shuffle(array: Array<any>): Array<any> {
   var m = array.length,
     t, i;
 
@@ -264,7 +258,7 @@ function shuffle(array) {
   return array;
 }
 
-router.get("/lecturers/all/usernames", function (req, res) {
+router.get("/lecturers/all/usernames", function (req: express.Request, res: express.Response) {
   Lecturer.find({
     "active": true
   }, "_id username").then(lecturers => {
@@ -273,7 +267,7 @@ router.get("/lecturers/all/usernames", function (req, res) {
   });
 });
 
-router.get("/lecturers/all/fullnames", function (req, res) {
+router.get("/lecturers/all/fullnames", function (req: express.Request, res: express.Response) {
   Lecturer.find({
     "active": true
   }, "_id firstname lastname").then(lecturers => {
@@ -282,7 +276,7 @@ router.get("/lecturers/all/fullnames", function (req, res) {
   });
 });
 
-router.get("/:id/get", function (req, res) {
+router.get("/:id/get", function (req: express.Request, res: express.Response) {
   let id = req.params.id;
   if (id == null) {
     return res.status(404);
@@ -299,7 +293,7 @@ router.get("/:id/get", function (req, res) {
   }
 });
 
-router.post("/:text/search", function (req, res) {
+router.post("/:text/search", function (req: express.Request, res: express.Response) {
   let txtSearch = req.params.text;
   if (txtSearch == null || txtSearch.length < 2) {
     return res.status(404);
@@ -319,7 +313,7 @@ router.post("/:text/search", function (req, res) {
   }
 });
 
-router.post("/sheet/add", function (req, res) {
+router.post("/sheet/add", function (req: express.Request, res: express.Response) {
   if (!req.body.markSheet.type || req.body.markSheet.type.length == 0) {
     req.body.markSheet.type = 'UNKNOWN';
   }
@@ -355,7 +349,7 @@ router.post("/sheet/add", function (req, res) {
   });
 });
 
-router.get("/sheet/get/all/for/:lecturerID", function (req, res) {
+router.get("/sheet/get/all/for/:lecturerID", function (req: express.Request, res: express.Response) {
   var lecturerID = req.params.lecturerID;
   MarkSheet.find({
     lecturerID: lecturerID
@@ -367,7 +361,7 @@ router.get("/sheet/get/all/for/:lecturerID", function (req, res) {
   });
 });
 
-router.post("/sheet/update/mark/by/:lecturerID", function (req, res) {
+router.post("/sheet/update/mark/by/:lecturerID", function (req: express.Request, res: express.Response) {
   var lecturerID = req.params.lecturerID;
   var sheetID = req.body.markSheetID;
   var studentID = req.body.studentID;
@@ -392,7 +386,7 @@ router.post("/sheet/update/mark/by/:lecturerID", function (req, res) {
   });
 });
 
-router.post("/report/student", function (req, res) {
+router.post("/report/student", function (req: express.Request, res: express.Response) {
   var lecturerID = req.params.lecturerID;
   var subject = req.body.subject;
   var studentID = req.body.studentID;
@@ -420,10 +414,10 @@ router.post("/report/student", function (req, res) {
     student.parents.filter(p => p.email).forEach(async parent => {
       var status = 'NOTSENT';
       if (report.method == 'SMS' && parent.contactNumbers) {
-        var msg = `Hello, ${parent.surname} ${parent.name} this is a message from coportal, in relation to your child ${student.surname} ${student.firstname}.
-        ${ report.message }
+        var msg = `Hello, ${parent.surname} ${parent.name} this is a message from coportal, in relation to your child ${student.lastname} ${student.firstname}.
+        ${ report.message}
         kind regards
-        ${ report.subject } Lecturer.
+        ${ report.subject} Lecturer.
         `;
         var smsResponse = await smsProvider.sendSMS(parent.contactNumbers, msg);
         if (smsResponse) status = 'SMSSENT';
@@ -440,7 +434,7 @@ router.post("/report/student", function (req, res) {
       });
       report.markModified("parents");
       if (report.parents.length > 0) {
-        report.status = `Report was sent to ${report.parents.length} parents , ${report.parents.filter(p => p.status == 'SMSSENT').length} via sms and ${report.parents.filter(p => p.status == 'EMAILSENT').length} via email`;
+        report.status = `Report was sent to ${report.parents.length} parents , ${report.parents.filter((p: StudentParentType) => p.status == 'SMSSENT').length} via sms and ${report.parents.filter((p: StudentParentType) => p.status == 'EMAILSENT').length} via email`;
       } else {
         report.status = "Report was not sent to any parent";
       }
@@ -460,11 +454,12 @@ router.post("/report/student", function (req, res) {
 
 });
 
-router.get("/get/all/reports", function (req, res) {
+router.get("/get/all/reports", function (req: express.Request, res: express.Response) {
   Report.find({}).then(reports => {
     return res.json(reports);
   }).catch(err => {
     return res.status(512).send(err);
   })
 });
-module.exports = router;
+
+export default router;

@@ -1,4 +1,4 @@
-var express = require("express");
+import express from "express";
 var bcrypt = require('bcrypt');
 var router = express.Router();
 
@@ -8,8 +8,7 @@ import Admin from "../models/Admin";
 import Lecturer from "../models/Lecturer";
 import Student from "../models/Student";
 import ForgotPassword from "../models/ForgotPassword";
-import EmailProvider from "../services/EmailProvider";
-const emailProvider = new EmailProvider();
+import emailProvider from "../services/EmailProvider";
 /*
   TODO : Add admin
          Remove Admin
@@ -19,7 +18,7 @@ const emailProvider = new EmailProvider();
                 - 
 */
 
-router.post("/login", function (req, res) {
+router.post("/login", function (req: express.Request, res: express.Response) {
   var password = req.body.password;
   var username = req.body.username;
 
@@ -41,16 +40,16 @@ router.post("/login", function (req, res) {
             }).then(admin => {
               if (admin == null) {
                 Student.find({
-                  'parents.contactNumbers':username
+                  'parents.contactNumbers': username
                 }).populate({
                   path: 'modules',
                   select: '_id code name'
-                }).then(students =>{
-                  if(students && students.length > 0){
+                }).then(students => {
+                  if (students && students.length > 0) {
                     // parent != null
                     students.filter(s => s && s.parents && s.parents.length > 0).forEach(s => {
                       s.parents.filter(p => p && p.password && p.contactNumbers).forEach(parent => {
-                        if (ComparePassword(password,parent.password) ) {
+                        if (ComparePassword(password, parent.password)) {
                           return res.json({
                             userType: 'PARENT',
                             user: parent,
@@ -60,13 +59,13 @@ router.post("/login", function (req, res) {
                       })
                     });
                     return res.status(512).send("Incorrect password for " + username);
-                  }else{
+                  } else {
                     return res.status(512).send("Incorrect login details");
                   }
                 });
               } else {
                 // admin != null
-                if (!ComparePassword(password,admin.password) ) {
+                if (!ComparePassword(password, admin.password)) {
                   return res.status(512).send("Incorrect password for " + username);
                 }
                 res.json({
@@ -77,7 +76,7 @@ router.post("/login", function (req, res) {
             });
           } else {
             // lecturer != null
-            if (!ComparePassword(password,lecturer.password)) {
+            if (!ComparePassword(password, lecturer.password)) {
               return res.status(512).send("Incorrect password for " + username);
             }
             res.json({
@@ -88,7 +87,7 @@ router.post("/login", function (req, res) {
         });
       } else {
         // student != null
-        if (!ComparePassword(password,student.password)) {
+        if (!ComparePassword(password, student.password)) {
           return res.status(512).send("Incorrect password for " + username);
         }
         res.json({
@@ -101,36 +100,36 @@ router.post("/login", function (req, res) {
     });
 });
 
-router.post("/:userType/change/password/:userID",async function(req,res){
-    var userType = req.params.userType;
-    var userID = req.params.userID;
+router.post("/:userType/change/password/:userID", async function (req: express.Request, res: express.Response) {
+  var userType = req.params.userType;
+  var userID = req.params.userID;
 
-    switch(userType){
-      case 'student':
-        var student = await Student.findById(userID);
-        if(student){
-          if (!ComparePassword(req.body.oldPassword,student.password)) {
-            return res.status(512).send("Incorrect old password");
-          }else{
-            if(!req.body.newPassword || req.body.newPassword.length < 4){
-              return res.status(512).send("New password too short, atleast 4 charactors are required");
-            }
-            student.password = GeneratePassword(req.body.newPassword);
-            student.save(function(err){
-              if(err) return res.status(512).send("Unable to save your password,try again later");
-              return res.send("Password successfully changed");
-            });
+  switch (userType) {
+    case 'student':
+      var student = await Student.findById(userID);
+      if (student) {
+        if (!ComparePassword(req.body.oldPassword, student.password)) {
+          return res.status(512).send("Incorrect old password");
+        } else {
+          if (!req.body.newPassword || req.body.newPassword.length < 4) {
+            return res.status(512).send("New password too short, atleast 4 charactors are required");
           }
-        }else{
-          res.status(512).send("Unable to find a user with id " + userID);
+          student.password = GeneratePassword(req.body.newPassword);
+          student.save(function (err) {
+            if (err) return res.status(512).send("Unable to save your password,try again later");
+            return res.send("Password successfully changed");
+          });
         }
+      } else {
+        res.status(512).send("Unable to find a user with id " + userID);
+      }
       break;
-      default:
-        return res.status(512).send("Invalid request");
-    }
+    default:
+      return res.status(512).send("Invalid request");
+  }
 });
 
-router.post("/forgot/password", async function (req, res) {
+router.post("/forgot/password", async function (req: express.Request, res: express.Response) {
   var email = req.body.email;
 
   if (!email || email.indexOf('@') < 2 || email.indexOf('.') < 2 || email.length < 5) {
@@ -159,8 +158,9 @@ router.post("/forgot/password", async function (req, res) {
     return res.status(512).send("You have entered an incorrect email address");
   }
 
-  var forgotPassword = new ForgotPassword();
-  forgotPassword.email = email;
+  var forgotPassword = new ForgotPassword({
+    email
+  });
 
   var message = GenerateEmail(username, `${process.env.BASE_URL}/${forgotPassword._id}`);
 
@@ -175,19 +175,19 @@ router.post("/forgot/password", async function (req, res) {
   }
 });
 
-function ComparePassword(passwordNew,passwordSaved){
-    var compare = bcrypt.compareSync(passwordNew,passwordSaved);
-    return compare;
+function ComparePassword(passwordNew: string, passwordSaved: string) {
+  var compare = bcrypt.compareSync(passwordNew, passwordSaved);
+  return compare;
 }
 
-function GeneratePassword(password){
-    var saltRounds = 13;
-    var salt = bcrypt.genSaltSync(saltRounds);
-    var hash =   bcrypt.hashSync(password, salt);
-    return hash;
+function GeneratePassword(password: string) {
+  var saltRounds = 13;
+  var salt = bcrypt.genSaltSync(saltRounds);
+  var hash = bcrypt.hashSync(password, salt);
+  return hash;
 }
 
-function GenerateEmail(username, link) {
+function GenerateEmail(username: string, link: string) {
   return "<div class=\"Email-header\" style=\"font-size:20px;font-family:sans-serif;letter-spacing:1px; box-sizing:border-box; margin-top:60px;margin-bottom:98px;\">" +
     "<img class=\"corportal\" align=\"left\" style=\"width:160px;height:auto;margin-top:-40px;\" src=\"https://coportal.net/static/img/logo.1328452.png\">" +
     "<span>Coportal Communication</span></div><div style=\"font-family:sans-serif;margin-left:20px;color:dark\"><h4>Hi " + username +
@@ -197,4 +197,4 @@ function GenerateEmail(username, link) {
     "<br><img class=\"corportal\" align=\"left\" style=\"width:160px;height:auto;opacity:0.1\" src=\"https://coportal.net/static/img/coPortalLogo.jpg\"></div>";
 }
 
-module.exports = router;
+export default router;

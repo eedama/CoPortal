@@ -7,10 +7,9 @@ import Attendance from "../models/Attendance";
 import Module from "../models/Module";
 import Lecturer from "../models/Lecturer";
 import Student from "../models/Student";
-import EmailProvider from "../services/EmailProvider";
+import emailProvider from "../services/EmailProvider";
 import moment from "moment";
 import consoling from "../services/Logger";
-const emailProvider = new EmailProvider();
 
 router.post("/sign", function (req, res) {
   var studentId = req.body.studentId;

@@ -1,7 +1,7 @@
 var admin = require("firebase-admin");
 import helper from '../services/Helper';
 
-var serviceAccount = require("../firebase_service_account.json");
+var serviceAccount = require("../data/firebase_service_account.json");
 
 var app = admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -44,7 +44,7 @@ class FCM {
                     if (user == null) {
                         user = await Student.findById(adminID);
                         if (user == null) {
-                            consoling.info({key:'h54gf33gh4wrewfjjhg5vrfe54',success:false,input:user,message:"User of id " + adminID + " not found"});
+                            consoling.info({ key: 'h54gf33gh4wrewfjjhg5vrfe54', success: false, input: user, message: "User of id " + adminID + " not found" });
                             return reject("User of id " + adminID + " not found");
                         }
                     }
@@ -52,17 +52,17 @@ class FCM {
 
                 var tokens = user.deviceTokens.filter(v => !v.removed && v.token).map(v => v.token);
                 if (tokens) {
-                    consoling.info({key:'h523h4wrewfjjhg5vrfe54',input:payload,message: 'Will be pushing to ' + tokens.length + ' people'});
+                    consoling.info({ key: 'h523h4wrewfjjhg5vrfe54', input: payload, message: 'Will be pushing to ' + tokens.length + ' people' });
                     for (let i = 0; i < tokens.length; i++) {
                         try {
                             await this.sendToDevice(tokens[i], payload);
                         } catch (ex) {
-                            consoling.error({key:'grewfwret',message:ex});
+                            consoling.error({ key: 'grewfwret', message: ex });
                         }
                     }
                     return resolve("Notification will be sent to " + tokens.length + " devices");
-                } else {  
-                    consoling.info({key:'h523h4wrewfjjhg5ytrevrfe54',input:user,message: "User has no device"});
+                } else {
+                    consoling.info({ key: 'h523h4wrewfjjhg5ytrevrfe54', input: user, message: "User has no device" });
                     return reject("User has no device");
                 }
             } catch (err) {
@@ -77,15 +77,15 @@ class FCM {
                 .messaging()
                 .sendToDevice(registrationToken, payload, options)
                 .then((response) => {
-                    if (response.successCount > 0 && response.failureCount == 0) {  
-                        consoling.info({key:'h523h4wrgreewfjjhg5hrtge54',input:payload,message: response});
+                    if (response.successCount > 0 && response.failureCount == 0) {
+                        consoling.info({ key: 'h523h4wrgreewfjjhg5hrtge54', input: payload, message: response });
                         return resolve(response.results);
                     } else {
                         throw response.results;
                     }
                 })
                 .catch(async (error) => {
-                    consoling.error({key:'grertgewwfwret',message:error});
+                    consoling.error({ key: 'grertgewwfwret', message: error });
                     if (error.filter && error.filter(e => JSON.stringify(e.error).indexOf("The provided registration token is not registered") >= 0)) {
                         var _admin = await Admin.findOne({
                             deviceTokens: {
