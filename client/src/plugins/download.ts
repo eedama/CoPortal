@@ -6,7 +6,8 @@
 // v4.1 adds url download capability via solo URL argument (same domain/CORS only)
 // v4.2 adds semantic variable names, long (over 2MB) dataURL support, and hidden by default temp anchors
 // https://github.com/rndme/download
-
+declare var define: any;
+declare var exports: any;
 export default (function (root, factory) {
 	if (typeof define === 'function' && define.amd) {
 		// AMD. Register as an anonymous module.
@@ -18,11 +19,11 @@ export default (function (root, factory) {
 		module.exports = factory();
 	} else {
 		// Browser globals (root is window)
-		root.download = factory();
+		(root as any).download = factory();
 	}
 }(this, function () {
 
-	return function download(data, strFileName, strMimeType) {
+	return function download(data: any, strFileName: string, strMimeType: string) {
 
 		var self = window, // this script is only for browsers anyway...
 			defaultMime = "application/octet-stream", // this default mime also triggers iframe downloads
@@ -30,18 +31,16 @@ export default (function (root, factory) {
 			payload = data,
 			url = !strFileName && !strMimeType && payload,
 			anchor = document.createElement("a"),
-			toString = function (a) { return String(a); },
-			myBlob = (self.Blob || self.MozBlob || self.WebKitBlob || toString),
+			toString = function (a: any) { return String(a); },
+			myBlob = (self.Blob || (self as any).MozBlob || (self as any).WebKitBlob || toString),
 			fileName = strFileName || "download",
 			blob,
 			reader;
 		myBlob = myBlob.call ? myBlob.bind(self) : Blob;
 
-		if (String(this) === "true") { //reverse arguments, allowing download.bind(true, "text/xml", "export.xml") to act as a callback
-			payload = [payload, mimeType];
-			mimeType = payload[0];
-			payload = payload[1];
-		}
+		payload = [payload, mimeType];
+		mimeType = payload[0];
+		payload = payload[1];
 
 
 		if (url && url.length < 2048) { // if no filename and no mime, assume a url was passed as the only argument
@@ -51,7 +50,7 @@ export default (function (root, factory) {
 				var ajax = new XMLHttpRequest();
 				ajax.open("GET", url, true);
 				ajax.responseType = 'blob';
-				ajax.onload = function (e) {
+				ajax.onload = function (e: any) {
 					download(e.target.response, fileName, defaultMime);
 				};
 				setTimeout(function () { ajax.send(); }, 0); // allows setting custom ajax headers using the return:
@@ -63,7 +62,7 @@ export default (function (root, factory) {
 		//go ahead and download dataURLs right away
 		if (/^data\:[\w+\-]+\/[\w+\-]+[,;]/.test(payload)) {
 
-			if (payload.length > (1024 * 1024 * 1.999) && myBlob !== toString) {
+			if (payload.length > (1024 * 1024 * 1.999)) {
 				payload = dataUrlToBlob(payload);
 				mimeType = payload.type || defaultMime;
 			} else {
@@ -79,11 +78,11 @@ export default (function (root, factory) {
 			new myBlob([payload], { type: mimeType });
 
 
-		function dataUrlToBlob(strUrl) {
+		function dataUrlToBlob(strUrl: string) {
 			var parts = strUrl.split(/[:;,]/),
 				type = parts[1],
 				decoder = parts[2] == "base64" ? atob : decodeURIComponent,
-				binData = decoder(parts.pop()),
+				binData = (decoder as any)(parts.pop()),
 				mx = binData.length,
 				i = 0,
 				uiArr = new Uint8Array(mx);
@@ -93,7 +92,7 @@ export default (function (root, factory) {
 			return new myBlob([uiArr], { type: type });
 		}
 
-		function saver(url, winMode) {
+		function saver(url: any, winMode: any = null) {
 
 			if ('download' in anchor) { //html5 A[download]
 				anchor.href = url;
@@ -144,9 +143,9 @@ export default (function (root, factory) {
 			// handle non-Blob()+non-URL browsers:
 			if (typeof blob === "string" || blob.constructor === toString) {
 				try {
-					return saver("data:" + mimeType + ";base64," + self.btoa(blob));
+					return saver("data:" + mimeType + ";base64," + (self as any).btoa(blob));
 				} catch (y) {
-					return saver("data:" + mimeType + "," + encodeURIComponent(blob));
+					return saver("data:" + mimeType + "," + (encodeURIComponent as any)(blob));
 				}
 			}
 

@@ -159,7 +159,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 
 const axios = require("axios");
 
@@ -227,9 +227,9 @@ export default {
       .catch(err => {
         this.isLoading = false;
         if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
+          swal.fire(err.response.data, "error");
         } else {
-          swal("Unable to load modules", "Try again later", "error");
+          swal.fire("Unable to load modules", "Try again later", "error");
         }
       });
   },
@@ -253,9 +253,9 @@ export default {
           console.log(err);
           this.selectedSurveyStudentList = [];
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal(err.message, "Try again later", "error");
+            swal.fire(err.message, "Try again later", "error");
           }
         });
     },
@@ -279,9 +279,9 @@ export default {
           .catch(err => {
             this.isLoading = false;
             if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "error");
+              swal.fire(err.response.data, "error");
             } else {
-              swal(err.message, "Try again later", "error");
+              swal.fire(err.message, "Try again later", "error");
             }
           });
       }
@@ -305,9 +305,9 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal(err.message, "Try again later", "error");
+            swal.fire(err.message, "Try again later", "error");
           }
         });
     },
@@ -349,12 +349,12 @@ export default {
             console.log(file);
           })
           .catch(err => {
-            swal("Unable to upload selected file", err.message, "error");
+            swal.fire("Unable to upload selected file", err.message, "error");
             this.isUploading = false;
             this.notesFile = null;
           });
       } else {
-        swal("No file selected", "Please select a file", "error");
+        swal.fire("No file selected", "Please select a file", "error");
         this.notesFile = null;
       }
     },
@@ -397,14 +397,14 @@ export default {
         .then(result => {
           this.isUploading = false;
           this.addNotes = false;
-          swal("Notes successfully uploaded.");
+          swal.fire("Notes successfully uploaded.");
         })
         .catch(err => {
           this.isUploading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal(err.message, "Try again later", "error");
+            swal.fire(err.message, "Try again later", "error");
           }
         });
     },
@@ -433,9 +433,9 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to load the module", "Try again later", "error");
+            swal.fire("Unable to load the module", "Try again later", "error");
           }
         });
     },
@@ -458,7 +458,7 @@ export default {
           this.isLoading = false;
           if (results.data.id == null) {
             if (this.$store.state.user.isParent) {
-              swal("The student has not taken this test yet", "", "warning");
+              swal.fire("The student has not taken this test yet", "", "warning");
             } else {
               this.goToTakeTest(questionaire);
             }
@@ -469,9 +469,9 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "Try again later", "error");
+            swal.fire(err.response.data, "Try again later", "error");
           } else {
-            swal("Unable to load the questionaire", "Try again later", "error");
+            swal.fire("Unable to load the questionaire", "Try again later", "error");
           }
         });
     },
@@ -492,14 +492,14 @@ export default {
         )
         .then(results => {
           this.isUploading = false;
-          swal("Success", "Announcement successfully sent.", "success");
+          swal.fire("Success", "Announcement successfully sent.", "success");
         })
         .catch(err => {
           this.isUploading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "Try again later", "error");
+            swal.fire(err.response.data, "Try again later", "error");
           } else {
-            swal("Unable to load the questionaire", "Try again later", "error");
+            swal.fire("Unable to load the questionaire", "Try again later", "error");
           }
         });
     }

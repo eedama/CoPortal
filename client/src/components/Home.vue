@@ -510,7 +510,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 const axios = require("axios");
 export default {
   name: "Home",
@@ -685,9 +685,9 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal(err.message, "Try again later", "error");
+            swal.fire(err.message, "Try again later", "error");
           }
         });
       if (
@@ -713,9 +713,9 @@ export default {
           .catch(err => {
             this.isLoading = false;
             if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "error");
+              swal.fire(err.response.data, "error");
             } else {
-              swal("Unable to load modules", "Try again later", "error");
+              swal.fire("Unable to load modules", "Try again later", "error");
             }
           });
       }
@@ -733,7 +733,7 @@ export default {
         ? this.attendanceRegister.code
         : null;
       if (!students || !code) {
-        swal(
+        swal.fire(
           "Unable to sign register",
           "make sure you selected students",
           "error"
@@ -754,16 +754,16 @@ export default {
         )
         .then(results => {
           this.isLoading = false;
-          swal(results.data, "", "success");
+          swal.fire(results.data, "", "success");
           this.isCreatingAttendanceRegister = false;
         })
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "", "error");
+            swal.fire(err.response.data, "", "error");
           } else {
             console.log(err);
-            swal(
+            swal.fire(
               "Unable to get the attendance list",
               "Try again later",
               "error"
@@ -796,10 +796,10 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "", "error");
+            swal.fire(err.response.data, "", "error");
           } else {
             console.log(err);
-            swal(
+            swal.fire(
               "Unable to get the attendance list",
               "Try again later",
               "error"
@@ -821,16 +821,16 @@ export default {
         })
         .then(results => {
           this.isLoading = false;
-          swal(results.data, "", "success");
+          swal.fire(results.data, "", "success");
           this.signAttendanceRegister = false;
         })
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "", "error");
+            swal.fire(err.response.data, "", "error");
             this.currentAttendanceCodeError = err.response.data;
           } else {
-            swal(
+            swal.fire(
               "Unable to get the attendance list",
               "Try again later",
               "error"
@@ -858,9 +858,9 @@ export default {
         .catch(err => {
           this.attendanceRegisterHistoryStudentsLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal(
+            swal.fire(
               "Unable to get the attendance list",
               "Try again later",
               "error"
@@ -884,9 +884,9 @@ export default {
           .catch(err => {
             this.isLoading = false;
             if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "error");
+              swal.fire(err.response.data, "error");
             } else {
-              swal(
+              swal.fire(
                 "Unable to get the attendance list",
                 "Try again later",
                 "error"
@@ -936,9 +936,9 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal(
+            swal.fire(
               "Unable to create attendance register",
               "Try again later",
               "error"
@@ -972,7 +972,7 @@ export default {
         this.$store.commit("setStudentParent", currentParent);
         this.isChangingStudent = false;
         this.currentStudent = "";
-        swal(
+        swal.fire(
           "Success",
           `Successfully changed student to ${user.username}`,
           "success"
@@ -1000,7 +1000,7 @@ export default {
       window.open(url, "_blank");
     },
     AnnouncementClick(announcement) {
-      swal({
+      swal.fire({
         title: announcement.title,
         text: announcement.message
       });
@@ -1024,14 +1024,14 @@ export default {
         .then(results => {
           this.isLoading = false;
           this.isAddingAnnouncements = false;
-          swal("Success", "Announcement successfully sent.", "success");
+          swal.fire("Success", "Announcement successfully sent.", "success");
         })
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "Try again later", "error");
+            swal.fire(err.response.data, "Try again later", "error");
           } else {
-            swal("Unable to send announcement", "Try again later", "error");
+            swal.fire("Unable to send announcement", "Try again later", "error");
           }
         });
     }

@@ -181,7 +181,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 
 const axios = require("axios");
 
@@ -286,9 +286,9 @@ export default {
       .catch(err => {
         this.isLoading = false;
         if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
+          swal.fire(err.response.data, "error");
         } else {
-          swal("Unable to load modules", "Try again later", "error");
+          swal.fire("Unable to load modules", "Try again later", "error");
         }
       });
   },

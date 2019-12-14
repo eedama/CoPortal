@@ -150,7 +150,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 const axios = require("axios");
 
 export default {
@@ -196,9 +196,9 @@ export default {
       })
       .catch(err => {
         if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
+          swal.fire(err.response.data, "error");
         } else {
-          swal("Unable to load Report", "Try again later", "error");
+          swal.fire("Unable to load Report", "Try again later", "error");
         }
       });
   },
@@ -246,7 +246,7 @@ export default {
           })
           .then(results => {
             if (results) {
-              swal("Report successfully sent", results.data, "success");
+              swal.fire("Report successfully sent", results.data, "success");
               this.$router.push("/");
             }
           })
@@ -255,7 +255,7 @@ export default {
             if (err.response != null && err.response.status == 512) {
               this.txtError = err.response.data;
             } else {
-              swal("Unable to Send report", "Try again later", "error");
+              swal.fire("Unable to Send report", "Try again later", "error");
             }
           });
       }

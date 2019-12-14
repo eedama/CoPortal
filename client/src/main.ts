@@ -5,18 +5,19 @@ import store from './store';
 import './registerServiceWorker';
 
 import vuetify from './plugins/vuetify';
-import VueTyperPlugin from "vue-typer";
-import * as VueLoaders from "vue-loaders";
 import axios from "axios";
 
-import * as moment from "moment";
-import VueSession from "vue-session";
-
+import moment from "moment";
 import "vue-animate/dist/vue-animate.min.css";
 import "vue-loaders/dist/vue-loaders.css";
-
-import { Picker, Emoji } from "emoji-mart-vue";
 import "emoji-mart-vue/css/emoji-mart.css";
+import swal from "sweetalert2";
+import { Dictionary } from 'vue-router/types/router';
+
+const VueSession = require("vue-session");
+const { Picker, Emoji } = require("emoji-mart-vue");
+const VueTyperPlugin = require("vue-typer");
+const VueLoaders = require("vue-loaders");
 
 Vue.component("picker", Picker);
 Vue.component("emoji", Emoji);
@@ -41,7 +42,7 @@ Vue.mixin({
           .get(this.$store.state.settings.baseLink + "/get/all/Schools")
           .then(results => {
             var found = false;
-            results.data.forEach(schoolUrl => {
+            results.data.forEach((schoolUrl: { url: string }) => {
               if (schoolUrl.url === school) {
                 this.$store.commit("changeSchool", school);
                 found = true;
@@ -49,25 +50,28 @@ Vue.mixin({
             });
             if (!found) {
               ///code to be added if school is not found from url
-              swal(
+              swal.fire(
                 `The school ${school} is not on our server`,
                 "Please contact the admin if this is an unexpected error",
                 "error"
               );
             }
-            console.log("I was called", this.$store.state.settings.baseLink);
           })
           .catch(err => {
             if (err.response != null && err.response.status == 512) {
-              this.txtError = err.response.data;
+              swal.fire(
+                err.response.data,
+                "Please contact the admin if this is an unexpected error",
+                "error"
+              );
             }
           });
       }
     },
-    getMoment(value) {
+    getMoment(value: Date | undefined) {
       return moment(value);
     },
-    goToModule(moduleID) {
+    goToModule(moduleID: string) {
       this.$router.push({
         name: "ModuleView",
         params: {
@@ -75,23 +79,23 @@ Vue.mixin({
         }
       });
     },
-    goToLecturer(lecturerIDs) {
+    goToLecturer(lecturerID: string) {
       this.$router.push({
         name: "LecturerList",
         params: {
-          lecturerIDs: lecturerIDs
+          lecturerIDs: lecturerID
         }
       });
     },
-    goToStudent(studentIDs) {
+    goToStudent(studentID: string) {
       this.$router.push({
         name: "StudentList",
         params: {
-          studentIDs: studentIDs
+          studentIDs: studentID
         }
       });
     },
-    goToSolution(solutionID) {
+    goToSolution(solutionID: string) {
       this.$router.push({
         name: "TestMarks",
         params: {
@@ -99,7 +103,7 @@ Vue.mixin({
         }
       });
     },
-    goToTakeTest(questionaire) {
+    goToTakeTest(questionaire: any) {
       this.$router.push({
         name: "TakeTest",
         params: {
@@ -107,7 +111,7 @@ Vue.mixin({
         }
       });
     },
-    setATestForModule(moduleID) {
+    setATestForModule(moduleID: string) {
       this.$router.push({
         name: "SetTest",
         params: {
@@ -115,7 +119,7 @@ Vue.mixin({
         }
       });
     },
-    Login(results) {
+    Login(results: any) {
       switch (results.data.userType) {
         case "ADMIN":
           this.$store.commit("login", {
@@ -163,7 +167,7 @@ Vue.mixin({
         }
       }
       this.$session.start();
-      let newUser = {};
+      let newUser: any = null;
       if (results.data.userType === 'PARENT') {
         newUser = {
           type: results.data.userType,
@@ -183,11 +187,11 @@ Vue.mixin({
         users = new Array();
       }
       // unique
-      users = users.filter(user => user.id != newUser.id);
+      users = users.filter((user: { id: string }) => user.id != newUser.id);
       users.push(newUser);
       this.$session.set("users", users);
     },
-    Logout() {
+    logout() {
       this.$session.remove("user");
       this.$store.commit("logout");
       this.$router.push("/login");

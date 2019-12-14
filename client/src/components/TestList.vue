@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 const axios = require("axios");
 
 export default {
@@ -55,7 +55,7 @@ export default {
       })
       .catch(err => {
         this.isLoading = false;
-        swal("Unable to load questionaires", err.message, "error");
+        swal.fire("Unable to load questionaires", err.message, "error");
       });
   },
   methods: {
@@ -74,7 +74,7 @@ export default {
             });
           })
           .catch(err => {
-            swal("Unable to submit", err.message, "error");
+            swal.fire("Unable to submit", err.message, "error");
           });
       } else {
         this.$router.push({

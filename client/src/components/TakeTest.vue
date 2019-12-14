@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 const axios = require("axios");
 
 export default {
@@ -98,7 +98,7 @@ export default {
         return;
       }
 
-      swal({
+      swal.fire({
         title: "Submit?",
         text: "Are you sure you want to submit?",
         icon: "warning",
@@ -127,7 +127,7 @@ export default {
             )
             .then(results => {
               this.isLoading = false;
-              swal("Submitted!", {
+              swal.fire("Submitted!", {
                 icon: "success"
               });
               this.$router.push({
@@ -139,7 +139,7 @@ export default {
             })
             .catch(err => {
               this.isLoading = false;
-              swal("Unable to submit", err.message, "error");
+              swal.fire("Unable to submit", err.message, "error");
             });
         } else {
           this.isLoading = false;

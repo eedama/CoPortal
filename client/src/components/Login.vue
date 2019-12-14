@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 
 const axios = require("axios");
 
@@ -148,7 +148,7 @@ export default {
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {
-            swal("Unable to log you in", "Try again later", "error");
+            swal.fire("Unable to log you in", "Try again later", "error");
           }
         });
     },

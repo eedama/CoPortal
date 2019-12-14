@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 import * as moment from "moment";
 const axios = require("axios");
 
@@ -196,7 +196,7 @@ export default {
       })
       .catch(err => {
         this.isLoading = false;
-        swal("Unable to load your results", err.message, "error");
+        swal.fire("Unable to load your results", err.message, "error");
         this.$router.push("/");
         return;
       });
@@ -217,7 +217,7 @@ export default {
       window.print();
     },
     ViewMemorandum() {
-      swal(
+      swal.fire(
         "Memorandum not yet avaliable",
         "Not all students have wrote the test",
         "error"
@@ -245,7 +245,7 @@ export default {
               o.status = "not sent";
             }
           });
-          swal("Unable to submit questionaire", err.message, "error");
+          swal.fire("Unable to submit questionaire", err.message, "error");
         });
     },
     openCloseFeedbacks() {
@@ -257,7 +257,7 @@ export default {
     SubmitFeedback() {
       this.isLoading = true;
       if (!this.$store.state.user.isLoggedIn) {
-        swal(
+        swal.fire(
           "Unable to send",
           "Your session is over please log in again",
           "error"
@@ -311,7 +311,7 @@ export default {
               o.status = "not sent";
             }
           });
-          swal("Unable to submit questionaire", err.message, "error");
+          swal.fire("Unable to submit questionaire", err.message, "error");
         });
     }
   }

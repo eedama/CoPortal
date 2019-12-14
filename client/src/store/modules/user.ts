@@ -1,4 +1,6 @@
-const state = {
+import { ActionTree, MutationTree } from 'vuex';
+
+const state: UserStateType = {
   username: "admin",
   id: "",
   password: "admin",
@@ -13,7 +15,7 @@ const state = {
   parentStudents: []
 };
 
-const mutations = {
+const mutations: MutationTree<UserStateType> = {
   setParent(state, isParrent) {
     state.isParent = isParrent;
   },
@@ -49,7 +51,7 @@ const mutations = {
   }
 };
 
-const actions = {
+const actions: ActionTree<any, any> = {
   login: ({ commit }) => commit("login"),
   logout: ({ commit }) => commit("logout")
 };

@@ -283,7 +283,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 import * as moment from "moment";
 
 const axios = require("axios");
@@ -382,9 +382,9 @@ export default {
           .catch(err => {
             this.isLoading = false;
             if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "error");
+              swal.fire(err.response.data, "error");
             } else {
-              swal("Unable to load students", "Try again later", "error");
+              swal.fire("Unable to load students", "Try again later", "error");
             }
           });
       } else {
@@ -400,9 +400,9 @@ export default {
           .catch(err => {
             this.isLoading = false;
             if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "error");
+              swal.fire(err.response.data, "error");
             } else {
-              swal("Unable to load students", "Try again later", "error");
+              swal.fire("Unable to load students", "Try again later", "error");
             }
           });
       }
@@ -429,7 +429,7 @@ export default {
         );
 
         if (newModules == 0) {
-          swal(
+          swal.fire(
             "No change made",
             "Student is already assigned to the selected modules",
             "success"
@@ -456,7 +456,7 @@ export default {
                 stu.modules.push(name);
               });
 
-              swal(
+              swal.fire(
                 "Modules successfully assigned",
                 `${newModules.length} new modules are now assigned to ${
                   this.studentModule.username
@@ -468,9 +468,9 @@ export default {
             .catch(err => {
               this.isLoading = false;
               if (err.response != null && err.response.status == 512) {
-                swal(err.response.data, "error");
+                swal.fire(err.response.data, "error");
               } else {
-                swal("Unable to load students", err.message, "error");
+                swal.fire("Unable to load students", err.message, "error");
               }
             });
         }
@@ -509,7 +509,7 @@ export default {
           var victim = this.students.find(s => s._id == studentID);
           var index = this.students.indexOf(victim);
           this.students.splice(index, 1);
-          swal(
+          swal.fire(
             "Student was removed from the system",
             "To recover the student you can contact admin",
             "success"
@@ -518,9 +518,9 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to load students", err.message, "error");
+            swal.fire("Unable to load students", err.message, "error");
           }
         });
     },
@@ -546,7 +546,7 @@ export default {
               1
             );
           }
-          swal(
+          swal.fire(
             "Module was unassigned successfully",
             "You can reassign the link again",
             "success"
@@ -555,9 +555,9 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to load students", err.message, "error");
+            swal.fire("Unable to load students", err.message, "error");
           }
         });
     },
@@ -597,9 +597,9 @@ export default {
         })
         .catch(err => {
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to load students", err.message, "error");
+            swal.fire("Unable to load students", err.message, "error");
           }
         });
     },
@@ -618,9 +618,9 @@ export default {
         })
         .catch(err => {
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to load modules", "Try again later", "error");
+            swal.fire("Unable to load modules", "Try again later", "error");
           }
         });
     },
@@ -687,14 +687,14 @@ export default {
           };
           this.activeEditProfile(null);
 
-          swal("Profile successfully updated", "success");
+          swal.fire("Profile successfully updated", "success");
         })
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {
-            swal("Unable to submit the student", err.message, "error");
+            swal.fire("Unable to submit the student", err.message, "error");
           }
         });
     }

@@ -21,7 +21,7 @@ import SurveyList from '@/components/Survey/SurveyList.vue'
 Vue.use(Router)
 
 import store from '../store';
-import swal from "sweetalert";
+import swal from "sweetalert2";
 
 const router = new Router({
   routes: [{
@@ -244,13 +244,13 @@ router.beforeEach((to, from, next) => {
   }
   if (to.meta.authLevel != null) {
     if (userType == null) {
-      swal("You are not Authorized to access this page!", "You must be logged in to access this page.", "error").then((value) => {
+      swal.fire("You are not Authorized to access this page!", "You must be logged in to access this page.", "error").then((value) => {
         next('/');
       });;
       return;
     } else {
       if (to.meta.authLevel.indexOf(userType) < 0) {
-        swal("You are not Authorized to access this page!", "If you feel this is unfair, please contact admin.", "error").then((value) => {
+        swal.fire("You are not Authorized to access this page!", "If you feel this is unfair, please contact admin.", "error").then((value) => {
           next('/');
         });
         return;

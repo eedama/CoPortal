@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 import * as moment from "moment";
 
 const axios = require("axios");
@@ -173,9 +173,9 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to load modules", "Try again later", "error");
+            swal.fire("Unable to load modules", "Try again later", "error");
           }
         });
     },
@@ -237,7 +237,7 @@ export default {
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {
-            swal("Unable to submit the student", err.message, "error");
+            swal.fire("Unable to submit the student", err.message, "error");
           }
           this.$emit("submitted", false);
         });

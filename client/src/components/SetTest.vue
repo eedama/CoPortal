@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 import TakeTest from "./TakeTest";
 
 const axios = require("axios");
@@ -179,7 +179,7 @@ export default {
       this.answers.pop();
     },
     DeleteQuestion(question) {
-      swal({
+      swal.fire({
         title: "Are you sure?",
         text: "Once deleted, you will not be able to recover this question",
         icon: "warning",
@@ -189,7 +189,7 @@ export default {
         if (willDelete) {
           var index = this.questions.indexOf(question);
           this.questions.splice(index, 1);
-          swal("Question has been deleted!", {
+          swal.fire("Question has been deleted!", {
             icon: "success"
           });
         }
@@ -197,12 +197,12 @@ export default {
     },
     SaveQuestion() {
       if (this.questionaire.title.length < 2) {
-        swal("Incomplete question", "Please provide a valid question", "error");
+        swal.fire("Incomplete question", "Please provide a valid question", "error");
         return;
       }
 
       if (this.questionaire.answers.length < 1) {
-        swal(
+        swal.fire(
           "Incomplete question",
           "Please provide atleast one answer to the question",
           "error"
@@ -235,7 +235,7 @@ export default {
     SubmitQuestionaire() {
       this.isLoading = true;
       if (this.title.length < 3) {
-        swal(
+        swal.fire(
           "Incomplete questionaire",
           "Please provide a title for your questionaire",
           "error"
@@ -249,7 +249,7 @@ export default {
         (this.questionaire.timeLimit == null ||
           this.questionaire.timeLimit.length < 2)
       ) {
-        swal(
+        swal.fire(
           "Invalid time limit",
           "Please provide a valid time limit",
           "error"
@@ -288,18 +288,18 @@ export default {
             .catch(err => {
               self.isLoading = false;
               if (err.response != null && err.response.status == 512) {
-                swal(err.response.data, "error");
+                swal.fire(err.response.data, "error");
               } else {
-                swal("Unable to save mark sheet", err.message, "error");
+                swal.fire("Unable to save mark sheet", err.message, "error");
               }
             });
         })
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to submit questionaire", err.message, "error");
+            swal.fire("Unable to submit questionaire", err.message, "error");
           }
         });
     }

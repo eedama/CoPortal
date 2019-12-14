@@ -17,7 +17,7 @@ COPY . .
 
 # build app for production with minification
 # TODO : RE-ENABLE THIS AND FIX THE 1000000 ERRORS :smile:
-# RUN npm run build
+RUN npm run build
 
 EXPOSE 8080
 CMD [ "http-server", "dist" ] 

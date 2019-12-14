@@ -294,7 +294,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 import * as moment from "moment";
 
 const axios = require("axios");
@@ -401,9 +401,9 @@ export default {
           .catch(err => {
             this.isLoading = false;
             if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "error");
+              swal.fire(err.response.data, "error");
             } else {
-              swal("Unable to load lecturers", "Try again later", "error");
+              swal.fire("Unable to load lecturers", "Try again later", "error");
             }
           });
       } else {
@@ -417,9 +417,9 @@ export default {
           .catch(err => {
             this.isLoading = false;
             if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "error");
+              swal.fire(err.response.data, "error");
             } else {
-              swal("Unable to load lecturers", "Try again later", "error");
+              swal.fire("Unable to load lecturers", "Try again later", "error");
             }
           });
       }
@@ -446,7 +446,7 @@ export default {
         );
 
         if (newModules == 0) {
-          swal(
+          swal.fire(
             "No change made",
             "Student is already assigned to the selected modules",
             "success"
@@ -473,7 +473,7 @@ export default {
                 stu.modules.push(name);
               });
 
-              swal(
+              swal.fire(
                 "Modules successfully assigned",
                 `${newModules.length} new modules are now assigned to ${
                   this.lecturerModule.username
@@ -485,9 +485,9 @@ export default {
             .catch(err => {
               this.isLoading = false;
               if (err.response != null && err.response.status == 512) {
-                swal(err.response.data, "error");
+                swal.fire(err.response.data, "error");
               } else {
-                swal("Unable to load lecturers", err.message, "error");
+                swal.fire("Unable to load lecturers", err.message, "error");
               }
             });
         }
@@ -537,7 +537,7 @@ export default {
           var victim = this.lecturers.find(l => l._id == lecturerID);
           var index = this.lecturers.indexOf(victim);
           this.lecturers.splice(index, 1);
-          swal(
+          swal.fire(
             "Lecturer was removed from the system",
             "To recover the lecturer you can contact admin",
             "success"
@@ -545,7 +545,7 @@ export default {
         })
         .catch(err => {
           this.isLoading = false;
-          swal("An error has occurred", err.message, "error");
+          swal.fire("An error has occurred", err.message, "error");
         });
     },
     DeleteModule(lecturerID, moduleID) {
@@ -568,7 +568,7 @@ export default {
               1
             );
           }
-          swal(
+          swal.fire(
             "Module was unassigned successfully",
             "You can reassign the link again",
             "success"
@@ -576,9 +576,9 @@ export default {
         })
         .catch(err => {
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to load lecturers", err.message, "error");
+            swal.fire("Unable to load lecturers", err.message, "error");
           }
         });
     },
@@ -597,9 +597,9 @@ export default {
         })
         .catch(err => {
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to load modules", "Try again later", "error");
+            swal.fire("Unable to load modules", "Try again later", "error");
           }
         });
     },
@@ -661,14 +661,14 @@ export default {
           };
           this.activeEditProfile(null);
 
-          swal("Profile successfully updated", "success");
+          swal.fire("Profile successfully updated", "success");
         })
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {
-            swal("Unable to submit the lecturer", err.message, "error");
+            swal.fire("Unable to submit the lecturer", err.message, "error");
           }
         });
     }

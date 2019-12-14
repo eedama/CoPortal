@@ -70,7 +70,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import swal from "sweetalert";
+import swal from "sweetalert2";
 import axios from "axios";
 
 export default Vue.extend({
@@ -108,21 +108,25 @@ export default Vue.extend({
   },
   mounted() {
     if (!this.$store.state.settings.schoolAdded) {
-      this.changeSchool();
+      (this as any).changeSchool();
     }
   },
   methods: {
     confirmLogout() {
-      swal({
-        title: "Are you sure?",
-        text: "Your current session will be destroyed!",
-        type: "warning",
-        buttons: ["Log out", "Cancel"]
-      }).then(isConfirm => {
-        if (!isConfirm) {
-          this.Logout();
-        }
-      });
+      swal
+        .fire({
+          title: "Are you sure?",
+          text: "Your current session will be destroyed!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Log out",
+          cancelButtonText: "Cancel"
+        })
+        .then(result => {
+          if (result.value) {
+            (this as any).logout();
+          }
+        });
     }
   }
 });

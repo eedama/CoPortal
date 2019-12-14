@@ -249,7 +249,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 import * as moment from "moment";
 
 const axios = require("axios");
@@ -362,9 +362,9 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to load modules", "Try again later", "error");
+            swal.fire("Unable to load modules", "Try again later", "error");
           }
         });
     },
@@ -414,7 +414,7 @@ export default {
           this.isLoading = false;
           this.done = true;
           this.parentResults.push(results.data);
-          swal(
+          swal.fire(
             "Parent added",
             `${this.parent.firstname} ${this.parent.lastname} was successfully added as your ${this.parent.relationship}`,
             "success"
@@ -425,7 +425,7 @@ export default {
           if (err.response != null && err.response.status == 512) {
             this.txtError2 = err.response.data;
           } else {
-            swal("Unable to save the parent", err.message, "error");
+            swal.fire("Unable to save the parent", err.message, "error");
           }
           this.$emit("submitted", false);
         });
@@ -493,7 +493,7 @@ export default {
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {
-            swal("Unable to submit the student", err.message, "error");
+            swal.fire("Unable to submit the student", err.message, "error");
           }
           this.$emit("submitted", false);
         });

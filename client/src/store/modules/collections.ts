@@ -1,42 +1,44 @@
-const state = {
-  notifications:{
-    all:[],
-    lastUpdated:null
+import { ActionTree, MutationTree } from 'vuex';
+
+const state: CollectionStateType = {
+  notifications: {
+    all: [],
+    lastUpdated: null
   },
-  transactions:{
-    all:[],
-    lastUpdated:null
+  transactions: {
+    all: [],
+    lastUpdated: null
   },
-  documents:{
-    all:[],
-    lastUpdated:null
+  documents: {
+    all: [],
+    lastUpdated: null
   },
-  tasks:{
-    all:[],
-    lastUpdated:null
+  tasks: {
+    all: [],
+    lastUpdated: null
   },
-  lastUpdated:null
+  lastUpdated: null
 };
 
-const mutations = {
-   PopulateNotifications(state,obj){
-     state.notifications.all = obj.notifications;
-     state.notifications.lastUpdated = Date.now();
-   },
-   PopulateTransactions(state,obj){
+const mutations: MutationTree<CollectionStateType> = {
+  PopulateNotifications(state, obj: any) {
+    state.notifications.all = obj.notifications;
+    state.notifications.lastUpdated = new Date();
+  },
+  PopulateTransactions(state, obj: any) {
     state.transactions.all = obj.transactions;
-    state.transactions.lastUpdated = Date.now();
-   },
-   PopulateTasks(state,obj){
+    state.transactions.lastUpdated = new Date();
+  },
+  PopulateTasks(state, obj: any) {
     state.tasks.all = obj.tasks;
-    state.tasks.lastUpdated = Date.now();
-   }
- };
+    state.tasks.lastUpdated = new Date();
+  }
+};
 
- const actions = {
-  PopulateNotifications: ({commit,state},obj) => commit('PopulateNotifications',obj),
-  PopulateTransactions: ({commit,state},obj) => commit('PopulateTransactions',obj),
-  PopulateTasks: ({commit,state},obj) => commit('PopulateTasks',obj),
+const actions: ActionTree<CollectionStateType, any> = {
+  PopulateNotifications: ({ commit, state }, obj) => commit('PopulateNotifications', obj),
+  PopulateTransactions: ({ commit, state }, obj) => commit('PopulateTransactions', obj),
+  PopulateTasks: ({ commit, state }, obj) => commit('PopulateTasks', obj),
 };
 
 export default {
