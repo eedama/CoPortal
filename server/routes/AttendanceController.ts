@@ -126,9 +126,15 @@ router.get("/get/times/for/:moduleId", function (req: express.Request, res: expr
   Attendance.find({
     moduleId,
     "students.0": { $exists: true }
-  }, "date").then(attendances => {
+  }, "date students").then(attendances => {
     if (!attendances) attendances = [];
-    return res.json(attendances.reverse());
+    return res.json(attendances.map(v => {
+      return {
+        _id: v._id,
+        date: v.date,
+        totalStudents: v.students.length
+      }
+    }).reverse());
   }).catch(err => {
     consoling.info({ key: "GET Times for module", success: false, input: moduleId, message: err.message, err });
     return res.status(512).send(err.message);
