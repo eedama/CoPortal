@@ -78,7 +78,7 @@ router.post("/sign/bulk/students", function (req: express.Request, res: express.
 router.post("/create/for/:moduleId", async function (req: express.Request, res: express.Response) {
   var moduleId = req.params.moduleId;
   var duration = req.body.duration || 310;
-  var lecturerId = req.body.lecturerId
+  var lecturerId = req.body.lecturerId;
 
   try {
     let expireDate = moment().add(duration, 'seconds');
@@ -150,10 +150,11 @@ router.get("/get/for/:attendanceId", function (req: express.Request, res: expres
 
 function generateCode(length: number) {
   const alphabets = "abcdefghijklmnopqrstuvwxyz";
-  if (!length || length < 0) length = 5;
+  if (length == null || length <= 0) length = 5;
   let code = '';
   for (let i = 0; i < length; i++) {
-    code += alphabets[(Math.random() * (alphabets.length - 1))];
+    const index = Number((Math.random() * (alphabets.length - 1)).toFixed());
+    code += alphabets[index];
   }
   return code;
 }
