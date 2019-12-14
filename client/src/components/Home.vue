@@ -285,25 +285,24 @@
             </v-tab-item>
             <v-tab-item v-if="attendanceRegister">
               <v-row class="row">
+                <v-col cols="12">
+                  <h5 class="display-1 text-center title mt-3">Mark all the present students</h5>
+                </v-col>
                 <v-col cols="12" mx-auto class="v-triple-line mx-auto">
-                   <v-list-item-content mx-auto>
-                    <v-list-item-title mx-auto class="title mb-1 mx-auto">
-                    <p class="mx-auto">Mark all the present students</p></v-list-item-title
-                    >
-                  </v-list-item-content>
-                  <div class="Scroll-first-four">
-                    <v-list-item 
+                  <v-row class="Scroll-first-four">
+                    <v-col cols="12" md="4"
                       v-for="(student, i) in selectedAttendanceModuleStudents"
-                      :key="i"
+                      :key="i">
+                      <v-list-item
                       @click="student.selected = !student.selected"
                       :class="{ white: student.selected }"
                       class="pointer"
                        three-line>
-                        <v-list-item-avatar tile class="my-auto" size="40">
+                        <v-list-item-avatar large :color="student.selected ? 'secondary' : 'primary'" outlined class="my-auto">
                           <v-icon
-                          :color="student.selected ? 'secondary' : 'primary'"
+                          color="white"
                           >{{ student.selected ? 'mdi-check' : 'mdi-close' }}</v-icon
-                        >                       >
+                        > 
                         </v-list-item-avatar>
                         <v-list-item-content>
                           <v-list-item-title class="subtitle-1 mb-1">{{ student.username }}</v-list-item-title>
@@ -315,7 +314,8 @@
                           >
                         </v-list-item-content>
                       </v-list-item>
-                  </div>
+                    </v-col>
+                  </v-row>
                 </v-col>
                 <v-col cols="12">
                    <v-btn
@@ -1320,7 +1320,7 @@ export default {
 .Scroll-first-four {
   overflow: hidden;
   overflow-y: scroll;
-  height: 400px;
+  max-height: 300px;
 }
 
 .Scroll-first-four::-webkit-scrollbar {
