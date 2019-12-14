@@ -20,15 +20,6 @@
         <v-btn x-large v-if="$store.state.user.isLoggedIn" text>
           {{ $store.state.user.username }}
         </v-btn>
-
-        <v-btn
-          v-on:click="$router.push('/login')"
-          x-large
-          v-if="!$store.state.user.isLoggedIn"
-          text
-        >
-          Log in
-        </v-btn>
         <v-btn
           v-for="(navItem, i) in navItems.filter(
             v =>

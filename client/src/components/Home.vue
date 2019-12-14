@@ -10,205 +10,329 @@
       <v-card color="secondary">
         <v-row>
           <v-col cols="10">
-        <v-card-title class="headline text-white">Attendance register</v-card-title>
-        <v-card-text><span class="text-white">Enter the code to sign your attendance.</span></v-card-text>
+            <v-card-title class="headline text-white"
+              >Attendance register</v-card-title
+            >
+            <v-card-text
+              ><span class="text-white"
+                >Enter the code to sign your attendance.</span
+              ></v-card-text
+            >
           </v-col>
           <v-col class="m-auto my-auto" cols="2">
-<v-btn icon v-on:click="signAttendanceRegister = false" right class="right">
-            <v-icon style="color:ghostwhite">mdi-close</v-icon>
-          </v-btn>
+            <v-btn
+              icon
+              v-on:click="signAttendanceRegister = false"
+              right
+              class="right"
+            >
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
+            </v-btn>
           </v-col>
         </v-row>
       </v-card>
-        <v-row class="bg-white mx-auto">
+      <v-row class="bg-white mx-auto">
         <v-col cols="8" class=" text-center" offset-md="2">
-            <h5 class="display-1 text-xs-center mx-auto my-5">{{ getMoment().format("Do MMMM YYYY") }}</h5>
-            <h3 class="display-2 text-xs-center mx-auto my-5">{{ getMoment().format("hh:mm A") }}</h3>
+          <h5 class="display-1 text-xs-center mx-auto my-5">
+            {{ getMoment().format("Do MMMM YYYY") }}
+          </h5>
+          <h3 class="display-2 text-xs-center mx-auto my-5">
+            {{ getMoment().format("hh:mm A") }}
+          </h3>
         </v-col>
-          <v-col cols="12" mx-auto right class="mx-auto right">
-              <v-text-field
-                class="text-center mx-auto text-xs-center"
-                color="secondary"
-                size="40"
-                placeholder="Attendance code"
-                @keyup.enter="submitAttendanceCode"
+        <v-col cols="12" mx-auto right class="mx-auto right">
+          <v-text-field
+            class="text-center mx-auto text-xs-center"
+            color="secondary"
+            size="40"
+            placeholder="Attendance code"
+            @keyup.enter="submitAttendanceCode"
             solo
-                v-model="currentAttendanceCode"
-              >
-            </v-text-field>
-          <p class="red-text text-red text-center">{{ currentAttendanceCodeError }}</p>
-          <ball-pulse-loader class="col s12 text-center" v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+            v-model="currentAttendanceCode"
+          >
+          </v-text-field>
+          <p class="red-text text-red text-center">
+            {{ currentAttendanceCodeError }}
+          </p>
+          <ball-pulse-loader
+            class="col s12 text-center"
+            v-if="isLoading"
+            color="#000000"
+            size="20px"
+          ></ball-pulse-loader>
           <v-btn
             v-if="!isLoading"
             block
             x-large
             v-on:click="submitAttendanceCode"
             color="primary"
-          >Submit</v-btn>
-          </v-col>
-        </v-row>
+            >Submit</v-btn
+          >
+        </v-col>
+      </v-row>
     </v-dialog>
     <v-dialog
-      v-if="$store.state.user.isLoggedIn && $store.state.user.type == 'LECTURER'"
-      style="position:fixed;max-width:100%;max-height:60%;min-height:20%;min-width:40%;"
+      v-if="
+        $store.state.user.isLoggedIn && $store.state.user.type == 'LECTURER'
+      "
       class="card"
+      max-width="600"
+      color="white"
       v-model="isCreatingAttendanceRegister"
     >
-      <v-card class="col s12" style="background-color:#006064;">
-        <v-list-item-title>
-          <div class="v-title" style="color:ghostwhite">Creating attendance register</div>
-          <v-button v-on:click="isCreatingAttendanceRegister = false" class="right">
-            <v-icon style="color:ghostwhite">close</v-icon>
-          </v-button>
-        </v-list-item-title>
+      <v-card color="secondary">
+        <v-row>
+          <v-col cols="10">
+            <v-card-title class="headline text-white"
+              >Creating attendance register</v-card-title
+            >
+            <v-card-text
+              ><span class="text-white"
+                >Display this code for people to sign in.</span
+              ></v-card-text
+            >
+          </v-col>
+          <v-col class="m-auto my-auto" cols="2">
+            <v-btn
+              icon
+              v-on:click="isCreatingAttendanceRegister = false"
+              right
+              class="right"
+            >
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-card>
-      <v-content style="overflow-y:scroll" class="row">
-        <v-field class="col s8 offset-s2">
-          <label>Select a module</label>
-          <v-select @v-selected="setStudentsForModule" v-model="selectedAttendanceModule">
-            <v-option
-              v-for="(_module,i) in modules"
-              :key="i"
-              style="background-color:white"
-              :value="_module._id"
-            >{{ _module.name }} {{ _module.code }}</v-option>
+      <v-row class="bg-white row">
+        <v-col cols="12">
+          <v-select
+            class="ma-5"
+            :items="
+              modules.map(v => {
+                return { _id: v._id, title: `${v.name} - ${v.code}` };
+              })
+            "
+            item-text="title"
+            item-value="_id"
+            label="Select a module"
+            @change="setStudentsForModule"
+            v-model="selectedAttendanceModule"
+          >
           </v-select>
-        </v-field>
-        <v-tabs v-if="selectedAttendanceModule" class="col s12" @v-changed="changeAttendanceTab">
-          <v-tab id="tab-home" label="New">
-            <div class="row">
-              <v-content v-show="createAttendanceIndex == 0" class="col s12">
-                <v-field>
-                  <label>Select a duration</label>
-                  <v-select v-model="selectedAttendanceDuration">
-                    <v-option
-                      v-for="(duration,i) in ['5 minutes','10 minutes','15 minutes','30 minutes']"
-                      :key="i"
-                      style="background-color:white"
-                      :value="duration"
-                    >{{ duration }}</v-option>
+        </v-col>
+        <v-col v-if="selectedAttendanceModule" cols="12">
+          <v-tabs
+            grow
+            v-model="tabSelectedAttendanceModule"
+            @change="changeAttendanceTab"
+          >
+            <v-tab id="tab-home">Create new</v-tab>
+            <v-tab id="tab-home-history">View history</v-tab>
+            <v-tab v-if="attendanceRegister" id="tab-home-manual"
+              >Sign manually</v-tab
+            >
+          </v-tabs>
+          <v-tabs-items v-model="tabSelectedAttendanceModule">
+            <v-tab-item class="ma-5">
+              <v-row v-show="createAttendanceIndex == 0">
+                <v-col cols="12">
+                  <v-select
+                    color="secondary"
+                    outlined
+                    label="Select a duration"
+                    :items="[
+                      'Never',
+                      '5 minutes',
+                      '10 minutes',
+                      '15 minutes',
+                      '30 minutes'
+                    ]"
+                    v-model="selectedAttendanceDuration"
+                  >
                   </v-select>
-                </v-field>
-                <v-field>
-                  <p
-                    class="red-text text-red text-xs-center"
-                    v-if="attendanceError"
-                  >{{ attendanceError }}</p>
-                </v-field>
-              </v-content>
-              <v-content v-if="createAttendanceIndex == 1 && attendanceRegister" class="col s12">
-                <div class="row">
-                  <h5 class="col s12">The attendance code is</h5>
-                  <h2 class="col s12 text-xs-center center">{{ attendanceRegister.code }}</h2>
-                  <h4
-                    class="col s12 text-xs-center center"
+                </v-col>
+                <v-col v-if="attendanceError" mx-auto cols="12">
+                  <p class="red-text mx-auto text-red text-xs-center">
+                    {{ attendanceError }}
+                  </p>
+                </v-col>
+                <v-col mx-auto cols="12">
+                  <v-btn
+                    :loading="isLoading"
+                    v-on:click="createAttendance()"
+                    color="secondary"
+                    large
+                    block
+                    rounded
+                    >Generate</v-btn
+                  ></v-col
+                >
+              </v-row>
+              <v-row
+                v-if="createAttendanceIndex == 1 && attendanceRegister"
+                class="col s12"
+              >
+                <v-col cols="8" class=" text-center" offset-md="2">
+                  <h5 class="display-1 text-xs-center mx-auto my-5">
+                    Attendance code
+                  </h5>
+                  <h2 class="display-4 text-xs-center bg-grey text-blue mx-auto py-10">
+                    {{ attendanceRegister.code }}
+                  </h2>
+                  <h5
+                    class="text-xs-center display-2 title mx-auto my-5"
                     v-if="getMoment()"
-                  >Expires {{ getMoment(attendanceRegister.expiryDate).fromNow() }}</h4>
-                </div>
-              </v-content>
-              <v-button
-                v-if="createAttendanceIndex == 0 && !isLoading"
-                v-on:click="createAttendance()"
-                class="v-primary col s12"
-                style="background-color:#006064;color:ghostwhite"
-              >Create attendance register</v-button>
-            </div>
-          </v-tab>
-          <v-tab id="tab-home-history" label="History">
-            <div v-if="!selectedAttendanceDate" class="row">
-              <v-button
-                v-for="(time,i) in attendanceRegisterHistoryTimes"
-                :key="i"
-                @click="selectAttendanceDate(time)"
-                class="col s4 offset-s1"
-              >{{ getMoment(time.date).format("Do MMMM") }}</v-button>
-            </div>
-            <div v-if="selectedAttendanceDate" class="row">
-              <v-button v-on:click="selectedAttendanceDate = false">
-                <v-icon>arrow_back</v-icon>
-              </v-button>
-              <v-list class="v-triple-line col s12 center-align">
-                <div class="Scroll-first-four">
-                  <v-list-item
-                    style="margin-bottom:15px;"
-                    v-for="(student,i) in attendanceRegisterHistoryStudents.filter(v => v && v.studentId)"
-                    :key="i"
-                    class="hoverable col s12 m10 pointer white center-align waves-effect"
                   >
-                    <v-avatar>
-                      <img src="https://placeimg.com/40/40/people/1" alt="People" />
-                    </v-avatar>
-
-                    <div class="v-list-item-text">
-                      <span>{{ student.studentId.lastname + " " + student.studentId.firstname }} &nbsp;&bull; {{ getMoment(student.date).fromNow() }}</span>
-                      <span>{{ student.studentId.username }}</span>
-                    </div>
-                  </v-list-item>
-                </div>
-              </v-list>
-              <ball-pulse-loader
-                class="text-xs-center center col s12"
-                v-if="attendanceRegisterHistoryStudentsLoading"
-                color="#000000"
-                size="20px"
-              ></ball-pulse-loader>
-            </div>
-          </v-tab>
-          <v-tab v-if="attendanceRegister" id="tab-home-manual" label="Sign manually">
-            <div class="row">
-              <v-list class="v-triple-line col s12 center-align">
-                <h6>Mark all the present students</h6>
-                <div class="Scroll-first-four">
-                  <v-list-item
-                    style="margin-bottom:15px;"
-                    v-for="(student,i) in selectedAttendanceModuleStudents"
-                    :key="i"
-                    @click="student.selected = !student.selected"
-                    class="col s12 m10 pointer center-align waves-effect"
-                    :class="{'white':student.selected}"
+                    Expires
+                    <span class="text-peach">{{ getMoment(attendanceRegister.expiryDate).fromNow() }}</span>
+                  </h5>
+                </v-col>
+              </v-row>
+            </v-tab-item>
+            <v-tab-item>
+              <v-row v-if="!selectedAttendanceDate" class="row">
+                <v-col cols="12" md="6" 
+                  v-for="(time, i) in attendanceRegisterHistoryTimes"
+                  :key="i"
                   >
-                    <v-avatar>
-                      <v-icon
-                        v-show="!student.selected"
-                        class="black-text"
-                        style="color:ghostwhite;width:100%;height:100%"
-                      >close</v-icon>
-                      <v-icon
-                        v-show="student.selected"
-                        class="black-text"
-                        style="color:ghostwhite;width:100%;height:100%"
-                      >done</v-icon>
-                    </v-avatar>
-
-                    <div class="v-list-item-text">
-                      <span>{{ student.lastname + " " + student.firstname }} &nbsp;&bull;</span>
-                      <span>{{ student.username }}</span>
-                    </div>
-                  </v-list-item>
-                </div>
-              </v-list>
-              <div class="col s12">
-                <ball-pulse-loader class="col s12 center" v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+                  
+            <v-card
+                  @click="selectAttendanceDate(time)"
+              outlined
+              class="border-top-blue"
+            >
+              <v-row class="mx-auto my-auto px-2">
+                <v-col cols="2" class="mx-auto my-auto">
+                  <v-icon
+                    color="primary"
+                    class="text-peach mx-auto my-auto"
+                    size="30"
+                    >mdi-calendar</v-icon
+                  >
+                </v-col>
+                <v-col cols="10">
+                  <v-list-item-content>
+                    <v-list-item-title class="title mb-1">
+                      {{ getMoment(time.date).format("Do MMMM") }}</v-list-item-title
+                    >
+                    <v-list-item-subtitle
+                      ><span class="text-blue">
+                        {{ time.totalStudents }} attended</span
+                      ></v-list-item-subtitle
+                    >
+                  </v-list-item-content>
+                </v-col>
+              </v-row>
+            </v-card>
+                  </v-col
+                >
+              </v-row>
+              <div v-if="selectedAttendanceDate" class="Scroll-first-four">
+                <v-row>
+                  <v-col class="my-auto" cols="2">
+                    <v-btn large icon class="my-auto mx-5" v-on:click="selectedAttendanceDate = false">
+                      <v-icon>mdi-arrow-left</v-icon>
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="10"  class="my-auto">
+                    <v-list-item-content>
+                    <v-list-item-title class="title mb-1">
+                      {{ getMoment(selectedAttendanceDate.date).format("Do MMMM") }}</v-list-item-title
+                    >
+                    <v-list-item-subtitle
+                      ><span class="text-blue">
+                        {{ selectedAttendanceDate.totalStudents }} attended</span
+                      ></v-list-item-subtitle
+                    >
+                  </v-list-item-content>
+                  </v-col>
+                </v-row>
+                <v-row :loading="attendanceRegisterHistoryStudentsLoading" class="v-triple-line col s12 center-align">
+                  <v-col cols="12" md="6" v-for="(student,
+                              i) in attendanceRegisterHistoryStudents.filter(
+                                v => v && v.studentId
+                              )"
+                              :key="i">
+                   <v-card
+                      shaped
+                      outlined 
+                    >
+                      <v-list-item three-line>
+                        <v-list-item-avatar tile class="my-auto" size="40">
+                          <v-icon class="text-peach my-auto" size="60">mdi-account-outline</v-icon>
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                          <div class="overline mb-4">
+                            <span class="text-peach">{{ getMoment(student.date).fromNow() }}</span>
+                          </div>
+                          <v-list-item-title class="subtitle-1 mb-1">{{ student.studentId.username }}</v-list-item-title>
+                          <v-list-item-subtitle
+                            ><span class="text-blue">
+                              {{
+                                    student.studentId.lastname +
+                                      " " +
+                                      student.studentId.firstname
+                              }}
+                            </span></v-list-item-subtitle
+                          >
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-card>
+                    </v-col>
+                </v-row>
               </div>
-              <div class="col s12">
-                <v-button
-                  v-if="!isLoading"
-                  v-on:click="submitBulkAttendance"
-                  class="v-primary col s12"
-                  style="background-color:#006064;color:ghostwhite"
-                >Submit</v-button>
-              </div>
-            </div>
-          </v-tab>
-        </v-tabs>
-
-        <ball-pulse-loader
-          class="text-xs-center center col s12"
-          v-if="isLoading"
-          color="#000000"
-          size="20px"
-        ></ball-pulse-loader>
-      </v-content>
+            </v-tab-item>
+            <v-tab-item v-if="attendanceRegister">
+              <v-row class="row">
+                <v-col cols="12" mx-auto class="v-triple-line mx-auto">
+                   <v-list-item-content mx-auto>
+                    <v-list-item-title mx-auto class="title mb-1 mx-auto">
+                    <p class="mx-auto">Mark all the present students</p></v-list-item-title
+                    >
+                  </v-list-item-content>
+                  <div class="Scroll-first-four">
+                    <v-list-item 
+                      v-for="(student, i) in selectedAttendanceModuleStudents"
+                      :key="i"
+                      @click="student.selected = !student.selected"
+                      :class="{ white: student.selected }"
+                      class="pointer"
+                       three-line>
+                        <v-list-item-avatar tile class="my-auto" size="40">
+                          <v-icon
+                          :color="student.selected ? 'secondary' : 'primary'"
+                          >{{ student.selected ? 'mdi-check' : 'mdi-close' }}</v-icon
+                        >                       >
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                          <v-list-item-title class="subtitle-1 mb-1">{{ student.username }}</v-list-item-title>
+                          <v-list-item-subtitle
+                            ><span class="text-blue">
+                              {{student.lastname + " " + student.firstname
+                              }}
+                            </span></v-list-item-subtitle
+                          >
+                        </v-list-item-content>
+                      </v-list-item>
+                  </div>
+                </v-col>
+                <v-col cols="12">
+                   <v-btn
+                    :loading="isLoading"
+                    v-on:click="submitBulkAttendance"
+                    color="secondary"
+                    large
+                    block
+                    rounded
+                    >Submit</v-btn
+                  >
+                </v-col>
+              </v-row>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-col>
+      </v-row>
     </v-dialog>
     <v-dialog
       v-if="isParent"
@@ -219,38 +343,48 @@
       <v-card class="col s12" style="background-color:#006064;">
         <v-list-item-title>
           <div class="v-title" style="color:ghostwhite">Change Student</div>
-          <v-button v-on:click="isChangingStudent = false" class="right">
+          <v-btn v-on:click="isChangingStudent = false" class="right">
             <v-icon style="color:ghostwhite">close</v-icon>
-          </v-button>
+          </v-btn>
         </v-list-item-title>
       </v-card>
       <v-card-actions>
-        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+        <ball-pulse-loader
+          v-if="isLoading"
+          color="#000000"
+          size="20px"
+        ></ball-pulse-loader>
         <div class="row">
           <v-content class="col s12">
             <v-field>
               <label>Select Student</label>
               <v-select v-model="currentStudent">
                 <v-option
-                  v-for="(student,i) in students"
+                  v-for="(student, i) in students"
                   :key="i"
                   style="background-color:white"
                   :value="student._id"
-                >{{ student.username }}</v-option>
+                  >{{ student.username }}</v-option
+                >
               </v-select>
             </v-field>
           </v-content>
-          <v-button
+          <v-btn
             v-if="!isLoading"
             v-on:click="changeStudent()"
             class="v-primary col s12"
             style="background-color:#006064;color:ghostwhite"
-          >Change student</v-button>
+            >Change student</v-btn
+          >
         </div>
       </v-card-actions>
     </v-dialog>
     <v-dialog
-      v-if="$store.state.user.isLoggedIn && ($store.state.user.type=='LECTURER' || $store.state.user.type=='ADMIN')"
+      v-if="
+        $store.state.user.isLoggedIn &&
+          ($store.state.user.type == 'LECTURER' ||
+            $store.state.user.type == 'ADMIN')
+      "
       style="position:fixed;max-height:100vh;min-height:20%;width:100%;"
       class="card"
       v-model="isAddingAnnouncements"
@@ -258,10 +392,12 @@
       <v-card class="col s12">
         <v-list-item-title style="background-color:#006064;" class="row">
           <div class="col s12 m10 offset-m1 text-center">
-            <span style="color:ghostwhite" class="v-title">Send an announcement</span>
-            <v-button class="right" v-on:click="isAddingAnnouncements = false">
+            <span style="color:ghostwhite" class="v-title"
+              >Send an announcement</span
+            >
+            <v-btn class="right" v-on:click="isAddingAnnouncements = false">
               <v-icon style="color:ghostwhite">close</v-icon>
-            </v-button>
+            </v-btn>
           </div>
         </v-list-item-title>
         <v-content>
@@ -273,7 +409,12 @@
                 name="ModuleDescription"
                 type="text"
               />
-              <label class="text-center" style="color:#006064" for="ModuleDescription">Title</label>
+              <label
+                class="text-center"
+                style="color:#006064"
+                for="ModuleDescription"
+                >Title</label
+              >
             </div>
           </div>
           <div class="row">
@@ -284,9 +425,17 @@
                 name="ModuleDescription"
                 type="text"
               />
-              <label class="text-center" style="color:#006064" for="ModuleDescription">Message</label>
+              <label
+                class="text-center"
+                style="color:#006064"
+                for="ModuleDescription"
+                >Message</label
+              >
             </div>
-            <div style="padding:10px" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
+            <div
+              style="padding:10px"
+              class="input-field col s8 offset-s2 m6 offset-m3 text-center"
+            >
               <label>
                 <input
                   v-model="announcement.isParent"
@@ -294,7 +443,9 @@
                   name="group1"
                   type="checkbox"
                 />
-                <span :style="{'color:#006064':announcement.isParent}">Send announcement to parents</span>
+                <span :style="{ 'color:#006064': announcement.isParent }"
+                  >Send announcement to parents</span
+                >
               </label>
             </div>
           </div>
@@ -307,7 +458,7 @@
               class="col s8 offset-s2 m6 offset-m3 text-center"
             >
               <form style="max-height:60vh">
-                <p v-for="(_module,i) in modules" :key="i">
+                <p v-for="(_module, i) in modules" :key="i">
                   <label>
                     <input
                       v-model="announcement.module"
@@ -316,7 +467,9 @@
                       name="group1"
                       type="radio"
                     />
-                    <span>{{ _module.name }} ({{ _module.code }}) students</span>
+                    <span
+                      >{{ _module.name }} ({{ _module.code }}) students</span
+                    >
                   </label>
                 </p>
                 <p>
@@ -341,94 +494,139 @@
           <span
             v-if="!isLoading"
             style="float:left;left:0;position:absolute;padding-left:30px;color:ghostwhite;max-width:100%"
-          >The announcement will be sent to {{ modules.some(v => v && v._id == announcement.module) ? `${modules.find(v => v && v._id == announcement.module).name} ${modules.find(v => v && v._id == announcement.module).code}` : 'All' }} students {{ announcement.isParent ? ' and SMSs to thier parents as well' : ''}}</span>
-          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-          <v-button
+            >The announcement will be sent to
+            {{
+              modules.some(v => v && v._id == announcement.module)
+                ? `${
+                    modules.find(v => v && v._id == announcement.module).name
+                  } ${
+                    modules.find(v => v && v._id == announcement.module).code
+                  }`
+                : "All"
+            }}
+            students
+            {{
+              announcement.isParent ? " and SMSs to thier parents as well" : ""
+            }}</span
+          >
+          <ball-pulse-loader
+            v-if="isLoading"
+            color="#000000"
+            size="20px"
+          ></ball-pulse-loader>
+          <v-btn
             v-if="!isLoading"
             v-on:click="SendAnnouncement()"
             style="color:ghostwhite;max-width:40%"
             class="v-secondary"
-          >Send announcement</v-button>
+            >Send announcement</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-row v-if="!$store.state.user.isLoggedIn" class="row">
-              <v-col cols="12">
-        <h4
-          class="title text-blue px-5"
-        >We offer the following services</h4>
+      <v-col cols="9">
+        <h4 class="title text-blue px-5">We offer the following services</h4>
+      </v-col>
+      <v-col cols="2" class="mx-auto">
+        <v-btn
+          v-on:click="$router.push('/login')"
+          x-large
+          v-if="!$store.state.user.isLoggedIn"
+          block
+          rounded
+          p-5
+          color="secondary"
+        >
+          Login
+        </v-btn>
       </v-col>
       <v-col cols="12">
         <v-row class="px-10">
-            <v-col cols="4">
-        <v-card>
-          <v-card-title class="mx-auto" center>
-            <span class="text-center title mx-auto mb-n4 text-peach center">Digital attendance register</span>
-          </v-card-title>
-        <v-img src="../assets/images/backgrounds/family_2x.png" />
-        </v-card>
-      </v-col>
-      <v-col cols="4">
-        <v-card>
-          <v-card-title class="mx-auto" center>
-            <span class="text-center title mx-auto mb-n4 text-peach center">Study materials of all modules/subjects</span>
-          </v-card-title>
-        <v-img src="../assets/images/backgrounds/coderdojo.png" />
-        </v-card>
-      </v-col>
-      <v-col cols="4">
-        <v-card>
-          <v-card-title class="mx-auto" center>
-            <span class="text-center title mx-auto mb-n4 text-peach center">Online tests and assesments</span>
-          </v-card-title>
-        <v-img src="../assets/images/backgrounds/invoice_maker_2x.jpg" />
-        </v-card>
-      </v-col>
-            <v-col cols="4">
-        <v-card>
-          <v-card-title class="mx-auto" center>
-            <span class="text-center title mx-auto mb-n4 text-blue center">Real time notifications to parents and students</span>
-          </v-card-title>
-        <v-img src="../assets/images/backgrounds/notification.png" />
-        </v-card>
-      </v-col>
-      <v-col cols="4">
-        <v-card>
-          <v-card-title class="mx-auto" center>
-            <span class="text-center title mx-auto mb-n4 text-blue center">Access to marksheets and assessment results</span>
-          </v-card-title>
-        <v-img src="../assets/images/backgrounds/education.jpg" />
-        </v-card>
-      </v-col>
-      <v-col cols="4">
-        <v-card>
-          <v-card-title class="mx-auto" center>
-            <span class="text-center title mx-auto mb-n4 text-blue center">Digitalized administrative system roles</span>
-          </v-card-title>
-        <v-img src="../assets/images/backgrounds/seating.png" />
-        </v-card>
-      </v-col>
+          <v-col cols="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-peach center"
+                  >Digital attendance register</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/family_2x.png" />
+            </v-card>
+          </v-col>
+          <v-col cols="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-peach center"
+                  >Study materials of all modules/subjects</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/coderdojo.png" />
+            </v-card>
+          </v-col>
+          <v-col cols="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-peach center"
+                  >Online tests and assesments</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/invoice_maker_2x.jpg" />
+            </v-card>
+          </v-col>
+          <v-col cols="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-blue center"
+                  >Real time notifications to parents and students</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/notification.png" />
+            </v-card>
+          </v-col>
+          <v-col cols="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-blue center"
+                  >Access to marksheets and assessment results</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/education.jpg" />
+            </v-card>
+          </v-col>
+          <v-col cols="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-blue center"
+                  >Digitalized administrative system roles</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/seating.png" />
+            </v-card>
+          </v-col>
         </v-row>
       </v-col>
 
       <v-col cols="12">
-        <h4
-          class="title text-blue px-5"
-        >Meet some of our cool friends that might help boost your career life</h4>
+        <h4 class="title text-blue px-5">
+          Meet some of our cool friends that might help boost your career life
+        </h4>
       </v-col>
-      <v-col 
-        v-for="(partner,i) in partners"
-        :key="i" cols="4">
-      <v-card
+      <v-col v-for="(partner, i) in partners" :key="i" cols="4">
+        <v-card
           class="mx-5 mb-5"
           shaped
           outlined
-        v-on:click="GotoExternal(partner.link)"
-        > 
-        <v-img class="mx-10 my-5" max-width="200" max-height="100" :src="partner.img" />
+          v-on:click="GotoExternal(partner.link)"
+        >
+          <v-img
+            class="mx-10 my-5"
+            max-width="200"
+            max-height="100"
+            :src="partner.img"
+          />
         </v-card>
-        </v-col>
+      </v-col>
     </v-row>
 
     <v-row v-if="$store.state.user.isLoggedIn" class="row">
@@ -436,8 +634,15 @@
         <v-row>
           <v-col cols="10" offset-md="1">
             <v-list-item-title>
-              <v-btn class="my-auto" v-if="$store.state.user.type == 'LECTURER' || $store.state.user.type == 'ADMIN'"
-              icon v-on:click="isAddingAnnouncements = true">
+              <v-btn
+                class="my-auto"
+                v-if="
+                  $store.state.user.type == 'LECTURER' ||
+                    $store.state.user.type == 'ADMIN'
+                "
+                icon
+                v-on:click="isAddingAnnouncements = true"
+              >
                 <v-icon size="40">
                   mdi-plus
                 </v-icon>
@@ -446,34 +651,52 @@
             </v-list-item-title>
           </v-col>
           <v-col>
-        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-        </div>
+            <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
+              <ball-pulse-loader
+                v-if="isLoading"
+                color="#000000"
+                size="20px"
+              ></ball-pulse-loader>
+            </div>
           </v-col>
           <v-col style="overflow-y:scroll;max-height:50vh" cols="12">
-        <v-card
-          class="mx-10 mb-5"
-          shaped
-          outlined
-          v-on:click="AnnouncementClick(announcement)"
-          v-for="(announcement,i) in announcements"
-          :key="i"
-        >
-          <v-list-item three-line>
-            <v-list-item-avatar
-              tile
-              size="80"
+            <v-card
+              class="mx-10 mb-5"
+              shaped
+              outlined
+              v-on:click="AnnouncementClick(announcement)"
+              v-for="(announcement, i) in announcements"
+              :key="i"
             >
-            <v-icon class="text-peach" size="50">mdi-bell</v-icon>
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <div class="overline mb-4">{{ announcement.lecturerId ? announcement.lecturerId.lastname + " " + announcement.lecturerId.firstname : "Admin" }} &nbsp;&bull; <span class="text-peach">{{ getMoment(announcement.date).fromNow() }}</span></div>
-              <v-list-item-title class="subtitle-1 mb-1">{{ announcement.title }}</v-list-item-title>
-              <v-list-item-subtitle><span class="text-blue">{{ announcement.message }}</span></v-list-item-subtitle>
-            </v-list-item-content>
-
-          </v-list-item>
-        </v-card>
+              <v-list-item three-line>
+                <v-list-item-avatar tile size="80">
+                  <v-icon class="text-peach" size="50">mdi-bell</v-icon>
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <div class="overline mb-4">
+                    {{
+                      announcement.lecturerId
+                        ? announcement.lecturerId.lastname +
+                          " " +
+                          announcement.lecturerId.firstname
+                        : "Admin"
+                    }}
+                    &nbsp;&bull;
+                    <span class="text-peach">{{
+                      getMoment(announcement.date).fromNow()
+                    }}</span>
+                  </div>
+                  <v-list-item-title class="subtitle-1 mb-1">{{
+                    announcement.title
+                  }}</v-list-item-title>
+                  <v-list-item-subtitle
+                    ><span class="text-blue">{{
+                      announcement.message
+                    }}</span></v-list-item-subtitle
+                  >
+                </v-list-item-content>
+              </v-list-item>
+            </v-card>
           </v-col>
         </v-row>
       </v-col>
@@ -482,27 +705,42 @@
           <v-col cols="6" offset-md="3">
             <v-img src="../assets/images/backgrounds/education.jpg" />
           </v-col>
-        <v-col 
-        v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)"
-          :key="i"
-        cols="6">
-          <v-card
-          v-on:click="goToRoute(option)" outlined class="border-top-blue">
-            <v-row class="mx-auto my-auto px-2">
-              <v-col cols="2" class="mx-auto my-auto">
-                <v-icon color="primary" class="text-peach mx-auto my-auto" size="30">{{ option.icon }}</v-icon>
-              </v-col>
-              <v-col cols="10">
-                <v-list-item-content>
-              <v-list-item-title class="title mb-1">
-                   {{ option.text }}</v-list-item-title>
-              <v-list-item-subtitle><span class="text-blue">
-                   {{ option.description }}</span></v-list-item-subtitle>
-            </v-list-item-content>
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-col>
+          <v-col
+            v-for="(option, i) in options.filter(
+              o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0
+            )"
+            :key="i"
+            cols="6"
+          >
+            <v-card
+              v-on:click="goToRoute(option)"
+              outlined
+              class="border-top-blue"
+            >
+              <v-row class="mx-auto my-auto px-2">
+                <v-col cols="2" class="mx-auto my-auto">
+                  <v-icon
+                    color="primary"
+                    class="text-peach mx-auto my-auto"
+                    size="30"
+                    >{{ option.icon }}</v-icon
+                  >
+                </v-col>
+                <v-col cols="10">
+                  <v-list-item-content>
+                    <v-list-item-title class="title mb-1">
+                      {{ option.text }}</v-list-item-title
+                    >
+                    <v-list-item-subtitle
+                      ><span class="text-blue">
+                        {{ option.description }}</span
+                      ></v-list-item-subtitle
+                    >
+                  </v-list-item-content>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-col>
         </v-row>
       </v-col>
     </v-row>
@@ -517,6 +755,7 @@ export default {
   data() {
     return {
       /// lecturer attendance
+      tabSelectedAttendanceModule: null,
       createAttendanceIndex: 0,
       selectedAttendanceModule: null,
       selectedAttendanceModuleStudents: [],
@@ -869,7 +1108,8 @@ export default {
         });
     },
     changeAttendanceTab(e) {
-      if (e == "tab-home-history") {
+      if (e == 1) {
+        // Case is tab-home-history
         this.isLoading = true;
         axios
           .get(
@@ -904,6 +1144,9 @@ export default {
       }
       let duration = 310;
       switch (this.selectedAttendanceDuration) {
+        case "Never":
+          duration = 31538000;
+          break;
         case "5 minutes":
           duration = 310;
           break;
@@ -1031,7 +1274,11 @@ export default {
           if (err.response != null && err.response.status == 512) {
             swal.fire(err.response.data, "Try again later", "error");
           } else {
-            swal.fire("Unable to send announcement", "Try again later", "error");
+            swal.fire(
+              "Unable to send announcement",
+              "Try again later",
+              "error"
+            );
           }
         });
     }

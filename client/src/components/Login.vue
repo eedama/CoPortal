@@ -53,13 +53,8 @@
               </v-col>
 
               <v-col cols="12" md="8" offset-md="3" class="mx-auto">
-                <ball-pulse-loader
-                  v-if="isLoading"
-                  color="#000000"
-                  size="20px"
-                ></ball-pulse-loader>
                 <v-btn
-                  v-if="!isLoading"
+                  :loading="isLoading"
                   v-on:click="SubmitLogin()"
                   block
                   color="secondary"
