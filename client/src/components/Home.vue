@@ -469,34 +469,38 @@
           </v-col>
         </v-row>
       </v-card>
-      <v-row 
-      class="bg-white px-10">
-      <v-col cols="12">
-        <v-text-field
-          color="secondary"
-          label="Announcement title"
-          outlined
-          v-model="announcement.title"
-        >
-        </v-text-field>
-      </v-col>
-      <v-col cols="12">
-        <v-textarea
-          color="secondary"
-          label="Message"
-          outlined
-          prepend-inner-icon="mdi-bullhorn-outline"
-          v-model="announcement.message"
-        >
-        </v-textarea>
-      </v-col>
-      <v-col cols="12">
-        <v-checkbox v-model="announcement.isParent" label="Send announcement to parents"></v-checkbox>
-      </v-col>
-      <v-col cols="12">
-        <v-checkbox 
-                    v-model="announcement.module"
-                    value="all_students" label="Send to all students"></v-checkbox>
+      <v-row class="bg-white px-10">
+        <v-col cols="12">
+          <v-text-field
+            color="secondary"
+            label="Announcement title"
+            outlined
+            v-model="announcement.title"
+          >
+          </v-text-field>
+        </v-col>
+        <v-col cols="12">
+          <v-textarea
+            color="secondary"
+            label="Message"
+            outlined
+            prepend-inner-icon="mdi-bullhorn-outline"
+            v-model="announcement.message"
+          >
+          </v-textarea>
+        </v-col>
+        <v-col cols="12">
+          <v-checkbox
+            v-model="announcement.isParent"
+            label="Send announcement to parents"
+          ></v-checkbox>
+        </v-col>
+        <v-col cols="12">
+          <v-checkbox
+            v-model="announcement.module"
+            value="all_students"
+            label="Send to all students"
+          ></v-checkbox>
           <v-select
             v-show="announcement.module != 'all_students'"
             :items="
@@ -513,25 +517,25 @@
             v-model="announcement.module"
           >
           </v-select>
-      </v-col>
+        </v-col>
 
         <v-col cols="12">
-          <p
-          v-if="!isLoading"
-          class="text-center"
-          >The announcement will be sent to
-          {{
-            modules.some(v => v && v._id == announcement.module)
-              ? `${modules.find(v => v && v._id == announcement.module).name} ${
-                  modules.find(v => v && v._id == announcement.module).code
-                }`
-              : "All"
-          }}
-          students
-          {{
-            announcement.isParent ? " and SMSs to thier parents as well" : ""
-          }}</p
-        >
+          <p v-if="!isLoading" class="text-center">
+            The announcement will be sent to
+            {{
+              modules.some(v => v && v._id == announcement.module)
+                ? `${
+                    modules.find(v => v && v._id == announcement.module).name
+                  } ${
+                    modules.find(v => v && v._id == announcement.module).code
+                  }`
+                : "All"
+            }}
+            students
+            {{
+              announcement.isParent ? " and SMSs to thier parents as well" : ""
+            }}
+          </p>
           <v-btn
             :loading="isLoading"
             v-on:click="SendAnnouncement()"
@@ -652,34 +656,24 @@
     <v-row v-if="$store.state.user.isLoggedIn" class="row">
       <v-col cols="4">
         <v-row>
-          <v-col cols="10" offset-md="1">
+          <v-col cols="8">
             <v-list-item-title>
-              <v-btn
-                class="my-auto"
-                v-if="
-                  $store.state.user.type == 'LECTURER' ||
-                    $store.state.user.type == 'ADMIN'
-                "
-                icon
-                v-on:click="isAddingAnnouncements = true"
-              >
-                <v-icon size="40">
-                  mdi-plus
-                </v-icon>
-              </v-btn>
               <span class="title mx-5 my-auto text-blue">Annnouncements</span>
             </v-list-item-title>
           </v-col>
-          <v-col>
-            <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-              <ball-pulse-loader
-                v-if="isLoading"
-                color="#000000"
-                size="20px"
-              ></ball-pulse-loader>
-            </div>
+          <v-col cols="4">
+            <v-btn
+              class="my-auto"
+              v-if="
+                $store.state.user.type == 'LECTURER' ||
+                  $store.state.user.type == 'ADMIN'
+              "
+              v-on:click="isAddingAnnouncements = true"
+            >
+              Send new
+            </v-btn>
           </v-col>
-          <v-col style="overflow-y:scroll;max-height:50vh" cols="12">
+          <v-col style="overflow-y:auto;max-height:50vh" cols="12">
             <v-card
               class="mx-10 mb-5"
               shaped
@@ -1269,10 +1263,16 @@ export default {
       });
     },
     SendAnnouncement() {
-      this.isLoading = true;
-      if(this.announcement.module == "all_students"){
+      if (this.announcement.module == "all_students") {
         this.announcement.module = null;
       }
+      if (this.announcement.title.length < 3) {
+        return swal.fire("Enter a title for your announcement", "", "error");
+      }
+      if (this.announcement.message.length < 3) {
+        return swal.fire("Enter a message for your announcement", "", "error");
+      }
+      this.isLoading = true;
       this.announcement.isToAll = this.announcement.module == null;
       axios
         .post(
