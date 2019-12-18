@@ -61,7 +61,7 @@
             size="20px"
           ></ball-pulse-loader>
           <v-btn
-            v-if="!isLoading"
+            :loading="isLoading"
             block
             x-large
             v-on:click="submitAttendanceCode"
@@ -177,7 +177,9 @@
                   <h5 class="display-1 text-xs-center mx-auto my-5">
                     Attendance code
                   </h5>
-                  <h2 class="display-4 text-xs-center bg-grey text-blue mx-auto py-10">
+                  <h2
+                    class="display-4 text-xs-center bg-grey text-blue mx-auto py-10"
+                  >
                     {{ attendanceRegister.code }}
                   </h2>
                   <h5
@@ -185,131 +187,166 @@
                     v-if="getMoment()"
                   >
                     Expires
-                    <span class="text-peach">{{ getMoment(attendanceRegister.expiryDate).fromNow() }}</span>
+                    <span class="text-peach">{{
+                      getMoment(attendanceRegister.expiryDate).fromNow()
+                    }}</span>
                   </h5>
                 </v-col>
               </v-row>
             </v-tab-item>
             <v-tab-item>
               <v-row v-if="!selectedAttendanceDate" class="row">
-                <v-col cols="12" md="6" 
+                <v-col
+                  cols="12"
+                  md="6"
                   v-for="(time, i) in attendanceRegisterHistoryTimes"
                   :key="i"
-                  >
-                  
-            <v-card
-                  @click="selectAttendanceDate(time)"
-              outlined
-              class="border-top-blue"
-            >
-              <v-row class="mx-auto my-auto px-2">
-                <v-col cols="2" class="mx-auto my-auto">
-                  <v-icon
-                    color="primary"
-                    class="text-peach mx-auto my-auto"
-                    size="30"
-                    >mdi-calendar</v-icon
-                  >
-                </v-col>
-                <v-col cols="10">
-                  <v-list-item-content>
-                    <v-list-item-title class="title mb-1">
-                      {{ getMoment(time.date).format("Do MMMM") }}</v-list-item-title
-                    >
-                    <v-list-item-subtitle
-                      ><span class="text-blue">
-                        {{ time.totalStudents }} attended</span
-                      ></v-list-item-subtitle
-                    >
-                  </v-list-item-content>
-                </v-col>
-              </v-row>
-            </v-card>
-                  </v-col
                 >
+                  <v-card
+                    @click="selectAttendanceDate(time)"
+                    outlined
+                    class="border-top-blue"
+                  >
+                    <v-row class="mx-auto my-auto px-2">
+                      <v-col cols="2" class="mx-auto my-auto">
+                        <v-icon
+                          color="primary"
+                          class="text-peach mx-auto my-auto"
+                          size="30"
+                          >mdi-calendar</v-icon
+                        >
+                      </v-col>
+                      <v-col cols="10">
+                        <v-list-item-content>
+                          <v-list-item-title class="title mb-1">
+                            {{
+                              getMoment(time.date).format("Do MMMM")
+                            }}</v-list-item-title
+                          >
+                          <v-list-item-subtitle
+                            ><span class="text-blue">
+                              {{ time.totalStudents }} attended</span
+                            ></v-list-item-subtitle
+                          >
+                        </v-list-item-content>
+                      </v-col>
+                    </v-row>
+                  </v-card>
+                </v-col>
               </v-row>
               <div v-if="selectedAttendanceDate" class="Scroll-first-four">
                 <v-row>
                   <v-col class="my-auto" cols="2">
-                    <v-btn large icon class="my-auto mx-5" v-on:click="selectedAttendanceDate = false">
+                    <v-btn
+                      large
+                      icon
+                      class="my-auto mx-5"
+                      v-on:click="selectedAttendanceDate = false"
+                    >
                       <v-icon>mdi-arrow-left</v-icon>
                     </v-btn>
                   </v-col>
-                  <v-col cols="10"  class="my-auto">
+                  <v-col cols="10" class="my-auto">
                     <v-list-item-content>
-                    <v-list-item-title class="title mb-1">
-                      {{ getMoment(selectedAttendanceDate.date).format("Do MMMM") }}</v-list-item-title
-                    >
-                    <v-list-item-subtitle
-                      ><span class="text-blue">
-                        {{ selectedAttendanceDate.totalStudents }} attended</span
-                      ></v-list-item-subtitle
-                    >
-                  </v-list-item-content>
+                      <v-list-item-title class="title mb-1">
+                        {{
+                          getMoment(selectedAttendanceDate.date).format(
+                            "Do MMMM"
+                          )
+                        }}</v-list-item-title
+                      >
+                      <v-list-item-subtitle
+                        ><span class="text-blue">
+                          {{ selectedAttendanceDate.totalStudents }}
+                          attended</span
+                        ></v-list-item-subtitle
+                      >
+                    </v-list-item-content>
                   </v-col>
                 </v-row>
-                <v-row :loading="attendanceRegisterHistoryStudentsLoading" class="v-triple-line col s12 center-align">
-                  <v-col cols="12" md="6" v-for="(student,
-                              i) in attendanceRegisterHistoryStudents.filter(
-                                v => v && v.studentId
-                              )"
-                              :key="i">
-                   <v-card
-                      shaped
-                      outlined 
-                    >
+                <v-row
+                  :loading="attendanceRegisterHistoryStudentsLoading"
+                  class="v-triple-line col s12 center-align"
+                >
+                  <v-col
+                    cols="12"
+                    md="6"
+                    v-for="(student,
+                    i) in attendanceRegisterHistoryStudents.filter(
+                      v => v && v.studentId
+                    )"
+                    :key="i"
+                  >
+                    <v-card shaped outlined>
                       <v-list-item three-line>
                         <v-list-item-avatar tile class="my-auto" size="40">
-                          <v-icon class="text-peach my-auto" size="60">mdi-account-outline</v-icon>
+                          <v-icon class="text-peach my-auto" size="60"
+                            >mdi-account-outline</v-icon
+                          >
                         </v-list-item-avatar>
                         <v-list-item-content>
                           <div class="overline mb-4">
-                            <span class="text-peach">{{ getMoment(student.date).fromNow() }}</span>
+                            <span class="text-peach">{{
+                              getMoment(student.date).fromNow()
+                            }}</span>
                           </div>
-                          <v-list-item-title class="subtitle-1 mb-1">{{ student.studentId.username }}</v-list-item-title>
+                          <v-list-item-title class="subtitle-1 mb-1">{{
+                            student.studentId.username
+                          }}</v-list-item-title>
                           <v-list-item-subtitle
                             ><span class="text-blue">
                               {{
-                                    student.studentId.lastname +
-                                      " " +
-                                      student.studentId.firstname
+                                student.studentId.lastname +
+                                  " " +
+                                  student.studentId.firstname
                               }}
                             </span></v-list-item-subtitle
                           >
                         </v-list-item-content>
                       </v-list-item>
                     </v-card>
-                    </v-col>
+                  </v-col>
                 </v-row>
               </div>
             </v-tab-item>
             <v-tab-item v-if="attendanceRegister">
               <v-row class="row">
                 <v-col cols="12">
-                  <h5 class="display-1 text-center title mt-3">Mark all the present students</h5>
+                  <h5 class="display-1 text-center title mt-3">
+                    Mark all the present students
+                  </h5>
                 </v-col>
                 <v-col cols="12" mx-auto class="v-triple-line mx-auto">
                   <v-row class="Scroll-first-four">
-                    <v-col cols="12" md="4"
+                    <v-col
+                      cols="12"
+                      md="4"
                       v-for="(student, i) in selectedAttendanceModuleStudents"
-                      :key="i">
+                      :key="i"
+                    >
                       <v-list-item
-                      @click="student.selected = !student.selected"
-                      :class="{ white: student.selected }"
-                      class="pointer"
-                       three-line>
-                        <v-list-item-avatar large :color="student.selected ? 'secondary' : 'primary'" outlined class="my-auto">
-                          <v-icon
-                          color="white"
-                          >{{ student.selected ? 'mdi-check' : 'mdi-close' }}</v-icon
-                        > 
+                        @click="student.selected = !student.selected"
+                        :class="{ white: student.selected }"
+                        class="pointer"
+                        three-line
+                      >
+                        <v-list-item-avatar
+                          large
+                          :color="student.selected ? 'secondary' : 'primary'"
+                          outlined
+                          class="my-auto"
+                        >
+                          <v-icon color="white">{{
+                            student.selected ? "mdi-check" : "mdi-close"
+                          }}</v-icon>
                         </v-list-item-avatar>
                         <v-list-item-content>
-                          <v-list-item-title class="subtitle-1 mb-1">{{ student.username }}</v-list-item-title>
+                          <v-list-item-title class="subtitle-1 mb-1">{{
+                            student.username
+                          }}</v-list-item-title>
                           <v-list-item-subtitle
                             ><span class="text-blue">
-                              {{student.lastname + " " + student.firstname
-                              }}
+                              {{ student.lastname + " " + student.firstname }}
                             </span></v-list-item-subtitle
                           >
                         </v-list-item-content>
@@ -318,7 +355,7 @@
                   </v-row>
                 </v-col>
                 <v-col cols="12">
-                   <v-btn
+                  <v-btn
                     :loading="isLoading"
                     v-on:click="submitBulkAttendance"
                     color="secondary"
@@ -336,48 +373,67 @@
     </v-dialog>
     <v-dialog
       v-if="isParent"
-      style="position:fixed;max-width:100%;max-height:60%;min-height:20%;min-width:40%;"
       class="card"
+      max-width="600"
+      color="white"
       v-model="isChangingStudent"
     >
-      <v-card class="col s12" style="background-color:#006064;">
-        <v-list-item-title>
-          <div class="v-title" style="color:ghostwhite">Change Student</div>
-          <v-btn v-on:click="isChangingStudent = false" class="right">
-            <v-icon style="color:ghostwhite">close</v-icon>
-          </v-btn>
-        </v-list-item-title>
+      <v-card color="secondary">
+        <v-row>
+          <v-col cols="10">
+            <v-card-title class="headline text-white"
+              >Change Student</v-card-title
+            >
+            <v-card-text
+              ><span class="text-white"
+                >Access someone's profile</span
+              ></v-card-text
+            >
+          </v-col>
+          <v-col class="m-auto my-auto" cols="2">
+            <v-btn
+              icon
+              v-on:click="isChangingStudent = false"
+              right
+              class="right"
+            >
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-card>
-      <v-card-actions>
-        <ball-pulse-loader
-          v-if="isLoading"
-          color="#000000"
-          size="20px"
-        ></ball-pulse-loader>
-        <div class="row">
-          <v-content class="col s12">
-            <v-field>
-              <label>Select Student</label>
-              <v-select v-model="currentStudent">
-                <v-option
-                  v-for="(student, i) in students"
-                  :key="i"
-                  style="background-color:white"
-                  :value="student._id"
-                  >{{ student.username }}</v-option
-                >
-              </v-select>
-            </v-field>
-          </v-content>
-          <v-btn
-            v-if="!isLoading"
-            v-on:click="changeStudent()"
-            class="v-primary col s12"
-            style="background-color:#006064;color:ghostwhite"
-            >Change student</v-btn
+      <v-row class="bg-white">
+        <v-col cols="12">
+          <v-select
+            class="ma-5"
+            :items="
+              students.map(v => {
+                return {
+                  _id: v._id,
+                  title: `${v.username} - ${v.firstname} ${v.lastname}`
+                };
+              })
+            "
+            item-text="title"
+            item-value="_id"
+            label="Select Student"
+            v-model="currentStudent"
           >
-        </div>
-      </v-card-actions>
+          </v-select>
+        </v-col>
+
+        <v-col mx-auto cols="12">
+          <v-btn
+            :loading="isLoading"
+            v-on:click="changeStudent()"
+            color="secondary"
+            large
+            block
+            rounded
+            >Change student</v-btn
+          ></v-col
+        >
+      </v-row>
     </v-dialog>
     <v-dialog
       v-if="
@@ -385,144 +441,108 @@
           ($store.state.user.type == 'LECTURER' ||
             $store.state.user.type == 'ADMIN')
       "
-      style="position:fixed;max-height:100vh;min-height:20%;width:100%;"
-      class="card"
+      max-width="600"
+      color="white"
       v-model="isAddingAnnouncements"
     >
-      <v-card class="col s12">
-        <v-list-item-title style="background-color:#006064;" class="row">
-          <div class="col s12 m10 offset-m1 text-center">
-            <span style="color:ghostwhite" class="v-title"
-              >Send an announcement</span
+      <v-card color="secondary">
+        <v-row>
+          <v-col cols="10">
+            <v-card-title class="headline text-white"
+              >Send an announcement</v-card-title
             >
-            <v-btn class="right" v-on:click="isAddingAnnouncements = false">
-              <v-icon style="color:ghostwhite">close</v-icon>
+            <v-card-text
+              ><span class="text-white"
+                >Communicate with students in real-time</span
+              ></v-card-text
+            >
+          </v-col>
+          <v-col class="m-auto my-auto" cols="2">
+            <v-btn
+              icon
+              v-on:click="isAddingAnnouncements = false"
+              right
+              class="right"
+            >
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
             </v-btn>
-          </div>
-        </v-list-item-title>
-        <v-content>
-          <div class="row">
-            <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-              <input
-                v-model="announcement.title"
-                id="ModuleDescription"
-                name="ModuleDescription"
-                type="text"
-              />
-              <label
-                class="text-center"
-                style="color:#006064"
-                for="ModuleDescription"
-                >Title</label
-              >
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-              <input
-                v-model="announcement.message"
-                id="ModuleDescription"
-                name="ModuleDescription"
-                type="text"
-              />
-              <label
-                class="text-center"
-                style="color:#006064"
-                for="ModuleDescription"
-                >Message</label
-              >
-            </div>
-            <div
-              style="padding:10px"
-              class="input-field col s8 offset-s2 m6 offset-m3 text-center"
-            >
-              <label>
-                <input
-                  v-model="announcement.isParent"
-                  class="with-gap"
-                  name="group1"
-                  type="checkbox"
-                />
-                <span :style="{ 'color:#006064': announcement.isParent }"
-                  >Send announcement to parents</span
-                >
-              </label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col s8 offset-s2 m6 offset-m3 text-center p-20">
-              <label style="color:#006064">Send to :</label>
-            </div>
-            <div
-              style="position:relative;top:0%;max-height:40vh;overflow-y:scroll;width:60%"
-              class="col s8 offset-s2 m6 offset-m3 text-center"
-            >
-              <form style="max-height:60vh">
-                <p v-for="(_module, i) in modules" :key="i">
-                  <label>
-                    <input
-                      v-model="announcement.module"
-                      :value="_module._id"
-                      class="with-gap"
-                      name="group1"
-                      type="radio"
-                    />
-                    <span
-                      >{{ _module.name }} ({{ _module.code }}) students</span
-                    >
-                  </label>
-                </p>
-                <p>
-                  <label>
-                    <input
-                      v-model="announcement.module"
-                      :value="null"
-                      class="with-gap"
-                      name="group1"
-                      type="radio"
-                      :checked="true"
-                    />
-                    <span>All Students</span>
-                  </label>
-                </p>
-              </form>
-            </div>
-            <div class="col s8 offset-s2 m6 offset-m3 text-center p-20"></div>
-          </div>
-        </v-content>
-        <v-card-actions style="background-color:#006064;padding:10px">
-          <span
-            v-if="!isLoading"
-            style="float:left;left:0;position:absolute;padding-left:30px;color:ghostwhite;max-width:100%"
-            >The announcement will be sent to
-            {{
-              modules.some(v => v && v._id == announcement.module)
-                ? `${
-                    modules.find(v => v && v._id == announcement.module).name
-                  } ${
-                    modules.find(v => v && v._id == announcement.module).code
-                  }`
-                : "All"
-            }}
-            students
-            {{
-              announcement.isParent ? " and SMSs to thier parents as well" : ""
-            }}</span
-          >
-          <ball-pulse-loader
-            v-if="isLoading"
-            color="#000000"
-            size="20px"
-          ></ball-pulse-loader>
-          <v-btn
-            v-if="!isLoading"
-            v-on:click="SendAnnouncement()"
-            style="color:ghostwhite;max-width:40%"
-            class="v-secondary"
-            >Send announcement</v-btn
-          >
-        </v-card-actions>
+          </v-col>
+        </v-row>
       </v-card>
+      <v-row 
+      class="bg-white px-10">
+      <v-col cols="12">
+        <v-text-field
+          color="secondary"
+          label="Announcement title"
+          outlined
+          v-model="announcement.title"
+        >
+        </v-text-field>
+      </v-col>
+      <v-col cols="12">
+        <v-textarea
+          color="secondary"
+          label="Message"
+          outlined
+          prepend-inner-icon="mdi-bullhorn-outline"
+          v-model="announcement.message"
+        >
+        </v-textarea>
+      </v-col>
+      <v-col cols="12">
+        <v-checkbox v-model="announcement.isParent" label="Send announcement to parents"></v-checkbox>
+      </v-col>
+      <v-col cols="12">
+        <v-checkbox 
+                    v-model="announcement.module"
+                    value="all_students" label="Send to all students"></v-checkbox>
+          <v-select
+            v-show="announcement.module != 'all_students'"
+            :items="
+              modules.map(v => {
+                return {
+                  _id: v._id,
+                  title: `${v.name} ${v.code} students`
+                };
+              })
+            "
+            item-text="title"
+            item-value="_id"
+            label="Send to : "
+            v-model="announcement.module"
+          >
+          </v-select>
+      </v-col>
+
+        <v-col cols="12">
+          <p
+          v-if="!isLoading"
+          class="text-center"
+          >The announcement will be sent to
+          {{
+            modules.some(v => v && v._id == announcement.module)
+              ? `${modules.find(v => v && v._id == announcement.module).name} ${
+                  modules.find(v => v && v._id == announcement.module).code
+                }`
+              : "All"
+          }}
+          students
+          {{
+            announcement.isParent ? " and SMSs to thier parents as well" : ""
+          }}</p
+        >
+          <v-btn
+            :loading="isLoading"
+            v-on:click="SendAnnouncement()"
+            color="secondary"
+            large
+            block
+            rounded
+            >Send announcement</v-btn
+          ></v-col
+        >
+      </v-row>
     </v-dialog>
 
     <v-row v-if="!$store.state.user.isLoggedIn" class="row">
@@ -896,7 +916,7 @@ export default {
       if (this.isParent) {
         this.options.push({
           text: "Change a student",
-          icon: "people",
+          icon: "mdi-account-multiple",
           link: "/",
           auth: ["STUDENT"],
           showStudents: true
@@ -1250,6 +1270,9 @@ export default {
     },
     SendAnnouncement() {
       this.isLoading = true;
+      if(this.announcement.module == "all_students"){
+        this.announcement.module = null;
+      }
       this.announcement.isToAll = this.announcement.module == null;
       axios
         .post(
