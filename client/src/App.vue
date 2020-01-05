@@ -1,19 +1,18 @@
 <template>
   <v-app>
-    <v-card v-if="$route.meta.showNav" color="white" flat height="200px" tile>
-      <v-toolbar color="primary" dark prominent extended>
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
-        <v-btn
-          @click="changeSchool()"
-          x-large
-          v-if="$store.state.user.isLoggedIn"
-          text
-        >
-          {{ $store.state.settings.school }}
-        </v-btn>
+    <v-card v-if="$route.meta.showNav" color="white" flat height="100px" tile>
+      <v-toolbar color="secondary" dark prominent extended>
         <v-toolbar-title class="my-auto center">
-          <v-img center src="@/assets/logo_small.png" />
+          <v-row>
+            <v-col cols="6" class="pointer" @click="$router.push('/')">
+              <v-img center src="@/assets/icon.png"
+            /></v-col>
+            <v-col cols="6" class="my-auto">
+              <v-btn @click="changeSchool()" x-large block text>
+                {{ $store.state.settings.school }}
+              </v-btn>
+            </v-col>
+          </v-row>
         </v-toolbar-title>
 
         <v-spacer></v-spacer>

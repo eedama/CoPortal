@@ -258,9 +258,10 @@
         </v-col>
         <v-col
           cols="12"
-          sm="6"
-          md="4"
-          lg="3"
+          :sm="isFullscreen == null ? 6 : 8"
+          :md="isFullscreen == null ? 4 : 6"
+          :lg="isFullscreen == null ? 3 : 6"
+          class="mx-auto"
           v-show="isFullscreen == null || isFullscreen == student._id"
           v-for="(student, i) in filteredStudents"
           :key="i"

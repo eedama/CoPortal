@@ -549,7 +549,7 @@
       </v-row>
     </v-dialog>
 
-    <v-row v-if="!$store.state.user.isLoggedIn" class="row">
+    <v-row v-if="!$store.state.user.isLoggedIn" class="row mt-10 pt-10">
       <v-col cols="9">
         <h4 class="title text-blue px-5">We offer the following services</h4>
       </v-col>
@@ -653,7 +653,7 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="$store.state.user.isLoggedIn" class="row">
+    <v-row v-if="$store.state.user.isLoggedIn" class="row  mt-10 pt-10">
       <v-col cols="4">
         <v-row>
           <v-col cols="8">
@@ -668,6 +668,9 @@
                 $store.state.user.type == 'LECTURER' ||
                   $store.state.user.type == 'ADMIN'
               "
+              outlined
+              shaped
+              color="secondary"
               v-on:click="isAddingAnnouncements = true"
             >
               Send new

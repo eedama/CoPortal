@@ -5,6 +5,9 @@
         <v-card :loading="isLoading" class="px-5 py-5">
           <v-content>
             <v-row>
+              <v-col cols="12" md="5" offset-md="2" class="mx-auto">
+                <v-img center src="@/assets/logo_small.png"
+              /></v-col>
               <v-col cols="12" md="8" offset-md="3" class="mx-auto">
                 <v-text-field
                   prepend-inner-icon="mdi-account"
@@ -83,16 +86,6 @@
         </v-card>
       </v-col>
     </v-row>
-    <div class="row valign-wrapper" style="height:80vh">
-      <div class="col m6 offset-m3 col s12 center-align">
-        <div class="card row z-depth-5">
-          <div class="card-image col l8 offset-l2 m6 offset-m3 s12">
-            <img class="img-responsive" src="static/img/coPortalLogo.jpg" />
-          </div>
-          <div class="card-content"></div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
