@@ -271,24 +271,24 @@ router.get('/all/past/tests/for/:studentId', function (req: express.Request, res
     if (s == null) return res.status(512).send("Student not found");
     console.log(s);
     var answer: any[] = [];
-    // TODO : Revice this method, Why does it use a foreach and res.json inside it???
     for (const solution of s.solutions) {
       try {
-        const q = await Questionaire.findById(solution.questionaireId);
+        const q = await Questionaire.findById(solution.questionaireId, "title");
         if (q != null) {
+          // TODO : This algo might change if the pass mark is nolonger 50
+
+          const isPassed = ((solution.mark / solution.answers.length) * 100) >= 50;
           answer.push({
             solutionId: solution._id,
             title: q.title,
             mark: solution.mark + '/' + solution.answers.length,
+            isPassed: isPassed,
             date: solution.date
           })
         }
       } catch (err) {
 
       }
-    }
-    if (answer.length == 0) {
-      return res.status(512).send("Server error : questionaire does not exist");
     }
     return res.json(answer);
   }).catch(err => {
