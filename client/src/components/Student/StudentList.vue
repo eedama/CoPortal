@@ -1,285 +1,481 @@
 <template>
-  <div>
-    <div class="row">
-      <div class="col s8 offset-s2">
-        <md-button v-on:click="addingStudents ? addingStudents = false : $router.back()" class="right">
-          <md-icon>keyboard_backspace</md-icon>
-          <span>Back</span>
-        </md-button>
-      </div>
-    </div>
+  <v-row>
+    <v-col cols="10"> </v-col>
+    <v-col cols="2">
+      <v-btn
+        right
+        v-on:click="addingStudents ? (addingStudents = false) : $router.back()"
+        class="primary justify-end"
+      >
+        <v-icon>mdi-keyboard-backspace</v-icon>
+        <span class="px-2">Back</span>
+      </v-btn>
+    </v-col>
 
-    <div v-show="!addingStudents" class="row">
-      <div class="col s8 offset-s2 center-align">
-        <a v-on:click="addingStudents = !addingStudents" class="btn waves-effect">Add new student</a>
-      </div>
-    </div>
-    <div v-show="addingStudents" class="row" style="height:80vh">
-      <div class="col s12 m8 offset-m2 l6 offset-l3">
-        <add-student v-on:submitted="AddedNewStudent"></add-student>
-      </div>
-    </div>
-    <div v-show="!addingStudents" class="row">
+    <v-col
+      sm="12"
+      md="4"
+      md-offset="4"
+      class="mx-auto"
+      v-show="!addingStudents"
+    >
+      <v-btn
+        block
+        v-on:click="addingStudents = !addingStudents"
+        class="secondary"
+        >Add new student</v-btn
+      >
+    </v-col>
+    <v-col cols="12" v-show="addingStudents" class="row" style="height:80vh">
+      <add-student v-on:submitted="AddedNewStudent"></add-student>
+    </v-col>
+    <v-col cols="12">
+      <v-row v-if="!addingStudents" class="row">
+        <v-dialog
+          class="card"
+          max-width="600"
+          color="white"
+          :v-active.sync="studentModule._id != null"
+        >
+          <v-dialog-title
+            >Adding modules for {{ studentModule.username }}</v-dialog-title
+          >
 
-      <md-dialog class="card" style="position:absolute" :md-active.sync="studentModule._id != null">
-        <md-dialog-title>Adding modules for {{ studentModule.username }}</md-dialog-title>
-
-        <md-dialog-content>
-          <div class="row" :key="i" v-for="(m,i) in studentModule.modules.length">
-            <div class="col s10">
-              <md-field>
-                <label :for="`mmodules-${i}`">Module {{ m }}</label>
-                <md-select v-model="studentModule.modules[i]" :name="`mmodules-${i}`" :id="`mmodules-${i}`">
-                  <md-option :disabled="studentModule.modules.filter(sm => sm == _module._id).length > 0" v-for="_module in modules" :value="_module._id" :key="_module._id">{{ _module.name }} ({{ _module.code }})</md-option>
-                </md-select>
-              </md-field>
+          <v-dialog-content>
+            <div
+              class="row"
+              :key="i"
+              v-for="(m, i) in studentModule.modules.length"
+            >
+              <div class="col s10">
+                <v-field>
+                  <label :for="`mmodules-${i}`">Module {{ m }}</label>
+                  <v-select
+                    v-model="studentModule.modules[i]"
+                    :name="`mmodules-${i}`"
+                    :id="`mmodules-${i}`"
+                  >
+                    <v-option
+                      :disabled="
+                        studentModule.modules.filter(sm => sm == _module._id)
+                          .length > 0
+                      "
+                      v-for="_module in modules"
+                      :value="_module._id"
+                      :key="_module._id"
+                      >{{ _module.name }} ({{ _module.code }})</v-option
+                    >
+                  </v-select>
+                </v-field>
+              </div>
+              <div class="col s2 bottom-align">
+                <a
+                  v-on:click="studentModule.modules.push(null)"
+                  v-show="
+                    i == studentModule.modules.length - 1 &&
+                      studentModule.modules[i] != null
+                  "
+                  class="btn btn-floating waves-effect"
+                  ><i class="material-icons">add</i></a
+                >
+                <a
+                  v-on:click="studentModule.modules.splice(i, 1)"
+                  v-show="i != studentModule.modules.length - 1"
+                  class="btn btn-floating red waves-effect"
+                  ><i class="material-icons">close</i></a
+                >
+              </div>
             </div>
-            <div class="col s2 bottom-align">
-              <a v-on:click="studentModule.modules.push(null)" v-show="i == (studentModule.modules.length - 1) && studentModule.modules[i] != null" class="btn btn-floating waves-effect"><i class="material-icons">add</i></a>
-              <a v-on:click="studentModule.modules.splice(i,1)" v-show="i != (studentModule.modules.length - 1)" class="btn btn-floating red waves-effect"><i class="material-icons">close</i></a>
-            </div>
-          </div>
-        </md-dialog-content>
-        <md-dialog-actions>
-          <md-button class="md-primary" @click="AddNewModule(null)">Close</md-button>
-          <md-button v-if="!isLoading" class="md-primary" @click="AddNewModule('submit')">Save Changes</md-button>
-          <div class="row">
-            <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-              <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-            </div>
-          </div>
-        </md-dialog-actions>
-      </md-dialog>
-      <md-dialog class="card" style="position:absolute" :md-active.sync="showEditProfile">
-        <md-dialog-actions>
-          <md-button class="md-icon-button right" @click="activeEditProfile(null)">
-            <md-icon>close</md-icon>
-          </md-button>
-        </md-dialog-actions>
-        <div style="overflow-y:scroll;overflow-x:hidden" class="col m8 offset-m2 col s12 center-align">
-          <div class="card-content row">
+          </v-dialog-content>
+          <v-dialog-actions>
+            <v-btn class="v-primary" @click="AddNewModule(null)">Close</v-btn>
+            <v-btn
+              v-if="!isLoading"
+              class="v-primary"
+              @click="AddNewModule('submit')"
+              >Save Changes</v-btn
+            >
             <div class="row">
-              <div class="col s12 center-align">
-                <h5>Editting {{student.firstname}} {{student.lastname}}'s profile</h5>
-              </div>
-              <div class="input-field col s10 offset-s1 m8 offset-m2 text-center">
-                <input v-model="student.firstname" id="Firstname" name="Firstname" type="text" />
-                <label class="text-center" for="Firstname">Firstname</label>
-              </div>
-              <div class="input-field col s10 offset-s1 m8 offset-m2 text-center">
-                <input v-model="student.lastname" id="Lastname" name="Lastname" type="text" />
-                <label class="text-center" for="Lastname">Lastname</label>
+              <div
+                class="col s8 offset-s2 m8 offset-m2 center-align text-center"
+              >
+                <ball-pulse-loader
+                  v-if="isLoading"
+                  color="#000000"
+                  size="20px"
+                ></ball-pulse-loader>
               </div>
             </div>
+          </v-dialog-actions>
+        </v-dialog>
+        <v-dialog
+          class="card"
+          style="position:absolute"
+          :v-active.sync="showEditProfile"
+        >
+          <v-dialog-actions>
+            <v-btn class="v-icon-button right" @click="activeEditProfile(null)">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-dialog-actions>
+          <div
+            style="overflow-y:scroll;overflow-x:hidden"
+            class="col m8 offset-m2 col s12 center-align"
+          >
+            <div class="card-content row">
+              <div class="row">
+                <div class="col s12 center-align">
+                  <h5>
+                    Editting {{ student.firstname }} {{ student.lastname }}'s
+                    profile
+                  </h5>
+                </div>
+                <div
+                  class="input-field col s10 offset-s1 m8 offset-m2 text-center"
+                >
+                  <input
+                    v-model="student.firstname"
+                    id="Firstname"
+                    name="Firstname"
+                    type="text"
+                  />
+                  <label class="text-center" for="Firstname">Firstname</label>
+                </div>
+                <div
+                  class="input-field col s10 offset-s1 m8 offset-m2 text-center"
+                >
+                  <input
+                    v-model="student.lastname"
+                    id="Lastname"
+                    name="Lastname"
+                    type="text"
+                  />
+                  <label class="text-center" for="Lastname">Lastname</label>
+                </div>
+              </div>
+              <div class="row">
+                <div
+                  class="input-field col s10 offset-s1 m8 offset-m2 text-center"
+                >
+                  <input
+                    v-model="student.username"
+                    id="Username"
+                    name="Username"
+                    type="text"
+                  />
+                  <label class="text-center" for="Username">Username</label>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col s10 offset-s1 m8 offset-m2">
+                  <v-field>
+                    <label>ID Number</label>
+                    <v-input
+                      v-model="student.idNumber"
+                      maxlength="13"
+                    ></v-input>
+                  </v-field>
+                </div>
+              </div>
+
+              <div class="row" v-show="student.idNumber.length > 6">
+                <div class="col s10 offset-s1 m8 offset-m2">
+                  <label>
+                    {{
+                      student.isSouthAfrican
+                        ? "South African Citizen"
+                        : "Non-South African Citizen"
+                    }}
+                  </label>
+                </div>
+                <div class="col s10 offset-s1 m8 offset-m2">
+                  <v-field>
+                    <label for="Gender">Gender</label>
+                    <v-select
+                      v-model="student.gender"
+                      name="Gender"
+                      id="Gender"
+                    >
+                      <v-option disabled>Pick a gender</v-option>
+                      <v-option value="Male">Male</v-option>
+                      <v-option value="Female">Female</v-option>
+                    </v-select>
+                  </v-field>
+                </div>
+                <div class="col s10 offset-s1 m8 offset-m2">
+                  <v-datepicker v-immediately v-model="student.dob">
+                    <label>Date of birth</label>
+                  </v-datepicker>
+                </div>
+              </div>
+
+              <div class="row" v-show="txtError.length > 0">
+                <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                  <label class="text-center red-text">{{ txtError }}</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <v-dialog-actions>
+            <v-btn class="red" @click="activeEditProfile(null)">
+              Cancel
+            </v-btn>
+            <v-btn v-if="!isLoading" v-on:click="UpdateStudent()" class="right">
+              Save changes
+            </v-btn>
             <div class="row">
-              <div class="input-field col s10 offset-s1 m8 offset-m2 text-center">
-                <input v-model="student.username" id="Username" name="Username" type="text" />
-                <label class="text-center" for="Username">Username</label>
+              <div
+                class="col s8 offset-s2 m8 offset-m2 center-align text-center"
+              >
+                <ball-pulse-loader
+                  v-if="isLoading"
+                  color="#000000"
+                  size="20px"
+                ></ball-pulse-loader>
               </div>
             </div>
+          </v-dialog-actions>
+        </v-dialog>
+        <v-col cols="12" sm="12" md="8" offset-md="2">
+          <v-text-field
+            class="text-center mx-auto text-xs-center"
+            color="secondary"
+            label="Search"
+            v-on:keypress.enter="DeepSearch"
+            solo
+            block
+            prepend-inner-icon="mdi-magnify"
+            v-model="txtSearch"
+          >
+          </v-text-field>
+          <p
+            v-show="filteredStudents.length == 0 && !isLoading"
+            class="text-center ma-5 red-text"
+          >
+            No results found
+          </p>
+        </v-col>
+        <v-col
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
+          v-show="isFullscreen == null || isFullscreen == student._id"
+          v-for="(student, i) in filteredStudents"
+          :key="i"
+        >
+          <v-card>
+            <v-card-header>
+               <v-list-item>
+      <v-list-item-avatar color="grey"></v-list-item-avatar>
+      <v-list-item-content>
+        <v-list-item-title class="headline">{{ student.lastname }} {{ student.firstname }}</v-list-item-title>
+        <v-list-item-subtitle>{{ student.username }}</v-list-item-subtitle>
+      </v-list-item-content>
 
-            <div class="row">
-              <div class="col s10 offset-s1 m8 offset-m2">
-                <md-field>
-                  <label>ID Number</label>
-                  <md-input v-model="student.idNumber" maxlength="13"></md-input>
-                </md-field>
-              </div>
-            </div>
+          <v-list-item-action>  <v-btn
+                  v-on:click="
+                    isFullscreen == student._id
+                      ? (isFullscreen = null)
+                      : (isFullscreen = student._id)
+                  "
+                  icon
+                  class="v-icon-button waves-effect"
+                >
+                  <v-icon>{{
+                    isFullscreen == student._id ? "mdi-close" : "mdi-fullscreen"
+                  }}</v-icon>
+                </v-btn>
+          </v-list-item-action>
+    </v-list-item>
+            </v-card-header>
 
-            <div class="row" v-show="student.idNumber.length > 6">
-              <div class="col s10 offset-s1 m8 offset-m2">
-                <label>
-                                                        {{ student.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                                                  </label>
-              </div>
-              <div class="col s10 offset-s1 m8 offset-m2">
-                <md-field>
-                  <label for="Gender">Gender</label>
-                  <md-select v-model="student.gender" name="Gender" id="Gender">
-                    <md-option disabled>Pick a gender</md-option>
-                    <md-option value="Male">Male</md-option>
-                    <md-option value="Female">Female</md-option>
-                  </md-select>
-                </md-field>
-              </div>
-              <div class="col s10 offset-s1 m8 offset-m2">
-                <md-datepicker md-immediately v-model="student.dob">
-                  <label>Date of birth</label>
-                </md-datepicker>
-              </div>
-            </div>
+                <v-tabs @change="studentTabChanged($event,student)" grow>
+      <v-tab>
+         <v-tooltip top>
+      <template v-slot:activator="{ on }">
+        <v-icon v-on="on">mdi-account-card-details-outline</v-icon>
+      </template>
+      <span>Details</span>
+    </v-tooltip>
+      </v-tab>
+      <v-tab>
+         <v-tooltip top>
+      <template v-slot:activator="{ on }">
+        <v-icon v-on="on">mdi-library-books</v-icon>
+      </template>
+      <span>Modules</span>
+    </v-tooltip>
+      </v-tab>
+      <v-tab>
+         <v-tooltip top>
+      <template v-slot:activator="{ on }">
+        <v-icon v-on="on">mdi-book-open</v-icon>
+      </template>
+      <span>Past tests</span>
+    </v-tooltip>
+      </v-tab>
+      <v-tab>
+         <v-tooltip top>
+      <template v-slot:activator="{ on }">
+        <v-icon v-on="on">mdi-settings</v-icon>
+      </template>
+      <span>Settings</span>
+    </v-tooltip>
+      </v-tab>
+        <v-tab-item>
+  <v-list class="v-double-line">
+                <v-list-item v-if="student.idNumber" class="waves-effect">
+                  <v-list-item-avatar>
+                    <v-icon>mdi-account-circle</v-icon>
+                  </v-list-item-avatar>
 
-            <div class="row" v-show="txtError.length > 0">
-              <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <label class="text-center red-text">{{ txtError }}</label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <md-dialog-actions>
-          <md-button class="red" @click="activeEditProfile(null)">
-            Cancel
-          </md-button>
-          <md-button v-if="!isLoading" v-on:click="UpdateStudent()" class="right">
-            Save changes
-          </md-button>
-          <div class="row">
-            <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-              <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-            </div>
-          </div>
-        </md-dialog-actions>
-      </md-dialog>
-      <div class="row">
-        <div class="col s10 offset-s1 m8 offset-m3 l6 offset-l3 ">
-          <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-            <input v-on:keypress.enter="DeepSearch" v-model="txtSearch" id="Password" name="Search" type="search" />
-            <label class="text-center" for="Search">Search</label>
-          </div>
-        </div>
-        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-        </div>
-      </div>
-      <div v-show="filteredStudents.length == 0 && !isLoading" class="col s12 center-align">
-        <p class="red-text">No results found</p>
-      </div>
-      <div v-show="isFullscreen == null || isFullscreen == student._id" v-for="(student,i) in filteredStudents" :key="i" :class="{'s10 offset-s1 m8 offset-m2 l6 offset-l3':isFullscreen == student._id,'m6 l4 xl3':isFullscreen == null,'hidden':isFullscreen != student._id}"
-        class="col">
-        <md-card class="hoverable">
-          <md-card-header>
-            <md-card-header-text>
-              <div class="md-title">{{ student.lastname }} {{ student.firstname}}</div>
-              <div class="md-subhead">Takes {{ student.modules.length }} {{ student.modules.length == 1 ? 'module' : 'modules' }}</div>
-            </md-card-header-text>
+                  <v-list-item-content>
+                    <v-list-item-title>ID number</v-list-item-title>
+                    <v-list-item-subtitle>{{
+                      student.idNumber
+                    }}</v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item v-if="student.gender" class="waves-effect">
+                  <v-list-item-avatar>
+                    <v-icon>mdi-gender-male-female</v-icon>
+                  </v-list-item-avatar>
 
-            <md-menu md-size="big" md-direction="bottom-end">
-              <md-button v-on:click=" isFullscreen == student._id ? isFullscreen = null : isFullscreen = student._id" class="md-icon-button waves-effect">
-                <md-icon>{{ isFullscreen == student._id ? 'close' : 'fullscreen'}}</md-icon>
-              </md-button>
-            </md-menu>
-          </md-card-header>
+                  <v-list-item-content>
+                    <v-list-item-title>Gender</v-list-item-title>
+                    <v-list-item-subtitle>{{
+                      student.gender
+                    }}</v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item
+                  v-if="student.isSouthAfrican != null"
+                  class="waves-effect"
+                >
+                  <v-list-item-avatar>
+                    <v-icon>mdi-flag</v-icon>
+                  </v-list-item-avatar>
 
-          <md-card-content>
-            <md-list class="md-double-line">
-              <md-subheader>Details</md-subheader>
-              <md-list-item v-if="student.gender" class="waves-effect">
-                <md-icon class="md-primary">account_circle</md-icon>
-                <div class="md-list-item-text">
-                  <span>{{ student.idNumber }}</span>
-                  <span>ID Number</span>
-                </div>
-              </md-list-item>
-              <md-list-item v-if="student.gender" class="waves-effect">
-                <md-icon class="md-primary">wc</md-icon>
-                <div class="md-list-item-text">
-                  <span>{{ student.gender }}</span>
-                  <span>Gender</span>
-                </div>
-              </md-list-item>
-              <md-list-item v-if="student.isSouthAfrican != null" class="waves-effect">
-                <md-icon class="md-primary">flag</md-icon>
-                <div class="md-list-item-text">
-                  <span>{{ student.isSouthAfrican ? "South African" : "Non South African" }}</span>
-                  <span>Nationality</span>
-                </div>
-              </md-list-item>
-            </md-list>
-          </md-card-content>
-
-
-          <md-card-expand>
-            <md-card-actions md-alignment="space-between">
-              <div>
-                <md-button v-on:click="activeEditProfile(student)">
-                  <md-icon>account_circle</md-icon> {{ student.username }}
-                </md-button>
-              </div>
-
-              <div>
-              </div>
-              <md-card-expand-trigger>
-                <md-button v-on:click="GetPastTestsFor(student)" class="md-icon-button">
-                  <md-icon>keyboard_arrow_down</md-icon>
-                </md-button>
-              </md-card-expand-trigger>
-            </md-card-actions>
-
-            <md-card-expand-content>
-              <md-card-content>
-
-                <md-list class="md-double-line">
-
-                  <md-subheader>Modules</md-subheader>
-
-                  <md-list-item v-for="modul in student.modules" :key="modul._id" :class="{'waves-effect':!modul.removed}">
-                    <md-icon class="md-primary">book</md-icon>
-                    <div v-on:click="!modul.removed ? goToModule(modul._id) : null" class="md-list-item-text">
-                      <span>{{ modul.name }}</span>
-                      <span>{{ modul.removed ? 'Unassign ' + modul.code : modul.code }}</span>
-                    </div>
-                    <md-button v-show="!modul.removed" v-on:click="modul.removed = true" class="md-icon-button md-list-action">
-                      <md-icon>delete</md-icon>
-                    </md-button>
-                    <md-button v-if="!isLoading" v-show="modul.removed" v-on:click="DeleteModule(student._id,modul._id)" class="md-icon-button md-list-action">
-                      <md-icon>done</md-icon>
-                    </md-button>
-                    <div v-show="modul.removed" class="row">
-                      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-                        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-                      </div>
-                    </div>
-                    <md-button v-show="modul.removed" v-on:click="modul.removed = false" class="md-icon-button md-list-action">
-                      <md-icon>close</md-icon>
-                    </md-button>
-                  </md-list-item>
-                  <md-list-item v-on:click="AddNewModule(student)" class="waves-effect">
-                    <md-icon class="md-primary">add</md-icon>
-                    <div class="md-list-item-text">
+                  <v-list-item-content>
+                    <v-list-item-title>Nationality</v-list-item-title>
+                    <v-list-item-subtitle>{{
+                      student.isSouthAfrican
+                        ? "South African"
+                        : "Non South African"
+                    }}</v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+      </v-tab-item>
+      <v-tab-item>
+      <v-row class="pa-2">
+                <v-col
+                  v-for="modul in student.modules"
+                  :key="modul._id"
+                  class="shrink"
+                >
+                  <v-chip
+                    :disabled="isLoading"
+                    close
+                    @click:close="modul.removed = true"
+                    @click="!modul.removed ? goToModule(modul._id) : null"
+                    ><span>{{ modul.name }}</span>
+                    <span>{{
+                      modul.removed ? "Unassign " + modul.code : modul.code
+                    }}</span>
+                  </v-chip>
+                  <v-btn
+                    v-if="!isLoading"
+                    :loading="isLoading"
+                    v-show="modul.removed"
+                    v-on:click="DeleteModule(student._id, modul._id)"
+                    color="primary"
+                  >
+                    Confirm
+                  </v-btn>
+                </v-col>
+                <v-col>
+                  <v-list-item
+                    v-on:click="AddNewModule(student)"
+                    class="waves-effect"
+                  >
+                    <v-icon class="v-primary">mdi-plus</v-icon>
+                    <div class="v-list-item-text">
                       <span>Add new Module</span>
                       <span></span>
                     </div>
-                  </md-list-item>
-                  <md-subheader>Past tests</md-subheader>
+                  </v-list-item>
+                </v-col>
+              </v-row> 
+        </v-tab-item>
+        <v-tab-item>
+ <v-list class="v-double-line">
+                      <v-list-item  v-on:click="goToSolution(pastTest.solutionId)"
+                      v-for="(pastTest, v) in student.pastTests"
+                      :key="v"
+                      class="waves-effect">
+                  <v-list-item-avatar :color="pastTest.isPassed ? 'primary' : 'secondary'">
+                    {{ pastTest.mark }}
+                  </v-list-item-avatar>
 
-                  <md-list-item v-on:click="goToSolution(pastTest.solutionId)" v-for="(pastTest,v) in student.pastTests" :key="v" href="#" class="waves-effect">
-                    <md-icon class="md-primary">account_circle</md-icon>
-                    <div class="md-list-item-text">
-                      <span>{{pastTest.mark}}</span>
-                      <span>{{pastTest.title}}</span>
-                    </div>
-                  </md-list-item>
-                  <md-subheader>Student settings</md-subheader>
+                  <v-list-item-content>
+                    <v-list-item-title>{{ pastTest.title }}</v-list-item-title>
+                    <v-list-item-subtitle>{{ getMoment(pastTest.date).fromNow() }}</v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+                    </v-list>
+        </v-tab-item>
+        <v-tab-item>
+              <v-list>
+                    <v-subheader></v-subheader>
 
-                  <md-list-item v-on:click="student.removed = !student.removed" class="waves-effect">
-                    <md-icon class="md-primary">delete</md-icon>
-                    <div class="md-list-item-text">
-                      <span>{{ student.removed ? 'Are you sure?':'Delete' }}</span>
-                    </div>
-
-                    <md-button v-if="!isLoading" v-show="student.removed" v-on:click="DeleteStudent(student._id)" class="md-icon-button md-list-action">
-                      <md-icon>done</md-icon>
-                    </md-button>
-                    <div v-show="student.removed" class="row">
-                      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-                        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
+                    <v-list-item
+                      v-on:click="student.removed = !student.removed"
+                      class="waves-effect"
+                    >
+                      <v-icon class="v-primary">mdi-delete</v-icon>
+                      <div class="v-list-item-text">
+                        <span>{{
+                          student.removed ? "Are you sure?" : "Delete"
+                        }}</span>
                       </div>
-                    </div>
-                    <md-button v-show="student.removed" class="md-icon-button md-list-action">
-                      <md-icon>close</md-icon>
-                    </md-button>
-                  </md-list-item>
-                </md-list>
-              </md-card-content>
-            </md-card-expand-content>
-          </md-card-expand>
-        </md-card>
 
-      </div>
-
-    </div>
-  </div>
+                      <v-btn
+                        v-if="!isLoading"
+                        v-show="student.removed"
+                        v-on:click="DeleteStudent(student._id)"
+                        class="v-icon-button v-list-action"
+                      >
+                        <v-icon>mdi-check</v-icon>
+                      </v-btn>
+                      <div v-show="student.removed" class="row">
+                        <div
+                          class="col s8 offset-s2 m8 offset-m2 center-align text-center"
+                        >
+                          <ball-pulse-loader
+                            v-if="isLoading"
+                            color="#000000"
+                            size="20px"
+                          ></ball-pulse-loader>
+                        </div>
+                      </div>
+                      <v-btn
+                        v-show="student.removed"
+                        class="v-icon-button v-list-action"
+                      >
+                        <v-icon>mdi-close</v-icon>
+                      </v-btn>
+                    </v-list-item>
+                  </v-list>
+                 </v-tab-item>
+                </v-tabs>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -298,7 +494,8 @@ export default {
         _id: null,
         username: "",
         modules: [null],
-        oldModules: []
+        oldModules: [],
+        studentTabs: []
       },
       txtSearch: "",
       txtError: "",
@@ -317,7 +514,6 @@ export default {
       addingStudents: false,
       students: [],
       modules: [],
-      selectedStudent: null,
       showEditProfile: false,
       isFullscreen: null,
       isLoading: false
@@ -374,7 +570,13 @@ export default {
           )
           .then(results => {
             this.isLoading = false;
-            this.students = results.data;
+            this.students = results.data.map(s => {
+              return {
+                ...s,
+                show :true,
+                pastTests: [],
+              }
+            });
             if (this.students.length == 1) {
               this.isFullscreen = this.students[0]._id;
             }
@@ -392,9 +594,12 @@ export default {
           .get(this.$store.state.settings.baseLink + "/s/students/all")
           .then(results => {
             this.isLoading = false;
-            this.students = results.data;
-            this.students.map(s => {
-              s.show = true;
+            this.students = results.data.map(s => {
+              return {
+                ...s,
+                show:true,
+                pastTests:[],
+              }
             });
           })
           .catch(err => {
@@ -458,9 +663,7 @@ export default {
 
               swal.fire(
                 "Modules successfully assigned",
-                `${newModules.length} new modules are now assigned to ${
-                  this.studentModule.username
-                }`,
+                `${newModules.length} new modules are now assigned to ${this.studentModule.username}`,
                 "success"
               );
               this.AddNewModule(null);
@@ -572,6 +775,13 @@ export default {
         }
       });
     },
+    studentTabChanged(arg,student){
+      switch(arg){
+        case 2: // This is the past tests tab
+          this.GetPastTestsFor(student);
+        break;
+      }
+    },
     GetPastTestsFor(student) {
       axios
         .get(
@@ -582,16 +792,15 @@ export default {
         .then(results => {
           this.students.map(s => {
             if (s._id == student._id) {
-              s.pastTests = [];
-              results.data.forEach(element => {
-                s.pastTests.push({
+              s.pastTests = results.data.map((element,i) => {
+                return {
                   solutionId: element.solutionId,
                   title: element.title,
                   mark: element.mark,
+                  isPassed: element.isPassed,
                   date: element.date
-                });
+                };
               });
-              this.selectedStudent = s;
             }
           });
         })
@@ -608,12 +817,11 @@ export default {
         .get(this.$store.state.settings.baseLink + "/m/modules/all")
         .then(results => {
           this.modules = results.data;
-          this.options = [];
-          this.modules.map(s => {
-            this.options.push({
+          this.options = this.modules.map(s => {
+            return {
               value: s._id,
               text: s.name + " ( " + s.code + " )"
-            });
+            };
           });
         })
         .catch(err => {
@@ -668,7 +876,7 @@ export default {
         .then(results => {
           this.isLoading = false;
           this.students = this.students.map(s => {
-            if(s._id == results.data._id){
+            if (s._id == results.data._id) {
               s = results.data;
             }
             return s;
