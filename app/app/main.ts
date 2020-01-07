@@ -83,7 +83,10 @@ Vue.use(Navigator, {
 Vue.prototype.$router = router;
 Vue.prototype.$route = null;
 
-var application = require("application");
+import { crashlytics } from "nativescript-plugin-firebase";
+Vue.prototype.$crashlytics = crashlytics;
+const application = require("application");
+
 Vue.mixin({
   data() {
     return {
@@ -136,11 +139,11 @@ Vue.mixin({
       var AndroidApplication = application.android;
       var activity = AndroidApplication.foregroundActivity;
       activity = AndroidApplication.foregroundActivity;
-      activity.onBackPressed = function(e) {
+      activity.onBackPressed = function (e) {
         if (self.currentPage && self.currentPage > 0) {
           self.currentPage--;
         } else {
-          activity.onBackPressed = function() {
+          activity.onBackPressed = function () {
             self.navigate(null);
           };
           self.navigate(null);
