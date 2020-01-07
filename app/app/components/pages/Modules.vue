@@ -107,17 +107,7 @@ export default {
   data() {
     return {
       introTxt: "Digitalize your business and keep track of all your earnings.",
-      modules: [],
-      adKeywords: [
-        "school",
-        "study",
-        "university",
-        "college",
-        "job",
-        "work",
-        "money",
-        "free"
-      ]
+      modules: []
     };
   },
   props: ["attendance", "survey"],
@@ -128,7 +118,6 @@ export default {
         clearHistory: true
       });
     }
-    const testing = this.TNS_ENV !== "production";
 
     this.isLoading = true;
 

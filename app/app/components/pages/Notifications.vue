@@ -74,7 +74,7 @@
                   v-for="notify in moduleNotifications[moduleName]"
                   :key="notify._id"
                   elevation="0"
-                  margin="5"
+                  class="m-x-5"
                 >
                   <Ripple @tap="readMessage(notify.title, notify.message)">
                     <GridLayout class="p-15" rows="auto,auto" columns="auto,*">
@@ -84,7 +84,7 @@
                         rowSpan="2"
                         verticalAlignment="center"
                         textAlignment="center"
-                        fontSize="30"
+                        fontSize="26"
                         class="mdi rounded-card p-15 text-peach"
                         :text="'mdi-bell' | fonticon"
                       ></Label>
@@ -128,9 +128,7 @@ export default {
   data() {
     return {
       introTxt: "Digitalize your business and keep track of all your earnings.",
-      moduleNotifications: {
-        General: []
-      }
+      moduleNotifications: {}
     };
   },
   mounted() {
@@ -140,6 +138,9 @@ export default {
       .getStudentNotification(this.$store.state.cache.cachedUser.user._id)
       .then(notifications => {
         const notification = JSON.parse(JSON.stringify(notifications));
+        if (!this.moduleNotifications.hasOwnProperty("General")) {
+          this.moduleNotifications.General = [];
+        }
         notification.forEach(notificationType => {
           let moduleName = "General";
           if (notificationType.moduleId != null) {
@@ -151,6 +152,7 @@ export default {
           this.moduleNotifications[moduleName].push(notificationType);
         });
         this.isLoading = false;
+        this.$forceUpdate();
       })
       .catch(err => {
         this.isLoading = false;
