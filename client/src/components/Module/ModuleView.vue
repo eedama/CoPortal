@@ -1,23 +1,124 @@
 <template>
   <div class="screen">
-    <md-dialog style="position:absolute;top:50%" class="card" :md-active.sync="addNotes">
-      <md-card class="col s12 m8 offset-m2">
-        <md-card-header>
-          <div class="md-title">Adding notes</div>
-        </md-card-header>
+     <v-dialog
+      v-if="
+        $store.state.user.isLoggedIn &&
+          ($store.state.user.type == 'LECTURER' ||
+            $store.state.user.type == 'ADMIN')
+      "
+      max-width="600"
+      color="white"
+      v-model="isAddingAnnouncements"
+    >
+      <v-card color="secondary">
+        <v-row>
+          <v-col cols="10">
+            <v-card-title class="headline text-white"
+              >Send an announcement</v-card-title
+            >
+            <v-card-text
+              ><span class="text-white"
+                >Communicate with students in real-time</span
+              ></v-card-text
+            >
+          </v-col>
+          <v-col class="m-auto my-auto" cols="2">
+            <v-btn
+              icon
+              v-on:click="isAddingAnnouncements = false"
+              right
+              class="right"
+            >
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+      <v-row class="bg-white px-10">
+        <v-col cols="12">
+          <v-text-field
+            color="secondary"
+            label="Announcement title"
+            outlined
+            v-model="announcement.title"
+          >
+          </v-text-field>
+        </v-col>
+        <v-col cols="12">
+          <v-textarea
+            color="secondary"
+            label="Message"
+            outlined
+            prepend-inner-icon="mdi-bullhorn-outline"
+            v-model="announcement.message"
+          >
+          </v-textarea>
+        </v-col>
+        <v-col cols="12">
+          <v-checkbox
+            v-model="announcement.isParent"
+            label="Send announcement to parents"
+          ></v-checkbox>
+        </v-col>
+        <v-col cols="12">
+          <v-chip-group
+          mandatory
+          active-class="primary--text"
+        >
+          <v-chip @click="announcement.isToAll = false">
+            Send to {{ module.name }} {{ module.code }} students only
+          </v-chip>
+          <v-chip @click="announcement.isToAll = true">
+            Send to all students
+          </v-chip>
+        </v-chip-group>
+        </v-col>
 
-        <md-card-content>
-          <md-field>
+        <v-col cols="12">
+          <p v-if="!isLoading" class="text-center">
+            The announcement will be sent to
+            <strong>{{
+              announcement.isToAll
+                ?
+                 "all students"
+                 : `${module.name} ${module.code} students only`
+            }}</strong>
+            {{
+              announcement.isParent ? " and SMSs to thier parents as well" : ""
+            }}
+          </p>
+          <v-btn
+            :loading="isUploading"
+            :disabled="isUploading"
+            v-on:click="SendAnnouncement()"
+            color="secondary"
+            large
+            block
+            rounded
+            >Send announcement</v-btn
+          ></v-col
+        >
+      </v-row>
+    </v-dialog>
+
+    <v-dialog class="card" v-model="addNotes">
+      <v-card class="col s12 m8 offset-m2">
+        <v-card-header>
+          <div class="v-title">Adding notes</div>
+        </v-card-header>
+
+        <v-card-content>
+          <v-field>
             <label>Title</label>
-            <md-input v-model="notes.title" required></md-input>
-          </md-field>
-          <md-field>
+            <v-input v-model="notes.title" required></v-input>
+          </v-field>
+          <v-field>
             <label>Description</label>
-            <md-textarea v-model="notes.description" required></md-textarea>
-          </md-field>
-          <md-field>
+            <v-textarea v-model="notes.description" required></v-textarea>
+          </v-field>
+          <v-field>
             <label>Notes file</label>
-            <md-file
+            <v-file
               type="notesFile"
               id="notesFile"
               ref="notesFile"
@@ -25,385 +126,315 @@
               v-model="notes.file"
               placeholder="Select the file you want to upload"
             />
-          </md-field>
+          </v-field>
           <p class="center-align red-text" v-show="txtError.length > 2">{{ txtError }}</p>
-        </md-card-content>
-      </md-card>
-      <md-dialog-actions>
+        </v-card-content>
+      </v-card>
+      <v-dialog-actions>
         <ball-pulse-loader v-if="isUploading" color="#000000" size="20px"></ball-pulse-loader>
-        <md-button v-if="!isUploading" class="md-primary" @click="UploadNotes()">Upload notes</md-button>
-        <md-button class="md-primary" @click="addNotes = false">Close</md-button>
-      </md-dialog-actions>
-    </md-dialog>
+        <v-btn v-if="!isUploading" class="v-primary" @click="UploadNotes()">Upload notes</v-btn>
+        <v-btn class="v-primary" @click="addNotes = false">Close</v-btn>
+      </v-dialog-actions>
+    </v-dialog>
 
-    <md-dialog class="card" style="position:absolute" :md-active.sync="addStudent">
-      <md-content style="overflow-y:scroll" class="row">
+    <v-dialog class="card" v-model="addStudent">
+      <v-content style="overflow-y:scroll" class="row">
         <add-student v-on:submitted="AddedNewStudent"></add-student>
-      </md-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="addStudent = false">Close</md-button>
-      </md-dialog-actions>
-    </md-dialog>
+      </v-content>
+      <v-dialog-actions>
+        <v-btn class="v-primary" @click="addStudent = false">Close</v-btn>
+      </v-dialog-actions>
+    </v-dialog>
 
-    <md-dialog class="card" style="position:absolute" :md-active.sync="addLecturer">
-      <md-content style="overflow-y:scroll" class="row">
+    <v-dialog class="card" v-model="addLecturer">
+      <v-content style="overflow-y:scroll" class="row">
         <add-lecturer v-on:submitted="AddedNewLecturer"></add-lecturer>
-      </md-content>
-      <md-dialog-actions>
-        <md-button class="md-primary" @click="addLecturer = false">Close</md-button>
-      </md-dialog-actions>
-    </md-dialog>
+      </v-content>
+      <v-dialog-actions>
+        <v-btn class="v-primary" @click="addLecturer = false">Close</v-btn>
+      </v-dialog-actions>
+    </v-dialog>
 
-    <div class="row">
-      <div class="col s8 offset-s2">
-        <md-button v-on:click="$router.back()" class="right">
-          <md-icon>keyboard_backspace</md-icon>
-          <span>Back</span>
-        </md-button>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col s12">
-        <md-card>
-          <md-card-header>
-            <div class="md-title">{{ module.name }}</div>
-            <div class="md-subhead">{{ module.code }}</div>
-            <div class="md-subhead center-align">{{ module.description }}</div>
-          </md-card-header>
-        </md-card>
-      </div>
-      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-      </div>
-      <div class="col s12">
-        <md-tabs @md-changed="ChangeTab">
-          <md-tab id="tab-home" md-label="Home">
-            <div class="row">
-              <div class="col s12 m6 xl3">
-                <md-card>
-                  <md-card-header>
-                    <md-card-header-text>
-                      <div class="md-subheader">Notes</div>
-                    </md-card-header-text>
-                    <md-menu md-size="big" md-direction="bottom-end">
-                      <md-button class="md-icon-button" md-menu-trigger>
-                        <md-icon>more_vert</md-icon>
-                      </md-button>
+    <v-row>
+       <v-col cols="10"> </v-col>
+    <v-col cols="2">
+      <v-btn
+        right
+        v-on:click="$router.back()"
+        class="primary justify-end"
+      >
+        <v-icon>mdi-keyboard-backspace</v-icon>
+        <span class="px-2">Back</span>
+      </v-btn>
+    </v-col>
+    </v-row>
+    <v-row v-if="module">
+      <v-col cols="12" sm="12" md="6" lg="6" xlg="6" class="mx-auto">
+        <v-card :loading="isLoading" class="pa-3">
+          <v-card-header class="text-center">
+            <div class="display-2 py-2">{{ module.name }} {{ module.code }}</div>
+            <div class="title">{{ module.description }}</div>
+          </v-card-header>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12" sm="12" md="6" lg="6" xlg="6" class="mx-auto">
+        <v-card :loading="isLoading" class="pa-3">
+        <v-tabs grow>
+          <v-tab id="tab-announcements">
+            Announcements
+          </v-tab>
+          <v-tab id="tab-tests">
+            Tests
+          </v-tab>
+          <v-tab id="tab-notes">
+            Notes
+          </v-tab>
+          <v-tab v-if="module && module.students" id="tab-students">
+            <v-badge
+          color="red"
+          
+          :content="module.students.length"
+        >
+          {{ module.students.length == 1 ? 'student' : 'students' }}
+        </v-badge>
+          </v-tab>
+          <v-tab v-if="module && module.lecturers" id="tab-lecturers">
+            <v-badge
+          color="green"
+          
+          :content="module.lecturers.length"
+        >
+          {{ module.lecturers.length == 1 ? 'lecturer' : 'lecturers' }}
+        </v-badge>
+          </v-tab>
+          <v-tab-item>
+            <v-row>
 
-                      <md-menu-content class="card">
-                        <md-menu-item
-                          v-if="$store.state.user.type != 'STUDENT'"
-                          v-on:click="addNotes = true"
-                          class="waves-effect"
-                        >
-                          <span>Add new</span>
-                          <md-icon>add</md-icon>
-                        </md-menu-item>
-                      </md-menu-content>
-                    </md-menu>
-                  </md-card-header>
-                  <md-card-content>
-                    <md-list class="md-double-line">
-                      <md-list-item
-                        v-on:click="DownloadNotes(notes)"
-                        v-for="(notes,i) in module.notes"
-                        :key="i"
-                        class="waves-effect"
-                      >
-                        <md-icon class="md-primary">library_books</md-icon>
-                        <div class="md-list-item-text">
-                          <span>{{ notes.title }}</span>
-                          <span>{{ getMoment(notes.date).format('YYYY-MM-DD hh:mm') }}</span>
-                        </div>
-                      </md-list-item>
-                    </md-list>
-                  </md-card-content>
-                </md-card>
-              </div>
-              <div class="col s12 m6 xl3">
-                <md-card>
-                  <md-card-header>
-                    <md-card-header-text>
-                      <div class="md-subheader">Tests</div>
-                    </md-card-header-text>
-                    <md-menu md-size="big" md-direction="bottom-end">
-                      <md-button class="md-icon-button" md-menu-trigger>
-                        <md-icon>more_vert</md-icon>
-                      </md-button>
-
-                      <md-menu-content class="card">
-                        <md-menu-item
-                          v-if="$store.state.user.type != 'STUDENT'"
-                          v-on:click="setATestForModule(module._id)"
-                          class="waves-effect"
-                        >
-                          <span>Set a test</span>
-                          <md-icon>add</md-icon>
-                        </md-menu-item>
-                      </md-menu-content>
-                    </md-menu>
-                  </md-card-header>
-                  <md-card-content>
-                    <md-list class="md-double-line">
-                      <md-list-item
-                        v-for="questionaire in filteredTests"
-                        :key="questionaire._id"
-                        v-on:click="getSolutionFor(questionaire)"
-                        class="waves-effect"
-                      >
-                        <md-icon class="md-primary">library_books</md-icon>
-                        <div class="md-list-item-text">
-                          <span>{{ questionaire.title }}</span>
-                          <span>{{ questionaire.questions.length }} {{ questionaire.questions.length == 1 ? 'question' : 'questions' }}</span>
-                        </div>
-                        <md-caption class="right">{{ getMoment(questionaire.date).fromNow() }}</md-caption>
-                      </md-list-item>
-                    </md-list>
-                  </md-card-content>
-                </md-card>
-              </div>
-              <div class="col s12 m6 xl3">
-                <md-card>
-                  <md-card-header>
-                    <md-card-header-text>
-                      <div
-                        class="md-subheader"
-                      >{{ module.students.length }} {{ module.students.length == 1 ? 'student' : 'students' }}</div>
-                    </md-card-header-text>
-                    <md-menu md-size="big" md-direction="bottom-end">
-                      <md-button class="md-icon-button" md-menu-trigger>
-                        <md-icon>more_vert</md-icon>
-                      </md-button>
-                      <md-menu-content class="card">
-                        <md-menu-item v-on:click="Reload()" class="waves-effect">
-                          <span>Reload</span>
-                          <md-icon>reload</md-icon>
-                        </md-menu-item>
-                        <md-menu-item
-                          v-if="$store.state.user.type !== 'STUDENT'"
-                          v-on:click="addStudent = true"
-                          class="waves-effect"
-                        >
-                          <span>Add new</span>
-                          <md-icon>add</md-icon>
-                        </md-menu-item>
-                      </md-menu-content>
-                    </md-menu>
-                  </md-card-header>
-                  <md-card-content>
-                    <md-list class="md-double-line">
-                      <md-list-item>
-                        <md-icon class="md-primary">search</md-icon>
-                        <div class="md-list-item-text input-field">
-                          <input
-                            v-model="txtStudentSearch"
-                            id="StudentPassword"
-                            name="StudentPassword"
-                            type="search"
-                          />
-                          <label class="text-center" for="StudentPassword">Search</label>
-                        </div>
-                      </md-list-item>
-                      <md-list-item
-                        v-for="student in filteredStudents"
-                        :key="student._id"
-                        v-on:click="goToStudent(student._id)"
-                        class="waves-effect"
-                      >
-                        <md-icon class="md-primary">account_circle</md-icon>
-                        <div class="md-list-item-text">
-                          <span>{{ student.lastname }} {{ student.firstname }}</span>
-                          <span>{{ student.username }}</span>
-                        </div>
-                      </md-list-item>
-                    </md-list>
-                  </md-card-content>
-                </md-card>
-              </div>
-              <div class="col s12 m6 xl3">
-                <md-card>
-                  <md-card-header>
-                    <md-card-header-text>
-                      <div
-                        class="md-subheader"
-                      >{{ module.lecturers.length }} {{ module.lecturers.length == 1 ? 'lecturer' : 'lecturers' }}</div>
-                    </md-card-header-text>
-                    <md-menu md-size="big" md-direction="bottom-end">
-                      <md-button class="md-icon-button" md-menu-trigger>
-                        <md-icon>more_vert</md-icon>
-                      </md-button>
-
-                      <md-menu-content class="card">
-                        <md-menu-item
-                          v-if="$store.state.user.type == 'ADMIN'"
-                          v-on:click="addLecturer = true"
-                          class="waves-effect"
-                        >
-                          <span>Add new</span>
-                          <md-icon>add</md-icon>
-                        </md-menu-item>
-                      </md-menu-content>
-                    </md-menu>
-                  </md-card-header>
-                  <md-card-content>
-                    <md-list class="md-double-line">
-                      <md-list-item>
-                        <md-icon class="md-primary">search</md-icon>
-                        <div class="md-list-item-text input-field">
-                          <input
-                            v-model="txtLecturerSearch"
-                            id="LecturerPassword"
-                            name="LecturerPassword"
-                            type="search"
-                          />
-                          <label class="text-center" for="LecturerPassword">Search</label>
-                        </div>
-                      </md-list-item>
-                      <md-list-item
-                        v-for="lecturer in filteredLecturers"
-                        :key="lecturer._id"
-                        v-on:click="goToLecturer(lecturer._id)"
-                        class="waves-effect"
-                      >
-                        <md-icon class="md-primary">account_circle</md-icon>
-                        <div class="md-list-item-text">
-                          <span>{{ lecturer.lastname }} {{ lecturer.firstname }}</span>
-                          <span>{{ lecturer.username }}</span>
-                        </div>
-                      </md-list-item>
-                    </md-list>
-                  </md-card-content>
-                </md-card>
-              </div>
-            </div>
-          </md-tab>
-          <md-tab id="tab-announcement" md-label="Announcements">
-            <md-empty-state
-              v-if="announcements.length == 0"
-              md-icon="announcement"
-              md-label="No announcements"
-              :md-description="`All the announcements about ${module.name} (${module.code}) will be posted here.`"
+      <v-col cols="12" sm="12">
+        <v-row>
+          <v-col cols="8" class="mx-auto">
+            <v-btn
+              class="my-auto"
+              v-if="
+                $store.state.user.type == 'LECTURER' ||
+                  $store.state.user.type == 'ADMIN'
+              "
+              block 
+              shaped
+              @click="isAddingAnnouncements = true"
+              color="secondary"
             >
-              <md-button
-                v-if="userType !== 'STUDENT'"
-                class="md-primary md-raised"
-              >Add an announcement</md-button>
-            </md-empty-state>
-            <div v-if="$store.state.user.type != 'STUDENT' && !isAddingAnnouncements" class="row">
-              <div
-                v-on:click="isAddingAnnouncements = true"
-                class="col s8 card card-panel offset-s2 m6 offset-m3 text-center center-align hoverable pointer waves-effect"
-              >
-                <h5 class="center-align center text-center">Send an announcement</h5>
-              </div>
-            </div>
-
-            <md-card v-if="$store.state.user.type != 'STUDENT' && isAddingAnnouncements">
-              <md-header>
-                <md-button class="md-icon-button right" v-on:click="isAddingAnnouncements = false">
-                  <md-icon>close</md-icon>
-                </md-button>
-              </md-header>
-              <md-content>
-                <div class="row">
-                  <div class="input-field col s8 offset-s2 m6 offset-m3 center-align text-center">
-                    <label class="center-align text-center">Sending an announcement</label>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-                    <input
-                      v-model="announcement.title"
-                      id="ModuleDescription"
-                      name="ModuleDescription"
-                      type="text"
-                    />
-                    <label class="text-center" for="ModuleDescription">Title</label>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-                    <input
-                      v-model="announcement.message"
-                      id="ModuleDescription"
-                      name="ModuleDescription"
-                      type="text"
-                    />
-                    <label class="text-center" for="ModuleDescription">Message</label>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                    <label>Send to :</label>
-                  </div>
-                  <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                    <form action="#">
-                      <p>
-                        <label>
-                          <input
-                            v-model="announcement.isToAll"
-                            :value="false"
-                            class="with-gap"
-                            name="group1"
-                            type="radio"
-                            checked
-                          />
-                          <span>{{ module.name }} ({{ module.code }}) students</span>
-                        </label>
-                      </p>
-                      <p>
-                        <label>
-                          <input
-                            v-model="announcement.isToAll"
-                            :value="true"
-                            class="with-gap"
-                            name="group1"
-                            type="radio"
-                          />
-                          <span>All Students</span>
-                        </label>
-                      </p>
-                    </form>
-                  </div>
-                </div>
-              </md-content>
-              <md-card-actions>
-                <ball-pulse-loader v-if="isUploading" color="#000000" size="20px"></ball-pulse-loader>
-                <md-button
-                  v-if="!isUploading"
-                  v-on:click="SendAnnouncement()"
-                  class="md-primary"
-                >Send announcement</md-button>
-              </md-card-actions>
-            </md-card>
-            <md-card
-              class="hoverable"
-              v-show="!isAddingAnnouncements"
-              v-for="(announcement,i) in announcements"
+              Send an announcement
+            </v-btn>
+          </v-col>
+          <v-col style="overflow-y:auto;max-height:50vh" cols="12">
+            <v-card
+              class="mx-10 mb-5"
+              shaped
+              outlined
+              v-on:click="AnnouncementClick(announcement)"
+              v-for="(announcement, i) in announcements"
               :key="i"
             >
-              <md-list class="md-triple-line">
-                <md-list-item>
-                  <md-avatar>
-                    <img src="https://placeimg.com/40/40/people/1" alt="People" />
-                  </md-avatar>
-
-                  <div class="md-list-item-text">
-                    <span>{{ announcement.lecturerId ? announcement.lecturerId.lastname + " " + announcement.lecturerId.firstname : "Admin" }} &nbsp;&bull; {{ getMoment(announcement.date).fromNow() }}</span>
-                    <span>{{ announcement.title }}</span>
-                    <p>{{ announcement.message }}</p>
+              <v-list-item three-line>
+                <v-list-item-avatar tile size="80">
+                  <v-icon class="text-peach" size="50">mdi-bell</v-icon>
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <div class="overline mb-4">
+                    {{
+                      announcement.lecturerId
+                        ? announcement.lecturerId.lastname +
+                          " " +
+                          announcement.lecturerId.firstname
+                        : "Admin"
+                    }}
+                    &nbsp;&bull;
+                    <span class="text-peach">{{
+                      getMoment(announcement.date).fromNow()
+                    }}</span>
                   </div>
+                  <v-list-item-title class="subtitle-1 mb-1">{{
+                    announcement.title
+                  }}</v-list-item-title>
+                  <v-list-item-subtitle
+                    ><span class="text-blue">{{
+                      announcement.message
+                    }}</span></v-list-item-subtitle
+                  >
+                </v-list-item-content>
+              </v-list-item>
+            </v-card>
+          </v-col>
+         </v-row>
+      </v-col>
+            </v-row>
+          </v-tab-item>
+            <v-tab-item>
+            <v-row class="ma-3">
+              <v-col cols="12" sm="12" md="8" class="mx-auto">
+                  <v-btn
+              class="my-auto"
+              block
+              shaped
+              color="secondary" v-if="$store.state.user.type != 'STUDENT'"
+                          v-on:click="setATestForModule(module._id)"
+            >
+              Set a test
+            </v-btn>
+              </v-col>
+            <v-col cols="12" sm="12">
+                    <v-list class="v-double-line">
 
-                  <md-button class="md-icon-button md-list-action">
-                    <md-icon class="md-primary">thumb_up</md-icon>
-                  </md-button>
-                </md-list-item>
-              </md-list>
-            </md-card>
-          </md-tab>
-        </md-tabs>
-      </div>
-    </div>
+    <v-list-item prepend-icon="library_books" v-for="questionaire in filteredTests"
+                        :key="questionaire._id"
+                        v-on:click="getSolutionFor(questionaire)" three-line>
+            <v-list-item-avatar>
+              <v-icon>mdi-library-books</v-icon>
+            </v-list-item-avatar>
+      <v-list-item-content>
+        <v-list-item-title>{{ questionaire.title }}</v-list-item-title>
+        <v-list-item-subtitle>
+          {{ questionaire.questions.length }} {{ questionaire.questions.length == 1 ? 'question' : 'questions' }}
+        </v-list-item-subtitle>
+        <v-list-item-subtitle  class="caption">
+          {{ getMoment(questionaire.date).fromNow() }}
+        </v-list-item-subtitle>
+      </v-list-item-content>
+    </v-list-item>
+                    </v-list>
+              </v-col>
+              </v-row>
+            </v-tab-item>
+            <v-tab-item>
+            <v-row class="ma-3">
+                 <v-col cols="12" sm="12" md="8" class="mx-auto">
+                  <v-btn
+              class="my-auto"
+              block
+              shaped
+              color="secondary" v-if="$store.state.user.type != 'STUDENT'"
+                          v-on:click="addNotes = true"
+            >
+              Upload new notes
+            </v-btn>
+              </v-col>
+                 <v-col cols="12" sm="12">
+                     <v-list>
+    <v-list-item v-on:click="DownloadNotes(notes)"
+                        v-for="(notes,i) in module.notes"
+                        :key="i" two-line>
+            <v-list-item-avatar>
+              <v-icon>mdi-library-books</v-icon>
+            </v-list-item-avatar>
+      <v-list-item-content>
+        <v-list-item-title>{{ notes.title }}</v-list-item-title>
+        <v-list-item-subtitle>
+         {{ getMoment(notes.date).format('YYYY-MM-DD hh:mm') }}
+        </v-list-item-subtitle>
+      </v-list-item-content>
+    </v-list-item>
+                    </v-list>
+              </v-col>
+            </v-row>
+            </v-tab-item>
+            <v-tab-item>
+                    <v-row class="ma-3">
+                 <v-col cols="12" sm="12" md="8" class="mx-auto">
+                  <v-btn
+              class="my-auto"
+              block
+              shaped
+              color="secondary" v-if="$store.state.user.type !== 'STUDENT'"
+                          v-on:click="addStudent = true"
+            >
+              Register a student
+            </v-btn>
+              </v-col>
+               <v-col sm="12" md="6" offset-md="3">
+      <v-text-field
+        class="text-center mx-auto text-xs-center"
+        color="secondary"
+        label="Search"
+        solo
+        block
+        prepend-inner-icon="mdi-magnify" 
+        v-model="txtStudentSearch"
+      >
+      </v-text-field>
+    </v-col>
+                 <v-col cols="12" sm="12">
+                     <v-list>
+    <v-list-item v-for="student in filteredStudents"
+                        :key="student._id"
+                        v-on:click="goToStudent(student._id)" two-line>
+            <v-list-item-avatar>
+              <v-icon>mdi-account-circle</v-icon>
+            </v-list-item-avatar>
+      <v-list-item-content>
+        <v-list-item-title>{{ student.lastname }} {{ student.firstname }}</v-list-item-title>
+        <v-list-item-subtitle>
+         {{ student.username }}
+        </v-list-item-subtitle>
+      </v-list-item-content>
+    </v-list-item>
+                    </v-list>
+              </v-col>
+            </v-row>
+            </v-tab-item>
+            <v-tab-item>
+                       <v-row class="ma-3">
+              <v-col cols="12" sm="12" md="8" class="mx-auto">
+                  <v-btn
+              class="my-auto"
+              block
+              shaped
+              color="secondary" 
+                          v-if="$store.state.user.type == 'ADMIN'"
+                          v-on:click="addLecturer = true"
+            >
+              Register a lecturer
+            </v-btn>
+              </v-col>
+               <v-col sm="12" md="6" offset-md="3">
+      <v-text-field
+        class="text-center mx-auto text-xs-center"
+        color="secondary"
+        label="Search"
+        solo
+        block
+        prepend-inner-icon="mdi-magnify" 
+        v-model="txtLecturerSearch"
+      >
+      </v-text-field>
+    </v-col>
+            <v-col cols="12" sm="12">
+                    <v-list class="v-double-line">
+
+    <v-list-item 
+                        v-for="lecturer in filteredLecturers"
+                        :key="lecturer._id"
+                        v-on:click="goToLecturer(lecturer._id)" two-line>
+            <v-list-item-avatar>
+              <v-icon>mdi-teach</v-icon>
+            </v-list-item-avatar>
+      <v-list-item-content>
+        <v-list-item-title>{{ lecturer.lastname }} {{ lecturer.firstname }}</v-list-item-title>
+        <v-list-item-subtitle>
+          {{ lecturer.username }}
+        </v-list-item-subtitle>
+      </v-list-item-content>
+    </v-list-item>
+                    </v-list>
+              </v-col>
+              </v-row>
+            </v-tab-item>
+            </v-tabs>
+            </v-card>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
