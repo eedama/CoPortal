@@ -1,149 +1,203 @@
 <template>
-  <div class="row">
-    <div class="row">
-      <div class="col s8 offset-s2">
-        <md-button v-on:click="$router.back()" class="right">
-          <md-icon>keyboard_backspace</md-icon>
-          <span>Back</span>
-        </md-button>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-      </div>
-    </div>
-    <div class="col s12 center-align card-panel row">
-      <div class="col s12 m8 offset-m2">
-        <h4>
-          <a>{{ Solution.isMemo ? 'Memorandum' : Solution.studentId.firstname + " " + Solution.studentId.lastname}}</a>
-        </h4>
-        <h5>
-          Your score is
-          <a
-            :class="{'red-text':(Solution.mark*2 < Solution.answers.length)}"
-          >{{ Solution.mark }}/{{ Solution.answers.length }}</a>
-        </h5>
-      </div>
-      <div class="col s12 right-align">
-        <a class="btn-floating black waves-effect" title="Download" v-on:click="DownloadMarks">
-          <i class="material-icons">save</i>
-        </a>
-        <a class="btn-floating black waves-effect" title="Memorandum" v-on:click="ViewMemorandum">
-          <i class="material-icons">description</i>
-        </a>
-        <a
-          class="btn-floating black waves-effect"
-          :class="{'transparent':addingFeedBack}"
-          v-on:click="openCloseFeedbacks"
-          title="Feed back"
+  <div class="screen">
+    <v-row>
+      <v-col cols="10"> </v-col>
+      <v-col cols="2">
+        <v-btn right v-on:click="$router.back()" class="primary justify-end">
+          <v-icon>mdi-keyboard-backspace</v-icon>
+          <span class="px-2">Back</span>
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12" sm="12" md="6" lg="6" xlg="6" class="mx-auto">
+        <v-card :loading="isLoading" class="pa-3">
+          <v-card-header class="text-center">
+            <div class="display-2 py-2">
+              {{
+                Solution.isMemo
+                  ? "Memorandum"
+                  : Solution.studentId.firstname +
+                    " " +
+                    Solution.studentId.lastname
+              }}
+            </div>
+            <div
+              class="title"
+              :class="
+                Solution.mark * 2 < Solution.answers.length
+                  ? 'text-peach'
+                  : 'text-blue'
+              "
+            >
+              {{
+                Solution.isMemo
+                  ? `Total marks : ${Solution.answers.length}`
+                  : `Your mark is ${Solution.mark} out of ${Solution.answers.length}`
+              }}
+            </div>
+          </v-card-header>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col
+        cols="12"
+        sm="12"
+        md="4"
+        lg="4"
+        xlg="4"
+        class="mx-auto my-3 text-center"
+      >
+        <v-badge
+          class="mx-2"
+          bordered
+          color="secondary"
+          icon="mdi-download"
+          overlap
         >
-          <i :class="{'black-text':addingFeedBack}" class="material-icons">chat</i>
-        </a>
-      </div>
-      <div class="col s12 m8 offset-m2">
-        <span
-          class="blue-text"
-        >Scroll down to see {{ addingFeedBack ?'add your feedback' : 'view your test'}}.</span>
-      </div>
-    </div>
-    <div v-show="addingFeedBack" class="col s12 row card-panel">
-      <div class="col s12 right-align">
-        <a
-          class="btn-floating transparent waves-effect right-align"
-          v-on:click="addingFeedBack = !addingFeedBack"
-        >
-          <i class="material-icons red-text">close</i>
-        </a>
-      </div>
-      <div class="row">
-        <div
-          class="col s10 offset-s1 chat"
-          :class="{'right-align':feedback.from.id == $store.state.user.id}"
-          v-for="(feedback,i) in feedbacks"
-          :key="i"
-        >
-          <span
-            class="chip message"
-            :class="{'notSent':feedback.status != 'sent','black white-text':feedback.from.type != 'STUDENT'}"
+          <v-btn
+            class="white--text"
+            color="secondary"
+            v-on:click="DownloadMarks"
+            depressed
           >
-            <span
-              class="from"
-              :class="{'white-text':feedback.from.type != 'STUDENT'}"
-            >{{ feedback.from.name }}</span>
-            : {{ feedback.message }}
-          </span>
-          <p
-            class="time"
-          >{{ feedback.status != 'sent' ? feedback.status : getMoment(feedback.date).fromNow() }}</p>
-        </div>
-      </div>
-      <div class="col s10 switch">
-        <label>
-          <input v-on:change="toggleAutoRefresh" v-model="autoRefreshChats" type="checkbox" />
-          <span class="lever"></span>
-          {{ autoRefreshChats ? 'Auto refreshing every 5 seconds' : 'Auto refresh is off, Use the button on the right to get the latest messages' }}
-        </label>
-      </div>
-      <div class="col s2 right-align">
-        <a
-          v-if="!isLoading"
-          class="btn-floating transparent waves-effect right-align"
-          v-on:click="refreshFeedbacks"
+            Download
+          </v-btn>
+        </v-badge>
+        <v-badge
+          class="mx-2"
+          bordered
+          color="secondary"
+          icon="mdi-file-document-box-check-outline"
+          overlap
         >
-          <i class="material-icons black-text">refresh</i>
-        </a>
-        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-      </div>
-      <form class="col s12 center-align">
-        <div class="row">
-          <div class="input-field col s10 offset-s1 m6 offset-m3">
-            <i class="material-icons prefix">chat</i>
-            <textarea v-model="txtFeedback" id="icon_prefix2" class="materialize-textarea"></textarea>
-            <label for="icon_prefix2">Comment</label>
-          </div>
-          <div class="col s8 offset-s2 center-align">
-            <a
-              v-if="!isLoading"
-              v-on:click="SubmitFeedback"
-              class="btn green waves-effect-effect"
-            >Comment</a>
-            <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-          </div>
-        </div>
-      </form>
-    </div>
-    <div v-show="!addingFeedBack" class="col s10 offset-s1">
-      <div v-for="(solution,i) in Solution.answers" :key="i" class="row">
-        <div class="col m8 offset-m2 row card-panel hoverable">
-          <div class="col s12">
-            <h5 class="center-align">{{ solution.question.title }}</h5>
-          </div>
-          <div class="col m8 offset-m2 s12">
-            <form>
-              <h6 class="pointer" v-for="(answer,j) in solution.question.answers" :key="j">
-                <label>
-                  <input
-                    :disabled="solution.answer != answer"
-                    :checked="solution.answer == answer"
-                    :id="answer + '-' + j"
-                    class="with-gap"
-                    :name="solution._id"
-                    type="radio"
-                  />
-                  <span :for="answer + '-' + j">{{ answer }}</span>
-                </label>
-              </h6>
-            </form>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col s8 offset-s2 center-align">
-          <button v-on:click="$router.push('/')" class="btn red">Go home</button>
-        </div>
-      </div>
-    </div>
+          <v-btn
+            class="white--text"
+            color="secondary"
+            v-on:click="ViewMemorandum"
+            depressed
+          >
+            Memorandum
+          </v-btn>
+        </v-badge>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12" sm="12" md="8" lg="6" xlg="6" class="mx-auto">
+        <v-tabs v-model="tabSolutionFeedback" grow centered icons-and-text>
+          <v-tab>
+            Solution
+            <v-icon>mdi-file-document-box-check-outline</v-icon>
+          </v-tab>
+
+          <v-tab @click="refreshFeedbacks()">
+            Feedback
+            <v-icon>mdi-message-text</v-icon>
+          </v-tab>
+        </v-tabs>
+        <v-tabs-items v-model="tabSolutionFeedback">
+          <v-tab-item>
+            <v-row class="mx-auto">
+              <v-col
+                cols="12"
+                sm="12"
+                v-for="(solution, i) in Solution.answers"
+                :key="i"
+              >
+                <v-card class="col m8 offset-m2 row card-panel hoverable">
+                  <v-card-title class="title px-4">
+                    {{ solution.question.title }}
+                  </v-card-title>
+                  <v-card-text class="px-2">
+                    <v-radio-group v-model="solution.answer" column>
+                      <v-radio
+                        v-for="(answer, j) in solution.question.answers"
+                        :key="j"
+                        :disabled="solution.answer != answer"
+                        :value="answer"
+                        :label="answer"
+                      ></v-radio>
+                    </v-radio-group>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" sm="12" md="8" lg="8" xlg="8" class="mx-auto">
+                <v-btn
+                  block
+                  color="primary"
+                  v-on:click="$router.push('/')"
+                  class="btn red"
+                >
+                  Go home
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-tab-item>
+          <v-tab-item>
+            <v-row class="mx-auto">
+              <v-col cols="12">
+                <v-spacer></v-spacer>
+                <v-btn
+                  :loading="isLoading"
+                  :disabled="isLoading"
+                  large
+                  icon
+                  class="float-right ma-2"
+                  v-on:click="refreshFeedbacks"
+                >
+                  <v-icon>mdi-refresh</v-icon>
+                </v-btn>
+              </v-col>
+              <v-col cols="12" class="row">
+                <v-row class="mx-4">
+                <v-col cols="10" :class="{
+                    'float-right': feedback.from.id != $store.state.user.id
+                  }"
+                  v-for="(feedback, i) in feedbacks"
+                  :key="i">
+                   <v-card :loading="feedback.status != 'sent'" shaped :elevation="2" :outlined="feedback.status != 'sent'" class="mx-auto">
+                      <v-list-item>
+                        <v-list-item-avatar color="grey"></v-list-item-avatar>
+                        <v-list-item-content>
+                          <v-list-item-title :class="feedback.from.type == 'STUDENT' ? 'text-peach' : 'text-blue'">{{ feedback.from.name }}</v-list-item-title>
+                          <v-list-item-subtitle class="subtitle-1">{{ feedback.message }}</v-list-item-subtitle>
+                          <v-list-item-subtitle class="caption float-right">{{
+                      feedback.status != "sent"
+                        ? feedback.status
+                        : getMoment(feedback.date).fromNow()
+                    }}</v-list-item-subtitle>
+                        </v-list-item-content>
+                      </v-list-item>
+                      </v-card>
+                </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="12" class="col s10 switch">
+                <v-switch v-model="autoRefreshChats" @click="toggleAutoRefresh" inset :label="`
+                ${autoRefreshChats
+                      ? 'Auto refreshing every 5 seconds'
+                      : 'Auto refresh is off, Use the refresh icon to get the latest messages'}`"></v-switch>
+              </v-col>
+              <v-col cols="11">
+                <v-text-field
+                  prepend-inner-icon="mdi-chat"
+                  label="Comment"
+                  outlined
+                  v-model="txtFeedback"
+                  @keyup.enter="SubmitFeedback"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="1">
+                <v-btn class="float-right my-auto" :loading="isLoading" large icon @click="SubmitFeedback">
+                  <v-icon large>mdi-send</v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-tab-item>
+        </v-tabs-items>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -156,11 +210,11 @@ export default {
   name: "TestMarks",
   data() {
     return {
+      tabSolutionFeedback: null,
       txtFeedback: "",
       currentPage: 0,
       Solution: [],
       feedbacks: [],
-      addingFeedBack: false,
       autoRefreshChats: false,
       refreshTimer: "",
       isLoading: false
@@ -249,10 +303,7 @@ export default {
         });
     },
     openCloseFeedbacks() {
-      this.addingFeedBack = !this.addingFeedBack;
-      if (this.addingFeedBack) {
-        this.refreshFeedbacks();
-      }
+      this.refreshFeedbacks();
     },
     SubmitFeedback() {
       this.isLoading = true;
