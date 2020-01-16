@@ -9,7 +9,13 @@
             textAlignment="center"
             class="p-15 text-dark-black"
             fontSize="20%"
-            :text="currentPage >= Questionaire.questions.length ? `Confirm your submission` : `Question ${currentPage + 1} of ${Questionaire.questions.length}`"
+            :text="
+              currentPage >= Questionaire.questions.length
+                ? `Confirm your submission`
+                : `Question ${currentPage + 1} of ${
+                    Questionaire.questions.length
+                  }`
+            "
           ></label>
           <label
             row="1"
@@ -17,23 +23,29 @@
             textAlignment="center"
             class="p-15 text-dark-black"
             fontSize="18%"
-            :text="timeRemaining == null ? `No time limit` : (timeRemaining == 0 ? 'You ran out of time' : `${timeRemainingString}`)"
+            :text="
+              timeRemaining == null
+                ? `No time limit`
+                : timeRemaining == 0
+                ? 'You ran out of time'
+                : `${timeRemainingString}`
+            "
           ></label>
         </GridLayout>
         <Progress
           v-if="timeRemaining && totalTimeLimit"
           class="text-dark-black"
-          :value="((timeRemaining)/(totalTimeLimit) * 100)"
+          :value="(timeRemaining / totalTimeLimit) * 100"
         ></Progress>
         <Progress
           v-if="!timeRemaining"
           class="text-dark-black"
-          :value="((currentPage + 1)/(Questionaire.questions.length) * 100)"
+          :value="((currentPage + 1) / Questionaire.questions.length) * 100"
         ></Progress>
       </StackLayout>
 
       <ScrollView
-        v-if="currentPage >= 0 && (currentPage) < Questionaire.questions.length"
+        v-if="currentPage >= 0 && currentPage < Questionaire.questions.length"
         verticalAlignment="center"
         row="1"
       >
@@ -57,9 +69,10 @@
                     :name="`circleToggle-${currentPage}`"
                     boxType="circle"
                     :text="answer"
-                    v-for="(answer,j) in Questionaire.questions[currentPage].answers"
+                    v-for="(answer, j) in Questionaire.questions[currentPage]
+                      .answers"
                     :key="j"
-                    @tap="selectSolution(currentPage,answer)"
+                    @tap="selectSolution(currentPage, answer)"
                     :checked="solutions[currentPage] == answer"
                   ></CheckBox>
                 </StackLayout>
@@ -77,7 +90,10 @@
           ></label>
         </StackLayout>
       </ScrollView>
-      <StackLayout v-if="(currentPage) == Questionaire.questions.length && !isLoading" row="1">
+      <StackLayout
+        v-if="currentPage == Questionaire.questions.length && !isLoading"
+        row="1"
+      >
         <label
           class="p-y-15 p-5"
           :textWrap="true"
@@ -86,7 +102,12 @@
         ></label>
         <ScrollView>
           <StackLayout>
-            <CardView v-for="(solution,i) in solutions" :key="i" elevation="5" margin="10">
+            <CardView
+              v-for="(solution, i) in solutions"
+              :key="i"
+              elevation="5"
+              margin="10"
+            >
               <Ripple @tap="currentPage = i">
                 <GridLayout class="p-5" rows="auto,auto" columns="*">
                   <label
@@ -121,7 +142,7 @@
       </StackLayout>
       <StackLayout row="2">
         <GridLayout
-          v-if="(currentPage) != Questionaire.questions.length && !isLoading"
+          v-if="currentPage != Questionaire.questions.length && !isLoading"
           class="p-5"
           rows="auto"
           columns="auto,*,auto"
@@ -138,11 +159,11 @@
               class="font-weight-bold mdi p-5"
               textAlignment="left"
               fontSize="50%"
-              :text="'mdi-chevron-left' | fonticon "
+              :text="'mdi-chevron-left' | fonticon"
             ></label>
           </Ripple>
           <Ripple
-            v-if="(currentPage) < Questionaire.questions.length"
+            v-if="currentPage < Questionaire.questions.length"
             @tap="changePage(true)"
             class="m-15"
             col="2"
@@ -153,12 +174,12 @@
               class="font-weight-bold mdi p-5"
               textAlignment="right"
               fontSize="50%"
-              :text="'mdi-chevron-right' | fonticon "
+              :text="'mdi-chevron-right' | fonticon"
             ></label>
           </Ripple>
         </GridLayout>
         <GridLayout
-          v-if="(currentPage) == Questionaire.questions.length && !isLoading"
+          v-if="currentPage == Questionaire.questions.length && !isLoading"
           rows="auto"
           columns="auto,*"
         >
@@ -228,6 +249,10 @@ export default {
   },
   mounted() {
     this.pageLoaded();
+  },
+  beforeDestroy() {
+    clearInterval(this.timer);
+    this.timeUp = true;
   },
   props: ["dbQuestionaire", "isMemo"],
   methods: {
@@ -328,24 +353,24 @@ export default {
       this.$forceUpdate();
     },
 
-    ViewMarks(){
-       clearInterval(this.timer);
-       this.navigate(
-          "/test/marks",
-          {
-            solutionId: this.submitted._id
-          },
-          {
-            clearHistory: true
-          }
-        );
+    ViewMarks() {
+      clearInterval(this.timer);
+      this.navigate(
+        "/test/marks",
+        {
+          solutionId: this.submitted._id
+        },
+        {
+          clearHistory: true
+        }
+      );
     },
     async SubmitQuiz() {
       this.isLoading = true;
       this.txtError = "";
       var hasError = false;
-     
-      if(!this.timeUp){
+
+      if (!this.timeUp) {
         this.solutions.map((s, i) => {
           if (s == null) {
             hasError = true;
@@ -353,13 +378,7 @@ export default {
             this.currentPage = i;
           }
         });
-        if (hasError) {
-          this.isLoading = false;
-          return;
-        }
 
-   
-      if(!this.timeUp){
         var result = await confirm({
           title: "Submit confirmation",
           message: "Are you sure you want to submit?",
@@ -367,13 +386,12 @@ export default {
           cancelButtonText: "No"
         });
 
-        if(!result)
-        {
+        if (!result || hasError) {
           this.isLoading = false;
           return;
-        } 
+        }
       }
-        
+
       var solution = {
         id: this.Questionaire._id,
         isMemo: this.isMemo,
@@ -384,7 +402,6 @@ export default {
           answer: v,
           question: this.Questionaire.questions[i]
         });
-
       });
 
       this.$api
@@ -406,7 +423,6 @@ export default {
           });
         });
     }
-  }
   }
 };
 </script>
