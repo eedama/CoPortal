@@ -17,6 +17,8 @@ const store = new Vuex.Store({
   },
   strict: debug,
 });
-
+store.subscribe((mutation, state) => {
+  localStorage.setItem('store', JSON.stringify(state));
+});
 Vue.prototype.$store = store;
 export default store;

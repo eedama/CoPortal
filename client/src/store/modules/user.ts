@@ -16,6 +16,14 @@ const state: UserStateType = {
 };
 
 const mutations: MutationTree<UserStateType> = {
+  initialiseStore(state) {
+    const localStore = localStorage.getItem('store');
+    if (localStore) {
+      this.replaceState(
+        Object.assign(state, JSON.parse(localStore))
+      );
+    }
+  },
   setParent(state, isParrent) {
     state.isParent = isParrent;
   },
