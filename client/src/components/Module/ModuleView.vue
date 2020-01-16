@@ -168,9 +168,9 @@
       </v-btn>
     </v-col>
     </v-row>
-    <v-row v-if="module">
+    <v-row v-if="module && module.name">
       <v-col cols="12" sm="12" md="6" lg="6" xlg="6" class="mx-auto">
-        <v-card :loading="isLoading" class="pa-3">
+        <v-card class="pa-3">
           <v-card-header class="text-center">
             <div class="display-2 py-2">{{ module.name }} {{ module.code }}</div>
             <div class="title">{{ module.description }}</div>

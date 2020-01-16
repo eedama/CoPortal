@@ -151,47 +151,74 @@
               </v-col>
               <v-col cols="12" class="row">
                 <v-row class="mx-4">
-                <v-col cols="10" :class="{
-                    'float-right': feedback.from.id != $store.state.user.id
-                  }"
-                  v-for="(feedback, i) in feedbacks"
-                  :key="i">
-                   <v-card :loading="feedback.status != 'sent'" shaped :elevation="2" :outlined="feedback.status != 'sent'" class="mx-auto">
-                      <v-list-item>
+                  <v-col
+                    cols="12"
+                    :class="{
+                      'float-right': feedback.from.id != $store.state.user.id
+                    }"
+                    v-for="(feedback, i) in feedbacks"
+                    :key="i"
+                  >
+                    <v-card
+                      :loading="feedback.status != 'sent'"
+                      :shaped="feedback.from.id != $store.state.user.id"
+                      :outlined="feedback.from.id == $store.state.user.id"
+                      :class="{
+                        'float-right': feedback.from.type == 'STUDENT'
+                      }"
+                      class="mx-auto "
+                    >
+                      <v-list-item two-line>
                         <v-list-item-avatar color="grey"></v-list-item-avatar>
                         <v-list-item-content>
-                          <v-list-item-title :class="feedback.from.type == 'STUDENT' ? 'text-peach' : 'text-blue'">{{ feedback.from.name }}</v-list-item-title>
-                          <v-list-item-subtitle class="subtitle-1">{{ feedback.message }}</v-list-item-subtitle>
+                          <v-list-item-title
+                            class="subtitle-2"
+                            :class="
+                              feedback.from.type == 'STUDENT'
+                                ? 'text-peach'
+                                : 'text-blue'
+                            "
+                            >{{ feedback.from.name }}</v-list-item-title
+                          >
+                          <p class="subtitle-1">{{ feedback.message }}</p>
                           <v-list-item-subtitle class="caption float-right">{{
-                      feedback.status != "sent"
-                        ? feedback.status
-                        : getMoment(feedback.date).fromNow()
-                    }}</v-list-item-subtitle>
+                            feedback.status != "sent"
+                              ? feedback.status
+                              : getMoment(feedback.date).fromNow()
+                          }}</v-list-item-subtitle>
                         </v-list-item-content>
                       </v-list-item>
-                      </v-card>
-                </v-col>
+                    </v-card>
+                  </v-col>
                 </v-row>
               </v-col>
               <v-col cols="12" class="col s10 switch">
-                <v-switch v-model="autoRefreshChats" @click="toggleAutoRefresh" inset :label="`
-                ${autoRefreshChats
-                      ? 'Auto refreshing every 5 seconds'
-                      : 'Auto refresh is off, Use the refresh icon to get the latest messages'}`"></v-switch>
+                <v-switch
+                  v-model="autoRefreshChats"
+                  @click="toggleAutoRefresh"
+                  inset
+                  :label="
+                    `
+                ${
+                  autoRefreshChats
+                    ? 'Auto refreshing every 5 seconds'
+                    : 'Auto refresh is off, Use the refresh icon to get the latest messages'
+                }`
+                  "
+                ></v-switch>
               </v-col>
-              <v-col cols="11">
+              <v-col class="my-auto" cols="11">
                 <v-text-field
+                  class="my-auto"
                   prepend-inner-icon="mdi-chat"
+                  append-outer-icon="mdi-send"
+                  :loading="isLoading"
+                  @click:append-outer="SubmitFeedback"
                   label="Comment"
                   outlined
                   v-model="txtFeedback"
                   @keyup.enter="SubmitFeedback"
                 ></v-text-field>
-              </v-col>
-              <v-col cols="1">
-                <v-btn class="float-right my-auto" :loading="isLoading" large icon @click="SubmitFeedback">
-                  <v-icon large>mdi-send</v-icon>
-                </v-btn>
               </v-col>
             </v-row>
           </v-tab-item>
@@ -240,11 +267,7 @@ export default {
           return;
         }
         this.Solution = results.data;
-        if (
-          this.Solution == null ||
-          this.Solution.answers == null ||
-          this.Solution.answers.length < 1
-        ) {
+        if (this.Solution == null || this.Solution.answers == null) {
           throw new Error("Unable to retreive the solution , try again later");
         }
       })
