@@ -115,14 +115,13 @@ router.post("/submit/questionaire", function (req: express.Request, res: express
 
   if (!req.body.solution.isMemo) {
     solution.save(function (err) {
-      if (err) res.send(err);
+      if (err) return res.status(512).send(err.message);
       Student.findById(req.body.studentId).then(student => {
-        if (student == null) new Error("Student does not exist");
+        if (student == null) return res.status(512).send("Student does not exist");
         student.solutions.push(solution._id);
         student.save(function (err) {
           if (err) return res.status(512).send("Server error : " + err.message);
-          console.log(solution);
-          res.json(solution);
+          return res.json(solution);
         })
       }).catch(err => {
         return res.status(512).send("Server error : " + err.message);
@@ -131,7 +130,7 @@ router.post("/submit/questionaire", function (req: express.Request, res: express
   } else {
     solution.save(function (err) {
       if (err) return res.status(512).send("Server error : " + err.message);
-      res.json(solution);
+      return res.json(solution);
     });
   }
 });
@@ -143,7 +142,7 @@ router.get("/get/solution/id/for/:questionaireId", function (req: express.Reques
     isMemo: true
   }).then(solution => {
     if (solution == null) return res.status(512).send("No solution for this questionaire");
-    res.json({
+    return res.json({
       id: solution._id
     });
   }).catch(err => {

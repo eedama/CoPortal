@@ -51,14 +51,14 @@ SolutionSchema.pre("save", function (this: SolutionType, next) {
             .then((s) => {
                 if (s == null) throw new Error("Test does not have a memorandum");
 
-                this.answers = this.answers.filter(a => a.answer).map(answer => {
-                    let solution = s.answers.find(v => v.question.id == answer.question.id);
+                this.answers = this.answers.map(questionAnswer => {
+                    let solution = s.answers.find(v => questionAnswer && questionAnswer.question && v && v.question && v.question.id == questionAnswer.question.id);
                     if (solution == null) throw new Error("Test does not have a memorandum");
-                    if (answer.answer == solution.answer) {
+                    if (questionAnswer.answer == solution.answer) {
                         mark++;
                     }
-                    answer.correctAnswer = solution.answer;
-                    return answer;
+                    questionAnswer.correctAnswer = solution.answer;
+                    return questionAnswer;
                 });
                 this.mark = mark;
 
@@ -66,7 +66,7 @@ SolutionSchema.pre("save", function (this: SolutionType, next) {
                 var self = this;
                 MarkSheet.findOne({
                     id: this.questionaireId
-                }).then((sheet: any) => {
+                }).then((sheet) => {
                     if (sheet == null) throw new Error("Your mark is not added to your marksheet , no marksheet");
                     sheet.studentMarks.push({
                         studentID: self.studentId,
