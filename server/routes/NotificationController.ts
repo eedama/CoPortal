@@ -102,7 +102,7 @@ router.post("/announcements/get/for/:userID", function (req: express.Request, re
         element.seenBy = undefined;
         element.deletedBy = undefined;
       });
-      res.json(announcements);
+      res.json(announcements.reverse());
     });
 });
 
@@ -133,8 +133,7 @@ router.get("/announcements/get/all/for/student/:userID", function (req: express.
           element.seenBy = undefined;
           element.deletedBy = undefined;
         });
-        announcements.reverse();
-        return res.json(announcements);
+        return res.json(announcements.reverse());
       }).catch(err => {
         return res.status(512).send("Unable to retrieve the notifications, Try again later.");
       });

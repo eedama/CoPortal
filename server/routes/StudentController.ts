@@ -194,7 +194,7 @@ router.post("/add/parent/for/:studentID", function (req: express.Request, res: e
 router.get("/students/all", function (req: express.Request, res: express.Response) {
   Student.find({
     "active": true
-  })
+  }, "-deviceTokens -password")
     .populate(["rents"])
     .populate(['modules'])
     .then(students => {
@@ -212,7 +212,7 @@ router.get("/students/all/for/module/:moduleID", function (req: express.Request,
     Student.find({
       "active": true,
       "modules": moduleID
-    })
+    }, "-deviceTokens -password")
       .populate(['modules'])
       .then(students => {
         if (students == null) res.send("Server error : Try again later");

@@ -34,8 +34,14 @@ router.get('/modules/all', function (req: express.Request, res: express.Response
 		})
 		.then(modules => {
 			if (modules == null) return res.status(512).send('No modules where found');
-
-			res.json(modules);
+			const orderedModules = modules.map(mo => {
+				return {
+					...mo,
+					questionaires: mo.questionaires ? mo.questionaires.reverse() : [],
+					notes: mo.notes ? mo.notes.reverse() : []
+				}
+			})
+			res.json(orderedModules);
 		})
 		.catch(err => {
 			return res.status(512).send('Server error : ' + err.message);
@@ -57,10 +63,20 @@ router.get('/get/lecturer/notes/:notesID', function (req: express.Request, res: 
 router.get('/modules/all/for/:userID/:userType', function (req: express.Request, res: express.Response) {
 	var userID = req.params.userID;
 	var userType = req.params.userType;
-
-	Module.find()
-		.populate(['lecturers'])
-		.populate(['students'])
+	let query: mongoose.DocumentQuery<ModuleType[], ModuleType, {}> = null;
+	if (userType == 'ADMIN') {
+		query = Module.find({})
+	} else {
+		query = Module.find({
+			$or: [{
+				students: userID
+			}, {
+				lecturers: userID
+			}]
+		})
+	}
+	query.populate('lecturers', '-deviceTokens -password')
+		.populate('students', '-deviceTokens -password -parents')
 		.populate(['questionaires'])
 		.populate({
 			path: 'notes',
@@ -68,27 +84,27 @@ router.get('/modules/all/for/:userID/:userType', function (req: express.Request,
 		})
 		.then(async modules => {
 			if (modules == null) return res.status(512).send('No modules where found');
-			// TODO: to speed up ,,, add this on the find
-
-			for (var _module of modules) {
-				if (_module.questionaires) {
-					for (var questionaire of _module.questionaires) {
-						var solutions = await Solution.find({
-							studentId: userID,
-							questionaireId: questionaire._id,
-						});
-						questionaire.totalAttempts = solutions ? solutions.length : 0;
+			const orderedPromises = await modules.map(async _m => {
+				const mo = _m.toObject();
+				const promisedQ = mo.questionaires.map(async (q: any) => {
+					var solutions = await Solution.find({
+						studentId: userID,
+						questionaireId: q._id,
+					});
+					return {
+						...q,
+						totalAttempts: solutions ? solutions.length : 0
 					}
+				})
+				const questionaires = await Promise.all(promisedQ);
+				return {
+					...mo,
+					questionaires: questionaires ? questionaires.reverse() : [],
+					notes: mo.notes ? mo.notes.reverse() : []
 				}
-			}
-
-			modules = modules.filter(
-				m =>
-					userType == 'ADMIN' ||
-					m.students.filter((s: StudentType) => s._id == userID).length > 0 ||
-					m.lecturers.filter((l: LecturerType) => l._id == userID).length > 0
-			);
-			res.json(modules);
+			})
+			const orderedModules = await Promise.all(orderedPromises);
+			return res.json(orderedModules);
 		})
 		.catch(err => {
 			return res.status(512).send('Server error : ' + err.message);
