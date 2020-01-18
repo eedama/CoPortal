@@ -208,7 +208,7 @@
       <v-col cols="12" sm="12" md="6" lg="6" xlg="6" class="mx-auto">
         <v-card :loading="isLoading" class="pa-3">
           <v-tabs grow>
-            <v-tab id="tab-announcements">
+            <v-tab @click="loadAnnouncements()" id="tab-announcements">
               Announcements
             </v-tab>
             <v-tab id="tab-tests">
@@ -246,23 +246,25 @@
                         Send an announcement
                       </v-btn>
                     </v-col>
-                    <v-col style="overflow-y:auto;max-height:50vh" cols="12">
-                      <v-card
-                        class="mx-10 mb-5"
-                        shaped
-                        outlined
-                        v-on:click="AnnouncementClick(announcement)"
-                        v-for="(announcement, i) in announcements"
-                        :key="i"
-                      >
-                        <v-list-item three-line>
-                          <v-list-item-avatar tile size="80">
-                            <v-icon class="text-peach" size="50"
-                              >mdi-bell</v-icon
-                            >
+                    <v-col cols="12">
+                      <v-list class="v-double-line">
+                        <v-list-item
+                          v-for="(announcement, i) in announcements"
+                          :key="i"
+                          three-line
+                          @click="showAnnouncement(announcement)"
+                        >
+                          <v-list-item-avatar>
+                            <v-icon>mdi-bell</v-icon>
                           </v-list-item-avatar>
                           <v-list-item-content>
-                            <div class="overline mb-4">
+                            <v-list-item-title>{{
+                              announcement.title
+                            }}</v-list-item-title>
+                            <v-list-item-subtitle>
+                              {{ announcement.message }}
+                            </v-list-item-subtitle>
+                            <v-list-item-subtitle class="caption">
                               {{
                                 announcement.lecturerId
                                   ? announcement.lecturerId.lastname +
@@ -270,22 +272,13 @@
                                     announcement.lecturerId.firstname
                                   : "Admin"
                               }}
-                              &nbsp;&bull;
-                              <span class="text-peach">{{
+                              <span class="text-peach float-right">{{
                                 getMoment(announcement.date).fromNow()
                               }}</span>
-                            </div>
-                            <v-list-item-title class="subtitle-1 mb-1">{{
-                              announcement.title
-                            }}</v-list-item-title>
-                            <v-list-item-subtitle
-                              ><span class="text-blue">{{
-                                announcement.message
-                              }}</span></v-list-item-subtitle
-                            >
+                            </v-list-item-subtitle>
                           </v-list-item-content>
                         </v-list-item>
-                      </v-card>
+                      </v-list>
                     </v-col>
                   </v-row>
                 </v-col>
@@ -562,32 +555,36 @@ export default {
   },
   props: ["moduleID"],
   methods: {
-    ChangeTab(selected) {
-      if (selected == "tab-announcement") {
-        axios
-          .post(
-            this.$store.state.settings.baseLink +
-              "/n/announcements/get/for/" +
-              this.$store.state.user.id,
-            {
-              userType: this.$store.state.user.type,
-              moduleID: this.moduleID
-            }
-          )
-          .then(results => {
-            this.isLoading = false;
-            this.announcements = results.data;
-            console.log(results);
-          })
-          .catch(err => {
-            this.isLoading = false;
-            if (err.response != null && err.response.status == 512) {
-              swal.fire(err.response.data, "error");
-            } else {
-              swal.fire(err.message, "Try again later", "error");
-            }
-          });
-      }
+    showAnnouncement(announcement) {
+      swal.fire({
+        title: announcement.title,
+        text: announcement.message
+      });
+    },
+    loadAnnouncements() {
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/n/announcements/get/for/" +
+            this.$store.state.user.id,
+          {
+            userType: this.$store.state.user.type,
+            moduleID: this.moduleID
+          }
+        )
+        .then(results => {
+          this.isLoading = false;
+          this.announcements = results.data;
+          console.log("Announcements....", results);
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal.fire(err.response.data, "error");
+          } else {
+            swal.fire(err.message, "Try again later", "error");
+          }
+        });
     },
     DownloadNotes(notes) {
       this.isLoading = true;
@@ -724,6 +721,7 @@ export default {
     },
     Reload() {
       this.isLoading = true;
+      this.loadAnnouncements();
       axios
         .get(
           this.$store.state.settings.baseLink + "/m/get/module/" + this.moduleID
