@@ -25,8 +25,8 @@ import { ModuleType, LecturerType, StudentType } from "models.types";
 */
 router.get('/modules/all', function (req: express.Request, res: express.Response) {
 	Module.find()
-		.populate(['lecturers'])
-		.populate(['students'])
+		.populate('lecturers', '-deviceTokens -password')
+		.populate('students', '-deviceTokens -password -parents')
 		.populate(['questionaires'])
 		.populate({
 			path: 'notes',
@@ -34,7 +34,8 @@ router.get('/modules/all', function (req: express.Request, res: express.Response
 		})
 		.then(modules => {
 			if (modules == null) return res.status(512).send('No modules where found');
-			const orderedModules = modules.map(mo => {
+			const orderedModules = modules.map(_m => {
+				const mo = _m.toObject();
 				return {
 					...mo,
 					questionaires: mo.questionaires ? mo.questionaires.reverse() : [],
@@ -42,6 +43,18 @@ router.get('/modules/all', function (req: express.Request, res: express.Response
 				}
 			})
 			res.json(orderedModules);
+		})
+		.catch(err => {
+			return res.status(512).send('Server error : ' + err.message);
+		});
+});
+router.get('/get/all/module/names', function (req: express.Request, res: express.Response) {
+	Module.find({
+
+	}, 'name code')
+		.then(modules => {
+			if (modules == null) return res.status(512).send('No modules where found');
+			res.json(modules);
 		})
 		.catch(err => {
 			return res.status(512).send('Server error : ' + err.message);
