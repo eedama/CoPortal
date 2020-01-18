@@ -1,6 +1,6 @@
 <template>
   <div class="screen">
-     <v-dialog
+    <v-dialog
       v-if="
         $store.state.user.isLoggedIn &&
           ($store.state.user.type == 'LECTURER' ||
@@ -61,17 +61,14 @@
           ></v-checkbox>
         </v-col>
         <v-col cols="12">
-          <v-chip-group
-          mandatory
-          active-class="primary--text"
-        >
-          <v-chip @click="announcement.isToAll = false">
-            Send to {{ module.name }} {{ module.code }} students only
-          </v-chip>
-          <v-chip @click="announcement.isToAll = true">
-            Send to all students
-          </v-chip>
-        </v-chip-group>
+          <v-chip-group mandatory active-class="primary--text">
+            <v-chip @click="announcement.isToAll = false">
+              Send to {{ module.name }} {{ module.code }} students only
+            </v-chip>
+            <v-chip @click="announcement.isToAll = true">
+              Send to all students
+            </v-chip>
+          </v-chip-group>
         </v-col>
 
         <v-col cols="12">
@@ -79,9 +76,8 @@
             The announcement will be sent to
             <strong>{{
               announcement.isToAll
-                ?
-                 "all students"
-                 : `${module.name} ${module.code} students only`
+                ? "all students"
+                : `${module.name} ${module.code} students only`
             }}</strong>
             {{
               announcement.isParent ? " and SMSs to thier parents as well" : ""
@@ -101,40 +97,72 @@
       </v-row>
     </v-dialog>
 
-    <v-dialog class="card" v-model="addNotes">
-      <v-card class="col s12 m8 offset-m2">
-        <v-card-header>
-          <div class="v-title">Adding notes</div>
-        </v-card-header>
-
-        <v-card-content>
-          <v-field>
-            <label>Title</label>
-            <v-input v-model="notes.title" required></v-input>
-          </v-field>
-          <v-field>
-            <label>Description</label>
-            <v-textarea v-model="notes.description" required></v-textarea>
-          </v-field>
-          <v-field>
-            <label>Notes file</label>
-            <v-file
-              type="notesFile"
-              id="notesFile"
-              ref="notesFile"
-              v-on:change="handleNotesFileUpload()"
-              v-model="notes.file"
-              placeholder="Select the file you want to upload"
-            />
-          </v-field>
-          <p class="center-align red-text" v-show="txtError.length > 2">{{ txtError }}</p>
-        </v-card-content>
+    <v-dialog max-width="600" v-model="addNotes" class="pa-4 bg-white">
+      <v-card color="secondary">
+        <v-row>
+          <v-col cols="10">
+            <v-card-title class="headline text-white"
+              >Adding notes</v-card-title
+            >
+            <v-card-text
+              ><span class="text-white"
+                >All students will be able to download these notes</span
+              ></v-card-text
+            >
+          </v-col>
+          <v-col class="m-auto my-auto" cols="2">
+            <v-btn icon v-on:click="addNotes = false" right class="right">
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-card>
-      <v-dialog-actions>
-        <ball-pulse-loader v-if="isUploading" color="#000000" size="20px"></ball-pulse-loader>
-        <v-btn v-if="!isUploading" class="v-primary" @click="UploadNotes()">Upload notes</v-btn>
-        <v-btn class="v-primary" @click="addNotes = false">Close</v-btn>
-      </v-dialog-actions>
+      <v-row class="bg-white pa-3">
+        <v-col cols="12">
+          <v-text-field
+            color="secondary"
+            label="Notes title"
+            outlined
+            v-model="notes.title"
+          >
+          </v-text-field>
+        </v-col>
+        <v-col cols="12">
+          <v-text-field
+            color="secondary"
+            label="Notes description"
+            outlined
+            v-model="notes.description"
+          >
+          </v-text-field>
+        </v-col>
+        <v-col cols="12">
+          <v-file-input
+            label="File"
+            @change="handleNotesFileUpload"
+            placeholder="Select the file you want to upload"
+            prepend-icon="mdi-paperclip"
+            outlined
+            counter
+            accept="image/*,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.pdf"
+            show-size
+          ></v-file-input>
+        </v-col>
+        <v-col cols="12">
+          <p class="text-center error--text" v-show="txtError.length > 2">
+            {{ txtError }}
+          </p>
+        </v-col>
+        <v-col cols="12">
+          <v-btn
+            :loading="isUploading"
+            class="secondary"
+            block
+            @click="UploadNotes()"
+            >Upload notes</v-btn
+          >
+        </v-col>
+      </v-row>
     </v-dialog>
 
     <v-dialog class="card" v-model="addStudent">
@@ -156,23 +184,21 @@
     </v-dialog>
 
     <v-row>
-       <v-col cols="10"> </v-col>
-    <v-col cols="2">
-      <v-btn
-        right
-        v-on:click="$router.back()"
-        class="primary justify-end"
-      >
-        <v-icon>mdi-keyboard-backspace</v-icon>
-        <span class="px-2">Back</span>
-      </v-btn>
-    </v-col>
+      <v-col cols="10"> </v-col>
+      <v-col cols="2">
+        <v-btn right v-on:click="$router.back()" class="primary justify-end">
+          <v-icon>mdi-keyboard-backspace</v-icon>
+          <span class="px-2">Back</span>
+        </v-btn>
+      </v-col>
     </v-row>
     <v-row v-if="module && module.name">
       <v-col cols="12" sm="12" md="6" lg="6" xlg="6" class="mx-auto">
         <v-card class="pa-3">
           <v-card-header class="text-center">
-            <div class="display-2 py-2">{{ module.name }} {{ module.code }}</div>
+            <div class="display-2 py-2">
+              {{ module.name }} {{ module.code }}
+            </div>
             <div class="title">{{ module.description }}</div>
           </v-card-header>
         </v-card>
@@ -181,258 +207,277 @@
     <v-row>
       <v-col cols="12" sm="12" md="6" lg="6" xlg="6" class="mx-auto">
         <v-card :loading="isLoading" class="pa-3">
-        <v-tabs grow>
-          <v-tab id="tab-announcements">
-            Announcements
-          </v-tab>
-          <v-tab id="tab-tests">
-            Tests
-          </v-tab>
-          <v-tab id="tab-notes">
-            Notes
-          </v-tab>
-          <v-tab v-if="module && module.students" id="tab-students">
-            <v-badge
-          color="red"
-          
-          :content="module.students.length"
-        >
-          {{ module.students.length == 1 ? 'student' : 'students' }}
-        </v-badge>
-          </v-tab>
-          <v-tab v-if="module && module.lecturers" id="tab-lecturers">
-            <v-badge
-          color="green"
-          
-          :content="module.lecturers.length"
-        >
-          {{ module.lecturers.length == 1 ? 'lecturer' : 'lecturers' }}
-        </v-badge>
-          </v-tab>
-          <v-tab-item>
-            <v-row>
-
-      <v-col cols="12" sm="12">
-        <v-row>
-          <v-col cols="8" class="mx-auto">
-            <v-btn
-              class="my-auto"
-              v-if="
-                $store.state.user.type == 'LECTURER' ||
-                  $store.state.user.type == 'ADMIN'
-              "
-              block 
-              shaped
-              @click="isAddingAnnouncements = true"
-              color="secondary"
-            >
-              Send an announcement
-            </v-btn>
-          </v-col>
-          <v-col style="overflow-y:auto;max-height:50vh" cols="12">
-            <v-card
-              class="mx-10 mb-5"
-              shaped
-              outlined
-              v-on:click="AnnouncementClick(announcement)"
-              v-for="(announcement, i) in announcements"
-              :key="i"
-            >
-              <v-list-item three-line>
-                <v-list-item-avatar tile size="80">
-                  <v-icon class="text-peach" size="50">mdi-bell</v-icon>
-                </v-list-item-avatar>
-                <v-list-item-content>
-                  <div class="overline mb-4">
-                    {{
-                      announcement.lecturerId
-                        ? announcement.lecturerId.lastname +
-                          " " +
-                          announcement.lecturerId.firstname
-                        : "Admin"
-                    }}
-                    &nbsp;&bull;
-                    <span class="text-peach">{{
-                      getMoment(announcement.date).fromNow()
-                    }}</span>
-                  </div>
-                  <v-list-item-title class="subtitle-1 mb-1">{{
-                    announcement.title
-                  }}</v-list-item-title>
-                  <v-list-item-subtitle
-                    ><span class="text-blue">{{
-                      announcement.message
-                    }}</span></v-list-item-subtitle
+          <v-tabs grow>
+            <v-tab id="tab-announcements">
+              Announcements
+            </v-tab>
+            <v-tab id="tab-tests">
+              Tests
+            </v-tab>
+            <v-tab id="tab-notes">
+              Notes
+            </v-tab>
+            <v-tab v-if="module && module.students" id="tab-students">
+              <v-badge color="red" :content="module.students.length">
+                {{ module.students.length == 1 ? "student" : "students" }}
+              </v-badge>
+            </v-tab>
+            <v-tab v-if="module && module.lecturers" id="tab-lecturers">
+              <v-badge color="green" :content="module.lecturers.length">
+                {{ module.lecturers.length == 1 ? "lecturer" : "lecturers" }}
+              </v-badge>
+            </v-tab>
+            <v-tab-item>
+              <v-row>
+                <v-col cols="12" sm="12">
+                  <v-row>
+                    <v-col cols="8" class="mx-auto">
+                      <v-btn
+                        class="my-auto"
+                        v-if="
+                          $store.state.user.type == 'LECTURER' ||
+                            $store.state.user.type == 'ADMIN'
+                        "
+                        block
+                        shaped
+                        @click="isAddingAnnouncements = true"
+                        color="secondary"
+                      >
+                        Send an announcement
+                      </v-btn>
+                    </v-col>
+                    <v-col style="overflow-y:auto;max-height:50vh" cols="12">
+                      <v-card
+                        class="mx-10 mb-5"
+                        shaped
+                        outlined
+                        v-on:click="AnnouncementClick(announcement)"
+                        v-for="(announcement, i) in announcements"
+                        :key="i"
+                      >
+                        <v-list-item three-line>
+                          <v-list-item-avatar tile size="80">
+                            <v-icon class="text-peach" size="50"
+                              >mdi-bell</v-icon
+                            >
+                          </v-list-item-avatar>
+                          <v-list-item-content>
+                            <div class="overline mb-4">
+                              {{
+                                announcement.lecturerId
+                                  ? announcement.lecturerId.lastname +
+                                    " " +
+                                    announcement.lecturerId.firstname
+                                  : "Admin"
+                              }}
+                              &nbsp;&bull;
+                              <span class="text-peach">{{
+                                getMoment(announcement.date).fromNow()
+                              }}</span>
+                            </div>
+                            <v-list-item-title class="subtitle-1 mb-1">{{
+                              announcement.title
+                            }}</v-list-item-title>
+                            <v-list-item-subtitle
+                              ><span class="text-blue">{{
+                                announcement.message
+                              }}</span></v-list-item-subtitle
+                            >
+                          </v-list-item-content>
+                        </v-list-item>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-tab-item>
+            <v-tab-item>
+              <v-row class="ma-3">
+                <v-col cols="12" sm="12" md="8" class="mx-auto">
+                  <v-btn
+                    class="my-auto"
+                    block
+                    shaped
+                    color="secondary"
+                    v-if="$store.state.user.type != 'STUDENT'"
+                    v-on:click="setATestForModule(module._id)"
                   >
-                </v-list-item-content>
-              </v-list-item>
-            </v-card>
-          </v-col>
-         </v-row>
-      </v-col>
-            </v-row>
-          </v-tab-item>
-            <v-tab-item>
-            <v-row class="ma-3">
-              <v-col cols="12" sm="12" md="8" class="mx-auto">
-                  <v-btn
-              class="my-auto"
-              block
-              shaped
-              color="secondary" v-if="$store.state.user.type != 'STUDENT'"
-                          v-on:click="setATestForModule(module._id)"
-            >
-              Set a test
-            </v-btn>
-              </v-col>
-            <v-col cols="12" sm="12">
-                    <v-list class="v-double-line">
-
-    <v-list-item prepend-icon="library_books" v-for="questionaire in filteredTests"
-                        :key="questionaire._id"
-                        v-on:click="getSolutionFor(questionaire)" three-line>
-            <v-list-item-avatar>
-              <v-icon>mdi-library-books</v-icon>
-            </v-list-item-avatar>
-      <v-list-item-content>
-        <v-list-item-title>{{ questionaire.title }}</v-list-item-title>
-        <v-list-item-subtitle>
-          {{ questionaire.questions.length }} {{ questionaire.questions.length == 1 ? 'question' : 'questions' }}
-        </v-list-item-subtitle>
-        <v-list-item-subtitle  class="caption">
-          {{ getMoment(questionaire.date).fromNow() }}
-        </v-list-item-subtitle>
-      </v-list-item-content>
-    </v-list-item>
-                    </v-list>
-              </v-col>
+                    Set a test
+                  </v-btn>
+                </v-col>
+                <v-col cols="12" sm="12">
+                  <v-list class="v-double-line">
+                    <v-list-item
+                      prepend-icon="library_books"
+                      v-for="questionaire in filteredTests"
+                      :key="questionaire._id"
+                      v-on:click="getSolutionFor(questionaire)"
+                      three-line
+                    >
+                      <v-list-item-avatar>
+                        <v-icon>mdi-library-books</v-icon>
+                      </v-list-item-avatar>
+                      <v-list-item-content>
+                        <v-list-item-title>{{
+                          questionaire.title
+                        }}</v-list-item-title>
+                        <v-list-item-subtitle>
+                          {{ questionaire.questions.length }}
+                          {{
+                            questionaire.questions.length == 1
+                              ? "question"
+                              : "questions"
+                          }}
+                        </v-list-item-subtitle>
+                        <v-list-item-subtitle class="caption">
+                          {{ getMoment(questionaire.date).fromNow() }}
+                        </v-list-item-subtitle>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-col>
               </v-row>
             </v-tab-item>
             <v-tab-item>
-            <v-row class="ma-3">
-                 <v-col cols="12" sm="12" md="8" class="mx-auto">
+              <v-row class="ma-3">
+                <v-col cols="12" sm="12" md="8" class="mx-auto">
                   <v-btn
-              class="my-auto"
-              block
-              shaped
-              color="secondary" v-if="$store.state.user.type != 'STUDENT'"
-                          v-on:click="addNotes = true"
-            >
-              Upload new notes
-            </v-btn>
-              </v-col>
-                 <v-col cols="12" sm="12">
-                     <v-list>
-    <v-list-item v-on:click="DownloadNotes(notes)"
-                        v-for="(notes,i) in module.notes"
-                        :key="i" two-line>
-            <v-list-item-avatar>
-              <v-icon>mdi-library-books</v-icon>
-            </v-list-item-avatar>
-      <v-list-item-content>
-        <v-list-item-title>{{ notes.title }}</v-list-item-title>
-        <v-list-item-subtitle>
-         {{ getMoment(notes.date).format('YYYY-MM-DD hh:mm') }}
-        </v-list-item-subtitle>
-      </v-list-item-content>
-    </v-list-item>
-                    </v-list>
-              </v-col>
-            </v-row>
-            </v-tab-item>
-            <v-tab-item>
-                    <v-row class="ma-3">
-                 <v-col cols="12" sm="12" md="8" class="mx-auto">
-                  <v-btn
-              class="my-auto"
-              block
-              shaped
-              color="secondary" v-if="$store.state.user.type !== 'STUDENT'"
-                          v-on:click="addStudent = true"
-            >
-              Register a student
-            </v-btn>
-              </v-col>
-               <v-col sm="12" md="6" offset-md="3">
-      <v-text-field
-        class="text-center mx-auto text-xs-center"
-        color="secondary"
-        label="Search"
-        solo
-        block
-        prepend-inner-icon="mdi-magnify" 
-        v-model="txtStudentSearch"
-      >
-      </v-text-field>
-    </v-col>
-                 <v-col cols="12" sm="12">
-                     <v-list>
-    <v-list-item v-for="student in filteredStudents"
-                        :key="student._id"
-                        v-on:click="goToStudent(student._id)" two-line>
-            <v-list-item-avatar>
-              <v-icon>mdi-account-circle</v-icon>
-            </v-list-item-avatar>
-      <v-list-item-content>
-        <v-list-item-title>{{ student.lastname }} {{ student.firstname }}</v-list-item-title>
-        <v-list-item-subtitle>
-         {{ student.username }}
-        </v-list-item-subtitle>
-      </v-list-item-content>
-    </v-list-item>
-                    </v-list>
-              </v-col>
-            </v-row>
-            </v-tab-item>
-            <v-tab-item>
-                       <v-row class="ma-3">
-              <v-col cols="12" sm="12" md="8" class="mx-auto">
-                  <v-btn
-              class="my-auto"
-              block
-              shaped
-              color="secondary" 
-                          v-if="$store.state.user.type == 'ADMIN'"
-                          v-on:click="addLecturer = true"
-            >
-              Register a lecturer
-            </v-btn>
-              </v-col>
-               <v-col sm="12" md="6" offset-md="3">
-      <v-text-field
-        class="text-center mx-auto text-xs-center"
-        color="secondary"
-        label="Search"
-        solo
-        block
-        prepend-inner-icon="mdi-magnify" 
-        v-model="txtLecturerSearch"
-      >
-      </v-text-field>
-    </v-col>
-            <v-col cols="12" sm="12">
-                    <v-list class="v-double-line">
-
-    <v-list-item 
-                        v-for="lecturer in filteredLecturers"
-                        :key="lecturer._id"
-                        v-on:click="goToLecturer(lecturer._id)" two-line>
-            <v-list-item-avatar>
-              <v-icon>mdi-teach</v-icon>
-            </v-list-item-avatar>
-      <v-list-item-content>
-        <v-list-item-title>{{ lecturer.lastname }} {{ lecturer.firstname }}</v-list-item-title>
-        <v-list-item-subtitle>
-          {{ lecturer.username }}
-        </v-list-item-subtitle>
-      </v-list-item-content>
-    </v-list-item>
-                    </v-list>
-              </v-col>
+                    class="my-auto"
+                    block
+                    shaped
+                    color="secondary"
+                    v-if="$store.state.user.type != 'STUDENT'"
+                    v-on:click="addNotes = true"
+                  >
+                    Upload new notes
+                  </v-btn>
+                </v-col>
+                <v-col cols="12" sm="12">
+                  <v-list>
+                    <v-list-item
+                      v-on:click="DownloadNotes(notes)"
+                      v-for="(notes, i) in module.notes"
+                      :key="i"
+                      two-line
+                    >
+                      <v-list-item-avatar>
+                        <v-icon>mdi-library-books</v-icon>
+                      </v-list-item-avatar>
+                      <v-list-item-content>
+                        <v-list-item-title>{{ notes.title }}</v-list-item-title>
+                        <v-list-item-subtitle>
+                          {{ getMoment(notes.date).format("YYYY-MM-DD hh:mm") }}
+                        </v-list-item-subtitle>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-col>
               </v-row>
             </v-tab-item>
-            </v-tabs>
-            </v-card>
+            <v-tab-item>
+              <v-row class="ma-3">
+                <v-col cols="12" sm="12" md="8" class="mx-auto">
+                  <v-btn
+                    class="my-auto"
+                    block
+                    shaped
+                    color="secondary"
+                    v-if="$store.state.user.type !== 'STUDENT'"
+                    v-on:click="addStudent = true"
+                  >
+                    Register a student
+                  </v-btn>
+                </v-col>
+                <v-col sm="12" md="6" offset-md="3">
+                  <v-text-field
+                    class="text-center mx-auto text-xs-center"
+                    color="secondary"
+                    label="Search"
+                    solo
+                    block
+                    prepend-inner-icon="mdi-magnify"
+                    v-model="txtStudentSearch"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="12">
+                  <v-list>
+                    <v-list-item
+                      v-for="student in filteredStudents"
+                      :key="student._id"
+                      v-on:click="goToStudent(student._id)"
+                      two-line
+                    >
+                      <v-list-item-avatar>
+                        <v-icon>mdi-account-circle</v-icon>
+                      </v-list-item-avatar>
+                      <v-list-item-content>
+                        <v-list-item-title
+                          >{{ student.lastname }}
+                          {{ student.firstname }}</v-list-item-title
+                        >
+                        <v-list-item-subtitle>
+                          {{ student.username }}
+                        </v-list-item-subtitle>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-col>
+              </v-row>
+            </v-tab-item>
+            <v-tab-item>
+              <v-row class="ma-3">
+                <v-col cols="12" sm="12" md="8" class="mx-auto">
+                  <v-btn
+                    class="my-auto"
+                    block
+                    shaped
+                    color="secondary"
+                    v-if="$store.state.user.type == 'ADMIN'"
+                    v-on:click="addLecturer = true"
+                  >
+                    Register a lecturer
+                  </v-btn>
+                </v-col>
+                <v-col sm="12" md="6" offset-md="3">
+                  <v-text-field
+                    class="text-center mx-auto text-xs-center"
+                    color="secondary"
+                    label="Search"
+                    solo
+                    block
+                    prepend-inner-icon="mdi-magnify"
+                    v-model="txtLecturerSearch"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="12" sm="12">
+                  <v-list class="v-double-line">
+                    <v-list-item
+                      v-for="lecturer in filteredLecturers"
+                      :key="lecturer._id"
+                      v-on:click="goToLecturer(lecturer._id)"
+                      two-line
+                    >
+                      <v-list-item-avatar>
+                        <v-icon>mdi-teach</v-icon>
+                      </v-list-item-avatar>
+                      <v-list-item-content>
+                        <v-list-item-title
+                          >{{ lecturer.lastname }}
+                          {{ lecturer.firstname }}</v-list-item-title
+                        >
+                        <v-list-item-subtitle>
+                          {{ lecturer.username }}
+                        </v-list-item-subtitle>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-col>
+              </v-row>
+            </v-tab-item>
+          </v-tabs>
+        </v-card>
       </v-col>
     </v-row>
   </div>
@@ -557,8 +602,10 @@ export default {
           var data = results.data.file.base64StringFile;
           var fileName = results.data.file.fileName;
           var type = results.data.type;
-
-        //  var notes = download.download(data, fileName, type);
+          var a = document.createElement("a");
+          a.href = data;
+          a.download = fileName;
+          a.click();
         })
         .catch(err => {
           this.isLoading = false;
@@ -597,10 +644,10 @@ export default {
         reader.readAsArrayBuffer(file);
       });
     },
-    handleNotesFileUpload() {
-      if (this.notes.file.target.files.length > 0) {
+    handleNotesFileUpload(selectedFile) {
+      if (selectedFile) {
         this.isUploading = true;
-        this.getFile(this.notes.file.target.files[0])
+        this.getFile(selectedFile)
           .then(file => {
             this.isUploading = false;
             this.notesFile = file;
@@ -611,9 +658,6 @@ export default {
             this.isUploading = false;
             this.notesFile = null;
           });
-      } else {
-        swal.fire("No file selected", "Please select a file", "error");
-        this.notesFile = null;
       }
     },
     UploadNotes() {
@@ -716,7 +760,11 @@ export default {
           this.isLoading = false;
           if (results.data.id == null) {
             if (this.$store.state.user.isParent) {
-              swal.fire("The student has not taken this test yet", "", "warning");
+              swal.fire(
+                "The student has not taken this test yet",
+                "",
+                "warning"
+              );
             } else {
               this.goToTakeTest(questionaire);
             }
@@ -729,7 +777,11 @@ export default {
           if (err.response != null && err.response.status == 512) {
             swal.fire(err.response.data, "Try again later", "error");
           } else {
-            swal.fire("Unable to load the questionaire", "Try again later", "error");
+            swal.fire(
+              "Unable to load the questionaire",
+              "Try again later",
+              "error"
+            );
           }
         });
     },
@@ -757,7 +809,11 @@ export default {
           if (err.response != null && err.response.status == 512) {
             swal.fire(err.response.data, "Try again later", "error");
           } else {
-            swal.fire("Unable to load the questionaire", "Try again later", "error");
+            swal.fire(
+              "Unable to load the questionaire",
+              "Try again later",
+              "error"
+            );
           }
         });
     }
