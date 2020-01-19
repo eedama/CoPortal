@@ -26,7 +26,7 @@ import { StudentParentType } from "models.types";
 router.get("/lecturers/all", function (req: express.Request, res: express.Response) {
   Lecturer.find({
     "active": true
-  })
+  }, "-deviceTokens -password")
     .populate(["rents"])
     .populate(['modules'])
     .then(lecturers => {
