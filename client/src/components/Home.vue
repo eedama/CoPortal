@@ -792,7 +792,7 @@ export default {
       partners: [
         {
           link: "https://www.onlinecareerguidance.co.za",
-          img: "https://www.onlinecareerguidance.co.za/images_2014/Banner.jpg",
+          img: "https://www.onlinecareerguidance.co.za/images/ocgbanner.jpg",
           name: "Online career guidance",
           description: "Online career guidance"
         },
@@ -802,6 +802,13 @@ export default {
             "http://www.zabursaries.co.za/wp-content/uploads/2016/09/bursaries2017-south-africa-logo.png",
           name: "ZA Bursaries",
           description: "ZA Bursaries"
+        },
+        {
+          link: "http://ltprivatetutoring.co.za/",
+          img:
+            "http://ltprivatetutoring.co.za/img/logo2.png",
+          name: "LT Private Tutoring",
+          description: "LT Private Tutoring"
         }
       ],
       announcement: {
