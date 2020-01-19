@@ -31,11 +31,10 @@
           sm="12"
           md="8"
           class="mx-auto my-auto"
-          v-for="(question, i) in Questionaire.questions.filter(
-            (v, index) =>
-              currentPage == index ||
-              currentPage == Questionaire.questions.length
-          )"
+          v-for="(question, i) in Questionaire.questions"
+          v-show="
+            currentPage == i || currentPage == Questionaire.questions.length
+          "
           :key="i"
         >
           <v-card

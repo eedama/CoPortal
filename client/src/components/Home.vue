@@ -871,7 +871,7 @@ export default {
         {
           text: "Lecturers",
           description: "List of registered lecturers",
-          icon: "mdi-account-supervised-circle",
+          icon: "mdi-teach",
           link: "/lecturer/list",
           auth: ["ADMIN"]
         },

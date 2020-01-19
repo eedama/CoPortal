@@ -296,7 +296,7 @@ export default {
     ViewMemorandum() {
       swal.fire(
         "Memorandum not yet avaliable",
-        "Not all students have wrote the test",
+        "Please contact admin.",
         "error"
       );
     },

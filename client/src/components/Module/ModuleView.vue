@@ -165,13 +165,31 @@
       </v-row>
     </v-dialog>
 
-    <v-dialog class="card" v-model="addStudent">
-      <v-content style="overflow-y:scroll" class="row">
-        <add-student v-on:submitted="AddedNewStudent"></add-student>
-      </v-content>
-      <v-dialog-actions>
-        <v-btn class="v-primary" @click="addStudent = false">Close</v-btn>
-      </v-dialog-actions>
+    <v-dialog max-width="900" class="card" v-model="addStudent">
+      <v-card color="secondary">
+        <v-row>
+          <v-col cols="10">
+            <v-card-title class="headline text-white"
+              >Adding student</v-card-title
+            >
+            <v-card-text
+              ><span class="text-white"
+                >The student will be able to access the mobile app and this
+                portal</span
+              ></v-card-text
+            >
+          </v-col>
+          <v-col class="m-auto my-auto" cols="2">
+            <v-btn icon v-on:click="addStudent = false" right class="right">
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+      <add-student
+        class="bg-white"
+        v-on:submitted="AddedNewStudent"
+      ></add-student>
     </v-dialog>
 
     <v-dialog class="card" v-model="addLecturer">
