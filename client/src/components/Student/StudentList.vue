@@ -356,6 +356,28 @@
               </v-tab>
               <v-tab-item>
                 <v-list class="v-double-line">
+                  <v-list-item class="waves-effect">
+                    <v-list-item-avatar>
+                      <v-icon>mdi-account</v-icon>
+                    </v-list-item-avatar>
+
+                    <v-list-item-content>
+                      <v-list-item-title>Fullname</v-list-item-title>
+                      <v-list-item-subtitle>{{student.lastname}} {{ student.firstname }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item class="waves-effect">
+                    <v-list-item-avatar>
+                      <v-icon>mdi-account-circle</v-icon>
+                    </v-list-item-avatar>
+
+                    <v-list-item-content>
+                      <v-list-item-title>Username</v-list-item-title>
+                      <v-list-item-subtitle>{{
+                        student.username
+                      }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
                   <v-list-item v-if="student.idNumber" class="waves-effect">
                     <v-list-item-avatar>
                       <v-icon>mdi-account-circle</v-icon>
