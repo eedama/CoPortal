@@ -13,129 +13,124 @@
         </v-card-text>
       </v-card>
     </v-col>
-    <v-col cols="12" md="8" offset-md="2" v-show="!done">
-      <v-card class="pa-5">
-        <p class="title text-center mx-auto">
-          Adding a student
-        </p>
-        <v-content class="card-content">
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="student.firstname"
-                prepend-inner-icon="mdi-account"
-                label="Firstname"
-                type="text"
-                outlined
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="student.lastname"
-                prepend-inner-icon="mdi-account-outline"
-                label="Lastname"
-                type="text"
-                outlined
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" md="8" offset-md="2">
-              <v-text-field
-                v-model="student.username"
-                prepend-inner-icon="mdi-account"
-                label="Username"
-                type="text"
-                outlined
-              ></v-text-field>
-            </v-col>
+    <v-col cols="12" md="10" offset-md="1" class="mx-auto" v-show="!done">
+      <v-content class="card-content">
+        <v-row>
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="student.firstname"
+              prepend-inner-icon="mdi-account"
+              label="Firstname"
+              type="text"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="student.lastname"
+              prepend-inner-icon="mdi-account-outline"
+              label="Lastname"
+              type="text"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="8" offset-md="2">
+            <v-text-field
+              v-model="student.username"
+              prepend-inner-icon="mdi-account"
+              label="Username"
+              type="text"
+              outlined
+            ></v-text-field>
+          </v-col>
 
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="student.password"
-                prepend-inner-icon="mdi-lock"
-                label="Password"
-                @click:append="showPassword = !showPassword"
-                :append-icon="
-                  showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
-                "
-                :type="showPassword ? 'text' : 'password'"
-                outlined
-              >
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="student.confirmPassword"
-                prepend-inner-icon="mdi-lock"
-                label="Confirm Password"
-                @click:append="showPassword = !showPassword"
-                :append-icon="
-                  showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
-                "
-                :type="showPassword ? 'text' : 'password'"
-                outlined
-              >
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" md="8" offset-md="2">
-              <v-select
-                class="ma-5"
-                :items="
-                  modules.map(v => {
-                    return { _id: v._id, title: `${v.name} - ${v.code}` };
-                  })
-                "
-                item-text="title"
-                item-value="_id"
-                label="Select all modules"
-                outlined
-                multiple
-                v-model="student.modules"
-              >
-              </v-select>
-            </v-col>
-            <v-col cols="12" md="9">
-              <v-text-field
-                v-model="student.idNumber"
-                prepend-inner-icon="mdi-account"
-                label="ID number"
-                type="number"
-                outlined
-                maxlength="13"
-                :helper="
-                  student.isSouthAfrican
-                    ? `South African Citizen`
-                    : `Non-South African Citizen`
-                "
-              >
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" md="3">
-              <v-select
-                outlined
-                :items="['Male', 'Female']"
-                label="Pick a gender"
-                v-model="student.gender"
-              >
-              </v-select>
-            </v-col>
-            <div class="row" v-show="txtError.length > 0">
-              <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <label class="text-center red-text">{{ txtError }}</label>
-              </div>
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="student.password"
+              prepend-inner-icon="mdi-lock"
+              label="Password"
+              @click:append="showPassword = !showPassword"
+              :append-icon="
+                showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
+              "
+              :type="showPassword ? 'text' : 'password'"
+              outlined
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="student.confirmPassword"
+              prepend-inner-icon="mdi-lock"
+              label="Confirm Password"
+              @click:append="showPassword = !showPassword"
+              :append-icon="
+                showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
+              "
+              :type="showPassword ? 'text' : 'password'"
+              outlined
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="12" md="8" offset-md="2">
+            <v-select
+              class="ma-5"
+              :items="
+                moduleNames.map(v => {
+                  return { _id: v._id, title: `${v.name} - ${v.code}` };
+                })
+              "
+              item-text="title"
+              item-value="_id"
+              label="Select all modules"
+              outlined
+              multiple
+              v-model="student.modules"
+            >
+            </v-select>
+          </v-col>
+          <v-col cols="12" md="9">
+            <v-text-field
+              v-model="student.idNumber"
+              prepend-inner-icon="mdi-account"
+              label="ID number"
+              type="number"
+              outlined
+              maxlength="13"
+              :helper="
+                student.isSouthAfrican
+                  ? `South African Citizen`
+                  : `Non-South African Citizen`
+              "
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="12" md="3">
+            <v-select
+              outlined
+              :items="['Male', 'Female']"
+              label="Pick a gender"
+              v-model="student.gender"
+            >
+            </v-select>
+          </v-col>
+          <div class="row" v-show="txtError.length > 0">
+            <div class="col s8 offset-s2 m6 offset-m3 text-center">
+              <label class="text-center red-text">{{ txtError }}</label>
             </div>
-            <v-col cols="12" md="10" offset-md="1" class="mx-auto">
-              <v-btn
-                :loading="isLoading"
-                v-on:click="SubmitStudent()"
-                block
-                color="secondary"
-              >
-                Submit student
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-content>
-      </v-card>
+          </div>
+          <v-col cols="12" md="10" offset-md="1" class="mx-auto">
+            <v-btn
+              :loading="isLoading"
+              v-on:click="SubmitStudent()"
+              block
+              color="secondary"
+            >
+              Submit student
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-content>
     </v-col>
   </v-row>
 </template>
@@ -165,7 +160,7 @@ export default {
         isSouthAfrican: false
       },
       done: false,
-      modules: [],
+      moduleNames: [],
       isLoading: false
     };
   },
@@ -198,17 +193,10 @@ export default {
     LoadModules() {
       this.isLoading = true;
       axios
-        .get(this.$store.state.settings.baseLink + "/m/modules/all")
+        .get(this.$store.state.settings.baseLink + "/m/get/all/module/names")
         .then(results => {
           this.isLoading = false;
-          this.modules = results.data;
-          this.options = [];
-          this.modules.map(s => {
-            this.options.push({
-              value: s._id,
-              text: s.name + " ( " + s.code + " )"
-            });
-          });
+          this.moduleNames = results.data;
         })
         .catch(err => {
           this.isLoading = false;

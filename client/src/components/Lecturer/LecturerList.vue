@@ -27,7 +27,27 @@
       >
     </v-col>
   
-    <v-col cols="12" sm="12" md="6" class="mx-auto" v-show="addingLecturers">
+    <v-col cols="12" sm="12" md="6" class="mx-auto" v-if="addingLecturers">
+       <v-card color="secondary">
+        <v-row>
+          <v-col cols="10">
+            <v-card-title class="headline text-white"
+              >Adding lecturer</v-card-title
+            >
+            <v-card-text
+              ><span class="text-white"
+                >The lecturer will be able to access the mobile app and this
+                portal</span
+              ></v-card-text
+            >
+          </v-col>
+          <v-col class="m-auto my-auto" cols="2">
+            <v-btn icon v-on:click="addingLecturers = false" right class="right">
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
       <add-lecturer v-on:submitted="AddedNewLecturer"></add-lecturer>
     </v-col>
     <v-col cols="12">
