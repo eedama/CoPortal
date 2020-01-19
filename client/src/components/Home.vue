@@ -82,7 +82,7 @@
     >
       <v-card color="secondary">
         <v-row>
-          <v-col cols="10">
+          <v-col cols="12" sm="12" md="10">
             <v-card-title class="headline text-white"
               >Creating attendance register</v-card-title
             >
@@ -380,7 +380,7 @@
     >
       <v-card color="secondary">
         <v-row>
-          <v-col cols="10">
+          <v-col  cols="12" sm="12" md="10">
             <v-card-title class="headline text-white"
               >Change Student</v-card-title
             >
@@ -447,7 +447,7 @@
     >
       <v-card color="secondary">
         <v-row>
-          <v-col cols="10">
+          <v-col  cols="12" sm="12" md="10">
             <v-card-title class="headline text-white"
               >Send an announcement</v-card-title
             >
@@ -550,10 +550,10 @@
     </v-dialog>
 
     <v-row v-if="!$store.state.user.isLoggedIn" class="row mt-10 pt-10">
-      <v-col cols="9">
+      <v-col  cols="12" sm="7" md="9">
         <h4 class="title text-blue px-5">We offer the following services</h4>
       </v-col>
-      <v-col cols="2" class="mx-auto">
+      <v-col  cols="12" sm="5" md="3" class="mx-auto">
         <v-btn
           v-on:click="$router.push('/login')"
           x-large
@@ -568,7 +568,7 @@
       </v-col>
       <v-col cols="12">
         <v-row class="px-10">
-          <v-col cols="4">
+          <v-col cols="12" sm="6" md="4">
             <v-card>
               <v-card-title class="mx-auto" center>
                 <span class="text-center title mx-auto mb-n4 text-peach center"
@@ -578,7 +578,7 @@
               <v-img src="../assets/images/backgrounds/family_2x.png" />
             </v-card>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="12" sm="6" md="4">
             <v-card>
               <v-card-title class="mx-auto" center>
                 <span class="text-center title mx-auto mb-n4 text-peach center"
@@ -588,7 +588,7 @@
               <v-img src="../assets/images/backgrounds/coderdojo.png" />
             </v-card>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="12" sm="6" md="4">
             <v-card>
               <v-card-title class="mx-auto" center>
                 <span class="text-center title mx-auto mb-n4 text-peach center"
@@ -598,7 +598,7 @@
               <v-img src="../assets/images/backgrounds/invoice_maker_2x.jpg" />
             </v-card>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="12" sm="6" md="4">
             <v-card>
               <v-card-title class="mx-auto" center>
                 <span class="text-center title mx-auto mb-n4 text-blue center"
@@ -608,7 +608,7 @@
               <v-img src="../assets/images/backgrounds/notification.png" />
             </v-card>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="12" sm="6" md="4">
             <v-card>
               <v-card-title class="mx-auto" center>
                 <span class="text-center title mx-auto mb-n4 text-blue center"
@@ -618,7 +618,7 @@
               <v-img src="../assets/images/backgrounds/education.jpg" />
             </v-card>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="12" sm="6" md="4">
             <v-card>
               <v-card-title class="mx-auto" center>
                 <span class="text-center title mx-auto mb-n4 text-blue center"
@@ -636,7 +636,7 @@
           Meet some of our cool friends that might help boost your career life
         </h4>
       </v-col>
-      <v-col v-for="(partner, i) in partners" :key="i" cols="4">
+      <v-col v-for="(partner, i) in partners" :key="i" cols="12" sm="6" md="4">
         <v-card
           class="mx-5 mb-5"
           shaped
@@ -654,7 +654,7 @@
     </v-row>
 
     <v-row v-if="$store.state.user.isLoggedIn" class="row  mt-10 pt-10">
-      <v-col cols="4">
+      <v-col cols="12" sm="12" md="4">
         <v-row>
           <v-col cols="8">
             <v-list-item-title>
@@ -717,9 +717,9 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-col class="px-10" cols="8">
+      <v-col class="px-10" cols="12" sm="12" md="8">
         <v-row>
-          <v-col cols="6" offset-md="3">
+          <v-col cols="12" sm="12" md="8" offset-md="3" class="mx-auto">
             <v-img src="../assets/images/backgrounds/education.jpg" />
           </v-col>
           <v-col
@@ -727,7 +727,7 @@
               o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0
             )"
             :key="i"
-            cols="6"
+            cols="12" xs="12" sm="6"
           >
             <v-card
               v-on:click="goToRoute(option)"
