@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 import * as moment from "moment";
 
 const axios = require("axios");

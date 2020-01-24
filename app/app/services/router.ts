@@ -11,6 +11,11 @@ import Module from "../components/pages/components/Module.vue";
 import TakeTest from "../components/pages/components/TakeTest.vue";
 import TestMarks from "../components/pages/components/TestMarks.vue";
 import Timetable from "../components/pages/components/Timetable.vue";
+import StudentAttandance from "../components/pages/components/StudentAttendance.vue";
+import Attandance from "../components/pages/components/Attendance.vue";
+import Survey from "../components/pages/components/Survey.vue";
+import SurveyResults from "../components/pages/components/SurveyResults.vue";
+import TakeSurvey from "../components/pages/components/TakeSurvey.vue";
 import Modules from "../components/pages/Modules.vue";
 import Notifications from "../components/pages/Notifications.vue";
 import Profile from "../components/pages/Profile.vue";
@@ -59,7 +64,7 @@ var router = {
         title: "FeedbackChat",
         authLevel: 0
       }
-    },    
+    },
     "/pdf/view": {
       name: "pdfview",
       path: "/module/list",
@@ -107,7 +112,7 @@ var router = {
     },
     "/student/profile/view": {
       name: "profile",
-      path: "/student/profile/view/:userId",
+      path: "/student/profile/view",
       component: Profile,
       meta: {
         title: "StudentProfile",
@@ -165,6 +170,69 @@ var router = {
       component: TestMarks,
       meta: {
         title: "TestMarks",
+        authLevel: 0
+      }
+    },
+    "/student/attendance": {
+      name: "studentattendance",
+      path: "/student/attendance",
+      component: StudentAttandance,
+      meta: {
+        title: "StudentAttendance",
+        authLevel: 0
+      }
+    },
+    "/module/list/attend": {
+      name: "modulesattendlist",
+      path: "/module/list/attend",
+      component: Modules,
+      meta: {
+        title: "Modules",
+        authLevel: 0
+      }
+    },
+    "/module/list/survey": {
+      name: "modulesurvry",
+      path: "/module/list/survey",
+      component: Modules,
+      meta: {
+        title: "Modules",
+        authLevel: 0
+      }
+    },
+    "/module/attendance": {
+      name: "moduleattendance",
+      path: "/module/attendance",
+      component: Attandance,
+      meta: {
+        title: "Attendance",
+        authLevel: 0
+      }
+    },
+    "/module/survey": {
+      name: "modulesurvey",
+      path: "/module/survey",
+      component: Survey,
+      meta: {
+        title: "Survey",
+        authLevel: 0
+      }
+    },
+    "/module/survey/results": {
+      name: "modulesurveyresults",
+      path: "/module/survey/results",
+      component: SurveyResults,
+      meta: {
+        title: "SurveyResults",
+        authLevel: 0
+      }
+    },
+    "/module/survey/take": {
+      name: "modulesurveytake",
+      path: "/module/survey/take",
+      component: TakeSurvey,
+      meta: {
+        title: "TakeSurvey",
         authLevel: 0
       }
     }

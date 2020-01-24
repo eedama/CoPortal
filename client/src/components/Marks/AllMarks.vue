@@ -1,26 +1,35 @@
 <template>
   <div class="screen">
-    <div class="row">
-      <div class="col s8 offset-s2">
-        <md-button v-on:click="$router.back()" class="right">
-          <md-icon>keyboard_backspace</md-icon>
-          <span>Back</span>
-        </md-button>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col s10 offset-s1 m8 offset-m3 l6 offset-l3">
-        <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-          <input v-on:keypress.enter="DeepSearch" v-model="txtSearch" id="Password" name="Search" type="search" />
-          <label class="text-center" for="Search">Search</label>
-        </div>
-      </div>
-      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col s12 m3 row">
+
+    <v-row>
+       <v-col cols="10"> </v-col>
+    <v-col cols="2">
+      <v-btn
+        right
+        v-on:click="$router.back()"
+        class="primary justify-end"
+      >
+        <v-icon>mdi-keyboard-backspace</v-icon>
+        <span class="px-2">Back</span>
+      </v-btn>
+    </v-col>
+    </v-row>
+    <v-row>
+        <v-col sm="12" md="6" offset-md="3">
+      <v-text-field
+        class="text-center mx-auto text-xs-center"
+        color="secondary"
+        label="Search"
+        solo
+        block
+        prepend-inner-icon="mdi-magnify" 
+        v-model="txtSearch"
+      >
+      </v-text-field>
+    </v-col>
+    </v-row>
+    <v-row>
+      <v-col class="col s12 m3 row">
         <div class="col s12 center">
           <md-subheader><label class="markValue">Modules</label></md-subheader>
         </div>
@@ -31,12 +40,12 @@
                                       <br /><label class="center-align">{{ module.code }}</label></span></h6>
           </div>
         </div>
-      </div>
-      <div class="col s12 m9 row card-panel" v-if="currentModule == null">
+      </v-col>
+      <v-col class="col s12 m9 row card-panel" v-if="currentModule == null">
         <md-empty-state md-icon="" md-label="No module selected" md-description="Please click on a module">
         </md-empty-state>
-      </div>
-      <div class="col s12 m9 row center-align" v-if="currentModule != null">
+      </v-col>
+      <v-col class="col s12 m9 row center-align" v-if="currentModule != null">
         <md-card class="white col s12 m10 offset-m1 center">
           <md-card-header>
             <md-card-header-text>
@@ -175,13 +184,13 @@
             </md-card-expand-content>
           </md-card-expand>
         </md-card>
-      </div>
-    </div>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 
 const axios = require("axios");
 
@@ -286,9 +295,9 @@ export default {
       .catch(err => {
         this.isLoading = false;
         if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
+          swal.fire(err.response.data, "error");
         } else {
-          swal("Unable to load modules", "Try again later", "error");
+          swal.fire("Unable to load modules", "Try again later", "error");
         }
       });
   },

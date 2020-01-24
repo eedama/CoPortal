@@ -24,8 +24,8 @@
       <StackLayout row="1">
         <TabView
           tabBackgroundColor="white"
-          selectedTabTextColor="black"
-          androidSelectedTabHighlightColor="black"
+          selectedTabTextColor="#F96C5B"
+          androidSelectedTabHighlightColor="#F96C5B"
         >
           <TabViewItem v-if="isLecture()" title="Announcements">
               <GridLayout rows="auto,*">

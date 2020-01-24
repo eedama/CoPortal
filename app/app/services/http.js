@@ -34,7 +34,6 @@ export default class API {
         message: "Server error, please try again later"
       };
     } else {
-      console.log(result.content.toString());
       return true;
     }
   }
@@ -76,7 +75,7 @@ export default class API {
     if (appSettings.getString("CurrentSchoolURL")) {
       url = "/" + appSettings.getString("CurrentSchoolURL") + url;
     }
-    console.log("url", this.baseUrl + url)
+    console.log("url", this.baseUrl + url);
     return this.baseUrl + url;
   }
 
@@ -84,9 +83,7 @@ export default class API {
   getAllSchools() {
     return new Promise((resolve, reject) => {
       http
-        .request(
-          this.makeGet("/get/all/Schools")
-        )
+        .request(this.makeGet("/get/all/Schools"))
         .then(async result => {
           var answer = await this.handleResponse(result);
           if (answer) {
@@ -170,6 +167,36 @@ export default class API {
     });
   }
 
+  addStudentToAttendance(student) {
+    return new Promise((resolve, reject) => {
+      if (!student) {
+        reject(new Error("User Unknown"));
+      } else {
+        http
+          .request(this.makePost("/attendance/sign", student))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
+              }
+            }
+          })
+          .catch(err => {
+            return reject(
+              new Error("Unable to perform this operation, try again later")
+            );
+          });
+      }
+    });
+  }
+
   sendLinkToResetPassword(username) {
     return new Promise((resolve, reject) => {
       if (!username) {
@@ -234,6 +261,131 @@ export default class API {
     });
   }
 
+  getSurveyTemplate(moduleID) {
+    return new Promise((resolve, reject) => {
+      http
+        .request(this.makeGet("/survey/get/templates/for/" + moduleID))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
+          }
+        })
+        .catch(err => {
+          return reject(
+            new Error("Failed to retrieve modules try again later")
+          );
+        });
+    });
+  }
+
+  getLatestSurveyQuestions(moduleID) {
+    return new Promise((resolve, reject) => {
+      http
+        .request(this.makeGet("/survey/get/latest/survey/for/" + moduleID))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
+          }
+        })
+        .catch(err => {
+          return reject(new Error("Failed to retrieve survey try again later"));
+        });
+    });
+  }
+
+  getSurveyResults(surveyID) {
+    return new Promise((resolve, reject) => {
+      http
+        .request(this.makeGet("/survey/get/survey/questions/for/" + surveyID))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
+          }
+        })
+        .catch(err => {
+          return reject(new Error("Failed to retrieve survey try again later"));
+        });
+    });
+  }
+
+  getSurveyHistory(moduleID) {
+    return new Promise((resolve, reject) => {
+      http
+        .request(this.makeGet("/survey/get/surveys/for/" + moduleID))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
+          }
+        })
+        .catch(err => {
+          return reject(
+            new Error("Failed to retrieve modules try again later")
+          );
+        });
+    });
+  }
+  getAttendanceHistory(moduleID) {
+    return new Promise((resolve, reject) => {
+      http
+        .request(this.makeGet("/attendance/get/times/for/" + moduleID))
+        .then(async result => {
+          var answer = await this.handleResponse(result);
+          if (answer) {
+            if (answer.isError) {
+              return reject(new Error(answer.message));
+            } else if (answer == true) {
+              return resolve(result.content);
+            } else {
+              return reject(
+                new Error("Authorization error, please contact admin.")
+              );
+            }
+          }
+        })
+        .catch(err => {
+          return reject(
+            new Error("Failed to retrieve modules try again later")
+          );
+        });
+    });
+  }
+
   getAllModules() {
     return new Promise((resolve, reject) => {
       http
@@ -257,6 +409,36 @@ export default class API {
             new Error("Failed to retrieve modules try again later")
           );
         });
+    });
+  }
+
+  getAttendanceStudents(attendanceID) {
+    return new Promise((resolve, reject) => {
+      if (!attendanceID) {
+        reject(new Error("User Not Defined"));
+      } else {
+        http
+          .request(this.makeGet("/attendance/get/for/" + attendanceID))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
+              }
+            }
+          })
+          .catch(err => {
+            return reject(
+              new Error("Failed to retrieve modules try again later")
+            );
+          });
+      }
     });
   }
 
@@ -284,6 +466,128 @@ export default class API {
           .catch(err => {
             return reject(
               new Error("Failed to retrieve modules try again later")
+            );
+          });
+      }
+    });
+  }
+
+  submitSurveyQuestions(surveyId, response) {
+    return new Promise((resolve, reject) => {
+      if (!surveyId) {
+        reject(new Error("Invalid request"));
+      } else {
+        http
+          .request(this.makePost("/survey/submit/" + surveyId, response))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
+              }
+            }
+          })
+          .catch(err => {
+            return reject(
+              new Error("Unable to submit your survey, Try again later")
+            );
+          });
+      }
+    });
+  }
+
+  submitSurvey(templateId) {
+    return new Promise((resolve, reject) => {
+      if (!templateId) {
+        reject(new Error("Invalid request"));
+      } else {
+        http
+          .request(this.makePost("/survey/activate/survey/for/" + templateId))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
+              }
+            }
+          })
+          .catch(err => {
+            return reject(
+              new Error("Unable to submit your survey, Try again later")
+            );
+          });
+      }
+    });
+  }
+
+  submitBulkAttendance(attendance) {
+    return new Promise((resolve, reject) => {
+      if (!attendance) {
+        reject(new Error("Invalid request"));
+      } else {
+        http
+          .request(this.makePost("/attendance/sign/bulk/students", attendance))
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
+              }
+            }
+          })
+          .catch(err => {
+            return reject(
+              new Error("Unable to submit your quiz, Try again later")
+            );
+          });
+      }
+    });
+  }
+
+  createAttendance(attendance, moduleID) {
+    return new Promise((resolve, reject) => {
+      if (!attendance) {
+        reject(new Error("Invalid request"));
+      } else {
+        http
+          .request(
+            this.makePost("/attendance/create/for/" + moduleID, attendance)
+          )
+          .then(async result => {
+            var answer = await this.handleResponse(result);
+            if (answer) {
+              if (answer.isError) {
+                return reject(new Error(answer.message));
+              } else if (answer == true) {
+                return resolve(result.content);
+              } else {
+                return reject(
+                  new Error("Authorization error, please contact admin.")
+                );
+              }
+            }
+          })
+          .catch(err => {
+            return reject(
+              new Error("Unable to submit your quiz, Try again later")
             );
           });
       }
@@ -336,9 +640,7 @@ export default class API {
           }
         })
         .catch(err => {
-          return reject(
-            new Error("unable to access Notes")
-          );
+          return reject(new Error("unable to access Notes"));
         });
     });
   }
@@ -477,11 +779,12 @@ export default class API {
           .request(
             this.makePost(
               "/n/announcements/add/for/" +
-              moduleID +
-              "/by/" +
-              type +
-              "/of/id/" +
-              lectureID, {
+                moduleID +
+                "/by/" +
+                type +
+                "/of/id/" +
+                lectureID,
+              {
                 announcement: notification
               }
             )
@@ -669,9 +972,7 @@ export default class API {
   downloadNotes(noteID) {
     return new Promise((resolve, reject) => {
       http
-        .request(
-          this.makeGet("/m/download/notes/" + noteID)
-        )
+        .request(this.makeGet("/m/download/notes/" + noteID))
         .then(async result => {
           var answer = await this.handleResponse(result);
           if (answer) {
@@ -702,13 +1003,10 @@ export default class API {
     return new Promise((resolve, reject) => {
       http
         .request(
-          this.makePost(
-            "/a/update/student/" + studentID,
-            {
-              student,
-              overrideModules: true
-            }
-          )
+          this.makePost("/a/update/student/" + studentID, {
+            student,
+            overrideModules: true
+          })
         )
         .then(async result => {
           var answer = await this.handleResponse(result);
@@ -770,7 +1068,9 @@ export default class API {
     return new Promise((resolve, reject) => {
       http
         .request(
-          this.makeGet(`/m/get/solution/id/for/${questionaireId}/by/${userType}/of/id/${userId}`)
+          this.makeGet(
+            `/m/get/solution/id/for/${questionaireId}/by/${userType}/of/id/${userId}`
+          )
         )
         .then(async result => {
           var answer = await this.handleResponse(result);

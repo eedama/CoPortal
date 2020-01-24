@@ -1,302 +1,814 @@
 <template>
   <div class="screen">
-    <md-dialog
-      v-if="isParent"
-      style="position:absolute;max-width:60%;max-height:60%;min-height:20%;min-width:40%;"
+    <v-dialog
+      v-if="$store.state.user.isLoggedIn && $store.state.user.type == 'STUDENT'"
       class="card"
-      :md-active.sync="isChangingStudent"
+      max-width="600"
+      color="white"
+      v-model="signAttendanceRegister"
     >
-      <md-card class="col s12" style="background-color:#006064;">
-        <md-card-header>
-          <div class="md-title" style="color:ghostwhite">Change Student</div>
-          <md-button v-on:click="isChangingStudent = false" class="right">
-            <md-icon style="color:ghostwhite">close</md-icon>
-          </md-button>
-        </md-card-header>
-      </md-card>
-      <md-card-actions>
-        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-        <div class="row">
-          <md-content class="col s12">
-            <md-field>
-              <label>Select Student</label>
-              <md-select v-model="currentStudent">
-                <md-option
-                  v-for="(student,i) in students"
+      <v-card color="secondary">
+        <v-row>
+          <v-col cols="10">
+            <v-card-title class="headline text-white"
+              >Attendance register</v-card-title
+            >
+            <v-card-text
+              ><span class="text-white"
+                >Enter the code to sign your attendance.</span
+              ></v-card-text
+            >
+          </v-col>
+          <v-col class="m-auto my-auto" cols="2">
+            <v-btn
+              icon
+              v-on:click="signAttendanceRegister = false"
+              right
+              class="right"
+            >
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+      <v-row class="bg-white mx-auto">
+        <v-col cols="8" class=" text-center" offset-md="2">
+          <h5 class="display-1 text-xs-center mx-auto my-5">
+            {{ getMoment().format("Do MMMM YYYY") }}
+          </h5>
+          <h3 class="display-2 text-xs-center mx-auto my-5">
+            {{ getMoment().format("hh:mm A") }}
+          </h3>
+        </v-col>
+        <v-col cols="12" mx-auto right class="mx-auto right">
+          <v-text-field
+            class="text-center mx-auto text-xs-center"
+            color="secondary"
+            size="40"
+            placeholder="Attendance code"
+            @keyup.enter="submitAttendanceCode"
+            solo
+            v-model="currentAttendanceCode"
+          >
+          </v-text-field>
+          <p class="red-text text-red text-center">
+            {{ currentAttendanceCodeError }}
+          </p>
+          <ball-pulse-loader
+            class="col s12 text-center"
+            v-if="isLoading"
+            color="#000000"
+            size="20px"
+          ></ball-pulse-loader>
+          <v-btn
+            :loading="isLoading"
+            block
+            x-large
+            v-on:click="submitAttendanceCode"
+            color="primary"
+            >Submit</v-btn
+          >
+        </v-col>
+      </v-row>
+    </v-dialog>
+    <v-dialog
+      v-if="
+        $store.state.user.isLoggedIn && $store.state.user.type == 'LECTURER'
+      "
+      class="card"
+      max-width="600"
+      color="white"
+      v-model="isCreatingAttendanceRegister"
+    >
+      <v-card color="secondary">
+        <v-row>
+          <v-col cols="12" sm="12" md="10">
+            <v-card-title class="headline text-white"
+              >Creating attendance register</v-card-title
+            >
+            <v-card-text
+              ><span class="text-white"
+                >Display this code for people to sign in.</span
+              ></v-card-text
+            >
+          </v-col>
+          <v-col class="m-auto my-auto" cols="2">
+            <v-btn
+              icon
+              v-on:click="isCreatingAttendanceRegister = false"
+              right
+              class="right"
+            >
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+      <v-row class="bg-white row">
+        <v-col cols="12">
+          <v-select
+            class="ma-5"
+            :items="
+              modules.map(v => {
+                return { _id: v._id, title: `${v.name} - ${v.code}` };
+              })
+            "
+            item-text="title"
+            item-value="_id"
+            label="Select a module"
+            @change="setStudentsForModule"
+            v-model="selectedAttendanceModule"
+          >
+          </v-select>
+        </v-col>
+        <v-col v-if="selectedAttendanceModule" cols="12">
+          <v-tabs
+            grow
+            v-model="tabSelectedAttendanceModule"
+            @change="changeAttendanceTab"
+          >
+            <v-tab id="tab-home">Create new</v-tab>
+            <v-tab id="tab-home-history">View history</v-tab>
+            <v-tab v-if="attendanceRegister" id="tab-home-manual"
+              >Sign manually</v-tab
+            >
+          </v-tabs>
+          <v-tabs-items v-model="tabSelectedAttendanceModule">
+            <v-tab-item class="ma-5">
+              <v-row v-show="createAttendanceIndex == 0">
+                <v-col cols="12">
+                  <v-select
+                    color="secondary"
+                    outlined
+                    label="Select a duration"
+                    :items="[
+                      'Never',
+                      '5 minutes',
+                      '10 minutes',
+                      '15 minutes',
+                      '30 minutes'
+                    ]"
+                    v-model="selectedAttendanceDuration"
+                  >
+                  </v-select>
+                </v-col>
+                <v-col v-if="attendanceError" mx-auto cols="12">
+                  <p class="red-text mx-auto text-red text-xs-center">
+                    {{ attendanceError }}
+                  </p>
+                </v-col>
+                <v-col mx-auto cols="12">
+                  <v-btn
+                    :loading="isLoading"
+                    v-on:click="createAttendance()"
+                    color="secondary"
+                    large
+                    block
+                    rounded
+                    >Generate</v-btn
+                  ></v-col
+                >
+              </v-row>
+              <v-row
+                v-if="createAttendanceIndex == 1 && attendanceRegister"
+                class="col s12"
+              >
+                <v-col cols="8" class=" text-center" offset-md="2">
+                  <h5 class="display-1 text-xs-center mx-auto my-5">
+                    Attendance code
+                  </h5>
+                  <h2
+                    class="display-4 text-xs-center bg-grey text-blue mx-auto py-10"
+                  >
+                    {{ attendanceRegister.code }}
+                  </h2>
+                  <h5
+                    class="text-xs-center display-2 title mx-auto my-5"
+                    v-if="getMoment()"
+                  >
+                    Expires
+                    <span class="text-peach">{{
+                      getMoment(attendanceRegister.expiryDate).fromNow()
+                    }}</span>
+                  </h5>
+                </v-col>
+              </v-row>
+            </v-tab-item>
+            <v-tab-item>
+              <v-row v-if="!selectedAttendanceDate" class="row">
+                <v-col
+                  cols="12"
+                  md="6"
+                  v-for="(time, i) in attendanceRegisterHistoryTimes"
                   :key="i"
-                  style="background-color:white"
-                  :value="student._id"
-                >{{ student.username }}</md-option>
-              </md-select>
-            </md-field>
-          </md-content>
-          <md-button
-            v-if="!isLoading"
-            v-on:click="changeStudent()"
-            class="md-primary col s12"
-            style="background-color:#006064;color:ghostwhite"
-          >Change student</md-button>
-        </div>
-      </md-card-actions>
-    </md-dialog>
-    <md-dialog
-      v-if="$store.state.user.isLoggedIn && ($store.state.user.type=='LECTURER' || $store.state.user.type=='ADMIN')"
-      style="position:absolute;max-height:100vh;min-height:20%;width:100%;"
+                >
+                  <v-card
+                    @click="selectAttendanceDate(time)"
+                    outlined
+                    class="border-top-blue"
+                  >
+                    <v-row class="mx-auto my-auto px-2">
+                      <v-col cols="2" class="mx-auto my-auto">
+                        <v-icon
+                          color="primary"
+                          class="text-peach mx-auto my-auto"
+                          size="30"
+                          >mdi-calendar</v-icon
+                        >
+                      </v-col>
+                      <v-col cols="10">
+                        <v-list-item-content>
+                          <v-list-item-title class="title mb-1">
+                            {{
+                              getMoment(time.date).format("Do MMMM")
+                            }}</v-list-item-title
+                          >
+                          <v-list-item-subtitle
+                            ><span class="text-blue">
+                              {{ time.totalStudents }} attended</span
+                            ></v-list-item-subtitle
+                          >
+                        </v-list-item-content>
+                      </v-col>
+                    </v-row>
+                  </v-card>
+                </v-col>
+              </v-row>
+              <div v-if="selectedAttendanceDate" class="Scroll-first-four">
+                <v-row>
+                  <v-col class="my-auto" cols="2">
+                    <v-btn
+                      large
+                      icon
+                      class="my-auto mx-5"
+                      v-on:click="selectedAttendanceDate = false"
+                    >
+                      <v-icon>mdi-arrow-left</v-icon>
+                    </v-btn>
+                  </v-col>
+                  <v-col cols="10" class="my-auto">
+                    <v-list-item-content>
+                      <v-list-item-title class="title mb-1">
+                        {{
+                          getMoment(selectedAttendanceDate.date).format(
+                            "Do MMMM"
+                          )
+                        }}</v-list-item-title
+                      >
+                      <v-list-item-subtitle
+                        ><span class="text-blue">
+                          {{ selectedAttendanceDate.totalStudents }}
+                          attended</span
+                        ></v-list-item-subtitle
+                      >
+                    </v-list-item-content>
+                  </v-col>
+                </v-row>
+                <v-row
+                  :loading="attendanceRegisterHistoryStudentsLoading"
+                  class="v-triple-line col s12 center-align"
+                >
+                  <v-col
+                    cols="12"
+                    md="6"
+                    v-for="(student,
+                    i) in attendanceRegisterHistoryStudents.filter(
+                      v => v && v.studentId
+                    )"
+                    :key="i"
+                  >
+                    <v-card shaped outlined>
+                      <v-list-item three-line>
+                        <v-list-item-avatar tile class="my-auto" size="40">
+                          <v-icon class="text-peach my-auto" size="60"
+                            >mdi-account-outline</v-icon
+                          >
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                          <div class="overline mb-4">
+                            <span class="text-peach">{{
+                              getMoment(student.date).fromNow()
+                            }}</span>
+                          </div>
+                          <v-list-item-title class="subtitle-1 mb-1">{{
+                            student.studentId.username
+                          }}</v-list-item-title>
+                          <v-list-item-subtitle
+                            ><span class="text-blue">
+                              {{
+                                student.studentId.lastname +
+                                  " " +
+                                  student.studentId.firstname
+                              }}
+                            </span></v-list-item-subtitle
+                          >
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </div>
+            </v-tab-item>
+            <v-tab-item v-if="attendanceRegister">
+              <v-row class="row">
+                <v-col cols="12">
+                  <h5 class="display-1 text-center title mt-3">
+                    Mark all the present students
+                  </h5>
+                </v-col>
+                <v-col cols="12" mx-auto class="v-triple-line mx-auto">
+                  <v-row class="Scroll-first-four">
+                    <v-col
+                      cols="12"
+                      md="4"
+                      v-for="(student, i) in selectedAttendanceModuleStudents"
+                      :key="i"
+                    >
+                      <v-list-item
+                        @click="student.selected = !student.selected"
+                        :class="{ white: student.selected }"
+                        class="pointer"
+                        three-line
+                      >
+                        <v-list-item-avatar
+                          large
+                          :color="student.selected ? 'secondary' : 'primary'"
+                          outlined
+                          class="my-auto"
+                        >
+                          <v-icon color="white">{{
+                            student.selected ? "mdi-check" : "mdi-close"
+                          }}</v-icon>
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                          <v-list-item-title class="subtitle-1 mb-1">{{
+                            student.username
+                          }}</v-list-item-title>
+                          <v-list-item-subtitle
+                            ><span class="text-blue">
+                              {{ student.lastname + " " + student.firstname }}
+                            </span></v-list-item-subtitle
+                          >
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-col>
+                  </v-row>
+                </v-col>
+                <v-col cols="12">
+                  <v-btn
+                    :loading="isLoading"
+                    v-on:click="submitBulkAttendance"
+                    color="secondary"
+                    large
+                    block
+                    rounded
+                    >Submit</v-btn
+                  >
+                </v-col>
+              </v-row>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-col>
+      </v-row>
+    </v-dialog>
+    <v-dialog
+      v-if="isParent"
       class="card"
-      :md-active.sync="isAddingAnnouncements"
+      max-width="600"
+      color="white"
+      v-model="isChangingStudent"
     >
-      <md-card class="col s12">
-        <md-card-header style="background-color:#006064;" class="row">
-          <div class="col s12 m10 offset-m1 text-center">
-            <span
-              style="color:ghostwhite"
-              class="md-title"
-            >Send an announcement</span>
-            <md-button class="right" v-on:click="isAddingAnnouncements = false">
-              <md-icon style="color:ghostwhite">close</md-icon>
-            </md-button>
-          </div>
-        </md-card-header>
-        <md-content>
-          <div class="row">
-            <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-              <input
-                v-model="announcement.title"
-                id="ModuleDescription"
-                name="ModuleDescription"
-                type="text"
-              />
-              <label class="text-center" style="color:#006064" for="ModuleDescription">Title</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-              <input
-                v-model="announcement.message"
-                id="ModuleDescription"
-                name="ModuleDescription"
-                type="text"
-              />
-              <label class="text-center" style="color:#006064" for="ModuleDescription">Message</label>
-            </div>
-            <div style="padding:10px" class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-              <label>
-                <input
-                  v-model="announcement.isParent"
-                  class="with-gap"
-                  name="group1"
-                  type="checkbox"
-                />
-                <span :style="{'color:#006064':announcement.isParent}">Send announcement to parents</span>
-              </label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col s8 offset-s2 m6 offset-m3 text-center p-20">
-              <label style="color:#006064">Send to :</label>
-            </div>
-            <div
-              style="position:relative;top:0%;max-height:40vh;overflow-y:scroll;width:60%"
-              class="col s8 offset-s2 m6 offset-m3 text-center"
+      <v-card color="secondary">
+        <v-row>
+          <v-col  cols="12" sm="12" md="10">
+            <v-card-title class="headline text-white"
+              >Change Student</v-card-title
             >
-              <form style="max-height:60vh">
-                <p v-for="(_module,i) in modules" :key="i">
-                  <label>
-                    <input
-                      v-model="announcement.module"
-                      :value="_module._id"
-                      class="with-gap"
-                      name="group1"
-                      type="radio"
-                    />
-                    <span>{{ _module.name }} ({{ _module.code }}) students</span>
-                  </label>
-                </p>
-                <p>
-                  <label>
-                    <input
-                      v-model="announcement.module"
-                      :value="null"
-                      class="with-gap"
-                      name="group1"
-                      type="radio"
-                      :checked="true"
-                    />
-                    <span>All Students</span>
-                  </label>
-                </p>
-              </form>
-            </div>
-            <div class="col s8 offset-s2 m6 offset-m3 text-center p-20"></div>
-          </div>
-        </md-content>
-        <md-card-actions style="background-color:#006064;padding:10px">
-          <span v-if="!isLoading"
-            style="float:left;left:0;position:absolute;padding-left:30px;color:ghostwhite;max-width:60%"
-          >The announcement will be sent to {{ modules.some(v => v && v._id == announcement.module) ? `${modules.find(v => v && v._id == announcement.module).name} ${modules.find(v => v && v._id == announcement.module).code}` : 'All' }} students {{ announcement.isParent ? ' and SMSs to thier parents as well' : ''}}</span>
-          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-          <md-button
-            v-if="!isLoading"
-            v-on:click="SendAnnouncement()"
-            style="color:ghostwhite;max-width:40%"
-            class="md-secondary"
-          >Send announcement</md-button>
-        </md-card-actions>
-      </md-card>
-    </md-dialog>
-
-    <div class="row">
-      <div class="col s6 offset-s3 m8 offset-m2 center-align">
-        <h5 class="center-align">
-          <vue-typer
-            v-if="!$store.state.user.isLoggedIn"
-            class="center-align"
-            :text="titleText"
-            erase-style="backspace"
-          ></vue-typer>
-          <span v-if="$store.state.user.isLoggedIn">
-            Welcome
-            <span v-if="isParent">
-              <a class="pointer">{{$store.state.user.parent.name}}</a>
-            </span>
-            <span v-if="!isParent">
-              back
-              <a class="pointer">{{ $store.state.user.username }}</a>
-            </span>
-          </span>
-        </h5>
-      </div>
-      <div class="col s10 offset-s1 m8 offset-m2 center-align">
-        <img src="../assets/logo.png" class="responsive-img" />
-      </div>
-    </div>
-    <div v-if="!$store.state.user.isLoggedIn" class="row">
-      <div
-        v-on:click="$router.push('/login')"
-        class="col m6 offset-m3 s12 pointer bigButton center-align waves-effect"
-      >
-        <div class="card-panel hoverable">
-          <h5 class="center-align">
-            <i style="font-size:100%" class="material-icons left">lock</i>
-            <span>Login</span>
-          </h5>
-        </div>
-      </div>
-    </div>
-    <div v-if="!$store.state.user.isLoggedIn" class="row bottomPin">
-      <div class="col s12 center-align">
-        <h5
-          class="center-align"
-        >Meet some of our cool friends that might help boost your career life</h5>
-      </div>
-      <div
-        v-for="(partner,i) in partners"
-        :key="i"
-        v-on:click="GotoExternal(partner.link)"
-        class="col m3 s6 pointer bigButton center-align waves-effect"
-      >
-        <div class="card-panel hoverable">
-          <h6 class="center-align">
-            <span>{{ partner.name }}</span>
-          </h6>
-        </div>
-      </div>
-    </div>
-    <div v-if="$store.state.user.isLoggedIn" class="row">
-      <div class="col s12 m6 xl4 push-xl2">
-        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-          <md-card-header class="left">Annnouncements</md-card-header>
-        </div>
-        <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-          <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-        </div>
-        <md-list class="md-triple-line col s12 center-align">
-          <div class="Scroll-first-four">
-            <md-list-item
-              v-if="$store.state.user.type == 'LECTURER' || $store.state.user.type == 'ADMIN'"
-              v-on:click="isAddingAnnouncements = true"
-              style="margin-bottom:15px"
-              class="hoverable col s12 m10 pointer white center-align waves-effect"
+            <v-card-text
+              ><span class="text-white"
+                >Access someone's profile</span
+              ></v-card-text
             >
-              <md-avatar>
-                <md-icon>add</md-icon>
-              </md-avatar>
-
-              <div class="md-list-item-text center-align">
-                <span>Add new Announcement</span>
-              </div>
-            </md-list-item>
-            <md-list-item
-              v-on:click="AnnouncementClick(announcement)"
-              style="margin-bottom:15px;"
-              v-for="(announcement,i) in announcements"
-              :key="i"
-              class="hoverable col s12 m10 pointer white center-align waves-effect"
+          </v-col>
+          <v-col class="m-auto my-auto" cols="2">
+            <v-btn
+              icon
+              v-on:click="isChangingStudent = false"
+              right
+              class="right"
             >
-              <md-avatar>
-                <img src="https://placeimg.com/40/40/people/1" alt="People" />
-              </md-avatar>
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+      <v-row class="bg-white">
+        <v-col cols="12">
+          <v-select
+            class="ma-5"
+            :items="
+              students.map(v => {
+                return {
+                  _id: v._id,
+                  title: `${v.username} - ${v.firstname} ${v.lastname}`
+                };
+              })
+            "
+            item-text="title"
+            item-value="_id"
+            label="Select Student"
+            v-model="currentStudent"
+          >
+          </v-select>
+        </v-col>
 
-              <div class="md-list-item-text">
-                <span>{{ announcement.lecturerId ? announcement.lecturerId.lastname + " " + announcement.lecturerId.firstname : "Admin" }} &nbsp;&bull; {{ getMoment(announcement.date).fromNow() }}</span>
-                <span>{{ announcement.title }}</span>
-                <p>{{ announcement.message }}</p>
-              </div>
-            </md-list-item>
-          </div>
-        </md-list>
-      </div>
-      <div class="col s12 m6 xl4 push-xl2 row" style="margin-top:-6px;">
-        <div @click="changeSchool()" class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-          <md-card-header class="left">
-            {{ capitalize($store.state.settings.school) }}
-            <span v-if="isParent">Parent</span> Portal
-          </md-card-header>
-        </div>
-        <div
-          v-for="(option,i) in options.filter(o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0)"
-          :key="i"
-          v-on:click="goToRoute(option)"
-          class="col s12 pointer bigButton waves-effect"
+        <v-col mx-auto cols="12">
+          <v-btn
+            :loading="isLoading"
+            v-on:click="changeStudent()"
+            color="secondary"
+            large
+            block
+            rounded
+            >Change student</v-btn
+          ></v-col
         >
-          <div class="card-panel hoverable">
-            <h5 class="center-align">
-              <i style="font-size:100%" class="material-icons left">{{ option.icon }}</i>
-              <span>{{ option.text }}</span>
-            </h5>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div v-if="$store.state.user.isLoggedIn" class="row">
-      <div v-on:click="Logout()" class="col m2 offset-m5 s12 pointer center-align waves-effect">
-        <div class="card-panel hoverable red">
-          <h5 class="text-xs-center">
-            Log out
-            <i class="material-icons right">exit_to_app</i>
-          </h5>
-        </div>
-      </div>
-    </div>
+      </v-row>
+    </v-dialog>
+    <v-dialog
+      v-if="
+        $store.state.user.isLoggedIn &&
+          ($store.state.user.type == 'LECTURER' ||
+            $store.state.user.type == 'ADMIN')
+      "
+      max-width="600"
+      color="white"
+      v-model="isAddingAnnouncements"
+    >
+      <v-card color="secondary">
+        <v-row>
+          <v-col  cols="12" sm="12" md="10">
+            <v-card-title class="headline text-white"
+              >Send an announcement</v-card-title
+            >
+            <v-card-text
+              ><span class="text-white"
+                >Communicate with students in real-time</span
+              ></v-card-text
+            >
+          </v-col>
+          <v-col class="m-auto my-auto" cols="2">
+            <v-btn
+              icon
+              v-on:click="isAddingAnnouncements = false"
+              right
+              class="right"
+            >
+              <v-icon style="color:ghostwhite">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+      <v-row class="bg-white px-10">
+        <v-col cols="12">
+          <v-text-field
+            color="secondary"
+            label="Announcement title"
+            outlined
+            v-model="announcement.title"
+          >
+          </v-text-field>
+        </v-col>
+        <v-col cols="12">
+          <v-textarea
+            color="secondary"
+            label="Message"
+            outlined
+            prepend-inner-icon="mdi-bullhorn-outline"
+            v-model="announcement.message"
+          >
+          </v-textarea>
+        </v-col>
+        <v-col cols="12">
+          <v-checkbox
+            v-model="announcement.isParent"
+            label="Send announcement to parents"
+          ></v-checkbox>
+        </v-col>
+        <v-col cols="12">
+          <v-checkbox
+            v-model="announcement.module"
+            value="all_students"
+            label="Send to all students"
+          ></v-checkbox>
+          <v-select
+            v-show="announcement.module != 'all_students'"
+            :items="
+              modules.map(v => {
+                return {
+                  _id: v._id,
+                  title: `${v.name} ${v.code} students`
+                };
+              })
+            "
+            item-text="title"
+            item-value="_id"
+            label="Send to : "
+            v-model="announcement.module"
+          >
+          </v-select>
+        </v-col>
+
+        <v-col cols="12">
+          <p v-if="!isLoading" class="text-center">
+            The announcement will be sent to
+            {{
+              modules.some(v => v && v._id == announcement.module)
+                ? `${
+                    modules.find(v => v && v._id == announcement.module).name
+                  } ${
+                    modules.find(v => v && v._id == announcement.module).code
+                  }`
+                : "All"
+            }}
+            students
+            {{
+              announcement.isParent ? " and SMSs to thier parents as well" : ""
+            }}
+          </p>
+          <v-btn
+            :loading="isLoading"
+            v-on:click="SendAnnouncement()"
+            color="secondary"
+            large
+            block
+            rounded
+            >Send announcement</v-btn
+          ></v-col
+        >
+      </v-row>
+    </v-dialog>
+
+    <v-row v-if="!$store.state.user.isLoggedIn" class="row mt-10 pt-10">
+      <v-col  cols="12" sm="7" md="9">
+        <h4 class="title text-blue px-5">We offer the following services</h4>
+      </v-col>
+      <v-col  cols="12" sm="5" md="3" class="mx-auto">
+        <v-btn
+          v-on:click="$router.push('/login')"
+          x-large
+          v-if="!$store.state.user.isLoggedIn"
+          block
+          rounded
+          p-5
+          color="secondary"
+        >
+          Login
+        </v-btn>
+      </v-col>
+      <v-col cols="12">
+        <v-row class="px-10">
+          <v-col cols="12" sm="6" md="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-peach center"
+                  >Digital attendance register</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/family_2x.png" />
+            </v-card>
+          </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-peach center"
+                  >Study materials of all modules/subjects</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/coderdojo.png" />
+            </v-card>
+          </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-peach center"
+                  >Online tests and assesments</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/invoice_maker_2x.jpg" />
+            </v-card>
+          </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-blue center"
+                  >Real time notifications to parents and students</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/notification.png" />
+            </v-card>
+          </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-blue center"
+                  >Access to marksheets and assessment results</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/education.jpg" />
+            </v-card>
+          </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <v-card>
+              <v-card-title class="mx-auto" center>
+                <span class="text-center title mx-auto mb-n4 text-blue center"
+                  >Digitalized administrative system roles</span
+                >
+              </v-card-title>
+              <v-img src="../assets/images/backgrounds/seating.png" />
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+
+      <v-col cols="12">
+        <h4 class="title text-blue px-5">
+          Meet some of our cool friends that might help boost your career life
+        </h4>
+      </v-col>
+      <v-col v-for="(partner, i) in partners" :key="i" cols="12" sm="6" md="4">
+        <v-card
+          class="mx-5 mb-5"
+          shaped
+          outlined
+          v-on:click="GotoExternal(partner.link)"
+        >
+          <v-img
+            class="mx-10 my-5"
+            max-width="200"
+            max-height="100"
+            :src="partner.img"
+          />
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <v-row v-if="$store.state.user.isLoggedIn" class="row  mt-10 pt-10">
+      <v-col cols="12" sm="12" md="4">
+        <v-row>
+          <v-col cols="8">
+            <v-list-item-title>
+              <span class="title mx-5 my-auto text-blue">Annnouncements</span>
+            </v-list-item-title>
+          </v-col>
+          <v-col cols="4">
+            <v-btn
+              class="my-auto"
+              v-if="
+                $store.state.user.type == 'LECTURER' ||
+                  $store.state.user.type == 'ADMIN'
+              "
+              outlined
+              shaped
+              color="secondary"
+              v-on:click="isAddingAnnouncements = true"
+            >
+              Send new
+            </v-btn>
+          </v-col>
+          <v-col style="overflow-y:auto;max-height:50vh" cols="12">
+            <v-card
+              class="mx-10 mb-5"
+              shaped
+              outlined
+              v-on:click="AnnouncementClick(announcement)"
+              v-for="(announcement, i) in announcements"
+              :key="i"
+            >
+              <v-list-item three-line>
+                <v-list-item-avatar tile size="80">
+                  <v-icon class="text-peach" size="50">mdi-bell</v-icon>
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <div class="overline mb-4">
+                    {{
+                      announcement.lecturerId
+                        ? announcement.lecturerId.lastname +
+                          " " +
+                          announcement.lecturerId.firstname
+                        : "Admin"
+                    }}
+                    &nbsp;&bull;
+                    <span class="text-peach">{{
+                      getMoment(announcement.date).fromNow()
+                    }}</span>
+                  </div>
+                  <v-list-item-title class="subtitle-1 mb-1">{{
+                    announcement.title
+                  }}</v-list-item-title>
+                  <v-list-item-subtitle
+                    ><span class="text-blue">{{
+                      announcement.message
+                    }}</span></v-list-item-subtitle
+                  >
+                </v-list-item-content>
+              </v-list-item>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col class="px-10" cols="12" sm="12" md="8">
+        <v-row>
+          <v-col cols="12" sm="12" md="8" offset-md="3" class="mx-auto">
+            <v-img src="../assets/images/backgrounds/education.jpg" />
+          </v-col>
+          <v-col
+            v-for="(option, i) in options.filter(
+              o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0
+            )"
+            :key="i"
+            cols="12" xs="12" sm="6"
+          >
+            <v-card
+              v-on:click="goToRoute(option)"
+              outlined
+              class="border-top-blue"
+            >
+              <v-row class="mx-auto my-auto px-2">
+                <v-col cols="2" class="mx-auto my-auto">
+                  <v-icon
+                    color="primary"
+                    class="text-peach mx-auto my-auto"
+                    size="30"
+                    >{{ option.icon }}</v-icon
+                  >
+                </v-col>
+                <v-col cols="10">
+                  <v-list-item-content>
+                    <v-list-item-title class="title mb-1">
+                      {{ option.text }}</v-list-item-title
+                    >
+                    <v-list-item-subtitle
+                      ><span class="text-blue">
+                        {{ option.description }}</span
+                      ></v-list-item-subtitle
+                    >
+                  </v-list-item-content>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 const axios = require("axios");
 export default {
   name: "Home",
   data() {
     return {
+      /// lecturer attendance
+      tabSelectedAttendanceModule: null,
+      createAttendanceIndex: 0,
+      selectedAttendanceModule: null,
+      selectedAttendanceModuleStudents: [],
+      selectedAttendanceDuration: "5 minutes",
+      selectedAttendanceDate: null,
+      attendanceRegister: null,
+      attendanceRegisterHistoryTimes: [],
+      attendanceRegisterHistoryStudents: [],
+      attendanceRegisterHistoryStudentsLoading: false,
+      attendanceError: "",
+      /// student attendance
+      signAttendanceRegister: false,
+      currentAttendanceCodeError: "",
+      currentAttendanceCode: "",
+      ///
       isParent: false,
       partners: [
         {
           link: "https://www.onlinecareerguidance.co.za",
-          name: "Online career guidance"
+          img: "https://www.onlinecareerguidance.co.za/images/ocgbanner.jpg",
+          name: "Online career guidance",
+          description: "Online career guidance"
         },
         {
           link: "http://www.zabursaries.co.za",
-          name: "ZA Bursaries"
+          img:
+            "http://www.zabursaries.co.za/wp-content/uploads/2016/09/bursaries2017-south-africa-logo.png",
+          name: "ZA Bursaries",
+          description: "ZA Bursaries"
+        },
+        {
+          link: "http://ltprivatetutoring.co.za/",
+          img:
+            "http://ltprivatetutoring.co.za/img/logo2.png",
+          name: "LT Private Tutoring",
+          description: "LT Private Tutoring"
         }
       ],
       announcement: {
@@ -310,6 +822,7 @@ export default {
       announcements: [],
       modules: [],
       isAddingAnnouncements: false,
+      isCreatingAttendanceRegister: false,
       showEmoji: false,
       isLoading: false,
       isChangingStudent: false,
@@ -323,10 +836,33 @@ export default {
         "Contact admin for your login info"
       ],
       options: [
-        ,
+        {
+          text: "Attendance Register",
+          description: "Create and view registers",
+          icon: "mdi-calendar-check",
+          link: "/module/list/attend",
+          attendanceRegister: true,
+          auth: ["LECTURER"]
+        },
+        {
+          text: "Sign Attendance Register",
+          description: "Mark that you are in class",
+          icon: "mdi-calendar-check",
+          link: "/module/list/attend",
+          signAttendanceRegister: true,
+          auth: ["STUDENT"]
+        },
+        {
+          text: "Survey",
+          description: "Rate the level of the lecturer",
+          icon: "mdi-forum",
+          link: "/survey/list",
+          auth: ["LECTURER", "ADMIN"]
+        },
         {
           text: "Students",
-          icon: "people",
+          description: "List of registered students",
+          icon: "mdi-account-supervisor",
           link: "/student/list",
           auth: ["LECTURER", "ADMIN"]
         },
@@ -334,37 +870,43 @@ export default {
           text: this.$store.state.user.isParent
             ? "Student Profile"
             : "Edit profile",
-          icon: "account_circle",
+          description: "Student's profile in detail",
+          icon: "mdi-account-circle",
           link: "/student/update",
           auth: ["STUDENT"]
         },
         {
           text: "Lecturers",
-          icon: "supervised_user_circle",
+          description: "List of registered lecturers",
+          icon: "mdi-teach",
           link: "/lecturer/list",
           auth: ["ADMIN"]
         },
         {
           text: this.$store.state.user.isParent ? "Student Modules" : "Modules",
-          icon: "books",
+          description: "List of modules",
+          icon: "mdi-book-open-page-variant",
           link: "/module/list",
           auth: ["ADMIN", "LECTURER", "STUDENT"]
         },
         {
           text: this.$store.state.user.isParent ? "Student Marks" : "Marks",
-          icon: "done_all",
+          description: "All results from past tests",
+          icon: "mdi-check-all",
           link: "/marks/all",
           auth: ["STUDENT"]
         },
         {
           text: "Assessment results",
-          icon: "done_all",
+          description: "All results from past assessments",
+          icon: "mdi-check-all",
           link: "/marks/sheet",
           auth: ["LECTURER", "ADMIN"]
         },
         {
           text: "Report a student",
-          icon: "timeline",
+          description: "Send a note to a student's parent",
+          icon: "mdi-bullhorn-outline",
           link: "/Student/Report",
           auth: ["LECTURER", "ADMIN"]
         }
@@ -378,7 +920,7 @@ export default {
       if (this.isParent) {
         this.options.push({
           text: "Change a student",
-          icon: "people",
+          icon: "mdi-account-multiple",
           link: "/",
           auth: ["STUDENT"],
           showStudents: true
@@ -406,9 +948,9 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal(err.message, "Try again later", "error");
+            swal.fire(err.message, "Try again later", "error");
           }
         });
       if (
@@ -434,15 +976,243 @@ export default {
           .catch(err => {
             this.isLoading = false;
             if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "error");
+              swal.fire(err.response.data, "error");
             } else {
-              swal("Unable to load modules", "Try again later", "error");
+              swal.fire("Unable to load modules", "Try again later", "error");
             }
           });
       }
     }
   },
   methods: {
+    submitBulkAttendance() {
+      console.log("Here we go!");
+      const students = this.selectedAttendanceModuleStudents
+        ? this.selectedAttendanceModuleStudents
+            .filter(v => v && v.selected)
+            .map(v => v._id)
+        : null;
+      const code = this.attendanceRegister
+        ? this.attendanceRegister.code
+        : null;
+      if (!students || !code) {
+        swal.fire(
+          "Unable to sign register",
+          "make sure you selected students",
+          "error"
+        );
+        return;
+      }
+      console.log("selected students", students);
+      console.log("selected code", code);
+      this.isLoading = true;
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/attendance/sign/bulk/students",
+          {
+            students,
+            code
+          }
+        )
+        .then(results => {
+          this.isLoading = false;
+          swal.fire(results.data, "", "success");
+          this.isCreatingAttendanceRegister = false;
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal.fire(err.response.data, "", "error");
+          } else {
+            console.log(err);
+            swal.fire(
+              "Unable to get the attendance list",
+              "Try again later",
+              "error"
+            );
+          }
+        });
+    },
+    setStudentsForModule(moduleId) {
+      this.selectedAttendanceModuleStudents = [];
+      if (!moduleId) return;
+      axios
+        .get(
+          this.$store.state.settings.baseLink +
+            "/s/students/all/for/module/" +
+            moduleId
+        )
+        .then(results => {
+          this.isLoading = false;
+          this.selectedAttendanceModuleStudents = results.data.map(v => {
+            return {
+              _id: v._id,
+              username: v.username,
+              lastname: v.lastname,
+              firstname: v.firstname,
+              selected: true
+            };
+          });
+          console.log("results", this.selectedAttendanceModuleStudents);
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal.fire(err.response.data, "", "error");
+          } else {
+            console.log(err);
+            swal.fire(
+              "Unable to get the attendance list",
+              "Try again later",
+              "error"
+            );
+          }
+        });
+    },
+    submitAttendanceCode() {
+      this.currentAttendanceCodeError = "";
+      if (!this.currentAttendanceCode) {
+        this.currentAttendanceCodeError = "Please enter a valid code";
+        return;
+      }
+      this.isLoading = true;
+      axios
+        .post(this.$store.state.settings.baseLink + "/attendance/sign", {
+          studentId: this.$store.state.user.id,
+          code: this.currentAttendanceCode
+        })
+        .then(results => {
+          this.isLoading = false;
+          swal.fire(results.data, "", "success");
+          this.signAttendanceRegister = false;
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal.fire(err.response.data, "", "error");
+            this.currentAttendanceCodeError = err.response.data;
+          } else {
+            swal.fire(
+              "Unable to get the attendance list",
+              "Try again later",
+              "error"
+            );
+          }
+        });
+    },
+    selectAttendanceDate(time) {
+      this.selectedAttendanceDate = time;
+      this.attendanceRegisterHistoryStudentsLoading = true;
+      axios
+        .get(
+          this.$store.state.settings.baseLink +
+            "/attendance/get/for/" +
+            this.selectedAttendanceDate._id
+        )
+        .then(results => {
+          this.attendanceRegisterHistoryStudentsLoading = false;
+          this.attendanceRegisterHistoryStudents = results.data;
+          console.log(
+            "attendanceRegisterHistoryStudents",
+            this.attendanceRegisterHistoryStudents
+          );
+        })
+        .catch(err => {
+          this.attendanceRegisterHistoryStudentsLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal.fire(err.response.data, "error");
+          } else {
+            swal.fire(
+              "Unable to get the attendance list",
+              "Try again later",
+              "error"
+            );
+          }
+        });
+    },
+    changeAttendanceTab(e) {
+      if (e == 1) {
+        // Case is tab-home-history
+        this.isLoading = true;
+        axios
+          .get(
+            this.$store.state.settings.baseLink +
+              "/attendance/get/times/for/" +
+              this.selectedAttendanceModule
+          )
+          .then(results => {
+            this.isLoading = false;
+            this.attendanceRegisterHistoryTimes = results.data;
+          })
+          .catch(err => {
+            this.isLoading = false;
+            if (err.response != null && err.response.status == 512) {
+              swal.fire(err.response.data, "error");
+            } else {
+              swal.fire(
+                "Unable to get the attendance list",
+                "Try again later",
+                "error"
+              );
+            }
+          });
+      }
+      console.log(e);
+    },
+    createAttendance() {
+      this.attendanceError = "";
+      if (!this.selectedAttendanceModule) {
+        this.attendanceError = "Please select a module";
+        return;
+      }
+      let duration = 310;
+      switch (this.selectedAttendanceDuration) {
+        case "Never":
+          duration = 31538000;
+          break;
+        case "5 minutes":
+          duration = 310;
+          break;
+        case "10 minutes":
+          duration = 610;
+          break;
+        case "15 minutes":
+          duration = 910;
+          break;
+        case "30 minutes":
+          duration = 1810;
+          break;
+      }
+      this.isLoading = true;
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/attendance/create/for/" +
+            this.selectedAttendanceModule,
+          {
+            duration,
+            lecturerId: this.$store.state.user.id
+          }
+        )
+        .then(results => {
+          this.isLoading = false;
+          this.createAttendanceIndex = 1;
+          this.attendanceRegister = results.data;
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal.fire(err.response.data, "error");
+          } else {
+            swal.fire(
+              "Unable to create attendance register",
+              "Try again later",
+              "error"
+            );
+          }
+        });
+    },
     changeStudent() {
       const currentStudent = this.students.filter(
         student => student._id === this.currentStudent
@@ -469,7 +1239,7 @@ export default {
         this.$store.commit("setStudentParent", currentParent);
         this.isChangingStudent = false;
         this.currentStudent = "";
-        swal(
+        swal.fire(
           "Success",
           `Successfully changed student to ${user.username}`,
           "success"
@@ -479,6 +1249,10 @@ export default {
     goToRoute(option) {
       if (option.showStudents) {
         this.isChangingStudent = true;
+      } else if (option.attendanceRegister) {
+        this.isCreatingAttendanceRegister = true;
+      } else if (option.signAttendanceRegister) {
+        this.signAttendanceRegister = true;
       } else {
         this.$router.push(option.link);
       }
@@ -493,12 +1267,21 @@ export default {
       window.open(url, "_blank");
     },
     AnnouncementClick(announcement) {
-      swal({
+      swal.fire({
         title: announcement.title,
         text: announcement.message
       });
     },
     SendAnnouncement() {
+      if (this.announcement.module == "all_students") {
+        this.announcement.module = null;
+      }
+      if (this.announcement.title.length < 3) {
+        return swal.fire("Enter a title for your announcement", "", "error");
+      }
+      if (this.announcement.message.length < 3) {
+        return swal.fire("Enter a message for your announcement", "", "error");
+      }
       this.isLoading = true;
       this.announcement.isToAll = this.announcement.module == null;
       axios
@@ -517,14 +1300,18 @@ export default {
         .then(results => {
           this.isLoading = false;
           this.isAddingAnnouncements = false;
-          swal("Success", "Announcement successfully sent.", "success");
+          swal.fire("Success", "Announcement successfully sent.", "success");
         })
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "Try again later", "error");
+            swal.fire(err.response.data, "Try again later", "error");
           } else {
-            swal("Unable to send announcement", "Try again later", "error");
+            swal.fire(
+              "Unable to send announcement",
+              "Try again later",
+              "error"
+            );
           }
         });
     }
@@ -566,7 +1353,7 @@ export default {
 .Scroll-first-four {
   overflow: hidden;
   overflow-y: scroll;
-  height: 400px;
+  max-height: 300px;
 }
 
 .Scroll-first-four::-webkit-scrollbar {

@@ -1,94 +1,125 @@
 <template>
-  <div id="app">
-    <nav class="navFixed z-depth-2" v-if="$route.meta.showNav">
-      <div class="nav-wrapper">
-        <div class="row brand-logo">
-          <div class="col s12 m2">
-            <a v-on:click="$router.push('/')" class="pointer waves-effect">
-              <md-avatar>
-                <img class="img-responsive" src="static/img/co-portalIcon.png">
-              </md-avatar>
-            </a>
-          </div>
-          <div class="col s12 m8 hide-on-small-only">
-            <ul class="left">
-              <li>
-                <a @click="changeSchool()" class="center-align pointer waves-effect black-text">
-                  <span>{{ $store.state.settings.school }}</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <ul class="right">
-          <li v-if="$store.state.user.isLoggedIn">
-            <a class="center-align pointer waves-effect black-text">
-              <span>{{ $store.state.user.username }}</span>
-            </a>
-          </li>
-          <li class="hide-on-med-and-down" v-if="$store.state.user.isLoggedIn">
-            <a v-on:click="$router.push('/module/list')" class="black-text">
-              <i class="material-icons">books</i>
-            </a>
-          </li>
-          <li
-            class="hide-on-med-and-down"
-            v-if="$store.state.user.isLoggedIn && ($store.state.user.type == 'LECTURER' || $store.state.user.type == 'ADMIN')"
-          >
-            <a v-on:click="$router.push('/student/list')" class="black-text">
-              <i class="material-icons">people</i>
-            </a>
-          </li>
-          <li
-            class="hide-on-med-and-down"
-            v-if="$store.state.user.isLoggedIn && $store.state.user.type == 'ADMIN'"
-          >
-            <a v-on:click="$router.push('/lecturer/list')" class="black-text">
-              <i class="material-icons">supervised_user_circle</i>
-            </a>
-          </li>
-          <li
-            class="hide-on-med-and-down"
-            v-if="$store.state.user.isLoggedIn && $store.state.user.type == 'STUDENT'"
-          >
-            <a v-on:click="$router.push('/marks/all')" class="black-text">
-              <i class="material-icons">done_all</i>
-            </a>
-          </li>
-          <li
-            class="hide-on-med-and-down"
-            v-if="$store.state.user.isLoggedIn && ($store.state.user.type == 'LECTURER' || $store.state.user.type == 'ADMIN')"
-          >
-            <a v-on:click="$router.push('/marks/sheet')" class="black-text">
-              <i class="material-icons">done_all</i>
-            </a>
-          </li>
-          <li>
-            <a class="black-text" v-on:click="$router.back()">
-              <md-icon>keyboard_backspace</md-icon>
-              <span>Back</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-    <router-view style="padding-top:15px"/>
-  </div>
+  <v-app>
+    <v-card v-if="$route.meta.showNav" color="white" flat height="100px" tile>
+      <v-toolbar color="secondary" dark prominent extended>
+        <v-toolbar-title class="my-auto center">
+          <v-row>
+            <v-col cols="6" class="pointer" @click="$router.push('/')">
+              <v-img center src="@/assets/icon.png"
+            /></v-col>
+            <v-col cols="6" class="my-auto">
+              <v-btn @click="changeSchool()" x-large block text>
+                {{ $store.state.settings.school }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-toolbar-title>
+
+        <v-spacer></v-spacer>
+        <v-btn x-large v-if="$store.state.user.isLoggedIn" text>
+          {{ $store.state.user.username }}
+        </v-btn>
+        <v-btn
+          v-for="(navItem, i) in navItems.filter(
+            v =>
+              (v &&
+                (v.auth.some(c => c == 'ANY') &&
+                  $store.state.user.isLoggedIn)) ||
+              (v.auth.some(c => c == 'STUDENT') &&
+                $store.state.user.isLoggedIn &&
+                $store.state.user.type == 'STUDENT') ||
+              (v.auth.some(c => c == 'ADMIN') &&
+                $store.state.user.isLoggedIn &&
+                $store.state.user.type == 'ADMIN') ||
+              (v.auth.some(c => c == 'LECTURER') &&
+                $store.state.user.isLoggedIn &&
+                $store.state.user.type == 'LECTURER')
+          )"
+          :key="i"
+          icon
+          @click="$router.push(navItem.link)"
+        >
+          <v-icon>{{ navItem.icon }}</v-icon>
+        </v-btn>
+        <v-btn
+          v-on:click="confirmLogout()"
+          x-large
+          v-if="$store.state.user.isLoggedIn"
+          text
+        >
+          Log out
+        </v-btn>
+      </v-toolbar>
+    </v-card>
+
+    <v-content>
+      <router-view style="padding-top:15px" />
+    </v-content>
+  </v-app>
 </template>
 
-<script>
-const axios = require("axios");
-export default {
+<script lang="ts">
+import Vue from "vue";
+import swal from "sweetalert2";
+import axios from "axios";
+
+export default Vue.extend({
   name: "App",
+  data() {
+    return {
+      navItems: [
+        {
+          icon: "mdi-library-books",
+          link: "/module/list",
+          auth: ["ANY"]
+        },
+        {
+          icon: "mdi-account-multiple",
+          link: "/student/list",
+          auth: ["LECTURER"]
+        },
+        {
+          icon: "mdi-account-group",
+          link: "/lecturer/list",
+          auth: ["ADMIN"]
+        },
+        {
+          icon: "mdi-check-all",
+          link: "/marks/all",
+          auth: ["STUDENT"]
+        },
+        {
+          icon: "mdi-check-all",
+          link: "/marks/sheet",
+          auth: ["ADMIN", "LECTURER"]
+        }
+      ]
+    };
+  },
   mounted() {
     if (!this.$store.state.settings.schoolAdded) {
-      this.changeSchool();
+      (this as any).changeSchool();
     }
   },
   methods: {
-
+    confirmLogout() {
+      swal
+        .fire({
+          title: "Are you sure?",
+          text: "Your current session will be destroyed!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Log out",
+          cancelButtonText: "Cancel"
+        })
+        .then(result => {
+          if (result.value) {
+            (this as any).logout();
+          }
+        });
+    }
   }
-};
+});
 </script>
 
 <style>
@@ -112,8 +143,71 @@ export default {
   cursor: pointer;
 }
 
-.md-active {
+.v-active {
   background-color: transparent !important;
   border-bottom: 2px solid black !important;
+}
+
+.nice-border {
+  border: 1px solid black;
+}
+
+.bg-blue {
+  background-color: #2d5afd;
+}
+
+.bg-light-blue {
+  background-color: rgba(45, 90, 253, 0.1);
+}
+
+.border-left-blue {
+  border-left-width: 3;
+  border-left-color: #2d5afd;
+}
+
+.border-top-blue {
+  border-top-width: 1;
+  border-top-color: #2d5afd;
+}
+
+.border-top-peach {
+  border-top-width: 1;
+  border-top-color: #f96c5b;
+}
+
+.bg-peach {
+  background-color: #f96c5b;
+}
+
+.bg-white {
+  background-color: rgb(255, 255, 255);
+}
+
+.bg-grey {
+  background-color: #e9e9f0;
+}
+
+.outline-white {
+  border: 12 solid white;
+}
+
+.text-blue {
+  color: #2d5afd;
+}
+
+.text-white {
+  color: rgb(255, 255, 255);
+}
+
+.text-red {
+  color: #c4001d;
+}
+
+.text-peach {
+  color: #f96c5b;
+}
+
+.text-black {
+  color: black;
 }
 </style>

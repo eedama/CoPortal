@@ -209,7 +209,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 
 const axios = require("axios");
 const toLower = text => {
@@ -322,9 +322,9 @@ export default {
       .catch(err => {
         this.isLoading = false;
         if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
+          swal.fire(err.response.data, "error");
         } else {
-          swal("Unable to load modules", err.message, "error");
+          swal.fire("Unable to load modules", err.message, "error");
         }
       });
 
@@ -339,9 +339,9 @@ export default {
       })
       .catch(err => {
         if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
+          swal.fire(err.response.data, "error");
         } else {
-          swal("Unable to load mark sheets", "Try again later", "error");
+          swal.fire("Unable to load mark sheets", "Try again later", "error");
         }
       });
   },
@@ -376,9 +376,9 @@ export default {
         })
         .catch(err => {
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal(
+            swal.fire(
               "Unable load students for " + this.currentModule.name,
               err.message,
               "error"
@@ -414,9 +414,9 @@ export default {
         .catch(err => {
           item.editting = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable update marks for student", err.message, "error");
+            swal.fire("Unable update marks for student", err.message, "error");
           }
         });
     },
@@ -451,9 +451,9 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to save mark sheet", err.message, "error");
+            swal.fire("Unable to save mark sheet", err.message, "error");
           }
         });
     },

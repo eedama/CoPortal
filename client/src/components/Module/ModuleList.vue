@@ -1,134 +1,118 @@
 <template>
-  <div class="screen">
-    <div class="row">
-      <div class="col s8 offset-s2">
-        <md-button v-on:click="$router.back()" class="right">
-          <md-icon>keyboard_backspace</md-icon>
-          <span>Back</span>
-        </md-button>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col s10 offset-s1 m8 offset-m3 l6 offset-l3">
-        <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-          <input
-            v-on:keypress.enter="DeepSearch"
-            v-model="txtSearch"
-            id="Password"
-            name="Search"
-            type="search"
-          />
-          <label class="text-center" for="Search">Search</label>
-        </div>
-      </div>
-      <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
-        <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-      </div>
-    </div>
-
-    <div class="row">
-      <div v-if="userType !== 'STUDENT'" class="col s8 offset-s2 center-align">
-        <a
-          v-on:click="addingModules = !addingModules"
-          :class="{'red':addingModules}"
-          class="btn waves-effect"
-        >{{ !addingModules ? 'Add Module' : 'Cancel'}}</a>
-      </div>
-    </div>
-    <div v-if="addingModules" class="row valign-wrapper" style="height:80vh">
-      <div class="col m6 offset-m3 col s12 center-align">
-        <div class="card row">
-          <div class="card-content">
-            <div class="row">
-              <div class="col s12 center-align">
-                <h5>Adding a module</h5>
-              </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="module.name" id="ModuleName" name="ModuleName" type="text" />
-                <label class="text-center" for="ModuleName">Module name</label>
-              </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="module.code" id="ModuleCode" name="ModuleCode" type="text" />
-                <label class="text-center" for="ModuleCode">Module code</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-                <input
-                  v-model="module.description"
-                  id="ModuleDescription"
-                  name="ModuleDescription"
-                  type="text"
-                />
-                <label class="text-center" for="ModuleDescription">Module description</label>
-              </div>
-            </div>
-            <div class="row" v-show="txtError.length > 0">
-              <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <label class="text-center red-text">{{ txtError }}</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s8 offset-s2 m6 offset-m3 center-align text-center">
-                <input
-                  v-if="!isLoading"
-                  v-on:click="SubmitModule()"
-                  type="submit"
-                  value="Submit module"
-                  class="btn center-align tg-btn"
-                />
-                <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div v-if="!addingModules" class="row">
-      <div class="col s12">
-        <table class="highlight card" v-show="modules && modules.length > 0">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Code</th>
-              <th>Description</th>
-              <th>Lecturers</th>
-              <th>Total students</th>
-              <th>Total online tests</th>
-            </tr>
-          </thead>
-
-          <tbody class="row">
-            <tr
-              v-on:click="goToModule(module._id)"
-              class="pointer col-xs-12"
-              v-for="(module,i) in filteredModules"
-              :key="i"
+  <v-row class="screen">
+    <v-col class="right text-right px-5" cols="12" md="10" offset-md="2">
+      <v-btn right v-on:click="$router.back()" class="primary justify-end">
+        <v-icon>mdi-keyboard-backspace</v-icon>
+        <span class="px-2">Back</span>
+      </v-btn>
+    </v-col>
+    <v-col
+      cols="12"
+      md="4"
+      offset-md="4"
+      class="mx-auto"
+      v-if="userType !== 'STUDENT' && !addingModules"
+    >
+      <v-btn block v-on:click="addingModules = true" class="secondary"
+        >Add Module</v-btn
+      >
+    </v-col>
+    <v-col sm="12" md="6" offset-md="3" v-if="addingModules">
+      <v-card>
+        <v-content>
+          <v-col class="right text-right px-5" cols="12">
+            <v-btn class="right" right icon v-on:click="$router.back()">
+              <v-icon :size="32" color="primary">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="10" class="text-center mx-auto">
+            <v-subheading class="title text-center mx-auto">
+              Adding a module
+            </v-subheading>
+          </v-col>
+          <v-col cols="12" md="10" offset-md="1" class="mx-auto">
+            <v-text-field
+              v-model="module.name"
+              prepend-inner-icon="mdi-book-open-variant"
+              label="Module name"
+              type="text"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="10" offset-md="1" class="mx-auto">
+            <v-text-field
+              v-model="module.code"
+              prepend-inner-icon="mdi-google-classroom"
+              label="Module code"
+              type="text"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="10" offset-md="1" class="mx-auto">
+            <v-textarea
+              v-model="module.description"
+              prepend-inner-icon="mdi-message-bulleted"
+              label="Description"
+              type="text"
+              outlined
+            ></v-textarea>
+          </v-col>
+          <v-col cols="12" md="10" offset-md="1" class="mx-auto">
+            <p class="caption" v-if="txtError.length > 0">
+              {{ txtError }}
+            </p>
+          </v-col>
+          <v-col cols="12" md="10" offset-md="1" class="mx-auto">
+            <v-btn
+              :loading="isLoading"
+              v-on:click="SubmitModule()"
+              block
+              color="secondary"
             >
-              <td>{{ module.name }}</td>
-              <td>{{ module.code }}</td>
-              <td>{{ module.description }}</td>
-              <td>
-                <a class="pointer" v-for="lecturer in module.lecturers" :key="lecturer._id">
-                  <p>{{ lecturer.lastname }} {{ lecturer.firstname }}</p>
-                </a>
-              </td>
-              <td>
-                <a class="pointer">{{ module.students.length }} students</a>
-              </td>
-              <td>
-                <a class="pointer">{{ module.questionaires.length }} online tests</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+              Submit module
+            </v-btn>
+          </v-col>
+        </v-content>
+      </v-card>
+    </v-col>
+    <v-col v-if="!addingModules" sm="12" md="6" offset-md="3">
+      <v-text-field
+        class="text-center mx-auto text-xs-center"
+        color="secondary"
+        label="Search"
+        v-on:keypress.enter="DeepSearch"
+        solo
+        block
+        prepend-inner-icon="mdi-magnify"
+        v-model="txtSearch"
+      >
+      </v-text-field>
+    </v-col>
+
+    <v-col
+      cols="12"
+      md="10"
+      offset-md="1"
+      v-if="!addingModules"
+      class="mx-auto"
+    >
+      <v-data-table
+        :headers="headers"
+        :items="makeTableItems(filteredModules)"
+        class="elevation-1"
+        item-key="_id"
+        :items-per-page="100"
+        @click:row="arg => goToModule(arg._id)"
+        :loading="isLoading"
+        loading-text="Loading... Please wait"
+      >
+      </v-data-table>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 
 const axios = require("axios");
 
@@ -136,6 +120,44 @@ export default {
   name: "StidentList",
   data() {
     return {
+      headers: [
+        {
+          text: "Name",
+          align: "left",
+          sortable: true,
+          value: "name"
+        },
+        {
+          text: "Code",
+          align: "left",
+          sortable: true,
+          value: "code"
+        },
+        {
+          text: "Description",
+          align: "left",
+          sortable: true,
+          value: "description"
+        },
+        {
+          text: "Lecturers",
+          align: "left",
+          sortable: true,
+          value: "lecturerDetails"
+        },
+        {
+          text: "Total students",
+          align: "left",
+          sortable: true,
+          value: "totalStudents"
+        },
+        {
+          text: "Total online tests",
+          align: "left",
+          sortable: true,
+          value: "totalOnlineTests"
+        }
+      ],
       txtSearch: "",
       txtError: "",
       module: {
@@ -182,13 +204,28 @@ export default {
       .catch(err => {
         this.isLoading = false;
         if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
+          swal.fire(err.response.data, "error");
         } else {
-          swal("Unable to load modules", "Try again later", "error");
+          swal.fire("Unable to load modules", "Try again later", "error");
         }
       });
   },
   methods: {
+    makeTableItems(items) {
+      if (!items) return [];
+      return items.map(v => {
+        return {
+          ...v,
+          lecturerDetails: v.lecturers
+            ? v.lecturers
+                .filter(b => b.lastname && b.firstname)
+                .reduce((a, b) => a + `${b.lastname} ${b.firstname} , `, "")
+            : null,
+          totalStudents: v.students ? v.students.length : null,
+          totalOnlineTests: v.questionaires ? v.questionaires.length : null
+        };
+      });
+    },
     DeepSearch() {
       alert("Deep searching for " + this.txtSearch);
     },
@@ -230,7 +267,7 @@ export default {
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {
-            swal("Unable to submit the module", err.message, "error");
+            swal.fire("Unable to submit the module", err.message, "error");
           }
         });
     }

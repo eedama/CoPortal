@@ -7,9 +7,10 @@ import moment from "moment";
 
 import "./styles.scss";
 import { TNSFontIcon, fonticon } from "nativescript-fonticon"; // require the couchbase module
-import TextFieldPlugin from 'nativescript-material-textfield/vue'; 
+import TextFieldPlugin from "nativescript-material-textfield/vue";
+import RadListView from "nativescript-ui-listview/vue";
 Vue.use(TextFieldPlugin);
-
+Vue.use(RadListView);
 TNSFontIcon.debug = false;
 TNSFontIcon.paths = {
   mdi: "./assets/materialdesignicons.css"
@@ -23,7 +24,10 @@ Vue.registerElement(
   () => require("nativescript-ui-sidedrawer").RadSideDrawer
 );
 
-Vue.registerElement("CardView", () => require("@nstudio/nativescript-cardview").CardView);
+Vue.registerElement(
+  "CardView",
+  () => require("@nstudio/nativescript-cardview").CardView
+);
 
 Vue.registerElement("Ripple", () => require("nativescript-ripple").Ripple);
 
@@ -32,29 +36,33 @@ Vue.registerElement(
   () => require("@nstudio/nativescript-pulltorefresh").PullToRefresh
 );
 
-Vue.registerElement("Fab", () => require("@nstudio/nativescript-floatingactionbutton").Fab);
+Vue.registerElement(
+  "Fab",
+  () => require("@nstudio/nativescript-floatingactionbutton").Fab
+);
 
 Vue.registerElement(
   "DropDown",
   () => require("nativescript-drop-down/drop-down").DropDown
 );
 
-Vue.registerElement("CheckBox", () => require("@nstudio/nativescript-checkbox").CheckBox, {
-  model: {
-    prop: "checked",
-    event: "checkedChange"
+Vue.registerElement(
+  "CheckBox",
+  () => require("@nstudio/nativescript-checkbox").CheckBox,
+  {
+    model: {
+      prop: "checked",
+      event: "checkedChange"
+    }
   }
-});
+);
 
 Vue.registerElement(
   "ImageZoom",
   () => require("nativescript-image-zoom").ImageZoom
 );
 
-Vue.registerElement(
-  "PDFView", 
-  () => require("nativescript-pdf-view").PDFView
-);
+Vue.registerElement("PDFView", () => require("nativescript-pdf-view").PDFView);
 
 Vue.filter("fonticon", fonticon);
 
@@ -75,7 +83,10 @@ Vue.use(Navigator, {
 Vue.prototype.$router = router;
 Vue.prototype.$route = null;
 
-var application = require("application");
+import { crashlytics } from "nativescript-plugin-firebase";
+Vue.prototype.$crashlytics = crashlytics;
+const application = require("application");
+
 Vue.mixin({
   data() {
     return {
@@ -111,7 +122,12 @@ Vue.mixin({
       } else {
         options = options || {};
         options.props = props;
-        if (this.$navigator.route && this.$navigator.route.path == to) {
+        if (
+          this.$navigator.route &&
+          this.$navigator.route.path == to &&
+          to !== "/module/list/attend" &&
+          to !== "/module/list/survey"
+        ) {
           console.log("Going to same page", to);
           return;
         }
@@ -123,11 +139,11 @@ Vue.mixin({
       var AndroidApplication = application.android;
       var activity = AndroidApplication.foregroundActivity;
       activity = AndroidApplication.foregroundActivity;
-      activity.onBackPressed = function(e) {
+      activity.onBackPressed = function (e) {
         if (self.currentPage && self.currentPage > 0) {
           self.currentPage--;
         } else {
-          activity.onBackPressed = function() {
+          activity.onBackPressed = function () {
             self.navigate(null);
           };
           self.navigate(null);

@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:10
 
 # install simple http server for serving static content
 RUN npm install -g http-server
@@ -16,7 +16,8 @@ RUN npm install
 COPY . .
 
 # build app for production with minification
+# TODO : RE-ENABLE THIS AND FIX THE 1000000 ERRORS :smile:
 RUN npm run build
 
 EXPOSE 8080
-CMD [ "http-server", "dist" ]
+CMD [ "http-server", "dist" ] 

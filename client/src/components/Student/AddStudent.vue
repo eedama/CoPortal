@@ -1,108 +1,142 @@
 <template>
-  <div>
-    <div class="row">
-      <div class="col s12 center-align card-panel" v-show="done">
-        <md-empty-state md-icon="done" md-label="Student was successfully added." md-description="You can now assign the student to more modules / view the student's progress.">
-        </md-empty-state>
-      </div>
-      <div v-show="!done" class="col s12 center-align">
-        <div class="card row">
-          <div class="card-header center-align z-depth-3 cardBar">
-            <h5 style="padding:20px">Adding a student</h5>
+  <v-row class="row">
+    <v-col cols="12" md="4" offset-md="4" class="my-auto" v-show="done">
+      <v-card class="ma-5">
+        <v-card-text>
+          <p class="title text-center mx-auto">
+            Student was successfully added.
+          </p>
+          <p class="subtitle text-center mx-auto">
+            You can now assign the student to more modules / view the student's
+            progress.
+          </p>
+        </v-card-text>
+      </v-card>
+    </v-col>
+    <v-col cols="12" md="10" offset-md="1" class="mx-auto" v-show="!done">
+      <v-content class="card-content">
+        <v-row>
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="student.firstname"
+              prepend-inner-icon="mdi-account"
+              label="Firstname"
+              type="text"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="student.lastname"
+              prepend-inner-icon="mdi-account-outline"
+              label="Lastname"
+              type="text"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="8" offset-md="2">
+            <v-text-field
+              v-model="student.username"
+              prepend-inner-icon="mdi-account"
+              label="Username"
+              type="text"
+              outlined
+            ></v-text-field>
+          </v-col>
+
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="student.password"
+              prepend-inner-icon="mdi-lock"
+              label="Password"
+              @click:append="showPassword = !showPassword"
+              :append-icon="
+                showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
+              "
+              :type="showPassword ? 'text' : 'password'"
+              outlined
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model="student.confirmPassword"
+              prepend-inner-icon="mdi-lock"
+              label="Confirm Password"
+              @click:append="showPassword = !showPassword"
+              :append-icon="
+                showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
+              "
+              :type="showPassword ? 'text' : 'password'"
+              outlined
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="12" md="8" offset-md="2">
+            <v-select
+              class="ma-5"
+              :items="
+                moduleNames.map(v => {
+                  return { _id: v._id, title: `${v.name} - ${v.code}` };
+                })
+              "
+              item-text="title"
+              item-value="_id"
+              label="Select all modules"
+              outlined
+              multiple
+              v-model="student.modules"
+            >
+            </v-select>
+          </v-col>
+          <v-col cols="12" md="9">
+            <v-text-field
+              v-model="student.idNumber"
+              prepend-inner-icon="mdi-account"
+              label="ID number"
+              type="number"
+              outlined
+              maxlength="13"
+              :helper="
+                student.isSouthAfrican
+                  ? `South African Citizen`
+                  : `Non-South African Citizen`
+              "
+            >
+            </v-text-field>
+          </v-col>
+          <v-col cols="12" md="3">
+            <v-select
+              outlined
+              :items="['Male', 'Female']"
+              label="Pick a gender"
+              v-model="student.gender"
+            >
+            </v-select>
+          </v-col>
+          <div class="row" v-show="txtError.length > 0">
+            <div class="col s8 offset-s2 m6 offset-m3 text-center">
+              <label class="text-center red-text">{{ txtError }}</label>
+            </div>
           </div>
-          <div class="card-content">
-            <div class="row">
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="student.firstname" id="Firstname" name="Firstname" type="text" />
-                <label class="text-center" for="Firstname">Firstname</label>
-              </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="student.lastname" id="Lastname" name="Lastname" type="text" />
-                <label class="text-center" for="Lastname">Lastname</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-model="student.username" id="Username" name="Username" type="text" />
-                <label class="text-center" for="Username">Username</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="student.password" id="Password" name="Password" type="password" />
-                <label class="text-center" for="Password">Password</label>
-              </div>
-              <div class="input-field col m4 offset-m1 s12 text-center">
-                <input v-model="student.confirmPassword" id="ConfirmPassword" name="ConfirmPassword" type="password" />
-                <label class="text-center" for="ConfirmPassword">Confirm Password</label>
-              </div>
-            </div>
-            <div class="row" :key="m" v-for="(m,i) in student.modules.length">
-              <div class="col s10">
-                <md-field>
-                  <label :for="`modules-${i}`">Module {{ m }}</label>
-                  <md-select v-model="student.modules[i]" :name="`modules-${i}`" :id="`modules-${i}`">
-                    <md-option :disabled="student.modules.filter(sm => sm == _module._id).length > 0" v-for="_module in modules" :value="_module._id" :key="_module._id">{{ _module.name }} ({{ _module.code }})</md-option>
-                  </md-select>
-                </md-field>
-              </div>
-              <div class="col s2 bottom-align">
-                <a v-on:click="student.modules.push(null)" v-if="i == (student.modules.length - 1) && student.modules[i] != null" class="btn btn-floating waves-effect"><i class="material-icons">add</i></a>
-                <a v-on:click="student.modules.splice(i,1)" v-if="i != (student.modules.length - 1)" class="btn btn-floating red waves-effect"><i class="material-icons">close</i></a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s12">
-                <md-field>
-                  <label>ID Number</label>
-                  <md-input v-model="student.idNumber" maxlength="13"></md-input>
-                </md-field>
-              </div>
-            </div>
-            <div class="row" v-show="student.idNumber.length > 6">
-              <div class="row">
-                <div class="col s12">
-                  <label>
-                                            {{ student.isSouthAfrican ? 'South African Citizen' : 'Non-South African Citizen' }}
-                                      </label>
-                </div>
-              </div>
-              <div class="col s12">
-                <md-field>
-                  <label for="Gender">Gender</label>
-                  <md-select v-model="student.gender" name="Gender" id="Gender">
-                    <md-option disabled>Pick a gender</md-option>
-                    <md-option value="Male">Male</md-option>
-                    <md-option value="Female">Female</md-option>
-                  </md-select>
-                </md-field>
-              </div>
-              <div class="col s12">
-                <md-datepicker md-immediately v-model="student.dob">
-                  <label>Date of birth</label>
-                </md-datepicker>
-              </div>
-            </div>
-            <div class="row" v-show="txtError.length > 0">
-              <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <label class="text-center red-text">{{ txtError }}</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s8 offset-s2 m6 offset-m3 text-center">
-                <input v-if="!isLoading" v-on:click="SubmitStudent()" type="submit" value="Submit student" class="btn center-align tg-btn" />
-                <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+          <v-col cols="12" md="10" offset-md="1" class="mx-auto">
+            <v-btn
+              :loading="isLoading"
+              v-on:click="SubmitStudent()"
+              block
+              color="secondary"
+            >
+              Submit student
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-content>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 import * as moment from "moment";
 
 const axios = require("axios");
@@ -111,6 +145,7 @@ export default {
   name: "AddStudent",
   data() {
     return {
+      showPassword: false,
       txtError: "",
       student: {
         firstname: "",
@@ -125,7 +160,7 @@ export default {
         isSouthAfrican: false
       },
       done: false,
-      modules: [],
+      moduleNames: [],
       isLoading: false
     };
   },
@@ -158,24 +193,17 @@ export default {
     LoadModules() {
       this.isLoading = true;
       axios
-        .get(this.$store.state.settings.baseLink + "/m/modules/all")
+        .get(this.$store.state.settings.baseLink + "/m/get/all/module/names")
         .then(results => {
           this.isLoading = false;
-          this.modules = results.data;
-          this.options = [];
-          this.modules.map(s => {
-            this.options.push({
-              value: s._id,
-              text: s.name + " ( " + s.code + " )"
-            });
-          });
+          this.moduleNames = results.data;
         })
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal(err.response.data, "error");
+            swal.fire(err.response.data, "error");
           } else {
-            swal("Unable to load modules", "Try again later", "error");
+            swal.fire("Unable to load modules", "Try again later", "error");
           }
         });
     },
@@ -214,7 +242,7 @@ export default {
         this.txtError = "Please enter a valid id number";
       }
 
-      if (this.student.modules.filter(m => m != null).length <= 0) {
+      if (this.student.modules.filter(m => m != null).length == 0) {
         this.txtError = "Please select at least one module";
       }
 
@@ -222,7 +250,7 @@ export default {
         this.isLoading = false;
         return;
       }
-      
+
       axios
         .post(this.$store.state.settings.baseLink + "/a/add/student", {
           student: this.student
@@ -237,7 +265,7 @@ export default {
           if (err.response != null && err.response.status == 512) {
             this.txtError = err.response.data;
           } else {
-            swal("Unable to submit the student", err.message, "error");
+            swal.fire("Unable to submit the student", err.message, "error");
           }
           this.$emit("submitted", false);
         });

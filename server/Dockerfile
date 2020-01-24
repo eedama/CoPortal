@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:10-alpine
 
 EXPOSE 3001
 
@@ -25,7 +25,7 @@ WORKDIR /app
 RUN npm install
 
 RUN npm rebuild bcrypt --build-from-source
-RUN npm run build
+RUN npm test
 
 RUN apk del builds-deps
 

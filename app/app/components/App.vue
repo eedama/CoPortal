@@ -1,103 +1,11 @@
 <template>
   <Page actionBarHidden="true">
     <RadSideDrawer ref="drawer">
-      <StackLayout ~drawerContent backgroundColor="#ffffff">
-        <GridLayout v-if="$store.state.cache.cachedUser" rows="auto,*,auto">
-          <CardView
-            v-if="$store.state.cache.cachedUser.user"
-            row="0"
-            class="bg-blue-black"
-            elevation="15"
-          >
-            <GridLayout verticalAlignment="center" class="p-5" rows="auto,auto" columns="*,auto">
-              <Label
-                row="0"
-                col="0"
-                fontSize="18%"
-                verticalAlignment="center" 
-                class="font-weight-bold text-white p-t-5"
-                :textWrap="true"
-                :text="`${$store.state.cache.cachedUser.user.firstname} ${$store.state.cache.cachedUser.user.lastname}`"
-              />
-              <Label
-                row="1"
-                col="0"
-                fontSize="16%"
-                verticalAlignment="center" 
-                class="h4 text-white p-t-5"
-                :textWrap="true"
-                :text="$store.state.cache.cachedUser.user.username"
-              />
-              <Image
-                row="0"
-                rowSpan="2"
-                col="1"
-                textAlignment="right"
-                verticalAlignment="center"
-                stretch="aspectFit"
-                width="80"
-                height="80"
-                borderRadius="100%"
-                :src="$store.state.cache.cachedUser.user.profilePic ? $store.state.cache.cachedUser.user.profilePic : $store.state.settings.defaultProfilePic"
-              ></Image>
-            </GridLayout>
-          </CardView>
-           <Image
-                  row="1"
-                  src="~/assets/images/coPortalLogo.png"
-                  stretch="aspectFit"
-                  verticalAlignment="bottom"
-                  opacity="0.1"
-                  textAlignment="right"
-                  class="m-x-15 bottomLogo"
-              ></Image>
-          <ScrollView row="1">
-            <StackLayout>
-              <Ripple
-                @tap="goTo(layout)"
-                v-for="(layout,i) in drawerLayouts.filter(d => d.auth == null || ($store.state.cache.cachedUser && d.auth.some(auth => auth == $store.state.cache.cachedUser.userType)))"
-                :key="i"
-              >
-                <GridLayout class="drawer-item p-y-10" rows="auto,auto" columns="auto,*">
-                  <label
-                    row="0"
-                    col="0"
-                    textAlignment="center"
-                    verticalAlignment="center"
-                    class="mdi p-5 text-blue-black"
-                    fontSize="25%"
-                    :text="'mdi-' + layout.icon | fonticon"
-                  ></label>
-                  <label
-                    row="0"
-                    col="1"
-                    verticalAlignment="center"
-                    class="text-dark-black p-5"
-                    fontSize="17%"
-                    :text="layout.text"
-                  ></label>
-                </GridLayout>
-              </Ripple>
-            </StackLayout>
-          </ScrollView>
-          <StackLayout textAlignment="center" row="2">
-            <GridLayout
-              v-if="$store.state.cache.cachedUser"
-              class="drawer-item p-y-10"
-              rows="auto"
-              columns="*"
-            >
-              <label
-                textAlignment="center"
-                verticalAlignment="bottom"
-                :textWrap="true"
-                class="font-weight-bold text-blue-black"
-                fontSize="18%"
-                :text="($store.state.cache.cachedUser.userType =='PARENT' && $store.state.cache.cachedUser.students) ? 'Gaurdian to ' + $store.state.cache.cachedUser.students.map(s => s.username).join() : $store.state.cache.cachedUser.userType.toLowerCase() + ' at ' + currentUserSchool"
-              ></label>
-            </GridLayout>
-          </StackLayout>
-        </GridLayout>
+      <StackLayout v-show="$store.state.cache.cachedUser" ~drawerContent backgroundColor="#ffffff">
+        <side-nav
+          @closeSideNav="$refs.drawer.nativeView.closeDrawer()"
+          v-if="$store.state.cache.cachedUser"
+        ></side-nav>
       </StackLayout>
 
       <GridLayout ~mainContent columns="*" rows="*">
@@ -109,15 +17,23 @@
               class="m-5"
               @tap="$refs.drawer.nativeView.showDrawer()"
             >
-              <label class="mdi p-5" fontSize="35%" :text="'mdi-menu' | fonticon"></label>
+              <label
+                class="mdi p-5 text-peach"
+                fontSize="35%"
+                :text="'mdi-menu' | fonticon"
+              ></label>
             </Ripple>
             <Ripple
               v-if="$store.state.cache.cachedUser"
               verticalAlignment="center"
               class="m-5"
-              @tap="goTo(notificationsRoute)"
+              @tap="navigate('/notifications/list')"
             >
-              <label class="mdi p-5" fontSize="25%" :text="'mdi-bell' | fonticon"></label>
+              <label
+                class="mdi p-5 text-blue"
+                fontSize="25%"
+                :text="'mdi-bell' | fonticon"
+              ></label>
             </Ripple>
           </StackLayout>
           <StackLayout
@@ -134,7 +50,12 @@
               text="Demo"
             ></label>
           </StackLayout>
-          <Navigator colSpan="2" row="1" rowSpan="2" :defaultRoute="userLoggedIn()"/>
+          <Navigator
+            colSpan="2"
+            row="1"
+            rowSpan="2"
+            :defaultRoute="userLoggedIn()"
+          />
         </GridLayout>
       </GridLayout>
     </RadSideDrawer>
@@ -143,11 +64,14 @@
 
 <script lang="ts">
 import * as connectivity from "tns-core-modules/connectivity";
-var dialogs = require("ui/dialogs");
 var appSettings = require("application-settings");
+import SideNav from "./main/SideNav.vue";
 
 export default {
   name: "App",
+  components: {
+    SideNav
+  },
   data() {
     return {
       msg: "What???",
@@ -159,71 +83,12 @@ export default {
         link: "/notifications/list",
         description: "All your notifications in one place",
         auth: ["STUDENT", "PARENT"]
-      },
-      drawerLayouts: [
-        {
-          text: "My profile",
-          icon: "account",
-          link: "/student/profile/view",
-          description: "View and edit personal information",
-          auth: ["STUDENT", "ADMIN", "LECTURER", "PARENT"]
-        },
-        {
-          text: "Lecturers",
-          icon: "account-supervisor-circle",
-          link: "/lecturer/list",
-          description: "Lecturers registered to the system",
-          auth: ["ADMIN"]
-        },
-        {
-          text: "Modules",
-          icon: "book-open-page-variant",
-          link: "/module/list",
-          description: "Modules you are registered for",
-          auth: ["ADMIN", "LECTURER", "STUDENT", "PARENT"]
-        },
-        {
-          text: "Timetable",
-          icon: "table",
-          link: "/timetable/view",
-          description: "View Your Table",
-          auth: ["STUDENT", "PARENT"]
-        },
-        {
-          text: "Report a student",
-          icon: "account-alert-outline",
-          link: "/Student/Report",
-          description: "Report a student",
-          auth: ["LECTURER", "ADMIN"]
-        },
-        {
-          text: "Settings",
-          icon: "settings",
-          link: "/settings",
-          description: "Customize your portal",
-          auth: ["STUDENT", "LECTURER", "ADMIN", "PARENT"]
-        },
-        /* 
-        {
-          text: "Switch student",
-          icon: "account-convert",
-          link: "/login",
-          description: "Switch user",
-          auth: ["PARENT"]
-        }, */
-        {
-          text: "Log out",
-          icon: "exit-run",
-          link: "/logout",
-          description: "Leave the system",
-          auth: ["STUDENT", "LECTURER", "ADMIN", "PARENT"]
-        }
-      ]
+      }
     };
   },
-  computed:{
-    currentUserSchool(){
-     return appSettings.getString("CurrentSchoolName");
+  computed: {
+    currentUserSchool() {
+      return appSettings.getString("CurrentSchoolName");
     }
   },
   mounted() {
@@ -232,17 +97,8 @@ export default {
       appSettings: this.appSettings,
       api: this.$api
     });
-    try{
-    this.$firebase.admob.hideBanner().then(() =>{
-      console.log('Banner_hidden',true);
-    }).catch(err =>{
-      console.log('Banner_hidden_dont_stress_1',err);
-    });
-    }catch(ex){
-      console.log('Banner_hidden_dont_stress',ex);
-    }
-   
-   connectivity.startMonitoring(conn => {
+
+    connectivity.startMonitoring(conn => {
       if (this.connectionType == 0 && conn > 0) {
         this.$feedback.success({
           title: "Back online",
@@ -269,42 +125,10 @@ export default {
         if (loggedInType === "LECTURER") {
           return "/module/list";
         } else if (loggedInType === "STUDENT") {
-          console.log("model29", loggedInType);
           return "/notifications/list";
         }
       } else {
         return "/login";
-      }
-    },
-    goTo(item) {
-      this.$refs.drawer.nativeView.closeDrawer();
-      if (item.link == "/logout") {
-        dialogs
-          .confirm({
-            title: "Log out",
-            message: "Are you sure you want to log out?",
-            okButtonText: "Yes",
-            cancelButtonText: "No"
-          })
-          .then(result => {
-            if (result) {
-              this.appSettings.remove("isLoggedInUserId");
-              this.appSettings.remove("userType");
-              this.appSettings.remove("device_token");
-
-              this.$store.commit("clearCache", {
-                db: this.$db,
-                appSettings: this.appSettings,
-                api: this.$api
-              });
-
-              this.navigate("/login", null, {
-                clearHistory: true
-              });
-            }
-          });
-      } else {
-        this.navigate(item.link);
       }
     }
   }

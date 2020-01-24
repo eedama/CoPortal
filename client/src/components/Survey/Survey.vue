@@ -143,7 +143,7 @@
 </template>
 
 <script>
-import swal from "sweetalert";
+import swal from "sweetalert2";
 const axios = require("axios");
 
 export default {
@@ -250,9 +250,9 @@ export default {
 
       .catch(err => {
         if (err.response != null && err.response.status == 512) {
-          swal(err.response.data, "error");
+          swal.fire(err.response.data, "error");
         } else {
-          swal("Unable to load Survey", "Try again later", "error");
+          swal.fire("Unable to load Survey", "Try again later", "error");
         }
       });
   },
@@ -290,15 +290,15 @@ export default {
             survey: this.surveyAnswers
           })
           .then(results => {
-            swal("Thank you!", "We got your feedback!", "success").then(v => {
+            swal.fire("Thank you!", "We got your feedback!", "success").then(v => {
               this.$router.push("/");
             });
           })
           .catch(err => {
             if (err.response != null && err.response.status == 512) {
-              swal(err.response.data, "error");
+              swal.fire(err.response.data, "error");
             } else {
-              swal("Unable to submit your Survey", "Try again later", "error");
+              swal.fire("Unable to submit your Survey", "Try again later", "error");
             }
           });
       }
