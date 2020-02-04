@@ -245,6 +245,7 @@ export default {
       }
 
       this.adKeywords = this.adKeywords
+        .filter(v => v)
         .map(v => v.toLowerCase())
         .filter((v, i, a) => a.indexOf(v) == i);
 
