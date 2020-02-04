@@ -204,7 +204,7 @@ const router = new Router({
     name: 'SurveyList',
     meta: {
       authLevel: ['LECTURER', 'ADMIN'],
-      showNav: false
+      showNav: true
     },
     props: true,
     component: SurveyList

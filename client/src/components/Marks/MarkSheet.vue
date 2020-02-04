@@ -1,13 +1,14 @@
 <template>
   <div class="screen">
-    <div  v-show="!printing" class="row">
-      <div class="col s8 offset-s2">
-        <md-button v-on:click="$router.back()" class="right">
-          <md-icon>keyboard_backspace</md-icon>
-          <span>Back</span>
-        </md-button>
-      </div>
-    </div>
+    <v-row>
+      <v-col cols="10"> </v-col>
+      <v-col cols="2">
+        <v-btn right v-on:click="$router.back()" class="primary justify-end">
+          <v-icon>mdi-keyboard-backspace</v-icon>
+          <span class="px-2">Back</span>
+        </v-btn>
+      </v-col>
+    </v-row>
     <div class="row">
       <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
         <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>

@@ -2,17 +2,13 @@
   <div class="screen">
 
     <v-row>
-       <v-col cols="10"> </v-col>
-    <v-col cols="2">
-      <v-btn
-        right
-        v-on:click="$router.back()"
-        class="primary justify-end"
-      >
-        <v-icon>mdi-keyboard-backspace</v-icon>
-        <span class="px-2">Back</span>
-      </v-btn>
-    </v-col>
+      <v-col cols="10"> </v-col>
+      <v-col cols="2">
+        <v-btn right v-on:click="$router.back()" class="primary justify-end">
+          <v-icon>mdi-keyboard-backspace</v-icon>
+          <span class="px-2">Back</span>
+        </v-btn>
+      </v-col>
     </v-row>
     <v-row>
         <v-col sm="12" md="6" offset-md="3">
@@ -30,14 +26,19 @@
     </v-row>
     <v-row>
       <v-col class="col s12 m3 row">
+         <v-tabs grow>
+          <v-tab v-for="(module,i) in filteredModules" :key="i" id="tab-announcements">
+            {{ module.name }} {{ module.code }}
+          </v-tab>
+         </v-tabs>
         <div class="col s12 center">
           <md-subheader><label class="markValue">Modules</label></md-subheader>
         </div>
         <div class="col s6 m12 pointer center-align waves-effect" v-on:click="selectedModuleIndex = i" v-for="(module,i) in filteredModules" :key="i">
           <div class="hoverable card-panel" :class="{'black':selectedModuleIndex==i}">
             <h6 class="center-align">
-              <span>{{ module.name }} 
-                                      <br /><label class="center-align">{{ module.code }}</label></span></h6>
+              <span>
+                                      <br /><label class="center-align"></label></span></h6>
           </div>
         </div>
       </v-col>

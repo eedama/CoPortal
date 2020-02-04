@@ -77,8 +77,8 @@
           </div>
         </v-dialog-content>
         <v-dialog-actions>
-          <v-button class="v-primary" @click="AddNewModule(null)">Close</v-button>
-          <v-button v-if="!isLoading" class="v-primary" @click="AddNewModule('submit')">Save Changes</v-button>
+          <v-btn class="v-primary" @click="AddNewModule(null)">Close</v-btn>
+          <v-btn v-if="!isLoading" class="v-primary" @click="AddNewModule('submit')">Save Changes</v-btn>
           <div class="row">
             <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
               <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
@@ -88,9 +88,9 @@
       </v-dialog>
       <v-dialog class="card" style="position:absolute" :v-active.sync="showEditProfile">
         <v-dialog-actions>
-          <v-button class="v-icon-button right" @click="activeEditProfile(null)">
+          <v-btn class="v-icon-button right" @click="activeEditProfile(null)">
             <v-icon>close</v-icon>
-          </v-button>
+          </v-btn>
         </v-dialog-actions>
         <div style="overflow-y:scroll;overflow-x:hidden" class="col m8 offset-m2 col s12 center-align">
           <div class="card-content row">
@@ -154,12 +154,12 @@
           </div>
         </div>
         <v-dialog-actions>
-          <v-button class="red" @click="activeEditProfile(null)">
+          <v-btn class="red" @click="activeEditProfile(null)">
             Cancel
-          </v-button>
-          <v-button v-if="!isLoading" v-on:click="UpdateLecturer()" class="right">
+          </v-btn>
+          <v-btn v-if="!isLoading" v-on:click="UpdateLecturer()" class="right">
             Save changes
-          </v-button>
+          </v-btn>
           <div class="row">
             <div class="col s8 offset-s2 m8 offset-m2 center-align text-center">
               <ball-pulse-loader v-if="isLoading" color="#000000" size="20px"></ball-pulse-loader>
