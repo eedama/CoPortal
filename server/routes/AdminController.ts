@@ -204,6 +204,10 @@ function GeneratePassword(password: string) {
     return hash;
 }
 
+router.get('/generate/password/:password', function (req: express.Request, res: express.Response) {
+    return res.send(GeneratePassword(req.params.password));
+})
+
 router.post("/add/student", function (req: express.Request, res: express.Response) {
     var student = new Student({
         _id: mongoose.Types.ObjectId(),
@@ -216,7 +220,6 @@ router.post("/add/student", function (req: express.Request, res: express.Respons
         idNumber: req.body.student.idNumber,
         isSouthAfrican: req.body.student.isSouthAfrican,
     });
-
     var studentModules: Array<ObjectID> = []
     if (req.body.student && req.body.student.modules) {
         studentModules = req.body.student.modules.filter((m: string) => m != null).map((m: string) => mongoose.Types.ObjectId(m));
