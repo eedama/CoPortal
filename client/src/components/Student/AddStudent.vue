@@ -13,123 +13,202 @@
         </v-card-text>
       </v-card>
     </v-col>
-    <v-col cols="12" md="10" offset-md="1" class="mx-auto" v-show="!done">
+    <v-col cols="12" class="mx-auto" v-show="!done">
       <v-content class="card-content">
-        <v-row>
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="student.firstname"
-              prepend-inner-icon="mdi-account"
-              label="Firstname"
-              type="text"
-              outlined
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="student.lastname"
-              prepend-inner-icon="mdi-account-outline"
-              label="Lastname"
-              type="text"
-              outlined
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" md="8" offset-md="2">
-            <v-text-field
-              v-model="student.username"
-              prepend-inner-icon="mdi-account"
-              label="Username"
-              type="text"
-              outlined
-            ></v-text-field>
-          </v-col>
+        <v-tabs grow>
+          <v-tab href="#tab-bulk">Bulk</v-tab>
+          <v-tab href="#tab-single">Single</v-tab>
+          <v-tab-item class="pa-5" value="tab-bulk">
+            <v-row>
+              <v-col v-if="students.length > 0" cols="8" class="mx-auto my-3">
+                <v-btn
+                  :loading="loadingCsv"
+                  outlined
+                  block
+                  color="secondary"
+                  @click="uploadBulkFromCSV()"
+                  >Upload from CSV</v-btn
+                >
+                <input
+                  @change="selectedFile"
+                  ref="select_csv"
+                  type="file"
+                  id="file"
+                  style="display:none"
+                />
+              </v-col>
+              <v-col cols="12">
+                <v-data-table
+                  :headers="headers"
+                  :items="students"
+                  fixed-header
+                  disable-sort
+                  :loading="loadingCsv || isLoading"
+                  class="elevation-1"
+                >
+                  <template v-slot:no-data>
+                    <v-col cols="8" class="mx-auto my-3">
+                      <v-btn
+                        :loading="loadingCsv"
+                        outlined
+                        block
+                        color="secondary"
+                        @click="uploadBulkFromCSV()"
+                        >Upload from CSV</v-btn
+                      >
+                      <input
+                        @change="selectedFile"
+                        ref="select_csv"
+                        type="file"
+                        id="file"
+                        style="display:none"
+                      />
+                    </v-col>
+                  </template>
+                </v-data-table>
+              </v-col>
+              <v-col cols="12" md="8" offset-md="2">
+                <v-select
+                  class="ma-5"
+                  :items="
+                    moduleNames.map(v => {
+                      return { _id: v._id, title: `${v.name} - ${v.code}` };
+                    })
+                  "
+                  item-text="title"
+                  item-value="_id"
+                  label="Select modules"
+                  outlined
+                  multiple
+                  v-model="student.modules"
+                >
+                </v-select>
+              </v-col>
+              <v-col cols="12" md="8" offset-md="2">
+                <v-btn block color="secondary" large :loading="isLoading"
+                  >Save Students</v-btn
+                >
+              </v-col>
+            </v-row>
+          </v-tab-item>
+          <v-tab-item class="pa-5" value="tab-single">
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="student.firstname"
+                  prepend-inner-icon="mdi-account"
+                  label="Firstname"
+                  type="text"
+                  outlined
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="student.lastname"
+                  prepend-inner-icon="mdi-account-outline"
+                  label="Lastname"
+                  type="text"
+                  outlined
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="8" offset-md="2">
+                <v-text-field
+                  v-model="student.username"
+                  prepend-inner-icon="mdi-account"
+                  label="Username"
+                  type="text"
+                  outlined
+                ></v-text-field>
+              </v-col>
 
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="student.password"
-              prepend-inner-icon="mdi-lock"
-              label="Password"
-              @click:append="showPassword = !showPassword"
-              :append-icon="
-                showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
-              "
-              :type="showPassword ? 'text' : 'password'"
-              outlined
-            >
-            </v-text-field>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="student.confirmPassword"
-              prepend-inner-icon="mdi-lock"
-              label="Confirm Password"
-              @click:append="showPassword = !showPassword"
-              :append-icon="
-                showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
-              "
-              :type="showPassword ? 'text' : 'password'"
-              outlined
-            >
-            </v-text-field>
-          </v-col>
-          <v-col cols="12" md="8" offset-md="2">
-            <v-select
-              class="ma-5"
-              :items="
-                moduleNames.map(v => {
-                  return { _id: v._id, title: `${v.name} - ${v.code}` };
-                })
-              "
-              item-text="title"
-              item-value="_id"
-              label="Select all modules"
-              outlined
-              multiple
-              v-model="student.modules"
-            >
-            </v-select>
-          </v-col>
-          <v-col cols="12" md="9">
-            <v-text-field
-              v-model="student.idNumber"
-              prepend-inner-icon="mdi-account"
-              label="ID number"
-              type="number"
-              outlined
-              maxlength="13"
-              :helper="
-                student.isSouthAfrican
-                  ? `South African Citizen`
-                  : `Non-South African Citizen`
-              "
-            >
-            </v-text-field>
-          </v-col>
-          <v-col cols="12" md="3">
-            <v-select
-              outlined
-              :items="['Male', 'Female']"
-              label="Pick a gender"
-              v-model="student.gender"
-            >
-            </v-select>
-          </v-col>
-          <div class="row" v-show="txtError.length > 0">
-            <div class="col s8 offset-s2 m6 offset-m3 text-center">
-              <label class="text-center red-text">{{ txtError }}</label>
-            </div>
-          </div>
-          <v-col cols="12" md="10" offset-md="1" class="mx-auto">
-            <v-btn
-              :loading="isLoading"
-              v-on:click="SubmitStudent()"
-              block
-              color="secondary"
-            >
-              Submit student
-            </v-btn>
-          </v-col>
-        </v-row>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="student.password"
+                  prepend-inner-icon="mdi-lock"
+                  label="Password"
+                  @click:append="showPassword = !showPassword"
+                  :append-icon="
+                    showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
+                  "
+                  :type="showPassword ? 'text' : 'password'"
+                  outlined
+                >
+                </v-text-field>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="student.confirmPassword"
+                  prepend-inner-icon="mdi-lock"
+                  label="Confirm Password"
+                  @click:append="showPassword = !showPassword"
+                  :append-icon="
+                    showPassword ? 'mdi-eye-outline' : 'mdi-eye-off-outline'
+                  "
+                  :type="showPassword ? 'text' : 'password'"
+                  outlined
+                >
+                </v-text-field>
+              </v-col>
+              <v-col cols="12" md="8" offset-md="2">
+                <v-select
+                  class="ma-5"
+                  :items="
+                    moduleNames.map(v => {
+                      return { _id: v._id, title: `${v.name} - ${v.code}` };
+                    })
+                  "
+                  item-text="title"
+                  item-value="_id"
+                  label="Select all modules"
+                  outlined
+                  multiple
+                  v-model="student.modules"
+                >
+                </v-select>
+              </v-col>
+              <v-col cols="12" md="9">
+                <v-text-field
+                  v-model="student.idNumber"
+                  prepend-inner-icon="mdi-account"
+                  label="ID number"
+                  type="number"
+                  outlined
+                  maxlength="13"
+                  :helper="
+                    student.isSouthAfrican
+                      ? `South African Citizen`
+                      : `Non-South African Citizen`
+                  "
+                >
+                </v-text-field>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-select
+                  outlined
+                  :items="['Male', 'Female']"
+                  label="Pick a gender"
+                  v-model="student.gender"
+                >
+                </v-select>
+              </v-col>
+              <div class="row" v-show="txtError.length > 0">
+                <div class="col s8 offset-s2 m6 offset-m3 text-center">
+                  <label class="text-center red-text">{{ txtError }}</label>
+                </div>
+              </div>
+              <v-col cols="12" md="10" offset-md="1" class="mx-auto">
+                <v-btn
+                  :loading="isLoading"
+                  v-on:click="SubmitStudent()"
+                  block
+                  color="secondary"
+                >
+                  Submit student
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-tab-item>
+        </v-tabs>
       </v-content>
     </v-col>
   </v-row>
@@ -138,6 +217,7 @@
 <script>
 import swal from "sweetalert2";
 import * as moment from "moment";
+import Papa from "papaparse";
 
 const axios = require("axios");
 
@@ -145,6 +225,15 @@ export default {
   name: "AddStudent",
   data() {
     return {
+      tab: "tab-single",
+      headers: [
+        { value: "firstname",text: "firstname" },
+        { value: "lastname",text: "lastname" },
+        { value: "gender",text: "gender" },
+        { value: "idNumber",text: "idNumber" },
+        { value: "password",text: "password" }
+      ],
+      students: [],
       showPassword: false,
       txtError: "",
       student: {
@@ -161,7 +250,8 @@ export default {
       },
       done: false,
       moduleNames: [],
-      isLoading: false
+      isLoading: false,
+      loadingCsv: false
     };
   },
   watch: {
@@ -190,6 +280,65 @@ export default {
     this.LoadModules();
   },
   methods: {
+    uploadBulkFromCSV() {
+      this.$refs.select_csv.click();
+    },
+    async selectedFile(arg) {
+      if (arg.target.files && arg.target.files.length >= 0) {
+        const file = arg.target.files[0];
+        if (file.type == "text/csv") {
+          this.loadingCsv = true;
+          const csvString = await this.readFile(file);
+          if (!csvString) {
+            this.loadingCsv = false;
+            return swal.fire(
+              "Unable to load selected file",
+              "Your browser does not support file readers",
+              "error"
+            );
+          }
+          const result = Papa.parse(csvString);
+          if (result.data && result.data.length > 0) {
+            this.students = result.data
+              .filter(row => row && row.length > 0 && row[0] != "firstname")
+              .map((row, i) => {
+                return {
+                  firstname: row.length >= 0 ? row[0] : "",
+                  lastname: row.length >= 1 ? row[1] : "",
+                  gender: row.length >= 2 ? row[2] : "",
+                  idNumber: row.length >= 3 ? row[3] : "",
+                  password:
+                    row.length >= 4 && row[4].length > 3 ? row[4] : "password"
+                };
+              })
+              .filter((v, i, a) => a.indexOf(v) == i);
+            console.log("ALl students...", this.students);
+            this.$forceUpdate();
+          }
+          this.loadingCsv = false;
+        } else {
+          swal.fire(
+            "Unable to load selected file",
+            "We only support .csv files",
+            "error"
+          );
+        }
+      }
+      console.log("We selected a file", file);
+    },
+    readFile(file) {
+      return new Promise(resolve => {
+        try {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            return resolve(e.target.result);
+          };
+          reader.readAsText(file);
+        } catch (err) {
+          return resolve(null);
+        }
+      });
+    },
     LoadModules() {
       this.isLoading = true;
       axios
@@ -201,7 +350,7 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal.fire(err.response.data, "error");
+            swal.fire("", err.response.data, "error");
           } else {
             swal.fire("Unable to load modules", "Try again later", "error");
           }
