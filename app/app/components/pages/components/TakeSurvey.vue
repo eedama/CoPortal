@@ -102,7 +102,6 @@
 const dialogs = require("ui/dialogs");
 var appSettings = require("application-settings");
 import * as connectivity from "tns-core-modules/connectivity";
-import date from "date-and-time";
 export default {
   data() {
     return {

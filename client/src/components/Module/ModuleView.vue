@@ -598,7 +598,7 @@ export default {
         .catch(err => {
           this.isLoading = false;
           if (err.response != null && err.response.status == 512) {
-            swal.fire(err.response.data, "error");
+            swal.fire("", err.response.data, "error");
           } else {
             swal.fire(err.message, "Try again later", "error");
           }

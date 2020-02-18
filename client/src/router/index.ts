@@ -12,7 +12,8 @@ import LecturerList from '@/components/Lecturer/LecturerList.vue'
 import ModuleView from '@/components/Module/ModuleView.vue'
 import AllMarks from '@/components/Marks/AllMarks.vue'
 import MarkSheet from '@/components/Marks/MarkSheet.vue'
-import Survey from '@/components/Survey/Survey.vue'
+import TakeSurvey from '@/components/Survey/TakeSurvey.vue'
+import GeneralSurvey from '@/components/Survey/GeneralSurvey.vue'
 import Report from '@/components/Report/Report.vue'
 import AddStudentTemp from '@/components/admin/AddStudentTemp.vue'
 import EditStudent from '@/components/Student/EditStudent.vue'
@@ -189,7 +190,16 @@ const router = new Router({
       showNav: false
     },
     props: true,
-    component: Survey
+    component: GeneralSurvey
+  }, {
+    path: '/module/survey/take/for/:moduleId',
+    name: 'TakeSurvey',
+    meta: {
+      authLevel: ['STUDENT', 'ADMIN', 'LECTURER'],
+      showNav: true
+    },
+    props: true,
+    component: TakeSurvey
   }, {
     path: '/Student/Report',
     name: 'Report',
@@ -203,7 +213,7 @@ const router = new Router({
     path: '/survey/list',
     name: 'SurveyList',
     meta: {
-      authLevel: ['LECTURER', 'ADMIN'],
+      authLevel: ['STUDENT', 'LECTURER', 'ADMIN'],
       showNav: true
     },
     props: true,

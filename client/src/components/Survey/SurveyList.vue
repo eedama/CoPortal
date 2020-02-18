@@ -130,7 +130,7 @@
                   <v-list-item
                     v-for="(moduleSurvey, k) in _module.moduleSurveys"
                     :key="k"
-                    @click="selectModuleSurvey(moduleSurvey)"
+                    @click="selectModuleSurvey(_module._id, moduleSurvey)"
                   >
                     <v-list-item-avatar>
                       <v-icon>mdi-forum</v-icon>
@@ -245,34 +245,45 @@ export default {
         })
         .catch(err => {
           _module.loaded = true;
-          console.log(err);
-          swal.fire(err.message, "error");
-        });
-    },
-    selectModuleSurvey(moduleSurvey) {
-      this.showingSurveyStudentList = true;
-      this.selectedSurveyStudentList = null;
-      axios
-        .get(
-          this.$store.state.settings.baseLink +
-            "/survey/get/survey/questions/for/" +
-            moduleSurvey._id
-        )
-        .then(results => {
-          this.isLoading = false;
-          this.selectedSurveyStudentList = results.data;
-          console.log(this.selectedSurveyStudentList);
-        })
-        .catch(err => {
-          this.isLoading = false;
-          console.log(err);
-          this.selectedSurveyStudentList = [];
           if (err.response != null && err.response.status == 512) {
-            swal.fire(err.response.data, "error");
+            swal.fire("", err.response.data, "error");
           } else {
             swal.fire(err.message, "Try again later", "error");
           }
         });
+    },
+    selectModuleSurvey(moduleId, moduleSurvey) {
+      switch (this.$store.state.user.type) {
+        case "STUDENT":
+          this.$router.push(`/module/survey/take/for/${moduleId}`);
+          break;
+        case "LECTURER":
+        case "ADMIN":
+          this.showingSurveyStudentList = true;
+          this.selectedSurveyStudentList = null;
+          axios
+            .get(
+              this.$store.state.settings.baseLink +
+                "/survey/get/survey/questions/for/" +
+                moduleSurvey._id
+            )
+            .then(results => {
+              this.isLoading = false;
+              this.selectedSurveyStudentList = results.data;
+              console.log(this.selectedSurveyStudentList);
+            })
+            .catch(err => {
+              this.isLoading = false;
+              console.log(err);
+              this.selectedSurveyStudentList = [];
+              if (err.response != null && err.response.status == 512) {
+                swal.fire(err.response.data, "error");
+              } else {
+                swal.fire(err.message, "Try again later", "error");
+              }
+            });
+          break;
+      }
     }
   }
 };
@@ -281,4 +292,3 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 </style>
-
