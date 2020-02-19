@@ -313,6 +313,76 @@ router.get("/:id/get", function (req: express.Request, res: express.Response) {
   }
 });
 
+router.post("/add/bulk/students/and/link/to/modules", async (req: express.Request, res: express.Response) => {
+
+  const students = req.body.students;
+  const modules = req.body.modules;
+
+  const dbModules = await Module.find({
+    _id: modules.filter((p: string) => p)
+  });
+  const studentPromises = students.map(async (_student: any) => {
+    try {
+      _student.gender = (_student.gender && _student.gender[0].toLowerCase() == "m") ? "Male" : "Female";
+
+      if (_student.idNumber && _student.idNumber.length == 12) {
+        _student.dob = new Date(
+          _student.idNumber.substring(0, 2),
+          _student.idNumber.substring(2, 4) - 1,
+          _student.idNumber.substring(4, 6)
+        );
+      }
+
+      _student.username = _student.firstname.toLowerCase().replace(/ /g, '') + '-' + _student.lastname.toLowerCase().replace(/ /g, '')
+      _student.password = _student.password ? _student.password : "password";
+
+      var student = new Student({
+        _id: mongoose.Types.ObjectId(),
+        lastname: _student.lastname && _student.lastname.length > 0 ? _student.lastname[0].toUpperCase() + _student.lastname.slice(1).toLowerCase() : _student.lastname,
+        firstname: _student.firstname && _student.firstname.length > 0 ? _student.firstname[0].toUpperCase() + _student.firstname.slice(1).toLowerCase() : _student.firstname,
+        password: GeneratePassword(_student.password),
+        username: _student.username,
+        gender: _student.gender,
+        dob: _student.dob,
+        idNumber: _student.idNumber,
+        isSouthAfrican: true
+      });
+
+      let existingStudent = await Student.findOne({
+        username: student.username
+      });
+      if (!existingStudent) {
+        existingStudent = student;
+      }
+      if (dbModules && dbModules.length > 0) {
+        dbModules.forEach(dbModule => {
+          dbModule.students = dbModule.students.filter((v: string) => v != existingStudent._id)
+          dbModule.students.push(existingStudent._id)
+
+          existingStudent.modules = existingStudent.modules.filter(v => v != dbModule._id);
+          existingStudent.modules.push(dbModule._id)
+        })
+      }
+
+      await existingStudent.save();
+      return true;
+    } catch (ex) {
+      return ex.message
+    }
+  })
+  const resolvedStudents = await Promise.all(studentPromises);
+  const promises = dbModules.map(async dbModule => {
+    try {
+      await dbModule.save()
+      return true;
+    } catch (ex) {
+      return ex.message;
+    }
+  })
+  const resolvedPromises = await Promise.all(promises);
+  return res.json(resolvedPromises.concat(resolvedStudents));
+});
+
 router.post("/add/bulk/students", async function (req: express.Request, res: express.Response) {
 
   const students = req.body.students; var succeded = [], failed = [];
@@ -332,7 +402,7 @@ router.post("/add/bulk/students", async function (req: express.Request, res: exp
       }
 
       _student.username = _student.firstname.toLowerCase().replace(/ /g, '') + '-' + _student.lastname.toLowerCase().replace(/ /g, '')
-      _student.password = _student.lastname.toLowerCase().replace(/ /g, '');
+      _student.password = _student.password ? _student.password : "password";
 
       var student = new Student({
         _id: mongoose.Types.ObjectId(),

@@ -85,7 +85,12 @@
                 </v-select>
               </v-col>
               <v-col cols="12" md="8" offset-md="2">
-                <v-btn block color="secondary" large :loading="isLoading"
+                <v-btn
+                  @click="saveBulkStudents()"
+                  block
+                  color="secondary"
+                  large
+                  :loading="isLoading"
                   >Save Students</v-btn
                 >
               </v-col>
@@ -227,11 +232,11 @@ export default {
     return {
       tab: "tab-single",
       headers: [
-        { value: "firstname",text: "firstname" },
-        { value: "lastname",text: "lastname" },
-        { value: "gender",text: "gender" },
-        { value: "idNumber",text: "idNumber" },
-        { value: "password",text: "password" }
+        { value: "firstname", text: "firstname" },
+        { value: "lastname", text: "lastname" },
+        { value: "gender", text: "gender" },
+        { value: "idNumber", text: "idNumber" },
+        { value: "password", text: "password" }
       ],
       students: [],
       showPassword: false,
@@ -280,6 +285,35 @@ export default {
     this.LoadModules();
   },
   methods: {
+    saveBulkStudents() {
+      this.isLoading = true;
+      axios
+        .post(
+          this.$store.state.settings.baseLink +
+            "/s/add/bulk/students/and/link/to/modules",
+          {
+            students: this.students,
+            modules: this.student.modules
+          }
+        )
+        .then(results => {
+          this.isLoading = false;
+          swal.fire(
+            "",
+            "Students successfully added and linked to the selected modules",
+            "success"
+          );
+          this.$router.back();
+        })
+        .catch(err => {
+          this.isLoading = false;
+          if (err.response != null && err.response.status == 512) {
+            swal.fire("", err.response.data, "error");
+          } else {
+            swal.fire("Unable to save students", "Try again later", "error");
+          }
+        });
+    },
     uploadBulkFromCSV() {
       this.$refs.select_csv.click();
     },
@@ -324,7 +358,6 @@ export default {
           );
         }
       }
-      console.log("We selected a file", file);
     },
     readFile(file) {
       return new Promise(resolve => {
