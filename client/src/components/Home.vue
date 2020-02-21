@@ -380,7 +380,7 @@
     >
       <v-card color="secondary">
         <v-row>
-          <v-col  cols="12" sm="12" md="10">
+          <v-col cols="12" sm="12" md="10">
             <v-card-title class="headline text-white"
               >Change Student</v-card-title
             >
@@ -447,7 +447,7 @@
     >
       <v-card color="secondary">
         <v-row>
-          <v-col  cols="12" sm="12" md="10">
+          <v-col cols="12" sm="12" md="10">
             <v-card-title class="headline text-white"
               >Send an announcement</v-card-title
             >
@@ -550,10 +550,10 @@
     </v-dialog>
 
     <v-row v-if="!$store.state.user.isLoggedIn" class="row mt-10 pt-10">
-      <v-col  cols="12" sm="7" md="9">
+      <v-col cols="12" sm="7" md="9">
         <h4 class="title text-blue px-5">We offer the following services</h4>
       </v-col>
-      <v-col  cols="12" sm="5" md="3" class="mx-auto">
+      <v-col cols="12" sm="5" md="3" class="mx-auto">
         <v-btn
           v-on:click="$router.push('/login')"
           x-large
@@ -727,7 +727,9 @@
               o => o.auth == null || o.auth.indexOf($store.state.user.type) >= 0
             )"
             :key="i"
-            cols="12" xs="12" sm="6"
+            cols="12"
+            xs="12"
+            sm="6"
           >
             <v-card
               v-on:click="goToRoute(option)"
@@ -805,8 +807,7 @@ export default {
         },
         {
           link: "http://ltprivatetutoring.co.za/",
-          img:
-            "http://ltprivatetutoring.co.za/img/logo2.png",
+          img: "http://ltprivatetutoring.co.za/img/logo2.png",
           name: "LT Private Tutoring",
           description: "LT Private Tutoring"
         }
@@ -853,11 +854,11 @@ export default {
           auth: ["STUDENT"]
         },
         {
-          text: "Survey",
+          text: "Surveys",
           description: "Rate the level of the lecturer",
           icon: "mdi-forum",
           link: "/survey/list",
-          auth: ["LECTURER", "ADMIN"]
+          auth: ["STUDENT", "LECTURER", "ADMIN"]
         },
         {
           text: "Students",

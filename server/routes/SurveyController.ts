@@ -153,7 +153,6 @@ router.post("/activate/survey/for/:surveyTemplateId", async function (req: expre
         let expireDate = moment().add(1, 'days');
         const surveyTemplate = await SurveyTemplates.findById(surveyTemplateId);
         const attendance = new Attendance({
-            _id: mongoose.Types.ObjectId(),
             code: generateCode(12),
             moduleId: surveyTemplate.moduleId,
             expireDate,
@@ -163,19 +162,16 @@ router.post("/activate/survey/for/:surveyTemplateId", async function (req: expre
         await attendance.save();
 
         const survey = new Survey({
-            _id: mongoose.Types.ObjectId(),
             surveyTemplateId,
             moduleId: surveyTemplate.moduleId,
             attendanceId: attendance._id,
             students: []
         });
 
-        survey.save(function (err) {
-            if (err) return res.status(512).send('Unable to active survey,please try again');
-            return res.send('Survey successfully activated');
-        });
+        await survey.save()
+        return res.send('Survey successfully activated');
     } catch (err) {
-        console.log(err.message)
+        console.log("The error", err.message)
         return res.status(512).send("Unable to active your survey, please try again later");
     }
 });
@@ -189,7 +185,7 @@ function generateCode(length: number) {
     if (!length || length < 0) length = 5;
     let code = '';
     for (let i = 0; i < length; i++) {
-        code += alphabets[(Math.random() * (alphabets.length - 1))];
+        code += alphabets[Math.floor(Math.random() * (alphabets.length - 1))];
     }
     return code;
 }
