@@ -153,6 +153,7 @@ router.post("/activate/survey/for/:surveyTemplateId", async function (req: expre
         let expireDate = moment().add(1, 'days');
         const surveyTemplate = await SurveyTemplates.findById(surveyTemplateId);
         const attendance = new Attendance({
+            _id: mongoose.Types.ObjectId(),
             code: generateCode(12),
             moduleId: surveyTemplate.moduleId,
             expireDate,
@@ -162,6 +163,7 @@ router.post("/activate/survey/for/:surveyTemplateId", async function (req: expre
         await attendance.save();
 
         const survey = new Survey({
+            _id: mongoose.Types.ObjectId(),
             surveyTemplateId,
             moduleId: surveyTemplate.moduleId,
             attendanceId: attendance._id,

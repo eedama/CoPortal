@@ -240,7 +240,7 @@ export default {
           swal.fire(
             "Successfully created the survey",
             `Students taking ${_module.name} ${_module.code} will be able to take the survey.`,
-            "error"
+            "success"
           );
         })
         .catch(err => {
